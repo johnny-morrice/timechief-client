@@ -10,6 +10,7 @@ function updateDateTimeElementContent() {
     let timeElement = document.getElementById('time');
     let dateElement = document.getElementById('date');
     timeElement.innerText = myDate.toLocaleTimeString();
+    // var dateOption = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     dateElement.innerText = myDate.toLocaleDateString();
 }
 

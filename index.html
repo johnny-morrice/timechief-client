@@ -8,10 +8,24 @@
     <title>Weather Clock</title>
   </head>
   <body>
-    <div id='time'></div>
-    <div id='date'></div>
-    <div id='temperature'>21°c</div>
-    <div id='weather-description'>Sunny</div>
+    <div id="column-flex">
+
+      <div class='flex-element'>
+        <div id='time'></div>
+      </div>
+      <div class='flex-element'>
+        <div id='date'></div>
+      </div>
+    
+    <div id='row-flex'>
+      <div class='flex-element'>
+        <div id='temperature'>21°c</div>
+      </div>
+      <div class='flex-element'>
+        <div id='weather-description'>Sunny</div>
+      </div>
+    </div>
+  </div>
 
     <!-- You can also require other files to run in this process -->
     <script src="./renderer.js"></script>
