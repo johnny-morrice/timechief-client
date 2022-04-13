@@ -10,8 +10,10 @@ function updateDateTimeElementContent() {
     let timeElement = document.getElementById('time');
     let dateElement = document.getElementById('date');
     timeElement.innerText = myDate.toLocaleTimeString();
-    // var dateOption = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    dateElement.innerText = myDate.toLocaleDateString();
+    var dateOptions = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+    var dateText = myDate.toLocaleDateString("en-GB", dateOptions);
+    dateText = dateText.replace(',', '');
+    dateElement.innerText = dateText;
 }
 
 setInterval(updateDateTimeElementContent, 250);
