@@ -1,15 +1,17 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
+const https = require('https');
 
+let mainWindow;
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
+      preload: path.join(__dirname, 'preload.js'),
+    },
   })
 
   // and load the index.html of the app.
@@ -17,7 +19,6 @@ function createWindow () {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
-  mainWindow.removeMenu()
 }
 
 // This method will be called when Electron has finished
@@ -40,5 +41,43 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+function httpGetAsync(hostname, path, callback)
+{
+    const options = {
+        hostname: hostname,
+        port: 443,
+        path: path,
+        method: 'GET'
+    };
+
+    const req = https.request(options, res => {
+        console.log(`statusCode: ${res.statusCode}`);
+
+        res.on('data', d => {
+            callback(d);
+        });
+    })
+
+    req.on('error', error => {
+      console.error(error);
+    });
+
+    req.end();
+}
+
+function getOpenWeather(callback) {
+  let hostname = 'api.openweathermap.org';
+  let path = '/data/2.5/weather?lat=55.953251&lon=-3.188267&appid=' + process.env.OPEN_WEATHER_API_KEY;
+  httpGetAsync(hostname, path, function(responseText) {
+      callback(responseText);
+  });
+}
+
+ipcMain.on("getWeather", (event, args) => {
+  getOpenWeather(function(responseText) {
+    mainWindow.webContents.send("weatherResult", responseText);
+  });
+
+});
+
+process.env.OPEN_WEATHER_API_KEY
