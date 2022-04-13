@@ -56,6 +56,7 @@ window.api.send("getWeather");
 updateDateTimeElementContent();
 setInterval(updateDateTimeElementContent, 250);
 updateWeatherContent();
+setInterval(updateWeatherContent(), 1000 * 60 * 10)
 
 
 // https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
