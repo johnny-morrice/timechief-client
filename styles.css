@@ -15,6 +15,11 @@ div#date {
     font-size: 5em;
 }
 
+div.static-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 5em;
+}
+
 div#debug {
     font-family: 'Share Tech Mono', monospace;
     font-size: 5em;
@@ -35,6 +40,11 @@ div.flex-element {
 }
 
 div#temperature {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 5em;
+}
+
+div#feels-like-temperature {
     font-family: 'Share Tech Mono', monospace;
     font-size: 5em;
 }

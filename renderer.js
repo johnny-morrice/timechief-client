@@ -25,9 +25,31 @@ function updateWeatherContent() {
 window.api.receive("weatherResult", (data) => {
     let debugElement = document.getElementById('debug');
     let resultText = String.fromCharCode(...data);
+    
     let json = JSON.parse(resultText);
-    debugElement.innerText = resultText;
+    let weather = json['weather'][0];
+    // debugElement.innerText = JSON.stringify(weather);
+    let description = weather["description"];
+    let main = json['main'];
+    let temp = main["temp"];
+    let feelsLike = main["feels_like"];
+    let descriptionElement = document.getElementById('weather-description');
+    let tempElement = document.getElementById('temperature');
+    let feelsLikeElement = document.getElementById('feels-like-temperature');
+    descriptionElement.innerText = capitalizeFirstLetter(description);
+    feelsLikeElement.innerText = absoluteTempToCelsiusText(feelsLike);
+    tempElement.innerText = absoluteTempToCelsiusText(temp);
 });
+
+function absoluteTempToCelsiusText(absTemp) {
+    let celsius = absTemp - 273.15;
+    let celsiusText = celsius.toLocaleString(undefined, { maximumFractionDigits: 1, minimumFractionDigits: 1})
+    return `${celsiusText}°c`
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 
 window.api.send("getWeather");
 
