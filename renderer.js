@@ -17,9 +17,7 @@ function updateDateTimeElementContent() {
 }
 
 function updateWeatherContent() {
-    // let url = 'https://api.openweathermap.org/data/2.5/weather?lat=55.953251&lon=-3.188267&appid=' + window.clockData.OPEN_WEATHER_API_KEY;
-    let debugElement = document.getElementById('debug');
-      debugElement.innerText = responseText;
+    window.api.send("getClockData");
 }
 
 window.api.receive("clockDataResult", (data) => {
@@ -47,7 +45,7 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-window.api.send("getClockData");
+updateWeatherContent();
 
 updateDateTimeElementContent();
 setInterval(updateDateTimeElementContent, 250);
