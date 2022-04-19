@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain} = require('electron')
+const { v4: uuidv4 } = require('uuid');
 const path = require('path')
-const https = require('https');
+const axios = require('axios');
 
 let mainWindow;
 function createWindow () {
@@ -41,89 +42,73 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-function httpGetAsync(hostname, path, authHeader, callback)
-{
-    const options = {
-        hostname: hostname,
-        port: 443,
-        path: path,
-        method: 'GET'
-    };
-
-    if (authHeader) {
-      options["headers"] = {
-        "Authorization": authHeader
-      };
-    }
-
-    const req = https.request(options, res => {
-        console.log(`statusCode: ${res.statusCode}`);
-
-        res.on('data', d => {
-            callback(res.statusCode, d);
-        });
-    })
-
-    req.on('error', error => {
-      console.error(error);
-    });
-
-    req.end();
+function addFishTag(options) {
+  options["headers"]["X-Fish-Tag"] = uuidv4();
 }
 
-function httpPostAsync(hostname, path, authHeader, body, callback)
+function addAuthHeader(options, authHeader) {
+  if (authHeader) {
+    options["headers"]["Authorization"] = authHeader;
+  }
+}
+
+function httpGetAsync(url, authHeader, callback)
 {
-    const options = {
-        hostname: hostname,
-        port: 443,
-        path: path,
-        method: 'POST',
-        body: body,
+    const config = {
+      url: url,
+      method: 'get',
+      headers: {},
     };
-
-    if (authHeader) {
-      options["headers"] = {
-        "Authorization": authHeader
-      };
-    }
-
-    const req = https.request(options, res => {
-        console.log(`statusCode: ${res.statusCode}`);
-
-        res.on('data', d => {
-            callback(res.statusCode, d);
-        });
-    })
-
-    req.on('error', error => {
-      console.error(error);
+    addFishTag(config);
+    addAuthHeader(config, authHeader);
+    axios(config).then(function (response) {
+      console.log(`GET ${url} ${response.status}`);
+      callback(response)
     });
+}
 
-    req.end();
+function httpPostAsync(url, authHeader, body, callback)
+{
+  const config = {
+    url: url,
+    method: 'post',
+    data: body,
+    headers: {},
+  };
+  addFishTag(config);
+  addAuthHeader(config, authHeader);
+  axios(config).then(function (response) {
+    console.log(`POST ${url} ${response.status}`);
+    callback(response)
+  });
 }
 
 // TODO make class.
 var jwt = undefined;
 var authorised = false;
 function getClockData(callback) {
-  let hostname = process.env.apiHostname;
   let clockSerial = process.env.clockSerial;
   let clockSecret = process.env.clockSecret;
-  let apiPath = '/api/clockdata'
-  let authnPath = '/authn/token/clock'
+  let baseURL = process.env.clockAPIBaseURL;
+  console.log(`device serial: ${clockSerial}`)
+  console.log(`API Base URL: ${baseURL}`);
+  let apiURL = baseURL + '/api/clockdata';
+  let authnURL = baseURL + '/authn/token/clock';
   let doGetClockData = function () {
-    httpGetAsync(hostname, apiPath, jwt, function(statusCode, clockDataText) {
-      if (statusCode == 401) {
+    httpGetAsync(apiURL, jwt, function(response) {
+      if (response.status == 401) {
+        console.log("unauthorised on clockdata API")
         // TODO helper methods to set jwt and authorization status.
         authorised = false;
         jwt = undefined;
         getClockDataWithAuthorisation();
-      } else if (statusCode = 200) {
-        callback(clockDataText);
+      } else if (response.status = 200) {
+        console.log("successfully hit clockdata API");
+        callback(response.data);
       } else {
         authorised = false;
         jwt = undefined;
-        console.log("bad status getting clock data: " + statusCode);
+        console.log(`bad status getting clock data: ${response.status}`);
       }
     });
   };
@@ -135,21 +120,20 @@ function getClockData(callback) {
     if (authorised) {
       doGetClockData();
     } else {
-      httpPostAsync(hostname, authnPath, undefined, authBody, function(statusCode, tokenData) {
-        if (statusCode == 401) {
+      httpPostAsync(authnURL, undefined, authBody, function(response) {
+        if (response.status == 401) {
           authorised = false;
           jwt = undefined;
           console.log("bad serial or secret");
-        } else if (statusCode == 200) {
-          let tokenText = String.fromCharCode(...data)
-          let token = JSON.parse(tokenText);
-          jwt = token["JWT"];
+        } else if (response.status == 200) {
+          console.log("success getting JWT")
+          jwt = `Bearer ${response.data["JWT"]}`;
           authorised = true;
           doGetClockData()
         } else {
           authorised = false;
           jwt = undefined;
-          console.log("bad status getting jwt: " + statusCode)
+          console.log(`bad status getting jwt: ${response.status}`)
         }
       });
     }

@@ -23,17 +23,12 @@ function updateWeatherContent() {
 }
 
 window.api.receive("clockDataResult", (data) => {
-    let debugElement = document.getElementById('debug');
-    let resultText = String.fromCharCode(...data);
-    debugElement.innerText = resultText;
-    
-    let json = JSON.parse(resultText);
-    let weather = json['weather'][0];
-    // debugElement.innerText = JSON.stringify(weather);
-    let description = weather["description"];
-    let main = json['main'];
-    let temp = main["temp"];
-    let feelsLike = main["feels_like"];
+    // let debugElement = document.getElementById('debug');
+    // debugElement.innerText = JSON.stringify(data);
+    let currentWeather = data["Weather"]["Current"];
+    let temp = currentWeather["Temperature"];
+    let feelsLike = currentWeather["FeelsLikeTemperature"];
+    let description = currentWeather["Description"];
     let descriptionElement = document.getElementById('weather-description');
     let tempElement = document.getElementById('temperature');
     let feelsLikeElement = document.getElementById('feels-like-temperature');
