@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain} = require('electron')
+const { v4: uuidv4 } = require('uuid');
 const path = require('path')
-const https = require('https');
+const axios = require('axios');
 
 let mainWindow;
 function createWindow () {
@@ -41,41 +42,108 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-function httpGetAsync(hostname, path, callback)
-{
-    const options = {
-        hostname: hostname,
-        port: 443,
-        path: path,
-        method: 'GET'
-    };
-
-    const req = https.request(options, res => {
-        console.log(`statusCode: ${res.statusCode}`);
-
-        res.on('data', d => {
-            callback(d);
-        });
-    })
-
-    req.on('error', error => {
-      console.error(error);
-    });
-
-    req.end();
+function addFishTag(options) {
+  options["headers"]["X-Fish-Tag"] = uuidv4();
 }
 
-function getOpenWeather(callback) {
-  let hostname = 'api.openweathermap.org';
-  let path = '/data/2.5/weather?lat=55.953251&lon=-3.188267&appid=' + process.env.OPEN_WEATHER_API_KEY;
-  httpGetAsync(hostname, path, function(responseText) {
-      callback(responseText);
+function addAuthHeader(options, authHeader) {
+  if (authHeader) {
+    options["headers"]["Authorization"] = authHeader;
+  }
+}
+
+function httpGetAsync(url, authHeader, callback)
+{
+    const config = {
+      url: url,
+      method: 'get',
+      headers: {},
+    };
+    addFishTag(config);
+    addAuthHeader(config, authHeader);
+    axios(config).then(function (response) {
+      console.log(`GET ${url} ${response.status}`);
+      callback(response)
+    });
+}
+
+function httpPostAsync(url, authHeader, body, callback)
+{
+  const config = {
+    url: url,
+    method: 'post',
+    data: body,
+    headers: {},
+  };
+  addFishTag(config);
+  addAuthHeader(config, authHeader);
+  axios(config).then(function (response) {
+    console.log(`POST ${url} ${response.status}`);
+    callback(response)
   });
 }
 
-ipcMain.on("getWeather", (event, args) => {
-  getOpenWeather(function(responseText) {
-    mainWindow.webContents.send("weatherResult", responseText);
+// TODO make class.
+var jwt = undefined;
+var authorised = false;
+function getClockData(callback) {
+  let clockSerial = process.env.clockSerial;
+  let clockSecret = process.env.clockSecret;
+  let baseURL = process.env.clockAPIBaseURL;
+  console.log(`device serial: ${clockSerial}`)
+  console.log(`API Base URL: ${baseURL}`);
+  let apiURL = baseURL + '/api/clockdata';
+  let authnURL = baseURL + '/authn/token/clock';
+  let doGetClockData = function () {
+    httpGetAsync(apiURL, jwt, function(response) {
+      if (response.status == 401) {
+        console.log("unauthorised on clockdata API")
+        // TODO helper methods to set jwt and authorization status.
+        authorised = false;
+        jwt = undefined;
+        getClockDataWithAuthorisation();
+      } else if (response.status = 200) {
+        console.log("successfully hit clockdata API");
+        callback(response.data);
+      } else {
+        authorised = false;
+        jwt = undefined;
+        console.log(`bad status getting clock data: ${response.status}`);
+      }
+    });
+  };
+  let authBody = {
+    'DeviceSerial': clockSerial,
+    'DeviceSecret': clockSecret,
+  }
+  let getClockDataWithAuthorisation = function() {
+    if (authorised) {
+      doGetClockData();
+    } else {
+      httpPostAsync(authnURL, undefined, authBody, function(response) {
+        if (response.status == 401) {
+          authorised = false;
+          jwt = undefined;
+          console.log("bad serial or secret");
+        } else if (response.status == 200) {
+          console.log("success getting JWT")
+          jwt = `Bearer ${response.data["JWT"]}`;
+          authorised = true;
+          doGetClockData()
+        } else {
+          authorised = false;
+          jwt = undefined;
+          console.log(`bad status getting jwt: ${response.status}`)
+        }
+      });
+    }
+  };
+  getClockDataWithAuthorisation();
+}
+
+ipcMain.on("getClockData", (event, args) => {
+  getClockData(function(responseText) {
+    mainWindow.webContents.send("clockDataResult", responseText);
   });
 
 });
