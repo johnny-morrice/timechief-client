@@ -1,5 +1,5 @@
 import { render } from "solid-js/web";
-import { createSignal } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 
 function getTimeText() {
   return new Date().toLocaleTimeString();
@@ -7,7 +7,7 @@ function getTimeText() {
 
 function getDateText() {
   let dateOptions = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
-  var dateText = myDate.toLocaleDateString("en-GB", dateOptions);
+  var dateText = new Date().toLocaleDateString("en-GB", dateOptions);
   return dateText.replace(',', '');
 }
 
@@ -18,9 +18,13 @@ function absoluteTempToCelsiusText(absTemp) {
     return `${celsiusText}°c`
 }
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
 const App = () => {
   const [myTime, setMyTime] = createSignal(getTimeText());
-  const [myDate, setMyDate] = createSignal(getDateText())
+  const [myDate, setMyDate] = createSignal(getDateText());
   const [temp, setTemp] = createSignal("");
   const [feelsLikeTemp, setFeelsLikeTemp] = createSignal("");
   const [weatherDescription, setWeatherDescription] = createSignal("");
@@ -60,7 +64,7 @@ const App = () => {
     clearInterval(weatherInterval);
   });
   return <div id="home-screen">
-    <div id="column-flex">
+    <div class="column-flex">
 
       <div class='flex-element'>
         <div id='time'>{myTime}</div>
@@ -69,7 +73,7 @@ const App = () => {
         <div id='date'>{myDate}</div>
       </div>
       
-      <div id='row-flex'>
+      <div class='row-flex'>
         <div class='flex-element'>
           <div id='temperature'>{temp}</div>
         </div>
