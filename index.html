@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
-    <link href="./styles.css" rel="stylesheet">
+    <link href="./static/styles.css" rel="stylesheet">
     <title>Weather Clock</title>
   </head>
   <body>
     <div id='debug'></div>
+    <p>Hello from html</p>
     <div id="app"></div>
-    <script src="./renderer.js"></script>
+    <script src="./src/renderer/renderer.jsx" type="module"></script>
   </body>
 </html>
