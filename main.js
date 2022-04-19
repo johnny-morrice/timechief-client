@@ -3,6 +3,7 @@ const {app, BrowserWindow, ipcMain} = require('electron')
 const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
+const { render, template, insert, createComponent } = require('solid-js/web');
 
 let mainWindow;
 function createWindow () {
