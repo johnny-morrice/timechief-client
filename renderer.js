@@ -22,9 +22,10 @@ function updateWeatherContent() {
       debugElement.innerText = responseText;
 }
 
-window.api.receive("weatherResult", (data) => {
+window.api.receive("clockDataResult", (data) => {
     let debugElement = document.getElementById('debug');
     let resultText = String.fromCharCode(...data);
+    debugElement.innerText = resultText;
     
     let json = JSON.parse(resultText);
     let weather = json['weather'][0];
@@ -51,7 +52,7 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-window.api.send("getWeather");
+window.api.send("getClockData");
 
 updateDateTimeElementContent();
 setInterval(updateDateTimeElementContent, 250);

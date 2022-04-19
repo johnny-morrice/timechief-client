@@ -41,7 +41,7 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-function httpGetAsync(hostname, path, callback)
+function httpGetAsync(hostname, path, authHeader, callback)
 {
     const options = {
         hostname: hostname,
@@ -50,11 +50,17 @@ function httpGetAsync(hostname, path, callback)
         method: 'GET'
     };
 
+    if (authHeader) {
+      options["headers"] = {
+        "Authorization": authHeader
+      };
+    }
+
     const req = https.request(options, res => {
         console.log(`statusCode: ${res.statusCode}`);
 
         res.on('data', d => {
-            callback(d);
+            callback(res.statusCode, d);
         });
     })
 
@@ -65,17 +71,95 @@ function httpGetAsync(hostname, path, callback)
     req.end();
 }
 
-function getOpenWeather(callback) {
-  let hostname = 'api.openweathermap.org';
-  let path = '/data/2.5/weather?lat=55.953251&lon=-3.188267&appid=' + process.env.OPEN_WEATHER_API_KEY;
-  httpGetAsync(hostname, path, function(responseText) {
-      callback(responseText);
-  });
+function httpPostAsync(hostname, path, authHeader, body, callback)
+{
+    const options = {
+        hostname: hostname,
+        port: 443,
+        path: path,
+        method: 'POST',
+        body: body,
+    };
+
+    if (authHeader) {
+      options["headers"] = {
+        "Authorization": authHeader
+      };
+    }
+
+    const req = https.request(options, res => {
+        console.log(`statusCode: ${res.statusCode}`);
+
+        res.on('data', d => {
+            callback(res.statusCode, d);
+        });
+    })
+
+    req.on('error', error => {
+      console.error(error);
+    });
+
+    req.end();
 }
 
-ipcMain.on("getWeather", (event, args) => {
-  getOpenWeather(function(responseText) {
-    mainWindow.webContents.send("weatherResult", responseText);
+// TODO make class.
+var jwt = undefined;
+var authorised = false;
+function getClockData(callback) {
+  let hostname = process.env.apiHostname;
+  let clockSerial = process.env.clockSerial;
+  let clockSecret = process.env.clockSecret;
+  let apiPath = '/api/clockdata'
+  let authnPath = '/authn/token/clock'
+  let doGetClockData = function () {
+    httpGetAsync(hostname, apiPath, jwt, function(statusCode, clockDataText) {
+      if (statusCode == 401) {
+        // TODO helper methods to set jwt and authorization status.
+        authorised = false;
+        jwt = undefined;
+        getClockDataWithAuthorisation();
+      } else if (statusCode = 200) {
+        callback(clockDataText);
+      } else {
+        authorised = false;
+        jwt = undefined;
+        console.log("bad status getting clock data: " + statusCode);
+      }
+    });
+  };
+  let authBody = {
+    'DeviceSerial': clockSerial,
+    'DeviceSecret': clockSecret,
+  }
+  let getClockDataWithAuthorisation = function() {
+    if (authorised) {
+      doGetClockData();
+    } else {
+      httpPostAsync(hostname, authnPath, undefined, authBody, function(statusCode, tokenData) {
+        if (statusCode == 401) {
+          authorised = false;
+          jwt = undefined;
+          console.log("bad serial or secret");
+        } else if (statusCode == 200) {
+          let tokenText = String.fromCharCode(...data)
+          let token = JSON.parse(tokenText);
+          jwt = token["JWT"];
+          authorised = true;
+          doGetClockData()
+        } else {
+          authorised = false;
+          jwt = undefined;
+          console.log("bad status getting jwt: " + statusCode)
+        }
+      });
+    }
+  };
+  getClockDataWithAuthorisation();
+}
+
+ipcMain.on("getClockData", (event, args) => {
+  getClockData(function(responseText) {
+    mainWindow.webContents.send("clockDataResult", responseText);
   });
 
 });
