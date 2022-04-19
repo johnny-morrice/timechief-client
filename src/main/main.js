@@ -3,6 +3,7 @@ const {app, BrowserWindow, ipcMain} = require('electron')
 const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
+const { render, template, insert, createComponent } = require('solid-js/web');
 
 let mainWindow;
 function createWindow () {
@@ -11,12 +12,12 @@ function createWindow () {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, '../renderer/preload.js'),
     },
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('dist/index.html');
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()

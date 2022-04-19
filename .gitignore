@@ -55,3 +55,8 @@ patches/mtime-cache.json
 
 spec/fixtures/logo.png
 env/
+
+target/
+
+# Compiled files
+renderer.js
