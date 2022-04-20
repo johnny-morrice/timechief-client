@@ -1,8 +1,8 @@
-function sendClockDataRequest() {
+export function sendClockDataRequest() {
     window.api.send("getClockData");
 }
 
-var clockDataCallbacks = [];
+const clockDataCallbacks = [];
 function receiveClockData() {
     window.api.receive("clockDataResult", (data) => {
         // let debugElement = document.getElementById('debug');
@@ -24,6 +24,5 @@ export function initializeIPC() {
         tenMinutes
     );
     receiveClockData();
-    sendClockDataRequest();
     return interval;
 }
