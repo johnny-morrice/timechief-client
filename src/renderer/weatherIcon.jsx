@@ -108,9 +108,9 @@ export function weatherIconStyleClass(weatherDescription) {
         case "few clouds":
             return "fa-cloud-sun";
         case "scattered clouds":
-            return "fa-cloud";
+            return "fa-cloud-sun";
         case "broken clouds":
-            return "fa-cloud";
+            return "fa-cloud-sun";
         case "overcast clouds":
             return "fa-cloud";
         default:
