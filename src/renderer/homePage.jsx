@@ -1,6 +1,7 @@
 import { createSignal, Index, onCleanup } from 'solid-js';
 import { addClockDataCallback } from './ipc';
 import { getTaskBarSignals } from './taskbarSignals';
+import { weatherIconStyleClass } from './weatherIcon';
 
 class HomePageSignals {
   constructor() {
@@ -18,10 +19,6 @@ function absoluteTempToCelsiusText(absTemp) {
     let celsiusText = celsius.toLocaleString(undefined, { maximumFractionDigits: 1, minimumFractionDigits: 1})
     return `${celsiusText}°c`
 }
-
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
 
 function getTimeText() {
     return new Date().toLocaleTimeString();
@@ -92,10 +89,10 @@ export const HomePage = () => {
                 <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) =>
                     <div class="row-flex">
                         <div class='flex-element'>
-                            <div class='current-weather-icon'></div>
+                            <div class='current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
                         </div>
                         <div class='flex-element'>
-                            <div class='current-weather-description'>{desc}</div>
+                            <div class='current-weather-description'>{desc()}</div>
                         </div>
                     </div>
                 }</Index>
