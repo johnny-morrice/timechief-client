@@ -3,6 +3,7 @@ import { onCleanup } from 'solid-js';
 import { initializeIPC, sendClockDataRequest } from './ipc';
 import { HomePage } from "./homePage";
 import { ConfigPage } from "./configPage";
+import { TaskBar } from "./taskbar";
 
 const App = () => {
   let ipcInterval = initializeIPC();
@@ -14,6 +15,7 @@ const App = () => {
   return <div id="app-root">
       <HomePage/>
       <ConfigPage/>
+      <TaskBar/>
     </div>
 };
 
