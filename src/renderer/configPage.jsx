@@ -1,5 +1,6 @@
 import { createSignal } from 'solid-js';
 import { addClockDataCallback } from './ipc';
+import { getTaskBarSignals } from './taskbarSignals';
 
 class ConfigPageSignals {
   constructor() {
@@ -28,29 +29,33 @@ function updateConfigPageSignals(signals, data) {
 }
 
 export const ConfigPage = () => {
-  let signals = new ConfigPageSignals();
+  let configSignals = new ConfigPageSignals();
+  let taskBarSignals = getTaskBarSignals();
 
-  addClockDataCallback((data) => updateConfigPageSignals(signals, data));
+  addClockDataCallback((data) => updateConfigPageSignals(configSignals, data));
 
-  return <div id="config-screen">
+  return <div id="config-screen" style={{
+        display: `${taskBarSignals.configDisplayStyle()}` 
+        }}
+        >
         <div class="column-flex">
             <div class='flex-element'>
-                <div id='device-serial'>deviceSerial</div>
+                <div id='device-serial'>{configSignals.deviceSerial}</div>
             </div>
             <div class='flex-element'>
-                <div id='ip-address'>{signals.myIPAddress}</div>
+                <div id='ip-address'>{configSignals.myIPAddress}</div>
             </div>
             <div class='flex-element'>
-                <div id='config-location'>{signals.location}</div>
+                <div id='config-location'>{configSignals.location}</div>
             </div>
             <div class='flex-element'>
-                <div id='config-timezone'>{signals.timezone}</div>
+                <div id='config-timezone'>{configSignals.timezone}</div>
             </div>
             <div class='flex-element'>
-                <div id='config-latitude'>{signals.latitude}</div>
+                <div id='config-latitude'>{configSignals.latitude}</div>
             </div>
             <div class='flex-element'>
-                <div id='config-longitude'>{signals.longitude}</div>
+                <div id='config-longitude'>{configSignals.longitude}</div>
             </div>
         </div>
   </div>;

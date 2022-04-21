@@ -1,5 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addClockDataCallback } from './ipc';
+import { getTaskBarSignals } from './taskbarSignals';
 
 class HomePageSignals {
   constructor() {
@@ -47,14 +48,15 @@ function updateHomePageSignals(signals, data) {
 }
 
 export const HomePage = () => {
-  let signals = new HomePageSignals();
+  let homePageSignals = new HomePageSignals();
+  let taskBarSignals = getTaskBarSignals();
 
-  addClockDataCallback((data) => updateHomePageSignals(signals, data));
+  addClockDataCallback((data) => updateHomePageSignals(homePageSignals, data));
 
   let timeInterval = setInterval(
     () => {
-      signals.setMyTime(getTimeText());
-      signals.setMyDate(getDateText());
+      homePageSignals.setMyTime(getTimeText());
+      homePageSignals.setMyDate(getDateText());
     },
     100
   );
@@ -63,28 +65,31 @@ export const HomePage = () => {
     clearInterval(timeInterval);
   });
 
-  return <div id="home-screen">
+  return <div id="home-screen" style={{
+          display: `${taskBarSignals.homeDisplayStyle()}`
+        }}
+        >
         <div class="column-flex">
             <div class='flex-element'>
-                <div id='home-location'>{signals.location}</div>
+                <div id='home-location'>{homePageSignals.location}</div>
             </div>
             <div class='flex-element'>
-                <div id='time'>{signals.myTime}</div>
+                <div id='time'>{homePageSignals.myTime}</div>
             </div>
             <div class='flex-element'>
-                <div id='date'>{signals.myDate}</div>
+                <div id='date'>{homePageSignals.myDate}</div>
             </div>
 
             <div class='row-flex'>
                 <div class='flex-element'>
-                    <div id='temperature'>{signals.temp}</div>
+                    <div id='temperature'>{homePageSignals.temp}</div>
                 </div>
                 <div class='flex-element'>
-                    <div id='feels-like-temperature'>{signals.feelsLikeTemp}</div>
+                    <div id='feels-like-temperature'>{homePageSignals.feelsLikeTemp}</div>
                 </div>
             </div>
             <div class='flex-element'>
-                <div id='weather-description'>{signals.weatherDescription}</div>
+                <div id='weather-description'>{homePageSignals.weatherDescription}</div>
             </div>
         </div>
     </div>;
