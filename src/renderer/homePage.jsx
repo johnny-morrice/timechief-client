@@ -1,4 +1,4 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createSignal, Index, onCleanup } from 'solid-js';
 import { addClockDataCallback } from './ipc';
 import { getTaskBarSignals } from './taskbarSignals';
 
@@ -8,7 +8,7 @@ class HomePageSignals {
       [this.myDate, this.setMyDate] = createSignal(getDateText());
       [this.temp, this.setTemp] = createSignal("");
       [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
-      [this.weatherDescription, this.setWeatherDescription] = createSignal("");
+      [this.weatherDescriptions, this.setWeatherDescriptions] = createSignal([]);
       [this.location, this.setLocation] = createSignal("")
   }
 }
@@ -38,10 +38,10 @@ function updateHomePageSignals(signals, data) {
     let currentWeather = data["Weather"]["Current"];
     let temp = currentWeather["Temperature"];
     let feelsLike = currentWeather["FeelsLikeTemperature"];
-    let description = currentWeather["Description"];
+    let descriptions = currentWeather["Descriptions"];
     let feelsLikeText = absoluteTempToCelsiusText(feelsLike);
     let tempText = absoluteTempToCelsiusText(temp);
-    signals.setWeatherDescription(capitalizeFirstLetter(description));
+    signals.setWeatherDescriptions(descriptions);
     signals.setFeelsLikeTemp(`feels like ${feelsLikeText}`);
     signals.setTemp(tempText);
     signals.setLocation(location);
@@ -88,8 +88,17 @@ export const HomePage = () => {
                     <div id='feels-like-temperature'>{homePageSignals.feelsLikeTemp}</div>
                 </div>
             </div>
-            <div class='flex-element'>
-                <div id='weather-description'>{homePageSignals.weatherDescription}</div>
+            <div class="column-flex">
+                <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) =>
+                    <div class="row-flex">
+                        <div class='flex-element'>
+                            <div class='current-weather-icon'></div>
+                        </div>
+                        <div class='flex-element'>
+                            <div class='current-weather-description'>{desc}</div>
+                        </div>
+                    </div>
+                }</Index>
             </div>
         </div>
     </div>;
