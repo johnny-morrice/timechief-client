@@ -1,5 +1,4 @@
 export function weatherIconStyleClass(weatherDescription) {
-    console.log("weather description is: " + weatherDescription);
     switch (weatherDescription.toLowerCase()) {
         case "clear sky":
             return "fa-sun";
