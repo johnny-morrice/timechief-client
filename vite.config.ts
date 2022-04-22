@@ -9,5 +9,4 @@ export default defineConfig({
         target: 'esnext',
         polyfillDynamicImport: false,
     }
-    // assetsInclude: ["assets"]
 });
