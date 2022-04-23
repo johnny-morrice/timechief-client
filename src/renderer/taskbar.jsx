@@ -17,6 +17,10 @@ export const TaskBar = () => {
       signals.showScreen("config");
   }
 
+  function onClickForecast() {
+      signals.showScreen("forecast");
+  }
+
   onClickHome();
 
   return <div id="taskbar">
@@ -26,6 +30,9 @@ export const TaskBar = () => {
             </div>
             <div class='flex-element'>
                 <button onClick={onClickConfig}>Config</button>
+            </div>
+            <div class='flex-element'>
+                <button onClick={onClickForecast}>Forecast</button>
             </div>
         </div>
     </div>;

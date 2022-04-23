@@ -26,6 +26,7 @@ function getTimeText() {
   
 function getDateText() {
     let dateOptions = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+    // The clock model on the webservice should include the locale.
     var dateText = new Date().toLocaleDateString("en-GB", dateOptions);
     return dateText.replace(',', '');
 }
