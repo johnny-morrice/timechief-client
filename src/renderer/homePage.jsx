@@ -36,9 +36,10 @@ function updateHomePageSignals(signals, data) {
     let temp = currentWeather["temp"];
     let feelsLike = currentWeather["feels_like"];
     let descriptions = [];
-    currentWeather["weather"].foreach((w) => {
-        descriptions.push("description");
-    });
+    let weatherConditions = currentWeather["weather"];
+    for (var i = 0; i < weatherConditions.length; i++) {
+        descriptions.push(weatherConditions[i]["description"]);
+    }
     let feelsLikeText = absoluteTempToCelsiusText(feelsLike);
     let tempText = absoluteTempToCelsiusText(temp);
     signals.setWeatherDescriptions(descriptions);
