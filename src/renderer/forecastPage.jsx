@@ -38,7 +38,6 @@ function updateForecastPageSignals(signals, data) {
         let dt = forecast["dt"];
         let dateText = parseUnixDate(dt);
         
-        console.log(`dateText: ${dateText}`);
         daySignals.setDate(dateText);
         let temp = forecast["temp"];
         let mornTemp = temp["morn"];
@@ -50,7 +49,6 @@ function updateForecastPageSignals(signals, data) {
         let dayFeelsLike = feelsLike["day"];
         let eveFeelsLike = feelsLike["eve"];
         let nightFeelsLike = feelsLike["night"];
-        console.log("here 4")
         daySignals.setMornTemp(kelvinToCelsiusText(mornTemp));
         daySignals.setDayTemp(kelvinToCelsiusText(dayTemp));
         daySignals.setEveTemp(kelvinToCelsiusText(eveTemp));

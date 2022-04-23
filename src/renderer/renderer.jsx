@@ -5,6 +5,7 @@ import { HomePage } from "./homePage";
 import { ConfigPage } from "./configPage";
 import { TaskBar } from "./taskbar";
 import { ForecastPage } from "./forecastPage";
+import { AstroPage } from "./astroPage";
 
 const App = () => {
   let ipcInterval = initializeIPC();
@@ -17,6 +18,7 @@ const App = () => {
       <HomePage/>
       <ForecastPage/>
       <ConfigPage/>
+      <AstroPage/>
       <TaskBar/>
     </div>
 };
