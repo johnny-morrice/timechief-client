@@ -4,6 +4,7 @@ import { initializeIPC, sendClockDataRequest } from './ipc';
 import { HomePage } from "./homePage";
 import { ConfigPage } from "./configPage";
 import { TaskBar } from "./taskbar";
+import { ForecastPage } from "./forecastPage";
 
 const App = () => {
   let ipcInterval = initializeIPC();
@@ -14,6 +15,7 @@ const App = () => {
 
   return <div id="app-root">
       <HomePage/>
+      <ForecastPage/>
       <ConfigPage/>
       <TaskBar/>
     </div>

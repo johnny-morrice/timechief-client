@@ -2,6 +2,7 @@ import { createSignal, Index, onCleanup } from 'solid-js';
 import { addClockDataCallback } from './ipc';
 import { getTaskBarSignals } from './taskbarSignals';
 import { weatherIconStyleClass } from './weatherIcon';
+import { kelvinToCelsiusText } from './temperature';
 
 class HomePageSignals {
   constructor() {
@@ -14,18 +15,13 @@ class HomePageSignals {
   }
 }
 
-function absoluteTempToCelsiusText(absTemp) {
-    let celsius = absTemp - 273.15;
-    let celsiusText = celsius.toLocaleString(undefined, { maximumFractionDigits: 1, minimumFractionDigits: 1})
-    return `${celsiusText}°c`
-}
-
 function getTimeText() {
     return new Date().toLocaleTimeString();
 }
   
 function getDateText() {
     let dateOptions = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+    // The clock model on the webservice should include the locale.
     var dateText = new Date().toLocaleDateString("en-GB", dateOptions);
     return dateText.replace(',', '');
 }
@@ -40,8 +36,8 @@ function updateHomePageSignals(signals, data) {
     for (var i = 0; i < weatherConditions.length; i++) {
         descriptions.push(weatherConditions[i]["description"]);
     }
-    let feelsLikeText = absoluteTempToCelsiusText(feelsLike);
-    let tempText = absoluteTempToCelsiusText(temp);
+    let feelsLikeText = kelvinToCelsiusText(feelsLike);
+    let tempText = kelvinToCelsiusText(temp);
     signals.setWeatherDescriptions(descriptions);
     signals.setFeelsLikeTemp(`feels like ${feelsLikeText}`);
     signals.setTemp(tempText);
@@ -90,8 +86,9 @@ export const HomePage = () => {
                 </div>
             </div>
             <div class="column-flex">
-                <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) =>
-                    <div class="row-flex">
+                <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
+                    console.log(`home page description: ${desc()}`);
+                    return <div class="row-flex">
                         <div class='flex-element'>
                             <div class='current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
                         </div>
@@ -99,7 +96,7 @@ export const HomePage = () => {
                             <div class='current-weather-description'>{desc()}</div>
                         </div>
                     </div>
-                }</Index>
+                }}</Index>
             </div>
         </div>
     </div>;
