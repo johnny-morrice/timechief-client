@@ -32,10 +32,13 @@ function getDateText() {
 
 function updateHomePageSignals(signals, data) {
     let location = data["Clock"]["Location"];
-    let currentWeather = data["Weather"]["Current"];
-    let temp = currentWeather["Temperature"];
-    let feelsLike = currentWeather["FeelsLikeTemperature"];
-    let descriptions = currentWeather["Descriptions"];
+    let currentWeather = data["Weather"]["current"];
+    let temp = currentWeather["temp"];
+    let feelsLike = currentWeather["feels_like"];
+    let descriptions = [];
+    currentWeather["weather"].foreach((w) => {
+        descriptions.push("description");
+    });
     let feelsLikeText = absoluteTempToCelsiusText(feelsLike);
     let tempText = absoluteTempToCelsiusText(temp);
     signals.setWeatherDescriptions(descriptions);
