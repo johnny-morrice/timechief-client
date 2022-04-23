@@ -15,7 +15,6 @@ class AstroPageSignals {
 
 function updateAstroPageSignals(signals, data) {
     let daily = data["Weather"]["daily"];
-    console.log(daily);
     if (daily.length > 0) {
         let today = daily[0];
         let sunriseUnix = today["sunrise"];
