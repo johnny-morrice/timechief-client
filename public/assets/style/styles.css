@@ -25,9 +25,22 @@ body {
     font-family: 'Titillium Web';
 }
 
-.section-name {
+div.table-color-flip {
+    background-color: green;
+    color: black;
+}
+
+div.fat {
+    padding: 0.5em;
+}
+
+div.section-name {
     font-weight: bold;
     font-size: 16pt;
+}
+
+div.data-name {
+    font-weight: bold;
 }
 
 div#home-location {
