@@ -79,6 +79,11 @@ div#home-data {
     margin-top: 75pt;
 }
 
+div.underline {
+    padding-bottom: 10pt;
+    border-bottom: 2pt solid green;
+}
+
 div.time-border {
     border-left: 2pt solid green;
     padding-top: 75pt;

@@ -81,7 +81,7 @@ export const AstroPage = () => {
         }}
         >
         <div class="column-flex">
-            <div class="flex-element section-name">Astronomical Data</div>
+            <div class="flex-element section-name underline">Astronomical Data</div>
             <div class='row-flex flex-element'>
                 <div class="flex-element data-name">Sunrise</div>
                 <div class="flex-element data-value">{astroSignals.sunrise}</div>
