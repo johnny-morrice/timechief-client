@@ -67,25 +67,17 @@ export const HomePage = () => {
         }}
         >
         <div class="column-flex">
-            <div class='flex-element'>
-                <div id='home-location'>{homePageSignals.location}</div>
-            </div>
-            <div class='flex-element'>
-                <div id='time'>{homePageSignals.myTime}</div>
-            </div>
-            <div class='flex-element'>
-                <div id='date'>{homePageSignals.myDate}</div>
-            </div>
+            <div class='flex-element' id='home-location'>{homePageSignals.location}</div>
+            <div class='flex-element' id='time'>{homePageSignals.myTime}</div>
+            <div class='flex-element' id='date'>{homePageSignals.myDate}</div>
 
             <div class='row-flex'>
-                <div class='flex-element'>
-                    <div id='temperature'>{homePageSignals.temp}</div>
-                </div>
-                <div class='flex-element'>
-                    <div id='feels-like-temperature'>{homePageSignals.feelsLikeTemp}</div>
-                </div>
+                <div class='section-name'>Temperature</div>
+                <div class='flex-element' id='temperature'>{homePageSignals.temp}</div>
+                <div class='flex-element' id='feels-like-temperature'>{homePageSignals.feelsLikeTemp}</div>
             </div>
             <div class="column-flex">
+                <div class='section-name'>Weather today</div>
                 <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
                     console.log(`home page description: ${desc()}`);
                     return <div class="row-flex">
