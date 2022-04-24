@@ -16,7 +16,17 @@
     font-display: swap;
 }
 
+button {
+    background-color: green;
+    color: black;
+    border: none;
+    padding: 10pt;
+    font-size: 22pt;
+}
 
+div#taskbar {
+    margin-top: 10pt;
+}
 
 body {
     background-color: black;
@@ -31,7 +41,7 @@ div.table-color-flip {
 }
 
 div.fat {
-    padding: 0.5em;
+    padding: 10pt;
 }
 
 div.section-name {
@@ -50,7 +60,7 @@ div#home-location {
 
 div#time {
     font-family: 'Share Tech Mono';
-    font-size: 22pt;
+    font-size: 60pt;
 }
 
 div.weather-icon {
@@ -68,9 +78,9 @@ div.row-flex {
 }
 
 div.column-flex > div.flex-element {
-    padding-bottom: 1em;
+    margin-bottom: 10pt;
 }
 
 div.row-flex > div.flex-element {
-    padding-right: 1em;
+    margin-right: 10pt;
 }
