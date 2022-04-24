@@ -1,10 +1,10 @@
-import { createSignal } from 'solid-js';
+import { createSignal, Show } from 'solid-js';
 import { addClockDataCallback } from './ipc';
 import { getTaskBarSignals } from './taskbarSignals';
 import { kelvinToCelsiusText } from './temperature';
 import { weatherIconStyleClass } from './weatherIcon';
 
-let dayForecastCount = 5;
+let dayForecastCount = 3;
 class ForecastPageSignals {
   constructor() {
     this.days = [];
@@ -79,33 +79,47 @@ export const ForecastPage = () => {
 
   addClockDataCallback((data) => updateForecastPageSignals(forecastSignals, data));
 
+  function weatherColumnClass(i) {
+      if (i % 2 == 0) {
+        return 'column-flex fat'
+      }
+      return 'column-flex fat table-color-flip';
+  }
+
   return <div id="forecast-screen" style={{
         display: `${taskBarSignals.forecastDisplayStyle()}` 
         }}
         >
             <div class="row-flex">
-                <For each={forecastSignals.days}>{(day, i) =>
-                    <div class='column-flex'>
-                        <div class='flex-element'>
-                            <div class="forecast-date">{day.date}</div>
-                        </div>
-                        <div class='row-flex'>
-                            <div class="column-flex">
+                <For each={forecastSignals.days}>{(day, i) => 
+                    <div class={weatherColumnClass(i())}>
+                        <div class="flex-element section-name">{day.date}</div>
+                        <div class='row-flex flex-element'>
+                            <div class="column-flex flex-element">
                                 <div class='flex-element'>Temperature</div>
                                 <div class='row-flex'>
-                                    <div class='flex-element'>Morn</div>
+                                    <Show when={i() == 0}>
+                                        <div class='flex-element data-name'>Morn</div>
+                                    </Show>
                                     <div class='flex-element'>{day.mornTemp}</div>
                                 </div>
                                 <div class='row-flex'>
-                                    <div class='flex-element'>Day</div>
+                                    <Show when={i() == 0}>
+                                        <div class='flex-element data-name'>Day</div>
+                                    </Show>
+                                    
                                     <div class='flex-element'>{day.dayTemp}</div>
                                 </div>
                                 <div class='row-flex'>
-                                    <div class='flex-element'>Eve</div>
+                                    <Show when={i() == 0}>
+                                        <div class='flex-element data-name'>Eve</div>
+                                    </Show>
                                     <div class='flex-element'>{day.eveTemp}</div>
                                 </div>
                                 <div class='row-flex'>
-                                    <div class='flex-element'>Night</div>
+                                    <Show when={i() == 0}>
+                                        <div class='flex-element data-name'>Night</div>
+                                    </Show>
                                     <div class='flex-element'>{day.nightTemp}</div>
                                 </div>
                             </div>
@@ -129,15 +143,11 @@ export const ForecastPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <Index each={day.weatherDescriptions()}>{(desc, i) =>
+                        <Index each={day.weatherDescriptions()}>{(desc, j) =>
                             <div class="row-flex">
-                            <div class='flex-element'>
-                                <div class='current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
+                                <div class='flex-element weather-icon'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
+                                <div class='flex-element'>{desc()}</div>
                             </div>
-                            <div class='flex-element'>
-                                <div class='current-weather-description'>{desc()}</div>
-                            </div>
-                        </div>
                         }</Index>
                     </div>
                 }</For>

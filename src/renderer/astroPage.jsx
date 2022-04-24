@@ -81,23 +81,24 @@ export const AstroPage = () => {
         }}
         >
         <div class="column-flex">
-            <div class='row-flex'>
+            <div class="flex-element section-name">Astronomical Data</div>
+            <div class='row-flex flex-element'>
                 <div class="flex-element data-name">Sunrise</div>
                 <div class="flex-element data-value">{astroSignals.sunrise}</div>
             </div>
-            <div class='row-flex'>
+            <div class='row-flex flex-element'>
                 <div class="flex-element data-name">Sunset</div>
                 <div class="flex-element data-value">{astroSignals.sunset}</div>
             </div>
-            <div class='row-flex'>
+            <div class='row-flex flex-element'>
                 <div class="flex-element data-name">Moonrise</div>
                 <div class="flex-element data-value">{astroSignals.moonrise}</div>
             </div>
-            <div class='row-flex'>
+            <div class='row-flex flex-element'>
                 <div class="flex-element data-name">Moonset</div>
                 <div class="flex-element data-value">{astroSignals.moonset}</div>
             </div>
-            <div class='row-flex'>
+            <div class='row-flex flex-element'>
                 <div class="flex-element data-name">Moon Phase</div>
                 <div class="flex-element data-value">{moonPhaseDescription(astroSignals.moonPhase())}</div>
             </div>

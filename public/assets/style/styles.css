@@ -1,7 +1,70 @@
-body {
-    background-color: white;
+@font-face {
+    font-family: 'Share Tech Mono';
+    src: url('../webfonts/ShareTechMono-Regular.woff2') format('woff2'),
+        url('../webfonts/ShareTechMono-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    src: url('../webfonts/TitilliumWeb-Regular.woff2') format('woff2'),
+        url('../webfonts/TitilliumWeb-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+button {
+    background-color: green;
     color: black;
-    /* font-family: 'Share Tech Mono', monospace; */
+    border: none;
+    padding: 10pt;
+    font-size: 22pt;
+}
+
+div#taskbar {
+    margin-top: 10pt;
+}
+
+body {
+    background-color: black;
+    color: green;
+    font-size: 14pt;
+    font-family: 'Titillium Web';
+}
+
+div.table-color-flip {
+    background-color: green;
+    color: black;
+}
+
+div.fat {
+    padding: 10pt;
+}
+
+div.section-name {
+    font-weight: bold;
+    font-size: 16pt;
+}
+
+div.data-name {
+    font-weight: bold;
+}
+
+div#home-location {
+    font-weight: bold;
+    font-size: 18pt;
+}
+
+div#time {
+    font-family: 'Share Tech Mono';
+    font-size: 60pt;
+}
+
+div.weather-icon {
+    font-size: 30pt;
 }
 
 div.column-flex {
@@ -14,6 +77,10 @@ div.row-flex {
     flex: row;
 }
 
-div.flex-element {
-    padding: 1em;
+div.column-flex > div.flex-element {
+    margin-bottom: 10pt;
+}
+
+div.row-flex > div.flex-element {
+    margin-right: 10pt;
 }
