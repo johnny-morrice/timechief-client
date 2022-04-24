@@ -39,23 +39,26 @@ export const ConfigPage = () => {
         }}
         >
         <div class="column-flex">
-            <div class='flex-element'>
-                <div id='device-serial'>{configSignals.deviceSerial}</div>
+            <div class='flex-element section-name'>Settings</div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Device Serial Number</div>
+                <div class='flex-element'>{configSignals.deviceSerial}</div>
             </div>
-            <div class='flex-element'>
-                <div id='ip-address'>{configSignals.myIPAddress}</div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Device IP Address</div>
+                <div class='flex-element'>{configSignals.myIPAddress}</div>
             </div>
-            <div class='flex-element'>
-                <div id='config-location'>{configSignals.location}</div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Device Location</div>
+                <div class='flex-element'>{configSignals.location}</div>
             </div>
-            <div class='flex-element'>
-                <div id='config-timezone'>{configSignals.timezone}</div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Device Timezone</div>
+                <div class='flex-element'>{configSignals.timezone}</div>
             </div>
-            <div class='flex-element'>
-                <div id='config-latitude'>{configSignals.latitude}</div>
-            </div>
-            <div class='flex-element'>
-                <div id='config-longitude'>{configSignals.longitude}</div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Device coordinates</div>
+                <div class='flex-element'>{configSignals.latitude}, {configSignals.longitude}</div> 
             </div>
         </div>
   </div>;
