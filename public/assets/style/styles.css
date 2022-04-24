@@ -16,6 +16,14 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Seven Segment';
+    src: url('../webfonts/7segment.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 button {
     background-color: green;
     color: black;
@@ -55,12 +63,32 @@ div.data-name {
 
 div#home-location {
     font-weight: bold;
-    font-size: 18pt;
+    font-size: 30pt;
 }
 
 div#time {
-    font-family: 'Share Tech Mono';
-    font-size: 60pt;
+    font-family: 'Seven Segment';
+    font-size: 100pt;
+}
+
+div#date {
+    font-size: 30pt;
+}
+
+div#home-data {
+    margin-top: 75pt;
+}
+
+div.underline {
+    padding-bottom: 10pt;
+    border-bottom: 2pt solid green;
+}
+
+div.time-border {
+    border-left: 2pt solid green;
+    padding-top: 75pt;
+    padding-bottom: 75pt;
+    padding-left: 20pt;
 }
 
 div.weather-icon {

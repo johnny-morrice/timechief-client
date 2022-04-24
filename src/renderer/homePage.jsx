@@ -66,26 +66,29 @@ export const HomePage = () => {
           display: `${taskBarSignals.homeDisplayStyle()}`
         }}
         >
-        <div class="column-flex">
-            <div class='flex-element' id='time'>{homePageSignals.myTime}</div>
-            <div class='flex-element' id='home-location'>{homePageSignals.location}</div>
-            <div class='flex-element' id='date'>{homePageSignals.myDate}</div>
-
-            <div class='section-name flex-element'>Temperature</div>
-            <div class='row-flex flex-element'>
-                <div class='flex-element' id='temperature'>{homePageSignals.temp}</div>
-                <div class='flex-element' id='feels-like-temperature'>{homePageSignals.feelsLikeTemp}</div>
-            </div>
-            <div class="column-flex">
-                <div class='section-name flex-element'>Weather today</div>
-                <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
-                    console.log(`home page description: ${desc()}`);
-                    return <div class="row-flex flex-element">
-                            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
-                            <div class='current-weather-description flex-element'>{desc()}</div>
-                    </div>
-                }}</Index>
-            </div>
+        <div class="row-flex">
+          <div class="flex-element column-flex" id="home-data">
+              <div class='section-name flex-element'>Temperature</div>
+              <div class='row-flex flex-element'>
+                  <div class='flex-element' id='temperature'>{homePageSignals.temp}</div>
+                  <div class='flex-element' id='feels-like-temperature'>{homePageSignals.feelsLikeTemp}</div>
+              </div>
+              <div class="column-flex">
+                  <div class='section-name flex-element'>Weather today</div>
+                  <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
+                      console.log(`home page description: ${desc()}`);
+                      return <div class="row-flex flex-element">
+                              <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
+                              <div class='current-weather-description flex-element'>{desc()}</div>
+                      </div>
+                  }}</Index>
+              </div>
+          </div>
+          <div class='flex-element column-flex time-border'>
+            <div id='time'>{homePageSignals.myTime}</div>
+            <div id='date'>{homePageSignals.myDate}</div>
+            <div id='home-location'>{homePageSignals.location}</div>
+          </div>
         </div>
     </div>;
 };

@@ -39,7 +39,7 @@ export const ConfigPage = () => {
         }}
         >
         <div class="column-flex">
-            <div class='flex-element section-name'>Settings</div>
+            <div class='flex-element section-name underline'>Settings</div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device Serial Number</div>
                 <div class='flex-element'>{configSignals.deviceSerial}</div>
