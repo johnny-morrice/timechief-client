@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addClockDataCallback, addRedeployCallback } from './ipc';
+import { addClockDataCallback, addRedeployCallback, triggerRedeploy } from './ipc';
 import { getTaskBarSignals } from './taskbarSignals';
 
 class ConfigPageSignals {
@@ -16,7 +16,7 @@ class ConfigPageSignals {
 class RedeploySignals {
     constructor() {
         [this.isDeployEnabled, this.setDeployEnabled] = createSignal(false);
-        [this.deployStatus, this.setDeployStatus] = createSignal("");
+        [this.deployStatus, this.setDeployStatus] = createSignal("unknown");
     }
 }
 
@@ -35,20 +35,20 @@ function updateConfigPageSignals(signals, data) {
     signals.setTimezone(timezone);
 }
 
-function updateRedeploySignals(signals, data) {
-    let isEnabled = data['redeploy_enabled'];
-    var status = data['status'];
-    signals.setEnabled(isEnabled);
+function updateRedeploySignals(signals, status) {
+    let isEnabled = status['redeploy_enabled'];
+    var status = status['status'];
+    signals.setDeployEnabled(isEnabled);
     signals.setDeployStatus(status);
 }
 
 export const ConfigPage = () => {
   let configSignals = new ConfigPageSignals();
-  let deploySignals = new RedeploySignals();
+  let redeploySignals = new RedeploySignals();
   let taskBarSignals = getTaskBarSignals();
 
   addClockDataCallback((data) => updateConfigPageSignals(configSignals, data));
-  addRedeployCallback((data) => updateRedeploySignals(updateRedeploySignals(deploySignals, data)));
+  addRedeployCallback((status) => updateRedeploySignals(redeploySignals, status));
 
   return <div id="config-screen" style={{
         display: `${taskBarSignals.configDisplayStyle()}` 
@@ -56,10 +56,14 @@ export const ConfigPage = () => {
         >
         <div class="column-flex">
             <div class='flex-element section-name underline'>Settings</div>
-            <Show when={deploySignals.isDeployEnabled()}>
+            <Show when={redeploySignals.isDeployEnabled()}>
                 <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Redeploy</div>
-                    <button class='flex-element' onClick={triggerRedeploy()}><i class='fa-solid fa-refresh'></i></button>
+                    <div class='flex-element data-name'>Redeploy device</div>
+                    <button class='flex-element' onClick={triggerRedeploy}><i class='fa-solid fa-refresh'></i></button>
+                </div>
+                <div class='row-flex flex-element'>
+                    <div class='flex-element data-name'>Redeploy status</div>
+                    <div class='flex-element'>{redeploySignals.deployStatus}</div>
                 </div>
             </Show>
             <div class='row-flex flex-element'>

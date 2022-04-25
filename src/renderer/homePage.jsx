@@ -76,7 +76,6 @@ export const HomePage = () => {
               <div class="column-flex">
                   <div class='section-name flex-element'>Weather today</div>
                   <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
-                      console.log(`home page description: ${desc()}`);
                       return <div class="row-flex flex-element">
                               <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
                               <div class='current-weather-description flex-element'>{desc()}</div>

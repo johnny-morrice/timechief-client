@@ -16,13 +16,19 @@ function receiveClockData() {
 const redeployCallbacks = [];
 function receiveRedeployStatus() {
     window.dev.receive("redeployStatus", (status) => {
+        console.log(`redeploy status: ${status}`)
         redeployCallbacks.forEach(cb => {
-            cb(data)
+            cb(status)
         });
     });
 }
 
-function triggerRedeploy() {
+function sendInit() {
+    window.init.send('init');
+}
+
+export function triggerRedeploy() {
+    console.log("triggering redeploy...");
     window.dev.send('redeploy');
 }
 
@@ -40,6 +46,7 @@ export function initializeIPC() {
         sendClockDataRequest,
         tenMinutes
     );
+    sendInit();
     receiveRedeployStatus();
     receiveClockData();
     return interval;

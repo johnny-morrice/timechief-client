@@ -28,6 +28,9 @@ button {
     background-color: green;
     color: black;
     border: none;
+}
+
+button.nav-button {
     padding: 10pt;
     font-size: 22pt;
 }

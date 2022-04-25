@@ -5,6 +5,8 @@ const path = require('path')
 const axios = require('axios');
 const { exec } = require('child_process');
 
+let isDevMode = process.env.devMode == 'true';
+
 let mainWindow;
 function createWindow () {
   // Create the browser window.
@@ -18,16 +20,13 @@ function createWindow () {
 
   // and load the index.html of the app.
   mainWindow.loadFile('dist/index.html');
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow()
+  createWindow();
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -143,7 +142,7 @@ function getClockData(callback) {
 }
 
 function redeployDevEnvironment(callback) {
-  exec('./script/redeployDevEnvironment.sh', (err, stdout, stderr) => {
+  exec(process.env.redeployCommand, (err, stdout, stderr) => {
     if (err) {
       callback({'redeploy_enabled': true, 'status': "fail", 'error': err});
     } else {
@@ -156,14 +155,22 @@ function redeployDevEnvironment(callback) {
   });
 }
 
+function sendInitialRedeployStatus() {
+  let initialRedeployStatus = {'redeploy_enabled': isDevMode, 'status': "not started"};
+  mainWindow.webContents.send("redeployStatus", initialRedeployStatus);
+}
+
+ipcMain.on('init', (event, args) => {
+  sendInitialRedeployStatus();
+  mainWindow.webContents.send("initStatus", {'init_status': "ok"});
+})
+
 ipcMain.on("getClockData", (event, args) => {
   getClockData(function(clockDataResult) {
     mainWindow.webContents.send("clockDataResult", clockDataResult);
   });
 });
 
-let isDevMode = process.env.devMode == 'true';
-mainWindow.webContents.send('redeployStatus', {'redeploy_enabled': isDevMode, 'status': "not started"});
 if (isDevMode) {
   ipcMain.on("redeploy", (event, args) => {
     redeployDevEnvironment(function(redeployStatus) {
@@ -171,5 +178,3 @@ if (isDevMode) {
     });
   });
 }
-
-process.env.OPEN_WEATHER_API_KEY
