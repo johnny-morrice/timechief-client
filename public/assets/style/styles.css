@@ -24,6 +24,11 @@
     font-display: swap;
 }
 
+body {
+    margin: 0px;
+    padding: 0px;
+}
+
 button {
     background-color: green;
     color: black;
@@ -37,6 +42,8 @@ button.nav-button {
 
 div#taskbar {
     margin-top: 10pt;
+    position: fixed;
+    bottom: 0;
 }
 
 body {
@@ -71,11 +78,11 @@ div#home-location {
 
 div#time {
     font-family: 'Seven Segment';
-    font-size: 100pt;
+    font-size: 80pt;
 }
 
 div#date {
-    font-size: 30pt;
+    font-size: 26pt;
 }
 
 div#home-data {
@@ -89,8 +96,8 @@ div.underline {
 
 div.time-border {
     border-left: 2pt solid green;
-    padding-top: 75pt;
-    padding-bottom: 75pt;
+    padding-top: 50pt;
+    padding-bottom: 50pt;
     padding-left: 20pt;
 }
 
