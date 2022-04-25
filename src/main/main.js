@@ -3,6 +3,9 @@ const {app, BrowserWindow, ipcMain} = require('electron')
 const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
+const { exec } = require('child_process');
+
+let isDevMode = process.env.devMode == 'true';
 
 let mainWindow;
 function createWindow () {
@@ -17,16 +20,13 @@ function createWindow () {
 
   // and load the index.html of the app.
   mainWindow.loadFile('dist/index.html');
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow()
+  createWindow();
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -141,11 +141,40 @@ function getClockData(callback) {
   getClockDataWithAuthorisation();
 }
 
-ipcMain.on("getClockData", (event, args) => {
-  getClockData(function(responseText) {
-    mainWindow.webContents.send("clockDataResult", responseText);
+function redeployDevEnvironment(callback) {
+  exec(process.env.redeployCommand, (err, stdout, stderr) => {
+    if (err) {
+      callback({'redeploy_enabled': true, 'status': "fail", 'error': err});
+    } else {
+      callback({'redeploy_enabled': true, 'status': "ok"});
+    }
+  
+    // the *entire* stdout and stderr (buffered)
+    console.log(`redeploy stdout: ${stdout}`);
+    console.log(`redeploy stderr: ${stderr}`);
   });
+}
 
+function sendInitialRedeployStatus() {
+  let initialRedeployStatus = {'redeploy_enabled': isDevMode, 'status': "not started"};
+  mainWindow.webContents.send("redeployStatus", initialRedeployStatus);
+}
+
+ipcMain.on('init', (event, args) => {
+  sendInitialRedeployStatus();
+  mainWindow.webContents.send("initStatus", {'init_status': "ok"});
+})
+
+ipcMain.on("getClockData", (event, args) => {
+  getClockData(function(clockDataResult) {
+    mainWindow.webContents.send("clockDataResult", clockDataResult);
+  });
 });
 
-process.env.OPEN_WEATHER_API_KEY
+if (isDevMode) {
+  ipcMain.on("redeploy", (event, args) => {
+    redeployDevEnvironment(function(redeployStatus) {
+      mainWindow.webContents.send("redeployStatus", redeployStatus);
+    });
+  });
+}

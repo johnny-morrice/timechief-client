@@ -30,16 +30,16 @@ export const TaskBar = () => {
   return <div id="taskbar">
         <div class="row-flex">
             <div class='flex-element'>
-                <button onClick={onClickHome}><i class="fa-solid fa-home"></i></button>
+                <button class='nav-button' onClick={onClickHome}><i class="fa-solid fa-home"></i></button>
             </div>
             <div class='flex-element'>
-                <button onClick={onClickForecast}><i class="fa-solid fa-cloud-sun"></i></button>
+                <button class='nav-button' onClick={onClickForecast}><i class="fa-solid fa-cloud-sun"></i></button>
             </div>
             <div class='flex-element'>
-                <button onClick={onClickAstro}><i class="fa-solid fa-moon"></i></button>
+                <button class='nav-button' onClick={onClickAstro}><i class="fa-solid fa-moon"></i></button>
             </div>
             <div class='flex-element'>
-                <button onClick={onClickConfig}><i class="fa-solid fa-gear"></i></button>
+                <button class='nav-button' onClick={onClickConfig}><i class="fa-solid fa-gear"></i></button>
             </div>
         </div>
     </div>;
