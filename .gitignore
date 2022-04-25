@@ -60,3 +60,5 @@ target/
 
 # Compiled files
 renderer.js
+
+*.log
