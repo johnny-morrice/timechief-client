@@ -13,6 +13,23 @@ function receiveClockData() {
     });
 }
 
+const redeployCallbacks = [];
+function receiveRedeployStatus() {
+    window.dev.receive("redeployStatus", (status) => {
+        redeployCallbacks.forEach(cb => {
+            cb(data)
+        });
+    });
+}
+
+function triggerRedeploy() {
+    window.dev.send('redeploy');
+}
+
+export function addRedeployCallback(callback) {
+    redeployCallbacks.push(callback);
+}
+
 export function addClockDataCallback(callback) {
     clockDataCallbacks.push(callback);
 }
@@ -23,6 +40,7 @@ export function initializeIPC() {
         sendClockDataRequest,
         tenMinutes
     );
+    receiveRedeployStatus();
     receiveClockData();
     return interval;
 }

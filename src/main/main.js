@@ -3,6 +3,7 @@ const {app, BrowserWindow, ipcMain} = require('electron')
 const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
+const { exec } = require('child_process');
 
 let mainWindow;
 function createWindow () {
@@ -141,11 +142,34 @@ function getClockData(callback) {
   getClockDataWithAuthorisation();
 }
 
-ipcMain.on("getClockData", (event, args) => {
-  getClockData(function(responseText) {
-    mainWindow.webContents.send("clockDataResult", responseText);
+function redeployDevEnvironment(callback) {
+  exec('./script/redeployDevEnvironment.sh', (err, stdout, stderr) => {
+    if (err) {
+      callback({'redeploy_enabled': true, 'status': "fail", 'error': err});
+    } else {
+      callback({'redeploy_enabled': true, 'status': "ok"});
+    }
+  
+    // the *entire* stdout and stderr (buffered)
+    console.log(`redeploy stdout: ${stdout}`);
+    console.log(`redeploy stderr: ${stderr}`);
   });
+}
 
+ipcMain.on("getClockData", (event, args) => {
+  getClockData(function(clockDataResult) {
+    mainWindow.webContents.send("clockDataResult", clockDataResult);
+  });
 });
+
+let isDevMode = process.env.devMode == 'true';
+mainWindow.webContents.send('redeployStatus', {'redeploy_enabled': isDevMode, 'status': "not started"});
+if (isDevMode) {
+  ipcMain.on("redeploy", (event, args) => {
+    redeployDevEnvironment(function(redeployStatus) {
+      mainWindow.webContents.send("redeployStatus", redeployStatus);
+    });
+  });
+}
 
 process.env.OPEN_WEATHER_API_KEY
