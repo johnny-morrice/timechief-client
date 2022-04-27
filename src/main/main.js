@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
 const { exec } = require('child_process');
+const Mutex = require('async-mutex').Mutex;
 
 let isDevMode = process.env.devMode == 'true';
 
@@ -85,63 +86,82 @@ function httpPostAsync(url, authHeader, body, callback)
   });
 }
 
-// TODO make class.
-var jwt = undefined;
-var authorised = false;
-function getClockData(callback) {
-  let clockSerial = process.env.clockSerial;
-  let clockSecret = process.env.clockSecret;
-  let baseURL = process.env.clockAPIBaseURL;
-  console.log(`device serial: ${clockSerial}`)
-  console.log(`API Base URL: ${baseURL}`);
-  let apiURL = baseURL + '/api/clockdata';
-  let authnURL = baseURL + '/authn/token/clock';
-  let doGetClockData = function () {
-    httpGetAsync(apiURL, jwt, function(response) {
+class ClockDataAPI {
+  constructor() {
+    this.jwt = null;
+    this.authorised = false;
+    this.clockSerial = process.env.clockSerial;
+    this.clockSecret = process.env.clockSecret;
+    this.baseURL = process.env.clockAPIBaseURL;
+    this.mutex = new Mutex();
+  }
+
+  getClockData(callback) {
+    let self = this;
+    this.mutex
+      .acquire()
+      .then(function(release) {
+          self.getClockDataWithAuthorisation(function (data) {
+            callback(data);
+            release();
+          });
+      })
+  }
+
+  doGetClockData(callback) {
+    let self = this;
+    let apiURL = this.baseURL + '/api/clockdata';
+    httpGetAsync(apiURL, this.jwt, function(response) {
       if (response.status == 401) {
         console.log("unauthorised on clockdata API")
-        // TODO helper methods to set jwt and authorization status.
-        authorised = false;
-        jwt = undefined;
-        getClockDataWithAuthorisation();
+        self.authorised = false;
+        self.jwt = null;
+        self.getClockDataWithAuthorisation(callback);
       } else if (response.status = 200) {
         console.log("successfully hit clockdata API");
         callback(response.data);
       } else {
-        authorised = false;
-        jwt = undefined;
+        self.authorised = false;
+        self.jwt = null;
         console.log(`bad status getting clock data: ${response.status}`);
+        this.mutex.release()
       }
     });
-  };
-  let authBody = {
-    'DeviceSerial': clockSerial,
-    'DeviceSecret': clockSecret,
   }
-  let getClockDataWithAuthorisation = function() {
-    if (authorised) {
-      doGetClockData();
+
+  getClockDataWithAuthorisation(callback) {
+    let self = this;
+    let authnURL = this.baseURL + '/authn/token/clock';
+    if (this.authorised) {
+      this.doGetClockData(callback);
     } else {
-      httpPostAsync(authnURL, undefined, authBody, function(response) {
+      let authBody = {
+        'DeviceSerial': this.clockSerial,
+        'DeviceSecret': this.clockSecret,
+      }
+      httpPostAsync(authnURL, null, authBody, function(response) {
         if (response.status == 401) {
-          authorised = false;
-          jwt = undefined;
+          self.authorised = false;
+          self.jwt = null;
           console.log("bad serial or secret");
+          this.mutex.release();
         } else if (response.status == 200) {
           console.log("success getting JWT")
-          jwt = `Bearer ${response.data["JWT"]}`;
-          authorised = true;
-          doGetClockData()
+          self.jwt = `Bearer ${response.data["JWT"]}`;
+          self.authorised = true;
+          self.doGetClockData(callback)
         } else {
-          authorised = false;
-          jwt = undefined;
+          self.authorised = false;
+          self.jwt = null;
           console.log(`bad status getting jwt: ${response.status}`)
+          this.mutex.release()
         }
       });
     }
   };
-  getClockDataWithAuthorisation();
 }
+
+var clockDataAPI = new ClockDataAPI()
 
 function redeployDevEnvironment(callback) {
   exec(process.env.redeployCommand, (err, stdout, stderr) => {
@@ -168,7 +188,7 @@ ipcMain.on('init', (event, args) => {
 })
 
 ipcMain.on("getClockData", (event, args) => {
-  getClockData(function(clockDataResult) {
+  clockDataAPI.getClockData(function(clockDataResult) {
     mainWindow.webContents.send("clockDataResult", clockDataResult);
   });
 });
