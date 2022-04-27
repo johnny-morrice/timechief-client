@@ -97,12 +97,15 @@ class ClockDataAPI {
   }
 
   getClockData(callback) {
-    const release = await mutex.acquire();
-    try {
-      this.getClockDataWithAuthorisation(callback);
-    } finally {
-        release();
-    }
+    let self = this;
+    this.mutex
+      .acquire()
+      .then(function(release) {
+          self.getClockDataWithAuthorisation(function (data) {
+            callback(data);
+            release();
+          });
+      })
   }
 
   doGetClockData(callback) {
