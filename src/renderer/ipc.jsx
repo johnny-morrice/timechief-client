@@ -41,10 +41,10 @@ export function addClockDataCallback(callback) {
 }
 
 export function initializeIPC() {
-    let tenMinutes = 1000 * 60 * 10;
+    let oneSecond = 1000;
     let interval = setInterval(
         sendClockDataRequest,
-        tenMinutes
+        oneSecond
     );
     sendInit();
     receiveRedeployStatus();

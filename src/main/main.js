@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
 const { exec } = require('child_process');
+const Mutex = require('async-mutex').Mutex;
 
 let isDevMode = process.env.devMode == 'true';
 
@@ -85,63 +86,69 @@ function httpPostAsync(url, authHeader, body, callback)
   });
 }
 
-// TODO make class.
-var jwt = undefined;
-var authorised = false;
-function getClockData(callback) {
-  let clockSerial = process.env.clockSerial;
-  let clockSecret = process.env.clockSecret;
-  let baseURL = process.env.clockAPIBaseURL;
-  console.log(`device serial: ${clockSerial}`)
-  console.log(`API Base URL: ${baseURL}`);
-  let apiURL = baseURL + '/api/clockdata';
-  let authnURL = baseURL + '/authn/token/clock';
-  let doGetClockData = function () {
-    httpGetAsync(apiURL, jwt, function(response) {
+class ClockDataAPI {
+  constructor() {
+    this.jwt = null;
+    this.authorised = false;
+    this.baseURL = process.env.clockAPIBaseURL;
+  }
+
+  getClockData(callback) {
+    let clockSerial = process.env.clockSerial;
+    let clockSecret = process.env.clockSecret;
+    console.log(`device serial: ${clockSerial}`)
+    getClockDataWithAuthorisation(clockSerial, clockSecret, callback);
+  }
+
+  doGetClockData(callback) {
+    let apiURL = this.baseURL + '/api/clockdata';
+    httpGetAsync(apiURL, this.jwt, function(response) {
       if (response.status == 401) {
         console.log("unauthorised on clockdata API")
-        // TODO helper methods to set jwt and authorization status.
-        authorised = false;
-        jwt = undefined;
+        this.authorised = false;
+        this.jwt = null;
         getClockDataWithAuthorisation();
       } else if (response.status = 200) {
         console.log("successfully hit clockdata API");
         callback(response.data);
       } else {
-        authorised = false;
-        jwt = undefined;
+        this.authorised = false;
+        this.jwt = null;
         console.log(`bad status getting clock data: ${response.status}`);
       }
     });
-  };
-  let authBody = {
-    'DeviceSerial': clockSerial,
-    'DeviceSecret': clockSecret,
   }
-  let getClockDataWithAuthorisation = function() {
-    if (authorised) {
+
+  getClockDataWithAuthorisation(clockSerial, clockSecret, callback) {
+    let authnURL = this.baseURL + '/authn/token/clock';
+    if (this.authorised) {
       doGetClockData();
     } else {
-      httpPostAsync(authnURL, undefined, authBody, function(response) {
+      let authBody = {
+        'DeviceSerial': clockSerial,
+        'DeviceSecret': clockSecret,
+      }
+      httpPostAsync(authnURL, null, authBody, function(response) {
         if (response.status == 401) {
-          authorised = false;
-          jwt = undefined;
+          this.authorised = false;
+          this.jwt = null;
           console.log("bad serial or secret");
         } else if (response.status == 200) {
           console.log("success getting JWT")
-          jwt = `Bearer ${response.data["JWT"]}`;
-          authorised = true;
-          doGetClockData()
+          this.jwt = `Bearer ${response.data["JWT"]}`;
+          this.authorised = true;
+          doGetClockData(callback)
         } else {
-          authorised = false;
-          jwt = undefined;
-          console.log(`bad status getting jwt: ${response.status}`)
+          this.authorised = false;
+          this.jwt = null;
+          console.log(`bad status getting this.jwt: ${response.status}`)
         }
       });
     }
   };
-  getClockDataWithAuthorisation();
 }
+
+var clockDataAPI = new ClockDataAPI()
 
 function redeployDevEnvironment(callback) {
   exec(process.env.redeployCommand, (err, stdout, stderr) => {
@@ -168,7 +175,7 @@ ipcMain.on('init', (event, args) => {
 })
 
 ipcMain.on("getClockData", (event, args) => {
-  getClockData(function(clockDataResult) {
+  clockDataAPI.getClockData(function(clockDataResult) {
     mainWindow.webContents.send("clockDataResult", clockDataResult);
   });
 });
