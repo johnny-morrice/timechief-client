@@ -93,10 +93,16 @@ class ClockDataAPI {
     this.clockSerial = process.env.clockSerial;
     this.clockSecret = process.env.clockSecret;
     this.baseURL = process.env.clockAPIBaseURL;
+    this.mutex = new Mutex();
   }
 
   getClockData(callback) {
-    this.getClockDataWithAuthorisation(callback);
+    const release = await mutex.acquire();
+    try {
+      this.getClockDataWithAuthorisation(callback);
+    } finally {
+        release();
+    }
   }
 
   doGetClockData(callback) {
