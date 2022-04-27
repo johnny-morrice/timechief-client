@@ -90,58 +90,59 @@ class ClockDataAPI {
   constructor() {
     this.jwt = null;
     this.authorised = false;
+    this.clockSerial = process.env.clockSerial;
+    this.clockSecret = process.env.clockSecret;
     this.baseURL = process.env.clockAPIBaseURL;
   }
 
   getClockData(callback) {
-    let clockSerial = process.env.clockSerial;
-    let clockSecret = process.env.clockSecret;
-    console.log(`device serial: ${clockSerial}`)
-    getClockDataWithAuthorisation(clockSerial, clockSecret, callback);
+    this.getClockDataWithAuthorisation(callback);
   }
 
   doGetClockData(callback) {
+    let self = this;
     let apiURL = this.baseURL + '/api/clockdata';
     httpGetAsync(apiURL, this.jwt, function(response) {
       if (response.status == 401) {
         console.log("unauthorised on clockdata API")
-        this.authorised = false;
-        this.jwt = null;
-        getClockDataWithAuthorisation();
+        self.authorised = false;
+        self.jwt = null;
+        self.getClockDataWithAuthorisation(callback);
       } else if (response.status = 200) {
         console.log("successfully hit clockdata API");
         callback(response.data);
       } else {
-        this.authorised = false;
-        this.jwt = null;
+        self.authorised = false;
+        self.jwt = null;
         console.log(`bad status getting clock data: ${response.status}`);
       }
     });
   }
 
-  getClockDataWithAuthorisation(clockSerial, clockSecret, callback) {
+  getClockDataWithAuthorisation(callback) {
+    let self = this;
     let authnURL = this.baseURL + '/authn/token/clock';
     if (this.authorised) {
-      doGetClockData();
+      this.doGetClockData(callback);
     } else {
       let authBody = {
-        'DeviceSerial': clockSerial,
-        'DeviceSecret': clockSecret,
+        'DeviceSerial': this.clockSerial,
+        'DeviceSecret': this.clockSecret,
       }
       httpPostAsync(authnURL, null, authBody, function(response) {
         if (response.status == 401) {
-          this.authorised = false;
-          this.jwt = null;
+          self.authorised = false;
+          self.jwt = null;
           console.log("bad serial or secret");
         } else if (response.status == 200) {
           console.log("success getting JWT")
-          this.jwt = `Bearer ${response.data["JWT"]}`;
-          this.authorised = true;
-          doGetClockData(callback)
+          self.jwt = `Bearer ${response.data["JWT"]}`;
+          self.authorised = true;
+          self.doGetClockData(callback)
         } else {
-          this.authorised = false;
-          this.jwt = null;
-          console.log(`bad status getting this.jwt: ${response.status}`)
+          self.authorised = false;
+          self.jwt = null;
+          console.log(`bad status getting jwt: ${response.status}`)
         }
       });
     }
