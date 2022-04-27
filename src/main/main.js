@@ -124,6 +124,7 @@ class ClockDataAPI {
         self.authorised = false;
         self.jwt = null;
         console.log(`bad status getting clock data: ${response.status}`);
+        this.mutex.release()
       }
     });
   }
@@ -143,6 +144,7 @@ class ClockDataAPI {
           self.authorised = false;
           self.jwt = null;
           console.log("bad serial or secret");
+          this.mutex.release();
         } else if (response.status == 200) {
           console.log("success getting JWT")
           self.jwt = `Bearer ${response.data["JWT"]}`;
@@ -152,6 +154,7 @@ class ClockDataAPI {
           self.authorised = false;
           self.jwt = null;
           console.log(`bad status getting jwt: ${response.status}`)
+          this.mutex.release()
         }
       });
     }
