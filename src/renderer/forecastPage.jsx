@@ -81,9 +81,9 @@ export const ForecastPage = () => {
 
   function weatherColumnClass(i) {
       if (i % 2 == 0) {
-        return 'column-flex fat'
+        return 'column-flex phat'
       }
-      return 'column-flex fat table-color-flip';
+      return 'column-flex phat table-color-flip';
   }
 
   return <div id="forecast-screen" style={{
@@ -96,7 +96,7 @@ export const ForecastPage = () => {
                         <div class="flex-element section-name">{day.date}</div>
                         <div class='row-flex flex-element'>
                             <div class="column-flex flex-element">
-                                <div class='flex-element'>Temperature</div>
+                                <div class='data-name flex-element'>Temperature</div>
                                 <div class='row-flex'>
                                     <Show when={i() == 0}>
                                         <div class='flex-element data-name'>Morn</div>
@@ -124,7 +124,7 @@ export const ForecastPage = () => {
                                 </div>
                             </div>
                             <div class="column-flex">
-                                <div class='flex-element'>Feels like</div>
+                                <div class='data-name flex-element'>Feels like</div>
                                 <div class='row-flex'>
                                     {/* <div class='flex-element'>Morning</div> */}
                                     <div class='flex-element'>{day.mornFeelsLike}</div>
