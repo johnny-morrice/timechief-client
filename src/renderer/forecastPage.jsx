@@ -96,7 +96,7 @@ export const ForecastPage = () => {
                         <div class="flex-element section-name">{day.date}</div>
                         <div class='row-flex flex-element'>
                             <div class="column-flex flex-element">
-                                <div class='data-name flex-element'>Temperature</div>
+                                <div class='data-name flex-element'>Temp</div>
                                 <div class='row-flex'>
                                     <Show when={i() == 0}>
                                         <div class='flex-element data-name'>Morn</div>
