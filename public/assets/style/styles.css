@@ -122,7 +122,8 @@ div.underline {
 
 div.time-border {
     border-left: 2pt solid green;
-    padding-top: 40pt;
+    margin-top: 10pt;
+    padding-top: 50pt;
     padding-bottom: 20pt;
     padding-left: 20pt;
 }
