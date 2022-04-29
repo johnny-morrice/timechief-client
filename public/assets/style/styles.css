@@ -74,13 +74,8 @@ div#home-location {
     font-size: 40pt;
 }
 
-div#home-error {
+div.home-error {
     color: red;
-}
-
-div.home-last-refreshed {
-    font-weight: bolder;
-    font-size: 12pt;
 }
 
 div#time {
@@ -93,7 +88,7 @@ div#date {
 }
 
 div#home-data {
-    margin-top: 75pt;
+    margin-top: 35pt;
 }
 
 div.underline {
@@ -118,8 +113,12 @@ div.weather-icon {
 }
 
 div.home-health-icon-bar {
-    height: 20pt;
-    line-height: 20pt;
+    height: 30pt;
+    line-height: 30pt;
+}
+
+div.health-icon {
+    font-size: 30pt;
 }
 
 div.column-flex {

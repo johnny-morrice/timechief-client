@@ -4,7 +4,6 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
 const { exec } = require('child_process');
-const Mutex = require('async-mutex').Mutex;
 
 let isDevMode = process.env.devMode == 'true';
 
@@ -55,7 +54,7 @@ function addAuthHeader(options, authHeader) {
   }
 }
 
-function httpGetAsync(url, authHeader, callback)
+function httpGetAsync(url, authHeader, callback, onFail)
 {
     const config = {
       url: url,
@@ -67,10 +66,15 @@ function httpGetAsync(url, authHeader, callback)
     axios(config).then(function (response) {
       console.log(`GET ${url} ${response.status}`);
       callback(response)
+    }).catch(function() {
+      console.log("get error");
+      if (onFail != undefined) {
+        onFail();
+      }
     });
 }
 
-function httpPostAsync(url, authHeader, body, callback)
+function httpPostAsync(url, authHeader, body, callback, onFail)
 {
   const config = {
     url: url,
@@ -83,6 +87,11 @@ function httpPostAsync(url, authHeader, body, callback)
   axios(config).then(function (response) {
     console.log(`POST ${url} ${response.status}`);
     callback(response)
+  }).catch(function() {
+    console.log('post error');
+    if (onFail != undefined) {
+      onFail();
+    }
   });
 }
 
@@ -93,28 +102,16 @@ class ClockDataAPI {
     this.clockSerial = process.env.clockSerial;
     this.clockSecret = process.env.clockSecret;
     this.baseURL = process.env.clockAPIBaseURL;
-    this.mutex = new Mutex();
   }
 
   getClockData(callback) {
-    let self = this;
-    this.mutex
-      .acquire()
-      .then(function(release) {
-          self.getClockDataWithAuthorisation(function (data) {
-            try {
-              callback(data);
-            } finally {
-              release();
-            }
-          });
-      })
+    this.getClockDataWithAuthorisation(callback);
   }
 
   doGetClockData(callback) {
     let self = this;
     let apiURL = this.baseURL + '/api/clockdata';
-    httpGetAsync(apiURL, this.jwt, function(response) {
+    let getCallback = function(response) {
       if (response.status == 401) {
         console.log("unauthorised on clockdata API")
         self.authorised = false;
@@ -127,9 +124,9 @@ class ClockDataAPI {
         self.authorised = false;
         self.jwt = null;
         console.log(`bad status getting clock data: ${response.status}`);
-        this.mutex.release()
       }
-    });
+    };
+    httpGetAsync(apiURL, this.jwt, getCallback);
   }
 
   getClockDataWithAuthorisation(callback) {
@@ -142,12 +139,11 @@ class ClockDataAPI {
         'DeviceSerial': this.clockSerial,
         'DeviceSecret': this.clockSecret,
       }
-      httpPostAsync(authnURL, null, authBody, function(response) {
+      let postCallback = function(response) {
         if (response.status == 401) {
           self.authorised = false;
           self.jwt = null;
           console.log("bad serial or secret");
-          this.mutex.release();
         } else if (response.status == 200) {
           console.log("success getting JWT")
           self.jwt = `Bearer ${response.data["JWT"]}`;
@@ -157,9 +153,9 @@ class ClockDataAPI {
           self.authorised = false;
           self.jwt = null;
           console.log(`bad status getting jwt: ${response.status}`)
-          this.mutex.release()
         }
-      });
+      }
+      httpPostAsync(authnURL, null, authBody, postCallback);
     }
   };
 }

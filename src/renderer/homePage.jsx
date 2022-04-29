@@ -7,6 +7,7 @@ import { apiErrorTimeout, minute, second } from './timing';
 
 class HomePageSignals {
   constructor() {
+      [this.isAPIError, this.setAPIError] = createSignal(false);
       [this.lastRefreshText, this.setLastRefreshText] = createSignal("");
       [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
       [this.myTime, this.setMyTime] = createSignal(getTimeText());
@@ -51,13 +52,10 @@ function updateHomePageSignals(signals, data) {
 function timeDifferenceToNowText(lastUpdateTime) {
   const now = new Date();
   const diff = now.getTime() - lastUpdateTime.getTime();
-  const minutes = diff / minute;
-  if (minutes < 1) {
+  if (diff < apiErrorTimeout) {
     return "Updated just now"
-  } else if (minutes < 2) {
-    return "Updated 1 minute ago"
   } else {
-    return `Updated ${minutes} minutes ago`
+    return "Connection error"
   }
 }
 
@@ -65,6 +63,14 @@ function isErrorTimeout(lastUpdateTime) {
   const now = new Date();
   const diff = now.getTime() - lastUpdateTime.getTime();
   return diff >= apiErrorTimeout;
+}
+
+function errorStyleClass(isError) {
+  if (isError) {
+    return "home-error";
+  } else {
+    return "";
+  }
 }
 
 export const HomePage = () => {
@@ -82,8 +88,10 @@ export const HomePage = () => {
   );
   let updateRefreshTimeInterval = setInterval(
     () => {
-      const text = timeDifferenceToNowText(homePageSignals.lastUpdateTime());
+      const lastUpdateTime = homePageSignals.lastUpdateTime();
+      const text = timeDifferenceToNowText(lastUpdateTime);
       homePageSignals.setLastRefreshText(text);
+      homePageSignals.setAPIError(isErrorTimeout(lastUpdateTime));
     },
     second
   );
@@ -115,22 +123,19 @@ export const HomePage = () => {
               </div>
               <div class="column-flex">
                 <div class='section-name flex-element'>Status</div>
-                <div class='row-flex home-health-icon-bar'>
-                  <Show when={!isErrorTimeout(homePageSignals.lastUpdateTime())}>
+                <div class={"row-flex home-health-icon-bar " + errorStyleClass(homePageSignals.isAPIError())}>
+                  <Show when={!homePageSignals.isAPIError()}>
                     <div class='flex-element home-health-icon'>
                       <i class='fa-solid fa-heart'></i>
                     </div>
                   </Show> 
-                  <Show when={isErrorTimeout(homePageSignals.lastUpdateTime())}>
-                    <div class='error flex-element'>
+                  <Show when={homePageSignals.isAPIError()}>
+                    <div class='flex-element'>
                       <i class='fa-solid fa-heart-crack'></i>
                     </div>
                   </Show> 
-                  <div class='flex-element home-last-refreshed'>{homePageSignals.lastRefreshText}</div>
+                  <div class='flex-element'>{homePageSignals.lastRefreshText}</div>
                 </div>
-                <Show when={isErrorTimeout(homePageSignals.lastUpdateTime())}>
-                  <div class='home-error'>Error refreshing API</div>
-                </Show>
               </div>
           </div>
           <div class='flex-element column-flex time-border'>
