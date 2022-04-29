@@ -114,6 +114,7 @@ export const HomePage = () => {
                   }}</Index>
               </div>
               <div class="column-flex">
+                <div class='section-name flex-element'>Status</div>
                 <div class='row-flex home-health-icon-bar'>
                   <Show when={!isErrorTimeout(homePageSignals.lastUpdateTime())}>
                     <div class='flex-element home-health-icon'>
