@@ -43,7 +43,7 @@ function updateHomePageSignals(signals, data) {
     let feelsLikeText = kelvinToCelsiusText(feelsLike);
     let tempText = kelvinToCelsiusText(temp);
     signals.setWeatherDescriptions(descriptions);
-    signals.setFeelsLikeTemp(`feels like ${feelsLikeText}`);
+    signals.setFeelsLikeTemp(feelsLikeText);
     signals.setTemp(tempText);
     signals.setLocation(location);
     signals.setLastUpdateTime(new Date());
@@ -107,36 +107,41 @@ export const HomePage = () => {
         >
         <div class="row-flex">
           <div class="flex-element column-flex" id="home-data">
-              <div class='section-name flex-element'>Temperature</div>
-              <div class='row-flex flex-element'>
-                  <div class='flex-element' id='temperature'>{homePageSignals.temp}</div>
-                  <div class='flex-element' id='feels-like-temperature'>{homePageSignals.feelsLikeTemp}</div>
+            <div class='home-section-name flex-element'>Weather now</div>
+            <div class="flex-element column-flex">
+              <div class="flex-element row-flex home-major-data-row">
+                <div class="flex-element">temp</div>
+                <div class='flex-element home-major-data'>{homePageSignals.temp}</div>
               </div>
-              <div class="column-flex">
-                  <div class='section-name flex-element'>Weather now</div>
-                  <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
-                      return <div class="row-flex flex-element weather-icon-bar">
-                              <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
-                              <div class='current-weather-description flex-element'>{desc()}</div>
-                      </div>
-                  }}</Index>
+              <div class="flex-element row-flex home-major-data-row">
+                <div class="flex-element">feels like</div>
+                <div class='flex-element home-major-data'>{homePageSignals.feelsLikeTemp}</div>
               </div>
-              <div class="column-flex">
-                <div class='section-name flex-element'>Status</div>
-                <div class={"row-flex home-health-icon-bar " + errorStyleClass(homePageSignals.isAPIError())}>
-                  <Show when={!homePageSignals.isAPIError()}>
-                    <div class='flex-element home-health-icon'>
-                      <i class='fa-solid fa-heart'></i>
+            </div>
+            <div class="column-flex">
+                <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
+                    return <div class="row-flex flex-element weather-icon-bar">
+                            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
+                            <div class='current-weather-description flex-element'>{desc()}</div>
                     </div>
-                  </Show> 
-                  <Show when={homePageSignals.isAPIError()}>
-                    <div class='flex-element'>
-                      <i class='fa-solid fa-heart-crack'></i>
-                    </div>
-                  </Show> 
-                  <div class='flex-element'>{homePageSignals.lastRefreshText}</div>
-                </div>
+                }}</Index>
+            </div>
+            <div class="column-flex">
+              <div class='section-name flex-element'>Status</div>
+              <div class={"row-flex home-health-icon-bar " + errorStyleClass(homePageSignals.isAPIError())}>
+                <Show when={!homePageSignals.isAPIError()}>
+                  <div class='flex-element home-health-icon'>
+                    <i class='fa-solid fa-heart'></i>
+                  </div>
+                </Show> 
+                <Show when={homePageSignals.isAPIError()}>
+                  <div class='flex-element'>
+                    <i class='fa-solid fa-heart-crack'></i>
+                  </div>
+                </Show> 
+                <div class='flex-element'>{homePageSignals.lastRefreshText}</div>
               </div>
+            </div>
           </div>
           <div class='flex-element column-flex time-border'>
             <div id='time'>{homePageSignals.myTime}</div>
