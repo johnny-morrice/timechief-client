@@ -1,3 +1,5 @@
+import { apiRefreshInterval } from "./timing";
+
 export function sendClockDataRequest() {
     window.api.send("getClockData");
 }
@@ -41,10 +43,9 @@ export function addClockDataCallback(callback) {
 }
 
 export function initializeIPC() {
-    let oneSecond = 1000;
     let interval = setInterval(
         sendClockDataRequest,
-        oneSecond
+        apiRefreshInterval
     );
     sendInit();
     receiveRedeployStatus();

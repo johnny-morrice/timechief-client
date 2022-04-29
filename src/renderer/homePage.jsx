@@ -3,9 +3,12 @@ import { addClockDataCallback } from './ipc';
 import { getTaskBarSignals } from './taskbarSignals';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
+import { apiErrorTimeout, minute, second } from './timing';
 
 class HomePageSignals {
   constructor() {
+      [this.lastRefreshText, this.setLastRefreshText] = createSignal("");
+      [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
       [this.myTime, this.setMyTime] = createSignal(getTimeText());
       [this.myDate, this.setMyDate] = createSignal(getDateText());
       [this.temp, this.setTemp] = createSignal("");
@@ -42,6 +45,26 @@ function updateHomePageSignals(signals, data) {
     signals.setFeelsLikeTemp(`feels like ${feelsLikeText}`);
     signals.setTemp(tempText);
     signals.setLocation(location);
+    signals.setLastUpdateTime(new Date());
+}
+
+function timeDifferenceToNowText(lastUpdateTime) {
+  const now = new Date();
+  const diff = now.getTime() - lastUpdateTime.getTime();
+  const minutes = diff / minute;
+  if (minutes < 1) {
+    return "Updated just now"
+  } else if (minutes < 2) {
+    return "Updated 1 minute ago"
+  } else {
+    return `Updated ${minutes} minutes ago`
+  }
+}
+
+function isErrorTimeout(lastUpdateTime) {
+  const now = new Date();
+  const diff = now.getTime() - lastUpdateTime.getTime();
+  return diff >= apiErrorTimeout;
 }
 
 export const HomePage = () => {
@@ -55,10 +78,18 @@ export const HomePage = () => {
       homePageSignals.setMyTime(getTimeText());
       homePageSignals.setMyDate(getDateText());
     },
-    100
+    second / 10
+  );
+  let updateRefreshTimeInterval = setInterval(
+    () => {
+      const text = timeDifferenceToNowText(homePageSignals.lastUpdateTime());
+      homePageSignals.setLastRefreshText(text);
+    },
+    second
   );
 
   onCleanup(() => {
+    clearInterval(updateRefreshTimeInterval);
     clearInterval(timeInterval);
   });
 
@@ -74,13 +105,31 @@ export const HomePage = () => {
                   <div class='flex-element' id='feels-like-temperature'>{homePageSignals.feelsLikeTemp}</div>
               </div>
               <div class="column-flex">
-                  <div class='section-name flex-element'>Weather today</div>
+                  <div class='section-name flex-element'>Weather now</div>
                   <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
-                      return <div class="row-flex flex-element">
+                      return <div class="row-flex flex-element weather-icon-bar">
                               <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
                               <div class='current-weather-description flex-element'>{desc()}</div>
                       </div>
                   }}</Index>
+              </div>
+              <div class="column-flex">
+                <div class='row-flex home-health-icon-bar'>
+                  <Show when={!isErrorTimeout(homePageSignals.lastUpdateTime())}>
+                    <div class='flex-element home-health-icon'>
+                      <i class='fa-solid fa-heart'></i>
+                    </div>
+                  </Show> 
+                  <Show when={isErrorTimeout(homePageSignals.lastUpdateTime())}>
+                    <div class='error flex-element'>
+                      <i class='fa-solid fa-heart-crack'></i>
+                    </div>
+                  </Show> 
+                  <div class='flex-element home-last-refreshed'>{homePageSignals.lastRefreshText}</div>
+                </div>
+                <Show when={isErrorTimeout(homePageSignals.lastUpdateTime())}>
+                  <div class='home-error'>Error refreshing API</div>
+                </Show>
               </div>
           </div>
           <div class='flex-element column-flex time-border'>

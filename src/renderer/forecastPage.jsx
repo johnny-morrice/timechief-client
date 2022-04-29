@@ -144,7 +144,7 @@ export const ForecastPage = () => {
                             </div>
                         </div>
                         <Index each={day.weatherDescriptions()}>{(desc, j) =>
-                            <div class="row-flex">
+                            <div class="row-flex weather-icon-bar">
                                 <div class='flex-element weather-icon'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
                                 <div class='flex-element'>{desc()}</div>
                             </div>

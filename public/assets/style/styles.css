@@ -74,6 +74,15 @@ div#home-location {
     font-size: 40pt;
 }
 
+div#home-error {
+    color: red;
+}
+
+div.home-last-refreshed {
+    font-weight: bolder;
+    font-size: 12pt;
+}
+
 div#time {
     font-family: 'Seven Segment';
     font-size: 100pt;
@@ -99,8 +108,18 @@ div.time-border {
     padding-left: 20pt;
 }
 
+div.weather-icon-bar {
+    height: 30pt;
+    line-height: 30pt;
+}
+
 div.weather-icon {
     font-size: 30pt;
+}
+
+div.home-health-icon-bar {
+    height: 20pt;
+    line-height: 20pt;
 }
 
 div.column-flex {

@@ -102,8 +102,11 @@ class ClockDataAPI {
       .acquire()
       .then(function(release) {
           self.getClockDataWithAuthorisation(function (data) {
-            callback(data);
-            release();
+            try {
+              callback(data);
+            } finally {
+              release();
+            }
           });
       })
   }
