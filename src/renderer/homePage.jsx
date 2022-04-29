@@ -107,7 +107,7 @@ export const HomePage = () => {
         >
         <div class="row-flex">
           <div class="flex-element column-flex" id="home-data">
-            <div class='home-section-name flex-element'>Weather now</div>
+            <div class='home-weather-title flex-element'>Weather</div>
             <div class="flex-element row-flex">
               <div class="flex-element column-flex home-major-data-fields-column">
                 <div class="flex-element">temp</div>
