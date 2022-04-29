@@ -108,17 +108,17 @@ export const HomePage = () => {
         <div class="row-flex">
           <div class="flex-element column-flex" id="home-data">
             <div class='home-section-name flex-element'>Weather now</div>
-            <div class="flex-element column-flex">
-              <div class="flex-element row-flex home-major-data-row">
+            <div class="flex-element row-flex">
+              <div class="flex-element column-flex home-major-data-fields-column">
                 <div class="flex-element">temp</div>
-                <div class='flex-element home-major-data'>{homePageSignals.temp}</div>
-              </div>
-              <div class="flex-element row-flex home-major-data-row">
                 <div class="flex-element">feels like</div>
+              </div>
+              <div class="flex-element column-flex home-major-data-column">
+                <div class='flex-element home-major-data'>{homePageSignals.temp}</div>
                 <div class='flex-element home-major-data'>{homePageSignals.feelsLikeTemp}</div>
               </div>
             </div>
-            <div class="column-flex">
+            <div class="flex-element column-flex">
                 <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
                     return <div class="row-flex flex-element weather-icon-bar">
                             <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>

@@ -90,10 +90,16 @@ div.home-major-data {
     height: 40pt;
 }
 
-div.home-major-data-row {
-    height: 40pt;
+div.home-major-data-column {
+    align-content: flex-end;
     line-height: 40pt;
 }
+
+div.home-major-data-fields-column {
+    align-content: flex-start;
+    line-height: 40pt;
+}
+
 
 div#time {
     font-family: 'Seven Segment';
@@ -105,6 +111,7 @@ div#date {
 }
 
 div#home-data {
+    margin-left: 5pt;
     margin-top: 5pt;
 }
 
