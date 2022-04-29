@@ -14,14 +14,14 @@ class AstroPageSignals {
 }
 
 function updateAstroPageSignals(signals, data) {
-    let daily = data["Weather"]["daily"];
+    let daily = data["Weather"]["Daily"];
     if (daily.length > 0) {
         let today = daily[0];
-        let sunriseUnix = today["sunrise"];
-        let sunsetUnix = today["sunset"];
-        let moonriseUnix = today["moonrise"];
-        let moonsetUnix = today["moonset"];
-        let moonphase = today["moon_phase"];
+        let sunriseUnix = today["Sunrise"];
+        let sunsetUnix = today["Sunset"];
+        let moonriseUnix = today["Moonrise"];
+        let moonsetUnix = today["Moonset"];
+        let moonphase = today["MoonPhase"];
         signals.setSunrise(parseUnixTime(sunriseUnix))
         signals.setSunset(parseUnixTime(sunsetUnix));
         signals.setMoonrise(parseUnixTime(moonriseUnix));

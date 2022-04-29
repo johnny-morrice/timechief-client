@@ -32,13 +32,13 @@ function getDateText() {
 
 function updateHomePageSignals(signals, data) {
     let location = data["Clock"]["Location"];
-    let currentWeather = data["Weather"]["current"];
-    let temp = currentWeather["temp"];
-    let feelsLike = currentWeather["feels_like"];
+    let currentWeather = data["Weather"]["Current"];
+    let temp = currentWeather["Temp"];
+    let feelsLike = currentWeather["FeelsLike"];
     let descriptions = [];
-    let weatherConditions = currentWeather["weather"];
+    let weatherConditions = currentWeather["WeatherConditions"];
     for (var i = 0; i < weatherConditions.length; i++) {
-        descriptions.push(weatherConditions[i]["description"]);
+        descriptions.push(weatherConditions[i]["Description"]);
     }
     let feelsLikeText = kelvinToCelsiusText(feelsLike);
     let tempText = kelvinToCelsiusText(temp);

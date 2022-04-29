@@ -31,24 +31,24 @@ class DayForecastSignals {
 
 function updateForecastPageSignals(signals, data) {
     let weather = data["Weather"];
-    let daily = weather["daily"];
+    let daily = weather["Daily"];
     for (var i = 0; i < daily.length && i < dayForecastCount; i++) {
         let forecast = daily[i];
         let daySignals = signals.days[i];
-        let dt = forecast["dt"];
+        let dt = forecast["Dt"];
         let dateText = parseUnixDate(dt);
         
         daySignals.setDate(dateText);
-        let temp = forecast["temp"];
-        let mornTemp = temp["morn"];
-        let dayTemp = temp["day"];
-        let eveTemp = temp["eve"];
-        let nightTemp = temp["night"];
-        let feelsLike = forecast["feels_like"];
-        let mornFeelsLike = feelsLike["morn"];
-        let dayFeelsLike = feelsLike["day"];
-        let eveFeelsLike = feelsLike["eve"];
-        let nightFeelsLike = feelsLike["night"];
+        let temp = forecast["Temp"];
+        let mornTemp = temp["Morn"];
+        let dayTemp = temp["Day"];
+        let eveTemp = temp["Eve"];
+        let nightTemp = temp["Night"];
+        let feelsLike = forecast["FeelsLike"];
+        let mornFeelsLike = feelsLike["Morn"];
+        let dayFeelsLike = feelsLike["Day"];
+        let eveFeelsLike = feelsLike["Eve"];
+        let nightFeelsLike = feelsLike["Night"];
         daySignals.setMornTemp(kelvinToCelsiusText(mornTemp));
         daySignals.setDayTemp(kelvinToCelsiusText(dayTemp));
         daySignals.setEveTemp(kelvinToCelsiusText(eveTemp));
@@ -58,9 +58,9 @@ function updateForecastPageSignals(signals, data) {
         daySignals.setEveFeelsLike(kelvinToCelsiusText(eveFeelsLike));
         daySignals.setNightFeelsLike(kelvinToCelsiusText(nightFeelsLike));
         let descriptions = [];
-        let weatherConditions = forecast["weather"];
+        let weatherConditions = forecast["WeatherConditions"];
         for (var j = 0; j < weatherConditions.length; j++) {
-            descriptions.push(weatherConditions[j]["description"]);
+            descriptions.push(weatherConditions[j]["Description"]);
         }
         daySignals.setWeatherDescriptions(descriptions);
     }
