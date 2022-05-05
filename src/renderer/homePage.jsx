@@ -15,7 +15,8 @@ class HomePageSignals {
       [this.temp, this.setTemp] = createSignal("");
       [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
       [this.weatherDescriptions, this.setWeatherDescriptions] = createSignal([]);
-      [this.location, this.setLocation] = createSignal("")
+      [this.location, this.setLocation] = createSignal("");
+      [this.firstWeatherDescription, this.setFirstWeatherDescription] = createSignal("");
   }
 }
 
@@ -43,6 +44,9 @@ function updateHomePageSignals(signals, data) {
     let feelsLikeText = kelvinToCelsiusText(feelsLike);
     let tempText = kelvinToCelsiusText(temp);
     signals.setWeatherDescriptions(descriptions);
+    if (descriptions.length > 0) {
+      signals.setFirstWeatherDescription(descriptions[0]);
+    }
     signals.setFeelsLikeTemp(feelsLikeText);
     signals.setTemp(tempText);
     signals.setLocation(location);
@@ -119,12 +123,12 @@ export const HomePage = () => {
               </div>
             </div>
             <div class="flex-element column-flex">
-                <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) => {
-                    return <div class="row-flex flex-element weather-icon-bar">
-                            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
-                            <div class='current-weather-description flex-element'>{desc()}</div>
+                {/* <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) =>  */}
+                    <div class="row-flex flex-element weather-icon-bar">
+                            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.firstWeatherDescription())}></i></div>
+                            <div class='current-weather-description flex-element'>{homePageSignals.firstWeatherDescription}</div>
                     </div>
-                }}</Index>
+                {/* }}</Index> */}
             </div>
             <div class="column-flex">
               <div class='section-name flex-element'>Status</div>
