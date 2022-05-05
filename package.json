@@ -1,20 +1,12 @@
 {
   "name": "electron-quick-start",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Timechief smart clock",
   "main": "src/main/main.js",
   "scripts": {
     "build": "vite build",
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
   "author": "GitHub",
   "license": "all-rights-reserved",
   "devDependencies": {
