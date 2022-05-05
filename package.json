@@ -1,5 +1,5 @@
 {
-  "name": "electron-quick-start",
+  "name": "timechief",
   "version": "1.0.0",
   "description": "Timechief smart clock",
   "main": "src/main/main.js",
