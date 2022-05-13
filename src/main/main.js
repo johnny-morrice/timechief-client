@@ -88,6 +88,7 @@ function addAuthHeader(options, authHeader) {
 
 function callAPI(config) {
   addFishTag(config);
+  logger.info(`calling API with config: ${JSON.stringify(config)}`);
   return axios(config);
 }
 
