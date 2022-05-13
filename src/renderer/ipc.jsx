@@ -9,9 +9,13 @@ function receiveClockData() {
     window.api.receive("clockDataResult", (data) => {
         // let debugElement = document.getElementById('debug');
         // debugElement.innerText = JSON.stringify(data);
-        clockDataCallbacks.forEach(cb => {
-            cb(data);
-        });
+        if ("APIError" in data) {
+            console.log(`error calling API: ${data["APIError"]}`);
+        } else {
+            clockDataCallbacks.forEach(cb => {
+                cb(data);
+            });
+        }
     });
 }
 
