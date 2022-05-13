@@ -1,14 +1,39 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
 const { exec } = require('child_process');
+const winston = require('winston');
+
+const logger = winston.createLogger({
+  level: 'debug',
+  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+  defaultMeta: {},
+  transports: [
+    //
+    // - Write all logs with importance level of `error` or less to `error.log`
+    // - Write all logs with importance level of `info` or less to `combined.log`
+    //
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
+
+//
+// If we're not in production then log to the `console` with the format:
+// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+//
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.combine(winston.format.timestamp(), winston.format.simple()),
+  }));
+}
 
 let isDevMode = process.env.devMode == 'true';
 
 let mainWindow;
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
@@ -45,156 +70,139 @@ app.on('window-all-closed', function () {
 })
 
 function addFishTag(options) {
+  if (!("headers" in options)) {
+    options["headers"] = {};
+  }
   options["headers"]["X-Fish-Tag"] = uuidv4();
 }
 
 function addAuthHeader(options, authHeader) {
+  if (!("headers" in options)) {
+    options["headers"] = {};
+  }
   if (authHeader) {
     options["headers"]["Authorization"] = authHeader;
   }
 }
 
-function httpGetAsync(url, authHeader, callback, onFail)
-{
-    const config = {
-      url: url,
-      method: 'get',
-      headers: {},
-    };
-    addFishTag(config);
-    addAuthHeader(config, authHeader);
-    axios(config).then(function (response) {
-      console.log(`GET ${url} ${response.status}`);
-      callback(response)
-    }).catch(function() {
-      console.log("get error");
-      if (onFail != undefined) {
-        onFail();
-      }
-    });
-}
-
-function httpPostAsync(url, authHeader, body, callback, onFail)
-{
-  const config = {
-    url: url,
-    method: 'post',
-    data: body,
-    headers: {},
-  };
+const api = axios.create({
+    timeout: 950,
+});
+require('axios-debug-log').addLogger(api, logger.debug);
+function callAPI(config) {
   addFishTag(config);
-  addAuthHeader(config, authHeader);
-  axios(config).then(function (response) {
-    console.log(`POST ${url} ${response.status}`);
-    callback(response)
-  }).catch(function() {
-    console.log('post error');
-    if (onFail != undefined) {
-      onFail();
-    }
-  });
+  return api(config);
 }
 
 class ClockDataAPI {
   constructor() {
-    this.jwt = null;
+    this.jwt = "Bearer UninitialisedGarbage";
     this.authorised = false;
     this.clockSerial = process.env.clockSerial;
     this.clockSecret = process.env.clockSecret;
     this.baseURL = process.env.clockAPIBaseURL;
+    this.jwtTimeout = new Date();
   }
 
-  getClockData(callback) {
-    this.getClockDataWithAuthorisation(callback);
+  incrementJwtTimeout() {
+    let duration = 60 * 1000;
+    this.jwtTimeout = new Date(this.jwtTimeout.getTime() + duration);
   }
 
-  doGetClockData(callback) {
-    let self = this;
+  doGetClockData(jwt) {
     let apiURL = this.baseURL + '/api/clockdata';
-    let getCallback = function(response) {
-      if (response.status == 401) {
-        console.log("unauthorised on clockdata API")
-        self.authorised = false;
-        self.jwt = null;
-        self.getClockDataWithAuthorisation(callback);
-      } else if (response.status = 200) {
-        console.log("successfully hit clockdata API");
-        callback(response.data);
-      } else {
-        self.authorised = false;
-        self.jwt = null;
-        console.log(`bad status getting clock data: ${response.status}`);
-      }
+    let config = {
+      url: apiURL,
+      method: "get",
     };
-    httpGetAsync(apiURL, this.jwt, getCallback);
+    addAuthHeader(config, jwt);
+    return callAPI(config).then(resp => {
+      if (resp.status == 200) {
+        return resp.data;
+      }
+    });
   }
 
-  getClockDataWithAuthorisation(callback) {
+  getClockData() {
     let self = this;
-    let authnURL = this.baseURL + '/authn/token/clock';
-    if (this.authorised) {
-      this.doGetClockData(callback);
-    } else {
+    // Get a JWT if the old one has timed out.
+    // The easiest way to be robust is simply to refresh login every so often.
+    let now = new Date();
+    if (self.jwtTimeout.getTime() < now.getTime()) {
+      let authnURL = this.baseURL + '/authn/token/clock';
       let authBody = {
         'DeviceSerial': this.clockSerial,
         'DeviceSecret': this.clockSecret,
       }
-      let postCallback = function(response) {
+      let setJwtCache = (response) => {
         if (response.status == 401) {
-          self.authorised = false;
           self.jwt = null;
-          console.log("bad serial or secret");
+          logger.error("bad serial or secret");
+          return null;
         } else if (response.status == 200) {
-          console.log("success getting JWT")
+          logger.info("success getting JWT")
           self.jwt = `Bearer ${response.data["JWT"]}`;
-          self.authorised = true;
-          self.doGetClockData(callback)
+          self.incrementJwtTimeout();
+          return self.jwt;
         } else {
-          self.authorised = false;
           self.jwt = null;
-          console.log(`bad status getting jwt: ${response.status}`)
+          logger.error(`bad status getting jwt: ${response.status}`)
+          return null;
         }
       }
-      httpPostAsync(authnURL, null, authBody, postCallback);
+      const authnConfig = {
+        url: authnURL,
+        method: 'post',
+        data: authBody,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      };
+      return callAPI(authnConfig).then(setJwtCache).then(jwt => self.doGetClockData(jwt));
     }
-  };
-}
+
+    return self.doGetClockData(self.jwt);
+  }
+};
 
 var clockDataAPI = new ClockDataAPI()
 
 function redeployDevEnvironment(callback) {
   exec(process.env.redeployCommand, (err, stdout, stderr) => {
     if (err) {
-      callback({'redeploy_enabled': true, 'status': "fail", 'error': err});
+      callback({ 'redeploy_enabled': true, 'status': "fail", 'error': err });
     } else {
-      callback({'redeploy_enabled': true, 'status': "ok"});
+      callback({ 'redeploy_enabled': true, 'status': "ok" });
     }
-  
+
     // the *entire* stdout and stderr (buffered)
-    console.log(`redeploy stdout: ${stdout}`);
-    console.log(`redeploy stderr: ${stderr}`);
+    logger.info(`redeploy stdout: ${stdout}`);
+    logger.info(`redeploy stderr: ${stderr}`);
   });
 }
 
 function sendInitialRedeployStatus() {
-  let initialRedeployStatus = {'redeploy_enabled': isDevMode, 'status': "not started"};
+  let initialRedeployStatus = { 'redeploy_enabled': isDevMode, 'status': "not started" };
   mainWindow.webContents.send("redeployStatus", initialRedeployStatus);
 }
 
 ipcMain.on('init', (event, args) => {
   sendInitialRedeployStatus();
-  mainWindow.webContents.send("initStatus", {'init_status': "ok"});
+  mainWindow.webContents.send("initStatus", { 'init_status': "ok" });
 })
 
 ipcMain.on("getClockData", (event, args) => {
-  clockDataAPI.getClockData(function(clockDataResult) {
-    mainWindow.webContents.send("clockDataResult", clockDataResult);
-  });
+  clockDataAPI.getClockData()
+    .then(json => mainWindow.webContents.send("clockDataResult", json))
+    .catch(error => {
+      logger.error(`error calling clock data API: ${error}`)
+      mainWindow.webContents.send("clockDataResult", {"APIError": error});
+    });
 });
 
 if (isDevMode) {
   ipcMain.on("redeploy", (event, args) => {
-    redeployDevEnvironment(function(redeployStatus) {
+    redeployDevEnvironment(function (redeployStatus) {
       mainWindow.webContents.send("redeployStatus", redeployStatus);
     });
   });
