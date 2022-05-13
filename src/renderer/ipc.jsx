@@ -22,7 +22,7 @@ function receiveClockData() {
 const redeployCallbacks = [];
 function receiveRedeployStatus() {
     window.dev.receive("redeployStatus", (status) => {
-        console.log(`redeploy status: ${status}`)
+        console.log(`redeploy status: ${JSON.stringify(status)}`)
         redeployCallbacks.forEach(cb => {
             cb(status)
         });
