@@ -5,10 +5,9 @@ const path = require('path')
 const axios = require('axios');
 const { exec } = require('child_process');
 const winston = require('winston');
-require('axios-debug-log')
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: 'debug',
   format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
   defaultMeta: {},
   transports: [
@@ -86,9 +85,13 @@ function addAuthHeader(options, authHeader) {
   }
 }
 
+const api = axios.create({
+    timeout: 950,
+});
+require('axios-debug-log').addLogger(api, logger.debug);
 function callAPI(config) {
   addFishTag(config);
-  return axios(config);
+  return api(config);
 }
 
 class ClockDataAPI {
