@@ -136,19 +136,15 @@ class ClockDataAPI {
       }
       let setJwtCache = (response) => {
         if (response.status == 401) {
-          self.jwt = null;
           logger.error("bad serial or secret");
-          return null;
         } else if (response.status == 200) {
           logger.info("success getting JWT")
           self.jwt = `Bearer ${response.data["JWT"]}`;
           self.incrementJwtTimeout();
-          return self.jwt;
         } else {
-          self.jwt = null;
           logger.error(`bad status getting jwt: ${response.status}`)
-          return null;
         }
+        return self.jwt;
       }
       const authnConfig = {
         url: authnURL,
