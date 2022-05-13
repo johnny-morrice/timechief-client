@@ -88,13 +88,12 @@ function addAuthHeader(options, authHeader) {
 
 function callAPI(config) {
   addFishTag(config);
-  logger.info(`calling API with config: ${JSON.stringify(config)}`);
   return axios(config);
 }
 
 class ClockDataAPI {
   constructor() {
-    this.jwt = null;
+    this.jwt = "Bearer UninitialisedGarbage";
     this.authorised = false;
     this.clockSerial = process.env.clockSerial;
     this.clockSecret = process.env.clockSecret;
@@ -151,7 +150,7 @@ class ClockDataAPI {
       const authnConfig = {
         url: authnURL,
         method: 'post',
-        body: authBody,
+        data: authBody,
         headers: {
           "Content-Type": "application/json"
         }
@@ -159,7 +158,7 @@ class ClockDataAPI {
       return callAPI(authnConfig).then(setJwtCache).then(jwt => self.doGetClockData(jwt));
     }
 
-    return self.doGetClockData(jwt);
+    return self.doGetClockData(self.jwt);
   }
 };
 
