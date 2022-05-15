@@ -3,14 +3,17 @@ import { addClockDataCallback } from './ipc';
 import { getTaskBarSignals } from './taskbarSignals';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
-import { apiErrorTimeout, minute, second } from './timing';
+import { apiErrorTimeout, second } from './timing';
 
 class HomePageSignals {
   constructor() {
       [this.isAPIError, this.setAPIError] = createSignal(false);
+      [this.locale, this.setLocale] = createSignal("");
+      [this.timezone, this.setTimezone] = createSignal("");
+      [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
       [this.lastRefreshText, this.setLastRefreshText] = createSignal("");
       [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
-      [this.myTime, this.setMyTime] = createSignal(getTimeText());
+      [this.myTime, this.setMyTime] = createSignal("");
       [this.myDate, this.setMyDate] = createSignal(getDateText());
       [this.temp, this.setTemp] = createSignal("");
       [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
@@ -20,8 +23,28 @@ class HomePageSignals {
   }
 }
 
-function getTimeText() {
-    return new Date().toLocaleTimeString();
+function getTimeText(homePageSignals) {
+    console.log("home page signals...");
+    console.log(homePageSignals);
+    let options = {};
+    let hourCycleOption = homePageSignals.hourCycleOption();
+    let hourCycleMapping = {
+      "24h": "h23",
+      "12h": "h12"
+    };
+    if (hourCycleOption) {
+      let timeOpt = hourCycleMapping[hourCycleOption];
+      options["hc"] = timeOpt;
+    }
+    let timezone = homePageSignals.timezone();
+    if (timezone) {
+      options["timeZone"] = timezone;
+    }
+    let locale = homePageSignals.locale();
+    if (!locale) {
+      locale = undefined;
+    }
+    return new Date().toLocaleTimeString(locale, options);
 }
   
 function getDateText() {
@@ -32,7 +55,11 @@ function getDateText() {
 }
 
 function updateHomePageSignals(signals, data) {
-    let location = data["Clock"]["Location"];
+    let clock = data["Clock"];
+    let hourCycleOption = clock["HourCycleOption"];
+    let timezone = clock["Timezone"];
+    let locale = clock["Locale"];
+    let location = clock["Location"];
     let currentWeather = data["Weather"]["Current"];
     let temp = currentWeather["Temp"];
     let feelsLike = currentWeather["FeelsLike"];
@@ -43,6 +70,9 @@ function updateHomePageSignals(signals, data) {
     }
     let feelsLikeText = kelvinToCelsiusText(feelsLike);
     let tempText = kelvinToCelsiusText(temp);
+    signals.setHourCycleOption(hourCycleOption);
+    signals.setLocale(locale);
+    signals.setTimezone(timezone);
     signals.setWeatherDescriptions(descriptions);
     if (descriptions.length > 0) {
       signals.setFirstWeatherDescription(descriptions[0]);
@@ -85,7 +115,7 @@ export const HomePage = () => {
 
   let timeInterval = setInterval(
     () => {
-      homePageSignals.setMyTime(getTimeText());
+      homePageSignals.setMyTime(getTimeText(homePageSignals));
       homePageSignals.setMyDate(getDateText());
     },
     second / 10
