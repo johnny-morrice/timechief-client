@@ -24,17 +24,15 @@ class HomePageSignals {
 }
 
 function getTimeText(homePageSignals) {
-    console.log("home page signals...");
-    console.log(homePageSignals);
     let options = {};
     let hourCycleOption = homePageSignals.hourCycleOption();
     let hourCycleMapping = {
-      "24h": "h23",
-      "12h": "h12"
+      "24h": false,
+      "12h": true
     };
     if (hourCycleOption) {
       let timeOpt = hourCycleMapping[hourCycleOption];
-      options["hc"] = timeOpt;
+      options["hour12"] = timeOpt;
     }
     let timezone = homePageSignals.timezone();
     if (timezone) {
@@ -44,7 +42,9 @@ function getTimeText(homePageSignals) {
     if (!locale) {
       locale = undefined;
     }
-    return new Date().toLocaleTimeString(locale, options);
+    console.log(options);
+    let time = new Date().toLocaleTimeString(locale, options);
+    return time.replace(/\s+(am|pm|AM|PM)/, "");
 }
   
 function getDateText() {
