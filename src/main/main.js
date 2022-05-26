@@ -129,10 +129,12 @@ class ClockDataAPI {
     // The easiest way to be robust is simply to refresh login every so often.
     let now = new Date();
     if (self.jwtTimeout.getTime() < now.getTime()) {
-      let authnURL = this.baseURL + '/authn/token/clock';
+      let authnURL = this.baseURL + '/authn/token';
       let authBody = {
         'DeviceSerial': this.clockSerial,
         'DeviceSecret': this.clockSecret,
+        'TokenPolicy': 'OrphanDevice',
+        'Scopes': ['clock-data:read']
       }
       let setJwtCache = (response) => {
         if (response.status == 401) {
