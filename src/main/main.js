@@ -168,9 +168,9 @@ var clockDataAPI = new ClockDataAPI()
 function redeployDevEnvironment(callback) {
   exec(process.env.redeployCommand, (err, stdout, stderr) => {
     if (err) {
-      callback({ 'redeploy_enabled': true, 'status': "fail", 'error': err });
+      callback({ "redeploy_enabled": true, "status": "fail", "error": err });
     } else {
-      callback({ 'redeploy_enabled': true, 'status': "ok" });
+      callback({ "redeploy_enabled": true, "status": "ok" });
     }
 
     // the *entire* stdout and stderr (buffered)
@@ -178,16 +178,6 @@ function redeployDevEnvironment(callback) {
     logger.info(`redeploy stderr: ${stderr}`);
   });
 }
-
-function sendInitialRedeployStatus() {
-  let initialRedeployStatus = { 'redeploy_enabled': isDevMode, 'status': "not started" };
-  mainWindow.webContents.send("redeployStatus", initialRedeployStatus);
-}
-
-ipcMain.on('init', (event, args) => {
-  sendInitialRedeployStatus();
-  mainWindow.webContents.send("initStatus", { 'init_status': "ok" });
-})
 
 ipcMain.on("getClockData", (event, args) => {
   clockDataAPI.getClockData()
@@ -198,10 +188,26 @@ ipcMain.on("getClockData", (event, args) => {
     });
 });
 
-if (isDevMode) {
-  ipcMain.on("redeploy", (event, args) => {
-    redeployDevEnvironment(function (redeployStatus) {
-      mainWindow.webContents.send("redeployStatus", redeployStatus);
-    });
-  });
-}
+ipcMain.on("deviceCommand", (event, command) => {
+  switch (command["command"]) {
+    case "redeploy":
+      if (isDevMode) {
+        logger.warn("redeploying device");
+        redeployDevEnvironment(function (redeployStatus) {
+          mainWindow.webContents.send("deviceStatus", redeployStatus);
+        });
+      } else {
+        logger.error("requested redeploy but not dev mode");
+        mainWindow.webContents.send("deviceStatus", {"redeploy_enabled": isDevMode, "status": "command failed"})
+      }
+      break;
+    case "heartbeat":
+      logger.debug("handling device heartbeat")
+      mainWindow.webContents.send("deviceStatus", {"redeploy_enabled": isDevMode, "status": "ok"});
+      break;
+    default:
+      logger.error(`unknown device command: ${command["command"]}`)
+      mainWindow.webContents.send("deviceStatus", {"redeploy_enabled": isDevMode, "status": "command failed"});
+      break;
+  }
+});
