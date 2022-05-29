@@ -19,27 +19,28 @@ function receiveClockData() {
     });
 }
 
-const redeployCallbacks = [];
+const deviceCallbacks = [];
 function receiveRedeployStatus() {
-    window.dev.receive("redeployStatus", (status) => {
-        console.log(`redeploy status: ${JSON.stringify(status)}`)
-        redeployCallbacks.forEach(cb => {
+    window.device.receive("deviceStatus", (status) => {
+        console.log(`deviceStatus status: ${JSON.stringify(status)}`)
+        deviceCallbacks.forEach(cb => {
             cb(status)
         });
     });
 }
 
-function sendInit() {
-    window.init.send('init');
-}
-
 export function triggerRedeploy() {
     console.log("triggering redeploy...");
-    window.dev.send('redeploy');
+    window.device.send("deviceCommand", {'command': 'redeploy'});
 }
 
-export function addRedeployCallback(callback) {
-    redeployCallbacks.push(callback);
+export function sendDeviceHeartbeat() {
+    console.log("sending device heartbeat...")
+    window.device.send("deviceCommand", {'command': 'heartbeat'});
+}
+
+export function addDeviceStatusCallback(callback) {
+    deviceCallbacks.push(callback);
 }
 
 export function addClockDataCallback(callback) {
@@ -47,11 +48,12 @@ export function addClockDataCallback(callback) {
 }
 
 export function initializeIPC() {
-    let interval = setInterval(
-        sendClockDataRequest,
+    let interval = setInterval(() => {
+        sendClockDataRequest();
+        sendDeviceHeartbeat();
+    },
         apiRefreshInterval
     );
-    sendInit();
     receiveRedeployStatus();
     receiveClockData();
     return interval;

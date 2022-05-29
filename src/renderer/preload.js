@@ -18,32 +18,15 @@ contextBridge.exposeInMainWorld(
 );
 
 contextBridge.exposeInMainWorld(
-    "init", {
-        send: (channel) => {
-            let validChannels = ["init"];
+    "device", {
+        send: (channel, ...args) => {
+            let validChannels = ["deviceCommand"];
             if (validChannels.includes(channel)) {
-                ipcRenderer.send(channel);
+                ipcRenderer.send(channel, ...args);
             }
         },
         receive: (channel, func) => {
-            let validChannels = ["initStatus"];
-            if (validChannels.includes(channel)) {
-                ipcRenderer.on(channel, (event, ...args) => func(...args));
-            }
-        }
-    }
-)
-
-contextBridge.exposeInMainWorld(
-    "dev", {
-        send: (channel) => {
-            let validChannels = ["redeploy"];
-            if (validChannels.includes(channel)) {
-                ipcRenderer.send(channel);
-            }
-        },
-        receive: (channel, func) => {
-            let validChannels = ["redeployStatus"];
+            let validChannels = ["deviceStatus"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.on(channel, (event, ...args) => func(...args));
             }
