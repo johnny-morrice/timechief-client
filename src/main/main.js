@@ -124,6 +124,10 @@ class ClockDataAPI {
     this.jwtTimeout = new Date();
   }
 
+  timeoutNow() {
+    this.jwtTimeout = new Date();
+  }
+
   incrementJwtTimeout() {
     let duration = 60 * 1000;
     this.jwtTimeout = new Date(this.jwtTimeout.getTime() + duration);
@@ -212,6 +216,7 @@ ipcMain.on("getClockData", (event, args) => {
   clockDataAPI.getClockData()
     .then(json => mainWindow.webContents.send("clockDataResult", json))
     .catch(error => {
+      clockDataAPI.timeoutNow();
       logger.error(`error calling clock data API: ${error}`)
       mainWindow.webContents.send("clockDataResult", {"APIError": error});
     });
