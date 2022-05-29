@@ -5,6 +5,26 @@ const path = require('path')
 const axios = require('axios');
 const { exec } = require('child_process');
 const winston = require('winston');
+const { networkInterfaces } = require('os');
+
+function getIpAddress() {
+  const nets = networkInterfaces();
+  
+  for (const name of Object.keys(nets)) {
+      for (const net of nets[name]) {
+          // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+          // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
+          // Just return the first IP address
+          const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+          if (net.family === familyV4Value && !net.internal) {
+              return net.address;
+          }
+      }
+  }
+
+  return "unknown";
+}
+
 
 const logger = winston.createLogger({
   level: 'debug',
@@ -167,16 +187,25 @@ var clockDataAPI = new ClockDataAPI()
 
 function redeployDevEnvironment(callback) {
   exec(process.env.redeployCommand, (err, stdout, stderr) => {
-    if (err) {
-      callback({ "redeploy_enabled": true, "status": "fail", "error": err });
-    } else {
-      callback({ "redeploy_enabled": true, "status": "ok" });
-    }
+    const deviceStatus = baseDeviceStatus();
 
+    if (err) {
+      deviceStatus["status"] = "command failed";
+      deviceStatus["error"] = err;
+    }
+    callback(deviceStatus);
     // the *entire* stdout and stderr (buffered)
     logger.info(`redeploy stdout: ${stdout}`);
     logger.info(`redeploy stderr: ${stderr}`);
   });
+}
+
+function baseDeviceStatus() {
+  return {
+    "redeploy_enabled": isDevMode,
+    "status": "ok",
+    "ip_address": getIpAddress()
+  }
 }
 
 ipcMain.on("getClockData", (event, args) => {
@@ -198,16 +227,20 @@ ipcMain.on("deviceCommand", (event, command) => {
         });
       } else {
         logger.error("requested redeploy but not dev mode");
-        mainWindow.webContents.send("deviceStatus", {"redeploy_enabled": isDevMode, "status": "command failed"})
+        const deviceStatus = baseDeviceStatus();
+        deviceStatus["status"] = "command failed";
+        mainWindow.webContents.send("deviceStatus", deviceStatus)
       }
       break;
     case "heartbeat":
       logger.debug("handling device heartbeat")
-      mainWindow.webContents.send("deviceStatus", {"redeploy_enabled": isDevMode, "status": "ok"});
+      mainWindow.webContents.send("deviceStatus", baseDeviceStatus());
       break;
     default:
       logger.error(`unknown device command: ${command["command"]}`)
-      mainWindow.webContents.send("deviceStatus", {"redeploy_enabled": isDevMode, "status": "command failed"});
+      const deviceStatus = baseDeviceStatus();
+      deviceStatus["status"] = "command failed";
+      mainWindow.webContents.send("deviceStatus", deviceStatus);
       break;
   }
 });
