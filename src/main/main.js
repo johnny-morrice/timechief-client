@@ -106,7 +106,7 @@ function addAuthHeader(options, authHeader) {
 }
 
 const api = axios.create({
-    timeout: 950,
+    timeout: 10 * 1000,
 });
 require('axios-debug-log').addLogger(api, logger.debug);
 function callAPI(config) {

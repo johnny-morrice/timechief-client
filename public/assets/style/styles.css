@@ -128,11 +128,6 @@ div.time-border {
     padding-left: 20pt;
 }
 
-div.weather-icon-bar {
-    height: 30pt;
-    line-height: 30pt;
-}
-
 div.weather-icon {
     font-size: 30pt;
 }
