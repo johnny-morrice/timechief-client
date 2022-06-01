@@ -25,7 +25,7 @@ class DayForecastSignals {
         [this.dayFeelsLike, this.setDayFeelsLike] = createSignal("");
         [this.eveFeelsLike, this.setEveFeelsLike] = createSignal("");
         [this.nightFeelsLike, this.setNightFeelsLike] = createSignal("");
-        [this.weatherConditions, this.setWeatherConditions] = createSignal([]);
+        [this.weatherConditions, this.setWeatherConditions] = createSignal("");
     }
 }
 

@@ -17,7 +17,6 @@ class HomePageSignals {
       [this.myDate, this.setMyDate] = createSignal(getDateText());
       [this.temp, this.setTemp] = createSignal("");
       [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
-      [this.weatherDescriptions, this.setWeatherDescriptions] = createSignal([]);
       [this.location, this.setLocation] = createSignal("");
       [this.currentWeatherConditions, this.setCurrentWeatherConditions] = createSignal("");
   }
@@ -69,7 +68,7 @@ function updateHomePageSignals(signals, data) {
     signals.setHourCycleOption(hourCycleOption);
     signals.setLocale(locale);
     signals.setTimezone(timezone);
-    signals.setWeatherDescriptions(descriptions);
+    console.log(weatherConditions);
     signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
     signals.setFeelsLikeTemp(feelsLikeText);
     signals.setTemp(tempText);
@@ -147,11 +146,9 @@ export const HomePage = () => {
               </div>
             </div>
             <div class="flex-element column-flex">
-                {/* <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) =>  */}
-                    <div class="row-flex flex-element weather-icon-bar">
-                            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.currentWeatherConditions())}></i></div>
-                    </div>
-                {/* }}</Index> */}
+                  <div class="row-flex flex-element weather-icon-bar">
+                          <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.currentWeatherConditions())}></i></div>
+                  </div>
             </div>
             <div class="column-flex">
               <div class='section-name flex-element'>Status</div>

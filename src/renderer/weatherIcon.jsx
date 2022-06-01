@@ -1,5 +1,6 @@
 export function weatherIconStyleClass(weatherCode) {
-    switch (weatherCode.toLowerCase()) {
+    // console.log(`weatherCode: ${weatherCode}`);
+    switch (weatherCode) {
         case "Sun":
             return "fa-sun"
         case "CloudSunRain":
@@ -25,4 +26,5 @@ export function weatherIconStyleClass(weatherCode) {
         case "Volcano":
             return "fa-volcano"
     }
+    return "";
 }
