@@ -163,7 +163,6 @@ export const HomePage = () => {
           </div>
         </div>
         <div class="column-flex flex-element">
-          <div class='section-name flex-element'>Status</div>
           <div class={"row-flex home-health-icon-bar " + errorStyleClass(homePageSignals.isAPIError())}>
             <Show when={!homePageSignals.isAPIError()}>
               <div class='flex-element home-health-icon'>
