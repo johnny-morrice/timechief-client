@@ -19,7 +19,7 @@ class HomePageSignals {
       [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
       [this.weatherDescriptions, this.setWeatherDescriptions] = createSignal([]);
       [this.location, this.setLocation] = createSignal("");
-      [this.firstWeatherDescription, this.setFirstWeatherDescription] = createSignal("");
+      [this.currentWeatherConditions, this.setCurrentWeatherConditions] = createSignal("");
   }
 }
 
@@ -63,20 +63,14 @@ function updateHomePageSignals(signals, data) {
     let currentWeather = data["Weather"]["Current"];
     let temp = currentWeather["Temp"];
     let feelsLike = currentWeather["FeelsLike"];
-    let descriptions = [];
     let weatherConditions = currentWeather["WeatherConditions"];
-    for (var i = 0; i < weatherConditions.length; i++) {
-        descriptions.push(weatherConditions[i]["Description"]);
-    }
     let feelsLikeText = kelvinToCelsiusText(feelsLike);
     let tempText = kelvinToCelsiusText(temp);
     signals.setHourCycleOption(hourCycleOption);
     signals.setLocale(locale);
     signals.setTimezone(timezone);
     signals.setWeatherDescriptions(descriptions);
-    if (descriptions.length > 0) {
-      signals.setFirstWeatherDescription(descriptions[0]);
-    }
+    signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
     signals.setFeelsLikeTemp(feelsLikeText);
     signals.setTemp(tempText);
     signals.setLocation(location);
@@ -155,8 +149,7 @@ export const HomePage = () => {
             <div class="flex-element column-flex">
                 {/* <Index each={homePageSignals.weatherDescriptions()}>{(desc, i) =>  */}
                     <div class="row-flex flex-element weather-icon-bar">
-                            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.firstWeatherDescription())}></i></div>
-                            <div class='current-weather-description flex-element'>{homePageSignals.firstWeatherDescription}</div>
+                            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.currentWeatherConditions())}></i></div>
                     </div>
                 {/* }}</Index> */}
             </div>

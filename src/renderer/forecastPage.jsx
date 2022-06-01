@@ -25,7 +25,7 @@ class DayForecastSignals {
         [this.dayFeelsLike, this.setDayFeelsLike] = createSignal("");
         [this.eveFeelsLike, this.setEveFeelsLike] = createSignal("");
         [this.nightFeelsLike, this.setNightFeelsLike] = createSignal("");
-        [this.weatherDescriptions, this.setWeatherDescriptions] = createSignal([]);
+        [this.weatherConditions, this.setWeatherConditions] = createSignal([]);
     }
 }
 
@@ -57,12 +57,8 @@ function updateForecastPageSignals(signals, data) {
         daySignals.setDayFeelsLike(kelvinToCelsiusText(dayFeelsLike));
         daySignals.setEveFeelsLike(kelvinToCelsiusText(eveFeelsLike));
         daySignals.setNightFeelsLike(kelvinToCelsiusText(nightFeelsLike));
-        let descriptions = [];
         let weatherConditions = forecast["WeatherConditions"];
-        for (var j = 0; j < weatherConditions.length; j++) {
-            descriptions.push(weatherConditions[j]["Description"]);
-        }
-        daySignals.setWeatherDescriptions(descriptions);
+        daySignals.setWeatherConditions(weatherConditions["ConditionCode"]);
     }
 }
 
@@ -143,12 +139,9 @@ export const ForecastPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <Index each={day.weatherDescriptions()}>{(desc, j) =>
-                            <div class="row-flex weather-icon-bar">
-                                <div class='flex-element weather-icon'><i class={"fa-solid " + weatherIconStyleClass(desc())}></i></div>
-                                <div class='flex-element'>{desc()}</div>
-                            </div>
-                        }</Index>
+                        <div class="row-flex weather-icon-bar">
+                            <div class='flex-element weather-icon'><i class={"fa-solid " + weatherIconStyleClass(day.weatherConditions())}></i></div>
+                        </div>  
                     </div>
                 }</For>
             </div>

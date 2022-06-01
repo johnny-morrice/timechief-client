@@ -1,5 +1,20 @@
-export function weatherIconStyleClass(weatherDescription) {
-    switch (weatherDescription.toLowerCase()) {
+// const (
+// 	Sun          = "Sun"
+// 	CloudSunRain = "CloudSunRain"
+// 	CloudSun     = "CloudSun"
+// 	Cloud        = "Cloud"
+// 	Rain         = "Rain"
+// 	HeavyRain    = "HeavyRain"
+// 	Lightning    = "Lightning"
+// 	Mist         = "Mist"
+// 	Tornado      = "Tornado"
+// 	Wind         = "Wind"
+// 	Snow         = "Snow"
+// 	Volcano      = "Volcano"
+// )
+
+export function weatherIconStyleClass(weatherCode) {
+    switch (weatherCode.toLowerCase()) {
         case "clear sky":
             return "fa-sun";
         case "thunderstorm with light rain":
