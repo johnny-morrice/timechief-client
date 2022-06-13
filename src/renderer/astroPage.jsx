@@ -1,6 +1,5 @@
 import { createSignal } from 'solid-js';
 import { addClockDataCallback } from './ipc';
-import { getTaskBarSignals } from './taskbarSignals';
 
 class AstroPageSignals {
   constructor() {
@@ -72,14 +71,9 @@ function moonPhaseDescription(moonPhase) {
 
 export const AstroPage = () => {
   let astroSignals = new AstroPageSignals();
-  let taskBarSignals = getTaskBarSignals();
-
   addClockDataCallback((data) => updateAstroPageSignals(astroSignals, data));
 
-  return <div id="config-screen" style={{
-        display: `${taskBarSignals.astroDisplayStyle()}` 
-        }}
-        >
+  return <div id="astro-screen">
         <div class="column-flex">
             <div class="flex-element section-name underline">Astronomical Data</div>
             <div class='row-flex flex-element'>

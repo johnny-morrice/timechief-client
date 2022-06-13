@@ -1,6 +1,5 @@
-import { createSignal, Index, onCleanup } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addClockDataCallback } from './ipc';
-import { getTaskBarSignals } from './taskbarSignals';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
 import { apiErrorTimeout, second } from './timing';
@@ -109,7 +108,6 @@ function errorStyleClass(isError) {
 
 export const HomePage = () => {
   let homePageSignals = new HomePageSignals();
-  let taskBarSignals = getTaskBarSignals();
 
   addClockDataCallback((data) => updateHomePageSignals(homePageSignals, data));
 
@@ -135,10 +133,7 @@ export const HomePage = () => {
     clearInterval(timeInterval);
   });
 
-  return <div id="home-screen" style={{
-    display: `${taskBarSignals.homeDisplayStyle()}`
-  }}
-  >
+  return <div id="home-screen">
     <div class="row-flex">
       <div class="flex-element column-flex" id="home-data">
         <div class='home-weather-title flex-element'>Weather</div>
