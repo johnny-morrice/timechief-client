@@ -3,8 +3,6 @@ import { showHome, showAstro, showDevice, showForecast, showAccount } from './ro
 
 
 export const TaskBar = () => {
-  let signals = getTaskBarSignals();
-
   onCleanup(() => {
     clearInterval(timeInterval);
   });
@@ -12,7 +10,7 @@ export const TaskBar = () => {
   return <div id="taskbar">
         <div class="row-flex">
             <div class='flex-element'>
-                <button class='nav-button' onClick={showHow}><i class="fa-solid fa-home"></i></button>
+                <button class='nav-button' onClick={showHome}><i class="fa-solid fa-home"></i></button>
             </div>
             <div class='flex-element'>
                 <button class='nav-button' onClick={showForecast}><i class="fa-solid fa-cloud-sun"></i></button>
