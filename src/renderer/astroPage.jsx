@@ -69,9 +69,14 @@ function moonPhaseDescription(moonPhase) {
     return "";
 }
 
+var initialised = false;
+let astroSignals = new AstroPageSignals();
 export const AstroPage = () => {
-  let astroSignals = new AstroPageSignals();
-  addClockDataCallback((data) => updateAstroPageSignals(astroSignals, data));
+  
+  if (!initialised) {
+    addClockDataCallback((data) => updateAstroPageSignals(astroSignals, data));
+    initialised = true;
+  }
 
   return <div id="astro-screen">
         <div class="column-flex">

@@ -68,10 +68,14 @@ function parseUnixDate(seconds) {
     return dateText;
 }
 
+var initialised = false;
+let forecastSignals = new ForecastPageSignals();
 export const ForecastPage = () => {
-  let forecastSignals = new ForecastPageSignals();
-
-  addClockDataCallback((data) => updateForecastPageSignals(forecastSignals, data));
+  
+  if (!initialised) {
+    addClockDataCallback((data) => updateForecastPageSignals(forecastSignals, data));
+    initialised = true;
+  }
 
   function weatherColumnClass(i) {
       if (i % 2 == 0) {

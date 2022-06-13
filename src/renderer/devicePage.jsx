@@ -42,13 +42,18 @@ function updateDeviceSignals(signals, statusResponse) {
     signals.setIpAddress(ipAddress);
 }
 
+var initialised = false;
+let configSignals = new DevicePageSignals();
+let deviceSignals = new DeviceSignals();
+
 export const DevicePage = () => {
-  let configSignals = new DevicePageSignals();
-  let deviceSignals = new DeviceSignals();
 
-  addClockDataCallback((data) => updateDevicePageSignals(configSignals, data));
-  addDeviceStatusCallback((status) => updateDeviceSignals(deviceSignals, status));
-
+  if (!initialised) {
+    addClockDataCallback((data) => updateDevicePageSignals(configSignals, data));
+    addDeviceStatusCallback((status) => updateDeviceSignals(deviceSignals, status));
+    initialised = true;
+  }
+  
   return <div id="config-screen">
         <div class="column-flex">
             <div class='flex-element section-name underline'>Settings</div>

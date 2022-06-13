@@ -106,11 +106,15 @@ function errorStyleClass(isError) {
   }
 }
 
+var initialised = false;
+let homePageSignals = new HomePageSignals();
 export const HomePage = () => {
-  let homePageSignals = new HomePageSignals();
 
-  addClockDataCallback((data) => updateHomePageSignals(homePageSignals, data));
-
+  if (!initialised) {
+    addClockDataCallback((data) => updateHomePageSignals(homePageSignals, data));
+    initialised = true;
+  }
+  
   let timeInterval = setInterval(
     () => {
       homePageSignals.setMyTime(getTimeText(homePageSignals));
