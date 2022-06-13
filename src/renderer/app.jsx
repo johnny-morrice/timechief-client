@@ -6,6 +6,7 @@ import { DevicePage } from "./devicePage";
 import { TaskBar } from "./taskbar";
 import { ForecastPage } from "./forecastPage";
 import { AstroPage } from "./astroPage";
+import { AccountPage } from "./accountPage";
 import { hashIntegration, Router, Routes, Route } from "solid-app-router";
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
       <Route path="/forecast" element={<ForecastPage/>} />
       <Route path="/device" element={<DevicePage/>} />
       <Route path="/astro" element={<AstroPage/>} />
+      <Route path="/account" element={<AccountPage/>} />
       <Route path="/" element={<HomePage/>} />
     </Routes>
 };
