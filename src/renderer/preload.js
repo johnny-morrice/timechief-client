@@ -2,10 +2,10 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld(
     "api", {
-        send: (channel) => {
+        send: (channel, ...args) => {
             let validChannels = ["getClockData", "pairingCreate", "pairingGet", "pairingComplete"];
             if (validChannels.includes(channel)) {
-                ipcRenderer.send(channel);
+                ipcRenderer.send(channel, ...args);
             }
         },
         receive: (channel, func) => {

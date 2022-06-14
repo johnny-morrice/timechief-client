@@ -32,16 +32,18 @@ export const AccountPage = () => {
         }, 300);
     });
     addPairingCompleteCallback((data) => {
-        accountSignals.setPairingCode("");
-        if (pairingGetInterval != null) {
-            clearInterval(pairingGetInterval);
+        if (data["ok"]) {
+            accountSignals.setPairingCode("");
+            if (pairingGetInterval != null) {
+                clearInterval(pairingGetInterval);
+            }
         }
     });
     addPairingGetCallback((data) => {
         if (data["Status"] == "linked") {
             let pairingCode = accountSignals.pairingCode();
             if (hasPairingCode(pairingCode)) {
-                sendPairingCompleteRequest();
+                sendPairingCompleteRequest(pairingCode);
             } else {
                 console.log("cannot complete pairing, lost pairing code");
             }

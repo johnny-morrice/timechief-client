@@ -183,7 +183,7 @@ class API {
     };
     addAuthHeader(config, jwt);
     return callAPI(config).then(resp => {
-      return resp.status == 204;
+      return {"ok" : resp.status == 204};
     });
   }
 
