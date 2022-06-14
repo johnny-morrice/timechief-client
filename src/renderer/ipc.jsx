@@ -6,7 +6,7 @@ class APIResultReceiver {
         this.channel = channel;
     }
 
-    receiveAPIResults() {
+    receive() {
         window.api.receive(this.channel, (data) => {
             if ("APIError" in data) {
                 console.log(`error calling API: ${data["APIError"]}`);
@@ -92,6 +92,9 @@ export function initializeIPC() {
         apiRefreshInterval
     );
     receiveRedeployStatus();
-    receiveClockData();
+    clockDataReceiver.receive();
+    pairingCompleteReceiver.receive();
+    pairingGetReceiver.receive();
+    pairingCompleteReceiver.receive();
     return interval;
 }
