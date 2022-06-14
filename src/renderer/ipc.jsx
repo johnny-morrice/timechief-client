@@ -85,13 +85,11 @@ export function sendPairingCompleteRequest(pairingCode) {
 
 export function initializeIPC() {
     let interval = setInterval(() => {
-        // sendClockDataRequest();
-        // sendDeviceHeartbeat();
+        sendClockDataRequest();
+        sendDeviceHeartbeat();
     },
         apiRefreshInterval
     );
-    sendClockDataRequest();
-    sendDeviceHeartbeat();
     receiveRedeployStatus();
     clockDataReceiver.receive();
     pairingCreateReceiver.receive();
