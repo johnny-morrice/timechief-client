@@ -9,8 +9,9 @@ class APIResultReceiver {
     receive() {
         window.api.receive(this.channel, (data) => {
             if ("APIError" in data) {
-                console.log(`error calling API: ${data["APIError"]}`);
+                console.log(`error calling API for channel ${this.channel}: ${data["APIError"]}`);
             } else {
+                console.log(`received data for channel: ${this.channel}: ${data}`);
                 this.callbacks.forEach(cb => {
                     cb(data);
                 });
@@ -31,7 +32,6 @@ export const clockDataReceiver = new APIResultReceiver("clockDataResult");
 const deviceCallbacks = [];
 function receiveRedeployStatus() {
     window.device.receive("deviceStatus", (status) => {
-        console.log(`deviceStatus status: ${JSON.stringify(status)}`)
         deviceCallbacks.forEach(cb => {
             cb(status)
         });
@@ -64,7 +64,6 @@ export function triggerRedeploy() {
 }
 
 export function sendDeviceHeartbeat() {
-    console.log("sending device heartbeat...")
     window.device.send("deviceCommand", {'command': 'heartbeat'});
 }
 
@@ -86,14 +85,16 @@ export function sendPairingCompleteRequest(pairingCode) {
 
 export function initializeIPC() {
     let interval = setInterval(() => {
-        sendClockDataRequest();
-        sendDeviceHeartbeat();
+        // sendClockDataRequest();
+        // sendDeviceHeartbeat();
     },
         apiRefreshInterval
     );
+    sendClockDataRequest();
+    sendDeviceHeartbeat();
     receiveRedeployStatus();
     clockDataReceiver.receive();
-    pairingCompleteReceiver.receive();
+    pairingCreateReceiver.receive();
     pairingGetReceiver.receive();
     pairingCompleteReceiver.receive();
     return interval;

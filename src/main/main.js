@@ -183,9 +183,7 @@ class API {
     };
     addAuthHeader(config, jwt);
     return callAPI(config).then(resp => {
-      if (resp.status == 200) {
-        return resp.data;
-      }
+      return resp.status == 204;
     });
   }
 
@@ -220,7 +218,7 @@ class API {
         'DeviceSerial': this.clockSerial,
         'DeviceSecret': this.clockSecret,
         'TokenPolicy': 'OrphanDevice',
-        'Scopes': ['clock-data:read']
+        'Scopes': ['clock-data:read', 'pairing:create', 'pairing:get', 'pairing:complete']
       }
       let setJwtCache = (response) => {
         if (response.status == 401) {
@@ -278,7 +276,10 @@ function baseDeviceStatus() {
 function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   ipcMain.on(sendChan, (event, args) => {
     apiCall(args)
-      .then(json => mainWindow.webContents.send(receiveChan, json))
+      .then(json => {
+        logger.info(`returning results to channel: ${receiveChan}`);
+        mainWindow.webContents.send(receiveChan, json)
+      })
       .catch(error => {
         api.timeoutNow();
         logger.error(`error calling ${sendChan} API: ${error}`)
@@ -287,9 +288,9 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   });
 }
 
-handleIPCAPICall("pairingCreate", "pairingCreateResult", api.pairingCreate);
-handleIPCAPICall("pairingGet", "pairingGetResult", api.pairingGet);
-handleIPCAPICall("pairingComplete", "pairingCompleteResult", api.pairingComplete);
+handleIPCAPICall("pairingCreate", "pairingCreateResult", () => api.pairingCreate());
+handleIPCAPICall("pairingGet", "pairingGetResult", (pairingCode) => api.pairingGet(pairingCode));
+handleIPCAPICall("pairingComplete", "pairingCompleteResult", (pairingCode) => api.pairingComplete(pairingCode));
 handleIPCAPICall("getClockData", "clockDataResult", () => api.getClockData());
 
 ipcMain.on("deviceCommand", (event, command) => {

@@ -22,7 +22,8 @@ export const AccountPage = () => {
   if (!initialised) {
     addClockDataCallback((data) => updateAccountPageSignals(accountSignals, data));
     addPairingCreateCallback((data) => {
-        accountSignals.setPairingCode(data["PairingCode"]);
+        console.log(`pairing create result: ${JSON.stringify(data)}`);
+        accountSignals.setPairingCode(data["Code"]);
         pairingGetInterval = setInterval(() => {
             let pairingCode = accountSignals.pairingCode();
             if (hasPairingCode(pairingCode)) {
@@ -98,7 +99,7 @@ export const AccountPage = () => {
                 </div>
                 <div class='row-flex flex-element'>
                     <div class="flex-element data-name">Enter your pairing code</div>
-                    <div class="flex-element data-value">{accountSignals.principalSerial}</div>
+                    <div class="flex-element data-value">{accountSignals.pairingCode}</div>
                 </div>
             </div>
         </Show>

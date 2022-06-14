@@ -41,7 +41,6 @@ function getTimeText(homePageSignals) {
   if (!locale) {
     locale = undefined;
   }
-  console.log(options);
   let time = new Date().toLocaleTimeString(locale, options);
   return time.replace(/\s+(am|pm|AM|PM)/, "");
 }
@@ -74,7 +73,6 @@ function updateHomePageSignals(signals, data) {
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
   signals.setTimezone(timezone);
-  console.log(weatherConditions);
   signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
   signals.setFeelsLikeTemp(feelsLikeText);
   signals.setTemp(tempText);
