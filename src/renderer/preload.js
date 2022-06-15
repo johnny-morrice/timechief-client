@@ -2,14 +2,14 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld(
     "api", {
-        send: (channel) => {
-            let validChannels = ["getClockData"];
+        send: (channel, ...args) => {
+            let validChannels = ["getClockData", "pairingCreate", "pairingGet", "pairingComplete"];
             if (validChannels.includes(channel)) {
-                ipcRenderer.send(channel);
+                ipcRenderer.send(channel, ...args);
             }
         },
         receive: (channel, func) => {
-            let validChannels = ["clockDataResult"];
+            let validChannels = ["clockDataResult", "pairingCreateResult", "pairingGetResult", "pairingCompleteResult"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.on(channel, (event, ...args) => func(...args));
             }

@@ -1,6 +1,5 @@
-import { createSignal, Index, onCleanup } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addClockDataCallback } from './ipc';
-import { getTaskBarSignals } from './taskbarSignals';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
 import { apiErrorTimeout, second } from './timing';
@@ -42,7 +41,6 @@ function getTimeText(homePageSignals) {
   if (!locale) {
     locale = undefined;
   }
-  console.log(options);
   let time = new Date().toLocaleTimeString(locale, options);
   return time.replace(/\s+(am|pm|AM|PM)/, "");
 }
@@ -75,7 +73,6 @@ function updateHomePageSignals(signals, data) {
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
   signals.setTimezone(timezone);
-  console.log(weatherConditions);
   signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
   signals.setFeelsLikeTemp(feelsLikeText);
   signals.setTemp(tempText);
@@ -107,12 +104,15 @@ function errorStyleClass(isError) {
   }
 }
 
+var initialised = false;
+let homePageSignals = new HomePageSignals();
 export const HomePage = () => {
-  let homePageSignals = new HomePageSignals();
-  let taskBarSignals = getTaskBarSignals();
 
-  addClockDataCallback((data) => updateHomePageSignals(homePageSignals, data));
-
+  if (!initialised) {
+    addClockDataCallback((data) => updateHomePageSignals(homePageSignals, data));
+    initialised = true;
+  }
+  
   let timeInterval = setInterval(
     () => {
       homePageSignals.setMyTime(getTimeText(homePageSignals));
@@ -135,10 +135,7 @@ export const HomePage = () => {
     clearInterval(timeInterval);
   });
 
-  return <div id="home-screen" style={{
-    display: `${taskBarSignals.homeDisplayStyle()}`
-  }}
-  >
+  return <div id="home-screen">
     <div class="row-flex">
       <div class="flex-element column-flex" id="home-data">
         <div class='home-weather-title flex-element'>Weather</div>

@@ -1,6 +1,5 @@
 import { createSignal, Show } from 'solid-js';
 import { addClockDataCallback } from './ipc';
-import { getTaskBarSignals } from './taskbarSignals';
 import { kelvinToCelsiusText } from './temperature';
 import { weatherIconStyleClass } from './weatherIcon';
 
@@ -69,11 +68,14 @@ function parseUnixDate(seconds) {
     return dateText;
 }
 
+var initialised = false;
+let forecastSignals = new ForecastPageSignals();
 export const ForecastPage = () => {
-  let forecastSignals = new ForecastPageSignals();
-  let taskBarSignals = getTaskBarSignals();
-
-  addClockDataCallback((data) => updateForecastPageSignals(forecastSignals, data));
+  
+  if (!initialised) {
+    addClockDataCallback((data) => updateForecastPageSignals(forecastSignals, data));
+    initialised = true;
+  }
 
   function weatherColumnClass(i) {
       if (i % 2 == 0) {
@@ -82,10 +84,7 @@ export const ForecastPage = () => {
       return 'column-flex phat table-color-flip';
   }
 
-  return <div id="forecast-screen" style={{
-        display: `${taskBarSignals.forecastDisplayStyle()}` 
-        }}
-        >
+  return <div id="forecast-screen">
             <div class="row-flex">
                 <For each={forecastSignals.days}>{(day, i) => 
                     <div class={weatherColumnClass(i())}>

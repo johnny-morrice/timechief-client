@@ -1,8 +1,7 @@
 import { createSignal } from 'solid-js';
 import { addClockDataCallback, addDeviceStatusCallback, triggerRedeploy } from './ipc';
-import { getTaskBarSignals } from './taskbarSignals';
 
-class ConfigPageSignals {
+class DevicePageSignals {
   constructor() {
       [this.deviceSerial, this.setDeviceSerial] = createSignal("");
       [this.location, this.setLocation] = createSignal("");
@@ -20,7 +19,7 @@ class DeviceSignals {
     }
 }
 
-function updateConfigPageSignals(signals, data) {
+function updateDevicePageSignals(signals, data) {
     let clock = data["Clock"];
     let location = clock["Location"];
     let deviceSerial = clock["DeviceSerial"];
@@ -43,18 +42,19 @@ function updateDeviceSignals(signals, statusResponse) {
     signals.setIpAddress(ipAddress);
 }
 
-export const ConfigPage = () => {
-  let configSignals = new ConfigPageSignals();
-  let deviceSignals = new DeviceSignals();
-  let taskBarSignals = getTaskBarSignals();
+var initialised = false;
+let configSignals = new DevicePageSignals();
+let deviceSignals = new DeviceSignals();
 
-  addClockDataCallback((data) => updateConfigPageSignals(configSignals, data));
-  addDeviceStatusCallback((status) => updateDeviceSignals(deviceSignals, status));
+export const DevicePage = () => {
 
-  return <div id="config-screen" style={{
-        display: `${taskBarSignals.configDisplayStyle()}` 
-        }}
-        >
+  if (!initialised) {
+    addClockDataCallback((data) => updateDevicePageSignals(configSignals, data));
+    addDeviceStatusCallback((status) => updateDeviceSignals(deviceSignals, status));
+    initialised = true;
+  }
+  
+  return <div id="config-screen">
         <div class="column-flex">
             <div class='flex-element section-name underline'>Settings</div>
             <Show when={deviceSignals.isDeployEnabled()}>
