@@ -1,5 +1,6 @@
 import { createSignal } from 'solid-js';
 import { addClockDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, sendPairingCompleteRequest, addPairingGetCallback, addPairingCompleteCallback, addPairingCreateCallback } from './ipc';
+import { toCanvas } from 'qrcode';
 
 class AccountPageSignals {
   constructor() {
@@ -24,6 +25,7 @@ var initialised = false;
 let accountSignals = new AccountPageSignals();
 export const AccountPage = () => {
   var pairingGetInterval = null;
+  var pairingQrCodeCanvas = null;
   if (!initialised) {
     addClockDataCallback((data) => updateAccountPageSignals(accountSignals, data));
     addDeviceStatusCallback((data) => updateAccountPageSignalsFromDevice(accountSignals, data));
@@ -35,6 +37,12 @@ export const AccountPage = () => {
             if (hasPairingCode(pairingCode)) {
                 sendPairingGetRequest(accountSignals.pairingCode());
             }
+            if (pairingQrCodeCanvas == null) {
+                let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
+                pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
+                canvasWrapper.appendChild(pairingQrCodeCanvas);
+                toCanvas(pairingQrCodeCanvas, `${accountSignals.wwwBaseURL()}/pairing?pairingCode=${encodeURIComponent(pairingCode)}`);
+            }
         }, 300);
     });
     addPairingCompleteCallback((data) => {
@@ -44,6 +52,12 @@ export const AccountPage = () => {
                 clearInterval(pairingGetInterval);
             }
         }
+        if (pairingQrCodeCanvas != null) {
+            let wrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
+            wrapper.removeChild(pairingQrCodeCanvas);
+            pairingQrCodeCanvas = null;
+        }
+        
     });
     addPairingGetCallback((data) => {
         if (data["Status"] == "linked") {
@@ -110,6 +124,8 @@ export const AccountPage = () => {
                     <div class="flex-element data-value">{accountSignals.pairingCode}</div>
                 </div>
                 <div class="flex-element data-name">Or scan the QR code</div>
+                <div id="pairing-qrcode-canvas-wrapper">
+                </div>
             </div>
         </Show>
   </div>;
