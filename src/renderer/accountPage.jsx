@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addClockDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, sendPairingCompleteRequest, addPairingGetCallback, addPairingCompleteCallback, addPairingCreateCallback } from './ipc';
 import { toCanvas } from 'qrcode';
 
@@ -26,6 +26,12 @@ let accountSignals = new AccountPageSignals();
 export const AccountPage = () => {
   var pairingGetInterval = null;
   var pairingQrCodeCanvas = null;
+  onCleanup(() => {
+    if (pairingGetInterval != null) {
+        clearInterval(pairingGetInterval);
+    }
+    removeQrCode();
+  });
   if (!initialised) {
     addClockDataCallback((data) => updateAccountPageSignals(accountSignals, data));
     addDeviceStatusCallback((data) => updateAccountPageSignalsFromDevice(accountSignals, data));
@@ -52,11 +58,7 @@ export const AccountPage = () => {
                 clearInterval(pairingGetInterval);
             }
         }
-        if (pairingQrCodeCanvas != null) {
-            let wrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
-            wrapper.removeChild(pairingQrCodeCanvas);
-            pairingQrCodeCanvas = null;
-        }
+
         
     });
     addPairingGetCallback((data) => {
@@ -70,6 +72,14 @@ export const AccountPage = () => {
         }
     });
     initialised = true;
+  }
+
+  function removeQrCode() {
+    if (pairingQrCodeCanvas != null) {
+        let wrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
+        wrapper.removeChild(pairingQrCodeCanvas);
+        pairingQrCodeCanvas = null;
+    }
   }
 
   function hasPrincipalSerial(serial) {
