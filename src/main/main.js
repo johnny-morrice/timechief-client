@@ -25,6 +25,9 @@ function getIpAddress() {
   return "unknown";
 }
 
+function getWwwBaseURL() {
+  return process.env.wwwBaseURL;
+}
 
 const logger = winston.createLogger({
   level: 'debug',
@@ -269,7 +272,8 @@ function baseDeviceStatus() {
   return {
     "redeploy_enabled": isDevMode,
     "status": "ok",
-    "ip_address": getIpAddress()
+    "ip_address": getIpAddress(),
+    "www_base_url": getWwwBaseURL()
   }
 }
 

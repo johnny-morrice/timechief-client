@@ -1,10 +1,11 @@
 import { createSignal } from 'solid-js';
-import { addClockDataCallback, sendPairingCreateRequest, sendPairingGetRequest, sendPairingCompleteRequest, addPairingGetCallback, addPairingCompleteCallback, addPairingCreateCallback } from './ipc';
+import { addClockDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, sendPairingCompleteRequest, addPairingGetCallback, addPairingCompleteCallback, addPairingCreateCallback } from './ipc';
 
 class AccountPageSignals {
   constructor() {
       [this.principalSerial, this.setPrincipalSerial] = createSignal("");
       [this.pairingCode, this.setPairingCode] = createSignal("");
+      [this.wwwBaseURL, this.setWwwBaseURL] = createSignal("");
   }
 }
 
@@ -15,12 +16,17 @@ function updateAccountPageSignals(signals, data) {
     }
 }
 
+function updateAccountPageSignalsFromDevice(signals, deviceStatus) {
+    signals.setWwwBaseURL(deviceStatus["www_base_url"]);
+}
+
 var initialised = false;
 let accountSignals = new AccountPageSignals();
 export const AccountPage = () => {
   var pairingGetInterval = null;
   if (!initialised) {
     addClockDataCallback((data) => updateAccountPageSignals(accountSignals, data));
+    addDeviceStatusCallback((data) => updateAccountPageSignalsFromDevice(accountSignals, data));
     addPairingCreateCallback((data) => {
         console.log(`pairing create result: ${JSON.stringify(data)}`);
         accountSignals.setPairingCode(data["Code"]);
@@ -97,12 +103,13 @@ export const AccountPage = () => {
             <div class="column-flex">
                 <div class='row-flex flex-element'>
                     <div class="flex-element data-name">Go to</div>
-                    <div class="flex-element data-value">(The URL)</div>
+                    <div class="flex-element data-value">{accountSignals.wwwBaseURL() + "/pairing"}</div>
                 </div>
                 <div class='row-flex flex-element'>
-                    <div class="flex-element data-name">Enter your pairing code</div>
+                    <div class="flex-element data-name">And enter your pairing code</div>
                     <div class="flex-element data-value">{accountSignals.pairingCode}</div>
                 </div>
+                <div class="flex-element data-name">Or scan the QR code</div>
             </div>
         </Show>
   </div>;
