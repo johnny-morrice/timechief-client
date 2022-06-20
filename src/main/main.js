@@ -220,7 +220,7 @@ class API {
       let authBody = {
         'DeviceSerial': this.clockSerial,
         'DeviceSecret': this.clockSecret,
-        'TokenPolicy': 'OrphanDevice',
+        'TokenPolicy': 'Device',
         'Scopes': ['clock-data:read', 'pairing:create', 'pairing:get', 'pairing:complete']
       }
       let setJwtCache = (response) => {
