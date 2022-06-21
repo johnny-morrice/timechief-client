@@ -132,7 +132,7 @@ class API {
   }
 
   incrementJwtTimeout() {
-    let duration = 60 * 1000;
+    let duration =  23 * 60 * 60 * 1000;
     this.jwtTimeout = new Date(this.jwtTimeout.getTime() + duration);
   }
 
