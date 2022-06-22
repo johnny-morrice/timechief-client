@@ -79,8 +79,10 @@ export const AccountPage = () => {
   function removeQrCode() {
     if (pairingQrCodeCanvas != null) {
         let wrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
-        wrapper.removeChild(pairingQrCodeCanvas);
-        pairingQrCodeCanvas = null;
+        if (wrapper) {
+            wrapper.removeChild(pairingQrCodeCanvas);
+            pairingQrCodeCanvas = null;
+        }
     }
   }
 
