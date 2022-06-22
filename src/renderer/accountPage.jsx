@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addClockDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, sendPairingCompleteRequest, addPairingGetCallback, addPairingCompleteCallback, addPairingCreateCallback } from './ipc';
+import { addClockDataCallback, addSessionRemoveCallback, addDeviceStatusCallback, sendSessionRemoveRequest, sendPairingCreateRequest, sendPairingGetRequest, sendPairingCompleteRequest, addPairingGetCallback, addPairingCompleteCallback, addPairingCreateCallback } from './ipc';
 import { toCanvas } from 'qrcode';
 
 class AccountPageSignals {
@@ -33,6 +33,7 @@ export const AccountPage = () => {
     removeQrCode();
   });
   if (!initialised) {
+    addSessionRemoveCallback((data) => {});
     addClockDataCallback((data) => updateAccountPageSignals(accountSignals, data));
     addDeviceStatusCallback((data) => updateAccountPageSignalsFromDevice(accountSignals, data));
     addPairingCreateCallback((data) => {
@@ -57,6 +58,7 @@ export const AccountPage = () => {
             if (pairingGetInterval != null) {
                 clearInterval(pairingGetInterval);
             }
+            sendSessionRemoveRequest();
         }
 
         
@@ -77,8 +79,10 @@ export const AccountPage = () => {
   function removeQrCode() {
     if (pairingQrCodeCanvas != null) {
         let wrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
-        wrapper.removeChild(pairingQrCodeCanvas);
-        pairingQrCodeCanvas = null;
+        if (wrapper) {
+            wrapper.removeChild(pairingQrCodeCanvas);
+            pairingQrCodeCanvas = null;
+        }
     }
   }
 

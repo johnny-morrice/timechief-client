@@ -28,6 +28,7 @@ export const pairingCreateReceiver = new APIResultReceiver("pairingCreateResult"
 export const pairingGetReceiver = new APIResultReceiver("pairingGetResult");
 export const pairingCompleteReceiver = new APIResultReceiver("pairingCompleteResult");
 export const clockDataReceiver = new APIResultReceiver("clockDataResult");
+export const sessionRemoveReceiver = new APIResultReceiver("sessionRemoveResult");
 
 const deviceCallbacks = [];
 function receiveRedeployStatus() {
@@ -58,6 +59,10 @@ export function addPairingCompleteCallback(cb) {
     pairingCompleteReceiver.addCallback(cb);
 }
 
+export function addSessionRemoveCallback(cb) {
+    sessionRemoveReceiver.addCallback(cb);
+}
+
 export function triggerRedeploy() {
     console.log("triggering redeploy...");
     window.device.send("deviceCommand", {'command': 'redeploy'});
@@ -81,6 +86,10 @@ export function sendPairingGetRequest(pairingCode) {
 
 export function sendPairingCompleteRequest(pairingCode) {
     window.api.send("pairingComplete", pairingCode);
+}
+
+export function sendSessionRemoveRequest() {
+    window.api.send("sessionRemove");
 }
 
 export function initializeIPC() {
