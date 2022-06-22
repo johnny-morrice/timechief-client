@@ -150,6 +150,20 @@ class API {
     });
   }
 
+  doSessionRemove(jwt) {
+    let self = this;
+    let apiURL = self.baseURL + '/api/session';
+    let config = {
+      url: apiURL,
+      method: "delete",
+    };
+    addAuthHeader(config, jwt);
+    return callAPI(config).then(resp => {
+      self.timeoutNow();
+      return {"ok" : resp.status == 204};
+    });
+  }
+
   doPairingCreate(jwt) {
     let apiURL = this.baseURL + '/api/pairing';
     let config = {
@@ -208,6 +222,11 @@ class API {
   pairingComplete(pairingCode) {
     let self = this;
     return self.callAPIWithJWT((jwt) => self.doPairingComplete(jwt, pairingCode));
+  }
+
+  sessionRemove() {
+    let self = this;
+    return self.callAPIWithJWT((jwt) => self.doSessionRemove(jwt));
   }
 
   callAPIWithJWT(cb) {
@@ -296,6 +315,7 @@ handleIPCAPICall("pairingCreate", "pairingCreateResult", () => api.pairingCreate
 handleIPCAPICall("pairingGet", "pairingGetResult", (pairingCode) => api.pairingGet(pairingCode));
 handleIPCAPICall("pairingComplete", "pairingCompleteResult", (pairingCode) => api.pairingComplete(pairingCode));
 handleIPCAPICall("getClockData", "clockDataResult", () => api.getClockData());
+handleIPCAPICall("sessionRemove", "sessionRemoveResult", () => api.sessionRemove());
 
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {
