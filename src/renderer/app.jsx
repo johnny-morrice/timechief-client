@@ -1,5 +1,6 @@
 import { render } from "solid-js/web";
 import { onCleanup } from 'solid-js';
+import { hashIntegration, Router, Routes, Route } from "solid-app-router";
 import { initializeIPC, sendClockDataRequest } from './ipc';
 import { HomePage } from "./homePage";
 import { DevicePage } from "./devicePage";
@@ -7,7 +8,7 @@ import { TaskBar } from "./taskbar";
 import { ForecastPage } from "./forecastPage";
 import { AstroPage } from "./astroPage";
 import { AccountPage } from "./accountPage";
-import { hashIntegration, Router, Routes, Route } from "solid-app-router";
+import { StatusBar } from './statusBar';
 
 const App = () => {
   let ipcInterval = initializeIPC();
@@ -28,7 +29,7 @@ const App = () => {
 
 
 export function attachApp() {
-  render(() => <Router source={hashIntegration()}><App /><TaskBar/></Router>, document.getElementById('app'));
+  render(() => <Router source={hashIntegration()}><StatusBar/><App /><TaskBar/></Router>, document.getElementById('app'));
 }
 
 attachApp();

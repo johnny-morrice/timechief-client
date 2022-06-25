@@ -3,7 +3,6 @@ import { addClockDataCallback } from './ipc';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
 import { apiErrorTimeout, second } from './timing';
-import { StatusBar } from './statusBar';
 
 class HomePageSignals {
   constructor() {
@@ -137,7 +136,6 @@ export const HomePage = () => {
   });
 
   return <div id="home-screen">
-    <StatusBar/>
     <div class="row-flex">
       <div class="flex-element column-flex" id="home-data">
         <div class='home-weather-title flex-element'>Weather</div>
