@@ -17,3 +17,7 @@ export function showDevice() {
 export function showAccount() {
     window.location.replace("#/account");
 }
+
+export function showLocale() {
+    window.location.replace("#/locale");
+}
