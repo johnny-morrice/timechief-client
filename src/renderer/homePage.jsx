@@ -3,6 +3,7 @@ import { addClockDataCallback } from './ipc';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
 import { apiErrorTimeout, second } from './timing';
+import { StatusBar } from './statusBar';
 
 class HomePageSignals {
   constructor() {
@@ -136,6 +137,7 @@ export const HomePage = () => {
   });
 
   return <div id="home-screen">
+    <StatusBar/>
     <div class="row-flex">
       <div class="flex-element column-flex" id="home-data">
         <div class='home-weather-title flex-element'>Weather</div>
@@ -157,21 +159,6 @@ export const HomePage = () => {
           <div class="column-flex flex-element">
             <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.todayWeatherConditions())}></i></div>
             <div class="flex-element">today</div>
-          </div>
-        </div>
-        <div class="column-flex flex-element">
-          <div class={"row-flex home-health-icon-bar " + errorStyleClass(homePageSignals.isAPIError())}>
-            {/* <Show when={!homePageSignals.isAPIError()}>
-              <div class='flex-element home-health-icon'>
-                <i class='fa-solid fa-heart'></i>
-              </div>
-            </Show> */}
-            <Show when={homePageSignals.isAPIError()}>
-              <div class='flex-element'>
-                <i class='fa-solid fa-heart-crack'></i>
-              </div>
-            <div class='flex-element'>{homePageSignals.lastRefreshText}</div>
-            </Show>
           </div>
         </div>
       </div>
