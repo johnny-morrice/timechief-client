@@ -122,22 +122,11 @@ div.underline {
 
 div.time-border {
     border-left: 2pt solid green;
-    margin-top: 10pt;
-    padding-top: 50pt;
-    padding-bottom: 20pt;
+    padding-bottom: 32pt;
     padding-left: 20pt;
 }
 
 div.weather-icon {
-    font-size: 30pt;
-}
-
-div.home-health-icon-bar {
-    height: 30pt;
-    line-height: 30pt;
-}
-
-div.health-icon {
     font-size: 30pt;
 }
 
@@ -158,3 +147,26 @@ div.column-flex > div.flex-element {
 div.row-flex > div.flex-element {
     margin-right: 10pt;
 }
+
+div.status-bar {
+    height: 10pt;
+    font-size: 8pt;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 5pt;
+    margin-right: 5pt;
+}
+
+i.fa-heart-crack.api-error-indicator {
+    color: red;
+}
+
+hr.status-line {
+    background-color: green;
+    height: 2pt;
+    border: none;
+    margin-top: 2pt;
+    margin-bottom: 0;
+}
+

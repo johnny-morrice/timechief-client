@@ -159,21 +159,6 @@ export const HomePage = () => {
             <div class="flex-element">today</div>
           </div>
         </div>
-        <div class="column-flex flex-element">
-          <div class={"row-flex home-health-icon-bar " + errorStyleClass(homePageSignals.isAPIError())}>
-            {/* <Show when={!homePageSignals.isAPIError()}>
-              <div class='flex-element home-health-icon'>
-                <i class='fa-solid fa-heart'></i>
-              </div>
-            </Show> */}
-            <Show when={homePageSignals.isAPIError()}>
-              <div class='flex-element'>
-                <i class='fa-solid fa-heart-crack'></i>
-              </div>
-            <div class='flex-element'>{homePageSignals.lastRefreshText}</div>
-            </Show>
-          </div>
-        </div>
       </div>
       <div class='flex-element column-flex time-border'>
         <div id='time'>{homePageSignals.myTime}</div>
