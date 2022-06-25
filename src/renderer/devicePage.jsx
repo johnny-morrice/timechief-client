@@ -4,10 +4,6 @@ import { addClockDataCallback, addDeviceStatusCallback, triggerRedeploy } from '
 class DevicePageSignals {
   constructor() {
       [this.deviceSerial, this.setDeviceSerial] = createSignal("");
-      [this.location, this.setLocation] = createSignal("");
-      [this.latitude, this.setLatitude] = createSignal("");
-      [this.longitude, this.setLongitude] = createSignal("");
-      [this.timezone, this.setTimezone] = createSignal("GB");
   }
 }
 
@@ -23,14 +19,7 @@ function updateDevicePageSignals(signals, data) {
     let clock = data["Clock"];
     let location = clock["Location"];
     let deviceSerial = clock["DeviceSerial"];
-    let latitude = clock["Latitude"];
-    let longitude = clock["Longitude"];
-    let timezone = clock["Timezone"];
     signals.setDeviceSerial(deviceSerial);
-    signals.setLocation(location);
-    signals.setLatitude(latitude);
-    signals.setLongitude(longitude);
-    signals.setTimezone(timezone);
 }
 
 function updateDeviceSignals(signals, statusResponse) {
@@ -74,18 +63,6 @@ export const DevicePage = () => {
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device IP Address</div>
                 <div class='flex-element'>{deviceSignals.ipAddress}</div>
-            </div>
-            <div class='row-flex flex-element'>
-                <div class='flex-element data-name'>Device Location</div>
-                <div class='flex-element'>{configSignals.location}</div>
-            </div>
-            <div class='row-flex flex-element'>
-                <div class='flex-element data-name'>Device Timezone</div>
-                <div class='flex-element'>{configSignals.timezone}</div>
-            </div>
-            <div class='row-flex flex-element'>
-                <div class='flex-element data-name'>Device coordinates</div>
-                <div class='flex-element'>{configSignals.latitude}, {configSignals.longitude}</div> 
             </div>
         </div>
   </div>;
