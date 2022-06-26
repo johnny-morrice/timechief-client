@@ -25,7 +25,7 @@ export const TaskBar = () => {
                 <button class='nav-button' onClick={showAccount}><i class="fa-solid fa-user"></i></button>
             </div>
             <div class='flex-element'>
-                <button class='nav-button' onClick={showLocale}><i class="fa-solid fa-globe"></i></button>
+                <button class='nav-button' onClick={showLocale}><i class="fa-solid fa-earth-americas"></i></button>
             </div>
         </div>
     </div>;
