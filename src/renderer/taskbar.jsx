@@ -19,10 +19,10 @@ export const TaskBar = () => {
                 <button class='nav-button' onClick={showAstro}><i class="fa-solid fa-moon"></i></button>
             </div>
             <div class='flex-element'>
-                <button class='nav-button' onClick={showDevice}><i class="fa-solid fa-gear"></i></button>
+                <button class='nav-button' onClick={showAccount}><i class="fa-solid fa-user"></i></button>
             </div>
             <div class='flex-element'>
-                <button class='nav-button' onClick={showAccount}><i class="fa-solid fa-user"></i></button>
+                <button class='nav-button' onClick={showDevice}><i class="fa-solid fa-microchip"></i></button>
             </div>
             <div class='flex-element'>
                 <button class='nav-button' onClick={showLocale}><i class="fa-solid fa-earth-americas"></i></button>

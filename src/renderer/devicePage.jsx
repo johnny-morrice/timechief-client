@@ -45,7 +45,7 @@ export const DevicePage = () => {
   
   return <div id="config-screen">
         <div class="column-flex">
-            <div class='flex-element section-name underline'>Settings</div>
+            <div class='flex-element section-name underline'>About this device</div>
             <Show when={deviceSignals.isDeployEnabled()}>
                 <div class='row-flex flex-element'>
                     <div class='flex-element data-name'>Redeploy device</div>
