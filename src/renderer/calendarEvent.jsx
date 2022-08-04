@@ -5,6 +5,9 @@ export class CalendarEvent {
     }
 
     eventShortText() {
+        if (this.data.ShortText.length > 30) {
+            return this.data.ShortText.slice(0, 30) + "...";
+        }
         return this.data.ShortText;
     }
 
