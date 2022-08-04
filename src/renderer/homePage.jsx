@@ -81,6 +81,10 @@ function updateHomePageSignals(signals, data) {
   signals.setLocation(location);
   signals.setLastUpdateTime(new Date());
   if (calendar.Calendar) {
+    // calendar.Calendar.Events.forEach(data => {
+    //   const cev = new CalendarEvent(data);
+    //   console.log(`starts: ${cev.formatStartTime(getLocale(signals))} event: ${cev.eventShortText()}`)
+    // });
     const nextEvent = findNextEvent(calendar.Calendar.Events);
     signals.setNextEvent(nextEvent);
   }

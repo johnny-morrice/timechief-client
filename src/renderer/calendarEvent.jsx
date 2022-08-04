@@ -44,6 +44,9 @@ export class CalendarEvent {
     isSoon() {
         const diff = 24 * 60 * 60 * 1000;
         const target = new Date();
+        if (this.startTime() <= target) {
+            return false;
+        }
         target.setTime(target.getTime() + diff);
         return this.startTime() <= target;
     }
