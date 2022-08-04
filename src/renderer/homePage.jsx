@@ -3,6 +3,7 @@ import { addClockDataCallback } from './ipc';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
 import { apiErrorTimeout, second } from './timing';
+import { CalendarEvent } from './calendarEvent';
 
 class HomePageSignals {
   constructor() {
@@ -13,12 +14,13 @@ class HomePageSignals {
     [this.lastRefreshText, this.setLastRefreshText] = createSignal("");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
     [this.myTime, this.setMyTime] = createSignal("");
-    [this.myDate, this.setMyDate] = createSignal(getDateText());
+    [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
     [this.temp, this.setTemp] = createSignal("");
     [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
     [this.location, this.setLocation] = createSignal("");
     [this.currentWeatherConditions, this.setCurrentWeatherConditions] = createSignal("");
     [this.todayWeatherConditions, this.setTodayWeatherConditions] = createSignal("");
+    [this.nextEvent, this.setNextEvent] = createSignal(null);
   }
 }
 
@@ -45,14 +47,15 @@ function getTimeText(homePageSignals) {
   return time.replace(/\s+(am|pm|AM|PM)/, "");
 }
 
-function getDateText() {
+function getDateText(locale) {
   let dateOptions = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
-  // The clock model on the webservice should include the locale.
-  var dateText = new Date().toLocaleDateString("en-GB", dateOptions);
+  var dateText = new Date().toLocaleDateString(locale, dateOptions);
   return dateText.replace(',', '');
 }
 
 function updateHomePageSignals(signals, data) {
+  console.log(data);
+  let calendar = data["Calendar"];
   let clock = data["Clock"];
   let hourCycleOption = clock["HourCycleOption"];
   let timezone = clock["Timezone"];
@@ -78,6 +81,44 @@ function updateHomePageSignals(signals, data) {
   signals.setTemp(tempText);
   signals.setLocation(location);
   signals.setLastUpdateTime(new Date());
+  if (calendar.Calendar) {
+    const nextEvent = findNextEvent(calendar.Calendar.Events);
+    signals.setNextEvent(nextEvent);
+  }
+}
+
+function findNextEvent(calendarEvents) {
+  for (var i = 0; i < calendarEvents.length; i++) {
+    const cev = new CalendarEvent(calendarEvents[i]);
+    if (cev.isHighlight()) {
+      return cev;
+    }
+  }
+  return null;
+}
+
+function getLocale(signals) {
+  const locale = signals.locale();
+  if (!locale) {
+    return "en-GB";
+  }
+  return locale;
+}
+
+function getNextEventStartTime(signals) {
+  const nextEvent = signals.nextEvent();
+  if (!nextEvent) {
+    return "";
+  }
+  return nextEvent.formatStartTime(getLocale(signals));
+}
+
+function getNextEventShortText(signals) {
+  const nextEvent = signals.nextEvent();
+  if (!nextEvent) {
+    return "";
+  }
+  return nextEvent.eventShortText();
 }
 
 function timeDifferenceToNowText(lastUpdateTime) {
@@ -96,14 +137,6 @@ function isErrorTimeout(lastUpdateTime) {
   return diff >= apiErrorTimeout;
 }
 
-function errorStyleClass(isError) {
-  if (isError) {
-    return "home-error";
-  } else {
-    return "";
-  }
-}
-
 var initialised = false;
 let homePageSignals = new HomePageSignals();
 export const HomePage = () => {
@@ -116,7 +149,7 @@ export const HomePage = () => {
   let timeInterval = setInterval(
     () => {
       homePageSignals.setMyTime(getTimeText(homePageSignals));
-      homePageSignals.setMyDate(getDateText());
+      homePageSignals.setMyDate(getDateText(homePageSignals.locale()));
     },
     second / 10
   );
@@ -164,6 +197,17 @@ export const HomePage = () => {
         <div id='time'>{homePageSignals.myTime}</div>
         <div id='date'>{homePageSignals.myDate}</div>
         <div id='home-location'>{homePageSignals.location}</div>
+        <Show when={homePageSignals.nextEvent}>
+          <div class='next-event-summary'>
+            <div class='next-event-time'>
+              <i class="fa-solid fa-calendar-day"></i>
+              <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
+            </div>
+            <div class='next-event-shorttext'>
+              {getNextEventShortText(signals)}
+            </div>
+          </div>
+        </Show>
       </div>
     </div>
   </div>;
