@@ -1,4 +1,4 @@
-class CalendarEvent {
+export class CalendarEvent {
 
     constructor(data) {
         this.data = data;
@@ -12,7 +12,7 @@ class CalendarEvent {
         if (this._startTime) {
             return this._startTime;
         }
-        this._startTime = new Date(data.Start * 1000);
+        this._startTime = new Date(this.data.Start * 1000);
         return this._startTime;
     }
 
@@ -20,8 +20,10 @@ class CalendarEvent {
         if (this._endTime) {
             return this._endTime;
         }
-        this._endTime = new Date(data.Start * 1000);
-        this._endTime;
+        if (this.data.End != 0) {
+            this._endTime = new Date(this.data.End * 1000);
+        }
+        return this._endTime;
     }
 
     formatStartTime(locale) {
@@ -33,8 +35,7 @@ class CalendarEvent {
     }
 
     formatTime(time, locale) {
-        const opts = {dateStyle: 'short', 'timeStyle': short};
-        return time.toLocaleString(locale, opts)
+        return time.toLocaleTimeString(locale, {'timeStyle': 'short'}) + " " + time.toLocaleDateString(locale, {dateStyle: 'short', });
     }
 
     isSoon() {
@@ -44,7 +45,7 @@ class CalendarEvent {
         return this.startTime() <= target;
     }
 
-    isHightlight() {
+    isHighlight() {
         return this.isHappeningNow() || this.isSoon();
     }
 

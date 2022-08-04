@@ -121,6 +121,17 @@ function getNextEventShortText(signals) {
   return nextEvent.eventShortText();
 }
 
+function hasNextEvent(signals) {
+  const nextEvent = signals.nextEvent();
+  if (!nextEvent) {
+    return false;
+  }
+  if (!nextEvent.eventShortText()) {
+    return false;
+  }
+  return true;
+}
+
 function timeDifferenceToNowText(lastUpdateTime) {
   const now = new Date();
   const diff = now.getTime() - lastUpdateTime.getTime();
@@ -149,7 +160,7 @@ export const HomePage = () => {
   let timeInterval = setInterval(
     () => {
       homePageSignals.setMyTime(getTimeText(homePageSignals));
-      homePageSignals.setMyDate(getDateText(homePageSignals.locale()));
+      homePageSignals.setMyDate(getDateText(getLocale(homePageSignals)));
     },
     second / 10
   );
@@ -197,14 +208,14 @@ export const HomePage = () => {
         <div id='time'>{homePageSignals.myTime}</div>
         <div id='date'>{homePageSignals.myDate}</div>
         <div id='home-location'>{homePageSignals.location}</div>
-        <Show when={homePageSignals.nextEvent}>
+        <Show when={hasNextEvent(homePageSignals)}>
           <div class='next-event-summary'>
             <div class='next-event-time'>
-              <i class="fa-solid fa-calendar-day"></i>
-              <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
+              <div class='next-event-symbol'><i class="fa-solid fa-calendar-day"></i></div>
+              <div class='next-event-time'>{getNextEventStartTime(homePageSignals)}</div>
             </div>
             <div class='next-event-shorttext'>
-              {getNextEventShortText(signals)}
+              {getNextEventShortText(homePageSignals)}
             </div>
           </div>
         </Show>
