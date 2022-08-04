@@ -11,7 +11,7 @@ class APIResultReceiver {
             if ("APIError" in data) {
                 console.log(`error calling API for channel ${this.channel}: ${data["APIError"]}`);
             } else {
-                console.log(`received data for channel: ${this.channel}: ${data}`);
+                // console.log(`received data for channel: ${this.channel}: ${data}`);
                 this.callbacks.forEach(cb => {
                     cb(data);
                 });
