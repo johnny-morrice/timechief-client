@@ -54,7 +54,6 @@ function getDateText(locale) {
 }
 
 function updateHomePageSignals(signals, data) {
-  console.log(data);
   let calendar = data["Calendar"];
   let clock = data["Clock"];
   let hourCycleOption = clock["HourCycleOption"];
