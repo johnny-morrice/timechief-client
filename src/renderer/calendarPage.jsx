@@ -39,6 +39,7 @@ class CalendarDays {
     }
     let allDays = this.allDays();
     let canonicalDates = dates.map(makeCanonicalDateText);
+    // TODO return proper CalendarDay objects.
     return canonicalDates.map(text => allDays[text]);
   }
 
@@ -59,6 +60,7 @@ class CalendarDays {
       }
       this._dirty = false;
     }
+    // TODO return proper CalendarDay objects.
     return this._days;
   }
 
