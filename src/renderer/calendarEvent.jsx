@@ -1,7 +1,15 @@
+export function makeCanonicalDateText(date) {
+    return `${date.getYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
 export class CalendarEvent {
 
     constructor(data) {
         this.data = data;
+    }
+
+    canonicalStartDateText() {
+        return makeCanonicalDateText(this.startTime());
     }
 
     eventShortText() {
