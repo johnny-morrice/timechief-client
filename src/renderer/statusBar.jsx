@@ -33,7 +33,6 @@ function updateSignals(signals, data) {
 
 function isCalendarErrorTimeout(signals) {
     let lastUpdateTime = signals.lastCalendarUpdateTime();
-    console.log(`last calendar update time: ${lastUpdateTime}`)
     if (lastUpdateTime) {
         return isTimeout(lastUpdateTime, calendarErrorTimeout);
     }
