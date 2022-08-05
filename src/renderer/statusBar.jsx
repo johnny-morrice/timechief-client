@@ -1,32 +1,57 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addClockDataCallback } from './ipc';
-import { apiErrorTimeout, second } from './timing'
+import { apiErrorTimeout, calendarErrorTimeout, second } from './timing'
 
 class StatusBarSignals {
     constructor() {
       [this.isAPIError, this.setAPIError] = createSignal(false);
       [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
       [this.isAccountLinked, this.setAccountLinked] = createSignal(false);
+      [this.lastCalendarUpdateTime, this.setLastCalendarUpdateTime] = createSignal(null);
+      [this.isCalendarExists, this.setCalendarExists] = createSignal(false);
     }
 }
 
 
 function updateSignals(signals, data) {
     signals.setLastUpdateTime(new Date());
+    let calendar = data["Calendar"];
+    let calendarLastUpdated = calendar["LastUpdated"];
+    var calendarLastDate = null;
+    if (calendarLastUpdated != 0) {
+        calendarLastDate = new Date(calendarLastUpdated * 1000);
+    }
+    signals.setCalendarExists = "Calendar" in calendar && new Boolean(calendar["Calendar"]);
+    signals.setLastCalendarUpdateTime(calendarLastDate);
     let principal = data["LinkedPrincipal"];
     if ("PrincipalSerial" in principal) {
         signals.setAccountLinked(new Boolean(principal["PrincipalSerial"]));
     } else {
         signals.setAccountLinked(false);
     }
-  }
-  
+}
 
-function isErrorTimeout(lastUpdateTime) {
+function isCalendarErrorTimeout(signals) {
+    let lastUpdateTime = signals.lastCalendarUpdateTime();
+    if (lastUpdateTime) {
+        return isTimeout(lastUpdateTime, calendarErrorTimeout);
+    }
+    return false;
+}
+
+function isCalendarError(signals) {
+    return signals.isCalendarExists() && isCalendarErrorTimeout(signals);
+}
+
+function isTimeout(lastTime, timeout) {
     const now = new Date();
-    const diff = now.getTime() - lastUpdateTime.getTime();
-    return diff >= apiErrorTimeout;
-  }
+    const diff = now.getTime() - lastTime.getTime();
+    return diff >= timeout;
+}
+
+function isAPIErrorTimeout(lastUpdateTime) {
+    return isTimeout(lastUpdateTime, apiErrorTimeout);
+}
 
 var initialised = false;
 export const StatusBar = () => {
@@ -38,7 +63,7 @@ export const StatusBar = () => {
     let updateRefreshTimeInterval = setInterval(
         () => {
           const lastUpdateTime = signals.lastUpdateTime();
-          signals.setAPIError(isErrorTimeout(lastUpdateTime));
+          signals.setAPIError(isAPIErrorTimeout(lastUpdateTime));
         },
         second
       );
@@ -47,6 +72,16 @@ export const StatusBar = () => {
     });
     return <div class="status-bar-root">
         <div class="status-bar">
+        <Show when={isCalendarError(signals)}>
+            <div class="status-bar-calendar-error-indicator">
+                <i class='fa-solid fa-calendar-xmark api-error-indicator'></i>
+            </div>
+        </Show>
+        <Show when={!isCalendarError(signals)}>
+            <div class="status-bar-calendar-error-indicator">
+                <i class='fa-solid fa-calendar-check'></i>
+            </div>
+        </Show>
         <Show when={signals.isAccountLinked()}>
         <div class="status-bar-api-error-indicator">
                 <i class='fa-solid fa-user'></i>
