@@ -1,4 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
+import { isCalendarExists } from './calendarHelper';
 import { addClockDataCallback } from './ipc';
 import { apiErrorTimeout, calendarErrorTimeout, second } from './timing'
 
@@ -21,7 +22,7 @@ function updateSignals(signals, data) {
     if (calendarLastUpdated != 0) {
         calendarLastDate = new Date(calendarLastUpdated * 1000);
     }
-    signals.setCalendarExists = "Calendar" in calendar && new Boolean(calendar["Calendar"]);
+    signals.setCalendarExists = isCalendarExists(data);
     signals.setLastCalendarUpdateTime(calendarLastDate);
     let principal = data["LinkedPrincipal"];
     if ("PrincipalSerial" in principal) {

@@ -30,7 +30,14 @@ export class CalendarEvent {
     }
 
     formatStartTime(locale) {
+        if (this.isAllDay()) {
+            return "All day " + this.startTime().toLocaleDateString(locale, {dateStyle: 'short', }); 
+        }
         return this.formatTime(this.startTime(), locale);
+    }
+
+    isAllDay() {
+        return this.data["AllDay"];
     }
 
     formatEndTime(locale) {

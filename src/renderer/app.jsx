@@ -10,6 +10,7 @@ import { AstroPage } from "./astroPage";
 import { AccountPage } from "./accountPage";
 import { StatusBar } from './statusBar';
 import { LocalePage } from "./localePage";
+import { CalendarPage } from "./calendarPage";
 
 const App = () => {
   let ipcInterval = initializeIPC();
@@ -25,6 +26,7 @@ const App = () => {
       <Route path="/astro" element={<AstroPage/>} />
       <Route path="/account" element={<AccountPage/>} />
       <Route path="/locale" element={<LocalePage/>} />
+      <Route path="/calendar" element={<CalendarPage/>} />
       <Route path="/" element={<HomePage/>} />
     </Routes>
 };

@@ -176,3 +176,6 @@ hr.status-line {
     margin-bottom: 0;
 }
 
+div.next-event-time {
+    font-weight: bold;
+}
