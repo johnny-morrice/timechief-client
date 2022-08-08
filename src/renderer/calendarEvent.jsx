@@ -1,5 +1,5 @@
 export function makeCanonicalDateText(date) {
-    return `${date.getYear()}-${date.getMonth()}-${date.getDate()}`;
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
 export class CalendarEvent {
@@ -54,7 +54,7 @@ export class CalendarEvent {
     }
 
     formatTime(time, locale, timeZone) {
-        let timeOpts = {'timeStyle': 'short', timeZone: timeZone};
+        let timeOpts = {timeStyle: 'short', timeZone: timeZone};
         let dateOpts = {dateStyle: 'short', timeZone: timeZone};
         return time.toLocaleTimeString(locale, timeOpts) + " " + time.toLocaleDateString(locale, dateOpts);
     }

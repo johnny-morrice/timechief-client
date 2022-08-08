@@ -104,6 +104,9 @@ function getTimeZone(signals) {
 }
 
 function findNextEvent(calendarEvents) {
+  if (!calendarEvents) {
+    return null;
+  }
   for (var i = 0; i < calendarEvents.length; i++) {
     const cev = new CalendarEvent(calendarEvents[i]);
     if (cev.isHighlight()) {

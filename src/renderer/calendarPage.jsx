@@ -6,8 +6,8 @@ import { day } from './timing';
 class CalendarPageSignals {
   constructor() {
     [this.calendarDays, this.setCalendarDays] = createSignal([]);
-    [this.locale, this.setLocale] = createSignal("");
-    [this.timeZone, this.setTimeZone] = createSignal("");
+    [this.locale, this.setLocale] = createSignal("en-GB");
+    [this.timeZone, this.setTimeZone] = createSignal("Europe/London");
   }
 }
 
@@ -15,11 +15,16 @@ function updateCalendarPageSignals(signals, data) {
   let calendarResp = data["Calendar"];
   if ("Calendar" in calendarResp) {
     let calendar = calendarResp["Calendar"];
-    let events = calendar["Events"].map(cev => new CalendarEvent(cev));
-    let calendarDays = new CalendarDays();
-    events.forEach(calendarDays.addNewEvent);
-    let ourCalendar = calendarDays.nextDays(5);
-    signals.setCalendarDays(ourCalendar);
+    let dataEvents = calendar["Events"];
+    if (dataEvents) {
+      let events = dataEvents.map(cev => new CalendarEvent(cev));
+      let calendarDays = new CalendarDays();
+      events.forEach(cev => calendarDays.addNewEvent(cev));
+      let ourCalendar = calendarDays.nextEvents(30, 4);
+      // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
+      signals.setCalendarDays(ourCalendar);
+    }
+
   }
   let clock = data["Clock"];
   signals.setLocale(clock["Locale"]);
@@ -27,7 +32,12 @@ function updateCalendarPageSignals(signals, data) {
 }
 
 function isCalendarDaysExists(signals) {
-  return new Boolean(signals.calendarDays());
+  let days = signals.calendarDays();
+  return days.length > 0;
+}
+
+function getCalendarDays(signals) {
+  return signals.calendarDays();
 }
 
 function cmpDate(a, b) {
@@ -53,7 +63,7 @@ class CalendarDay {
   }
 
   date() {
-    return this.calendarEvents[0].startTime();
+    return this._calendarEvents[0].startTime();
   }
 
   formatDate(locale, timeZone) {
@@ -68,52 +78,55 @@ class CalendarDay {
 class CalendarDays {
 
   constructor() {
-    this._dirty = true;
     this._days = {};
   }
 
-  nextDays(n) {
+  nextEvents(dayLimit, eventLimit) {
     let now = new Date();
     let dates = [now];
-    for (var i = 1; i < n; i++) {
+    for (var i = 1; i < dayLimit; i++) {
       let nextDate = new Date();
-      nextDate.setTime(nextDate.getTime() + day);
+      nextDate.setTime(nextDate.getTime() + (day * i));
       dates.push(nextDate);
     }
     let allDays = this._allDays();
-    let canonicalDates = dates.map(makeCanonicalDateText);
+    let canonicalDates = dates.map(d => makeCanonicalDateText(d));
     let out = [];
+    var eventCount = 0;
     canonicalDates.forEach(text => {
-      let events = allDays[text];
-      if (events) {
-        out.push(new CalendarDay(events));
+      if (eventCount < eventLimit) {
+        var events = allDays[text];
+        if (events) {
+          var exceeds = (eventCount + events.length) - eventLimit;
+          if (exceeds > 0) {
+            events = events.slice(0, exceeds);
+          }
+          out.push(new CalendarDay(events));
+          eventCount += events.length;
+        }
       }
     });
     return out;
   }
 
   _allDays() {
-    if (this._dirty) {
-      for (let [_, day] of Object.entries(this._days)) {
-        day.sort((a, b) => {
-          if (a.isAllDay() && b.isAllDay()) {
-            return 0;
-          } else if (a.isAllDay() && !b.isAllDay()) {
-            return 1;
-          } else if (!a.isAllDay() && b.isAllDay()) {
-            return -1;
-          } else {
-            return cmpDate(a.startTime(), b.startTime());
-          }
-        });
-      }
-      this._dirty = false;
+    for (let [_, day] of Object.entries(this._days)) {
+      day.sort((a, b) => {
+        if (a.isAllDay() && b.isAllDay()) {
+          return 0;
+        } else if (a.isAllDay() && !b.isAllDay()) {
+          return 1;
+        } else if (!a.isAllDay() && b.isAllDay()) {
+          return -1;
+        } else {
+          return cmpDate(a.startTime(), b.startTime());
+        }
+      });
     }
     return this._days;
   }
 
   addNewEvent(event) {
-    this._dirty = true;
     let canonicalDate = event.canonicalStartDateText();
     if (canonicalDate in this._days) {
       this._days[canonicalDate].push(event); 
@@ -147,18 +160,20 @@ export const CalendarPage = () => {
             <div class="no-calendar-events-message">No calendar events</div>
           </Show>
           <Show when={isCalendarDaysExists(calendarSignals)}>
-            <For each={signals.getCalendarDays()}>{(day, i) => 
+            <For each={getCalendarDays(calendarSignals)}>{(day, i) => 
               <div class="calendar-day">
                 <div class="calendar-day-date">{formatCalendarDayDate(calendarSignals, day)}</div>
                 <div class="calendar-events">
                   <For each={day.events()}>{(cev, j) =>
-                  <div class="calendar-event-when">
-                    <Show when={cev.isAllDay()}>
-                      <div class="calendar-event-allday-date">All day {formatCalendarEventStartTime(calendarSignals, cev)}</div>
-                    </Show>
-                    <Show when={!cev.isAllDay()}>
-                      <div class="calendar-event-datetimes">{formatCalendarEventStartTime(calendarSignals, cev)} - {formatCalendarEventEndTime(calendarSignals, cev)}</div>
-                    </Show>
+                  <div class="calendar-event-wrapper">
+                    <div class="calendar-event-when">
+                      <Show when={cev.isAllDay()}>
+                        <div class="calendar-event-allday-date">{formatCalendarEventStartTime(calendarSignals, cev)}</div>
+                      </Show>
+                      <Show when={!cev.isAllDay()}>
+                        <div class="calendar-event-datetimes">{formatCalendarEventStartTime(calendarSignals, cev)} - {formatCalendarEventEndTime(calendarSignals, cev)}</div>
+                      </Show>
+                    </div>
                     <div class="calendar-event-shorttext">{cev.eventShortText()}</div>
                   </div>
                 }</For>
