@@ -21,3 +21,7 @@ export function showAccount() {
 export function showLocale() {
     window.location.replace("#/locale");
 }
+
+export function showCalendar() {
+    window.location.replace("#/calendar");
+}

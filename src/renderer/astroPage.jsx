@@ -8,7 +8,6 @@ class AstroPageSignals {
       [this.moonrise, this.setMoonrise] = createSignal("");
       [this.moonset, this.setMoonset] = createSignal("");
       [this.moonPhase, this.setMoonPhase] = createSignal(0);
-
   }
 }
 

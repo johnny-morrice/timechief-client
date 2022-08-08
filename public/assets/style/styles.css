@@ -176,3 +176,16 @@ hr.status-line {
     margin-bottom: 0;
 }
 
+div.next-event-time {
+    font-weight: bold;
+}
+
+div.calendar-day-date {
+    font-size: 25pt;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+div.calendar-event-when {
+    font-weight: bold;
+}

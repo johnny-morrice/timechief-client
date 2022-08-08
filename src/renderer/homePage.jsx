@@ -9,7 +9,7 @@ class HomePageSignals {
   constructor() {
     [this.isAPIError, this.setAPIError] = createSignal(false);
     [this.locale, this.setLocale] = createSignal("");
-    [this.timezone, this.setTimezone] = createSignal("");
+    [this.timeZone, this.setTimezone] = createSignal("");
     [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
     [this.lastRefreshText, this.setLastRefreshText] = createSignal("");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
@@ -35,9 +35,9 @@ function getTimeText(homePageSignals) {
     let timeOpt = hourCycleMapping[hourCycleOption];
     options["hour12"] = timeOpt;
   }
-  let timezone = homePageSignals.timezone();
-  if (timezone) {
-    options["timeZone"] = timezone;
+  let timeZone = homePageSignals.timeZone();
+  if (timeZone) {
+    options["timeZone"] = timeZone;
   }
   let locale = homePageSignals.locale();
   if (!locale) {
@@ -57,7 +57,7 @@ function updateHomePageSignals(signals, data) {
   let calendar = data["Calendar"];
   let clock = data["Clock"];
   let hourCycleOption = clock["HourCycleOption"];
-  let timezone = clock["Timezone"];
+  let timeZone = clock["Timezone"];
   let locale = clock["Locale"];
   let location = clock["Location"];
   let currentWeather = data["Weather"]["Current"];
@@ -74,7 +74,7 @@ function updateHomePageSignals(signals, data) {
   }
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
-  signals.setTimezone(timezone);
+  signals.setTimezone(timeZone);
   signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
   signals.setFeelsLikeTemp(feelsLikeText);
   signals.setTemp(tempText);
@@ -95,7 +95,18 @@ function updateHomePageSignals(signals, data) {
   }
 }
 
+function getTimeZone(signals) {
+  let tz = signals.timeZone();
+  if (tz) {
+    return tz;
+  }
+  return "Europe/London";
+}
+
 function findNextEvent(calendarEvents) {
+  if (!calendarEvents) {
+    return null;
+  }
   for (var i = 0; i < calendarEvents.length; i++) {
     const cev = new CalendarEvent(calendarEvents[i]);
     if (cev.isHighlight()) {
@@ -118,7 +129,7 @@ function getNextEventStartTime(signals) {
   if (!nextEvent) {
     return "";
   }
-  return nextEvent.formatStartTime(getLocale(signals));
+  return nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
 }
 
 function getNextEventShortText(signals) {

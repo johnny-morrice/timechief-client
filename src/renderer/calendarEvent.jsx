@@ -1,7 +1,15 @@
+export function makeCanonicalDateText(date) {
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
 export class CalendarEvent {
 
     constructor(data) {
         this.data = data;
+    }
+
+    canonicalStartDateText() {
+        return makeCanonicalDateText(this.startTime());
     }
 
     eventShortText() {
@@ -29,16 +37,26 @@ export class CalendarEvent {
         return this._endTime;
     }
 
-    formatStartTime(locale) {
-        return this.formatTime(this.startTime(), locale);
+    formatStartTime(locale, timeZone) {
+        if (this.isAllDay()) {
+            let dateOpts = {dateStyle: 'short', timeZone: timeZone};
+            return "All day " + this.startTime().toLocaleDateString(locale, dateOpts); 
+        }
+        return this.formatTime(this.startTime(), locale, timeZone);
     }
 
-    formatEndTime(locale) {
-        return this.formatTime(this.endTime(), locale);
+    isAllDay() {
+        return this.data["AllDay"];
     }
 
-    formatTime(time, locale) {
-        return time.toLocaleTimeString(locale, {'timeStyle': 'short'}) + " " + time.toLocaleDateString(locale, {dateStyle: 'short', });
+    formatEndTime(locale, timeZone) {
+        return this.formatTime(this.endTime(), locale, timeZone);
+    }
+
+    formatTime(time, locale, timeZone) {
+        let timeOpts = {timeStyle: 'short', timeZone: timeZone};
+        let dateOpts = {dateStyle: 'short', timeZone: timeZone};
+        return time.toLocaleTimeString(locale, timeOpts) + " " + time.toLocaleDateString(locale, dateOpts);
     }
 
     isSoon() {
