@@ -37,23 +37,26 @@ export class CalendarEvent {
         return this._endTime;
     }
 
-    formatStartTime(locale) {
+    formatStartTime(locale, timeZone) {
         if (this.isAllDay()) {
-            return "All day " + this.startTime().toLocaleDateString(locale, {dateStyle: 'short', }); 
+            let dateOpts = {dateStyle: 'short', timeZone: timeZone};
+            return "All day " + this.startTime().toLocaleDateString(locale, dateOpts); 
         }
-        return this.formatTime(this.startTime(), locale);
+        return this.formatTime(this.startTime(), locale, timeZone);
     }
 
     isAllDay() {
         return this.data["AllDay"];
     }
 
-    formatEndTime(locale) {
-        return this.formatTime(this.endTime(), locale);
+    formatEndTime(locale, timeZone) {
+        return this.formatTime(this.endTime(), locale, timeZone);
     }
 
-    formatTime(time, locale) {
-        return time.toLocaleTimeString(locale, {'timeStyle': 'short'}) + " " + time.toLocaleDateString(locale, {dateStyle: 'short', });
+    formatTime(time, locale, timeZone) {
+        let timeOpts = {'timeStyle': 'short', timeZone: timeZone};
+        let dateOpts = {dateStyle: 'short', timeZone: timeZone};
+        return time.toLocaleTimeString(locale, timeOpts) + " " + time.toLocaleDateString(locale, dateOpts);
     }
 
     isSoon() {
