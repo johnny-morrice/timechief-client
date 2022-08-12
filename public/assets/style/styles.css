@@ -164,7 +164,7 @@ div.status-bar {
     margin-right: 5pt;
 }
 
-i.fa-heart-crack.api-error-indicator {
+i.is-error.api-error-indicator {
     color: red;
 }
 

@@ -22,7 +22,7 @@ function updateSignals(signals, data) {
     if (calendarLastUpdated != 0) {
         calendarLastDate = new Date(calendarLastUpdated * 1000);
     }
-    signals.setCalendarExists = isCalendarExists(data);
+    signals.setCalendarExists(isCalendarExists(data));
     signals.setLastCalendarUpdateTime(calendarLastDate);
     let principal = data["LinkedPrincipal"];
     if ("PrincipalSerial" in principal) {
@@ -75,7 +75,7 @@ export const StatusBar = () => {
         <div class="status-bar">
         <Show when={isCalendarError(signals)}>
             <div class="status-bar-calendar-error-indicator">
-                <i class='fa-solid fa-calendar-xmark api-error-indicator'></i>
+                <i class='fa-solid fa-calendar-xmark is-error api-error-indicator'></i>
             </div>
         </Show>
         <Show when={!isCalendarError(signals)}>
@@ -90,7 +90,7 @@ export const StatusBar = () => {
         </Show>
         <Show when={signals.isAPIError()}>
             <div class="status-bar-api-error-indicator">
-                <i class='fa-solid fa-heart-crack api-error-indicator'></i>
+                <i class='fa-solid fa-heart-crack is-error api-error-indicator'></i>
             </div>
             <div class="status-bar-message">Error</div>
         </Show>

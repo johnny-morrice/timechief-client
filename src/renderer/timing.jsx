@@ -5,4 +5,4 @@ export const day = hour * 24;
 
 export const apiRefreshInterval = second;
 export const apiErrorTimeout = second * 30;
-export const calendarErrorTimeout = hour;
+export const calendarErrorTimeout = minute * 20;
