@@ -3,7 +3,7 @@ import { addClockDataCallback } from './ipc';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
 import { apiErrorTimeout, second } from './timing';
-import { CalendarEvent } from './calendarEvent';
+import { CalendarEvent, sortCalendarEvents } from './calendarEvent';
 
 class HomePageSignals {
   constructor() {
@@ -103,12 +103,14 @@ function getTimeZone(signals) {
   return "Europe/London";
 }
 
-function findNextEvent(calendarEvents) {
-  if (!calendarEvents) {
+function findNextEvent(eventData) {
+  if (!eventData) {
     return null;
   }
+  let calendarEvents = eventData.map(ev => new CalendarEvent(ev));
+  sortCalendarEvents(calendarEvents);
   for (var i = 0; i < calendarEvents.length; i++) {
-    const cev = new CalendarEvent(calendarEvents[i]);
+    let cev = calendarEvents[i];
     if (cev.isHighlight()) {
       return cev;
     }

@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { CalendarEvent, makeCanonicalDateText } from './calendarEvent';
+import { CalendarEvent, makeCanonicalDateText, sortCalendarEvents } from './calendarEvent';
 import { addClockDataCallback } from './ipc';
 import { day } from './timing';
 
@@ -40,15 +40,6 @@ function getCalendarDays(signals) {
   return signals.calendarDays();
 }
 
-function cmpDate(a, b) {
-  if (a < b) {
-    return -1;
-  } else if (a > b) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
 
 function formatCalendarDayDate(signals, day) {
   return day.formatDate(signals.locale(), signals.timeZone());
@@ -111,17 +102,7 @@ class CalendarDays {
 
   _allDays() {
     for (let [_, day] of Object.entries(this._days)) {
-      day.sort((a, b) => {
-        if (a.isAllDay() && b.isAllDay()) {
-          return 0;
-        } else if (a.isAllDay() && !b.isAllDay()) {
-          return 1;
-        } else if (!a.isAllDay() && b.isAllDay()) {
-          return -1;
-        } else {
-          return cmpDate(a.startTime(), b.startTime());
-        }
-      });
+      sortCalendarEvents(day);
     }
     return this._days;
   }

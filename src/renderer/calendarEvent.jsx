@@ -2,6 +2,34 @@ export function makeCanonicalDateText(date) {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
+export function sortCalendarEvents(arr) {
+    arr.sort((a, b) => {
+        return compareCalendarEvents(a, b);
+    });
+}
+
+export function compareCalendarEvents(a, b) {
+    if (a.isAllDay() && b.isAllDay()) {
+        return 0;
+      } else if (a.isAllDay() && !b.isAllDay()) {
+        return 1;
+      } else if (!a.isAllDay() && b.isAllDay()) {
+        return -1;
+      } else {
+        return cmpDate(a.startTime(), b.startTime());
+      }
+}
+
+function cmpDate(a, b) {
+    if (a < b) {
+      return -1;
+    } else if (a > b) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
 export class CalendarEvent {
 
     constructor(data) {
