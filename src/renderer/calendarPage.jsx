@@ -13,18 +13,19 @@ class CalendarPageSignals {
 
 function updateCalendarPageSignals(signals, data) {
   let calendarResp = data["Calendar"];
-  if ("Calendar" in calendarResp) {
+  if ("Calendar" in calendarResp && calendarResp["Calendar"] != null) {
     let calendar = calendarResp["Calendar"];
-    let dataEvents = calendar["Events"];
-    if (dataEvents) {
-      let events = dataEvents.map(cev => new CalendarEvent(cev));
-      let calendarDays = new CalendarDays();
-      events.forEach(cev => calendarDays.addNewEvent(cev));
-      let ourCalendar = calendarDays.nextEvents(30, 3);
-      // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
-      signals.setCalendarDays(ourCalendar);
+    if ("Events" in calendar) {
+      let dataEvents = calendar["Events"];
+      if (dataEvents) {
+        let events = dataEvents.map(cev => new CalendarEvent(cev));
+        let calendarDays = new CalendarDays();
+        events.forEach(cev => calendarDays.addNewEvent(cev));
+        let ourCalendar = calendarDays.nextEvents(30, 3);
+        // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
+        signals.setCalendarDays(ourCalendar);
+      }
     }
-
   }
   let clock = data["Clock"];
   signals.setLocale(clock["Locale"]);

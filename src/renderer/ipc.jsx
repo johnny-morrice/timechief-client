@@ -4,6 +4,7 @@ class APIResultReceiver {
     constructor(channel) {
         this.callbacks = [];
         this.channel = channel;
+        this.lastData = null;
     }
 
     receive() {
@@ -11,7 +12,8 @@ class APIResultReceiver {
             if ("APIError" in data) {
                 console.log(`error calling API for channel ${this.channel}: ${data["APIError"]}`);
             } else {
-                // console.log(`received data for channel: ${this.channel}: ${data}`);
+                this.lastData = data;
+                console.log(`received data for channel: ${this.channel}: ${JSON.stringify(data)}`);
                 this.callbacks.forEach(cb => {
                     cb(data);
                 });
@@ -20,6 +22,9 @@ class APIResultReceiver {
     }
 
     addCallback(cb) {
+        if (this.lastData) {
+            cb(this.lastData);
+        }
         this.callbacks.push(cb);
     }
 }

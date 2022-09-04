@@ -35,10 +35,10 @@ export const TaskBar = () => {
             <div class='flex-element'>
                 <button class='nav-button' onClick={showForecast}><i class="fa-solid fa-cloud-sun"></i></button>
             </div>
-            <Show when={taskBarSignals.isCalendarExists}>
-            <div class='flex-element'>
-                <button class='nav-button' onClick={showCalendar}><i class="fa-solid fa-calendar-days"></i></button>
-            </div>
+            <Show when={taskBarSignals.isCalendarExists()}>
+                <div class='flex-element'>
+                    <button class='nav-button' onClick={showCalendar}><i class="fa-solid fa-calendar-days"></i></button>
+                </div>
             </Show>
             <div class='flex-element'>
                 <button class='nav-button' onClick={showAstro}><i class="fa-solid fa-moon"></i></button>

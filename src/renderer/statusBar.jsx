@@ -25,11 +25,10 @@ function updateSignals(signals, data) {
     signals.setCalendarExists(isCalendarExists(data));
     signals.setLastCalendarUpdateTime(calendarLastDate);
     let principal = data["LinkedPrincipal"];
-    if ("PrincipalSerial" in principal) {
-        signals.setAccountLinked(new Boolean(principal["PrincipalSerial"]));
-    } else {
-        signals.setAccountLinked(false);
-    }
+    let accountLinked = "PrincipalSerial" in principal && principal["PrincipalSerial"] != null && principal["PrincipalSerial"] != "";
+    signals.setAccountLinked(accountLinked);
+    console.log(`calendar exists: ${isCalendarExists(data)}, accountLinked: ${accountLinked}`);
+    console.log(`signal calendar exists: ${signals.isCalendarExists()} accountLinked: ${signals.isAccountLinked()}`);
 }
 
 function isCalendarErrorTimeout(signals) {
@@ -78,13 +77,13 @@ export const StatusBar = () => {
                 <i class='fa-solid fa-calendar-xmark is-error api-error-indicator'></i>
             </div>
         </Show>
-        <Show when={!isCalendarError(signals)}>
+        <Show when={signals.isCalendarExists() && !isCalendarError(signals)}>
             <div class="status-bar-calendar-error-indicator">
                 <i class='fa-solid fa-calendar-check'></i>
             </div>
         </Show>
         <Show when={signals.isAccountLinked()}>
-        <div class="status-bar-api-error-indicator">
+            <div class="status-bar-api-error-indicator">
                 <i class='fa-solid fa-user'></i>
             </div>
         </Show>
