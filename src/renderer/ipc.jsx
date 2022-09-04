@@ -1,4 +1,4 @@
-import { apiRefreshInterval } from "./timing";
+import { apiRefreshInterval, deviceRefreshInterval } from "./timing";
 
 class APIResultReceiver {
     constructor(channel) {
@@ -93,9 +93,13 @@ export function sendSessionRemoveRequest() {
 }
 
 export function initializeIPC() {
-    let interval = setInterval(() => {
-        sendClockDataRequest();
+    let deviceInterval = setInterval(() => {
         sendDeviceHeartbeat();
+    },
+        deviceRefreshInterval
+    );
+    let apiInterval = setInterval(() => {
+        sendClockDataRequest();
     },
         apiRefreshInterval
     );
@@ -104,5 +108,5 @@ export function initializeIPC() {
     pairingCreateReceiver.receive();
     pairingGetReceiver.receive();
     pairingCompleteReceiver.receive();
-    return interval;
+    return [deviceInterval, apiInterval];
 }

@@ -13,10 +13,10 @@ import { LocalePage } from "./localePage";
 import { CalendarPage } from "./calendarPage";
 
 const App = () => {
-  let ipcInterval = initializeIPC();
+  let ipcIntervals = initializeIPC();
   sendClockDataRequest();
   onCleanup(() => {
-    clearInterval(ipcInterval);
+    ipcIntervals.forEach(interval => clearInterval(interval));
   });
 
   return <Routes>
