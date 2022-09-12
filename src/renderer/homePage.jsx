@@ -207,7 +207,7 @@ export const HomePage = () => {
         <div class="flex-element row-flex">
           <div class="flex-element column-flex home-major-data-fields-column">
             <div class="flex-element">temp</div>
-            <div class="flex-element">feels like</div>
+            <div class="flex-element">feels</div>
           </div>
           <div class="flex-element column-flex home-major-data-column">
             <div class='flex-element home-major-data'>{homePageSignals.temp}</div>
