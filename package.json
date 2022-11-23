@@ -13,7 +13,7 @@
     "electron": "^19.0.6"
   },
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^1.2.0",
     "axios-debug-log": "^0.8.4",
     "solid-js": "^1.4.4",
     "uuid": "^8.3.2",
