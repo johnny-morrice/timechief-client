@@ -74,3 +74,7 @@ func (cfg Config) GetStream() string {
 	}
 	return stream
 }
+
+func (cfg Config) GetBundleToken() string {
+	return cfg.Config["bundleToken"]
+}

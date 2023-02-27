@@ -57,9 +57,9 @@ func (lt LaunchTarget) Launch() error {
 	return exec.Command(lt.Path + "/" + lt.Version.Command).Run()
 }
 
-func (lt LaunchTarget) Install() error {
+func (lt LaunchTarget) Install(cfg Config) error {
 	tempFile := lt.versionTempFile()
-	err := lt.Version.Download(tempFile)
+	err := lt.Version.Download(cfg, tempFile)
 	if err != nil {
 		return err
 	}

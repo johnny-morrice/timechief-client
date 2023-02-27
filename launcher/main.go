@@ -60,8 +60,10 @@ func initialise(c *cli.Context) error {
 		},
 	}
 	if !init.isInitialised() {
+		log.Println("initialising client")
 		return init.initialise()
 	}
+	log.Println("already initialised, skipping initialisation")
 	return nil
 }
 
@@ -182,7 +184,7 @@ func (up updater) createNewLaunchTarget(cfg Config, v Version) error {
 	newLt.Path = cfg.NewInstallPath(v.Version)
 	newLt.Version = v
 	newLt.VersionID = v.ID
-	err := newLt.Install()
+	err := newLt.Install(cfg)
 	if err != nil {
 		return err
 	}
