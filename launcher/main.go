@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/urfave/cli/v2"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -40,14 +41,53 @@ func getCLIApp() *cli.App {
 }
 
 func initialise(c *cli.Context) error {
-	// TODO: check if database exists or needs creating.
-	// TODO: check if at least one version is available.
-	// TODO: if no version is available, download the latest version.
+	db, err := getDBConnection()
+	if err != nil {
+		return err
+	}
+	cfgStore := ConfigStore{db: db}
+	cfg, err := cfgStore.GetConfig()
+	if err != nil {
+		return err
+	}
+	init := initialiser{
+		db: db,
+		updater: updater{
+			cfgStore:          cfgStore,
+			api:               ArtifactAPIClient{cfg.GetArtifactURL()},
+			launchTargetStore: LaunchTargetStore{db: db},
+			versionStore:      VersionStore{db: db},
+		},
+	}
+	if !init.isInitialised() {
+		return init.initialise()
+	}
 	return nil
 }
 
+type initialiser struct {
+	db *gorm.DB
+	updater
+}
+
+func (init initialiser) initialise() error {
+	err := autoMigrate(init.db)
+	if err != nil {
+		return err
+	}
+	return init.firstUpdate()
+}
+
+func (init initialiser) isInitialised() bool {
+	lt, err := init.launchTargetStore.GetActiveLaunchTarget()
+	return err == nil && lt.ID != 0
+}
+
 func launchClient(c *cli.Context) error {
-	// TODO: if not initialised, wait until initialised.
+	err := initialise(c)
+	if err != nil {
+		return err
+	}
 	db, err := getDBConnection()
 	if err != nil {
 		return err
@@ -72,10 +112,20 @@ func launchDaemon(c *cli.Context) error {
 		return err
 	}
 	api := ArtifactAPIClient{cfg.GetArtifactURL()}
+	up := updater{
+		versionStore:      VersionStore{db: db},
+		launchTargetStore: LaunchTargetStore{db: db},
+		cfgStore:          cfgStore,
+		api:               api,
+	}
+
+	init := initialiser{
+		db:      db,
+		updater: up,
+	}
 	daemon := updateDaemon{
-		versionStore: VersionStore{db: db},
-		cfgStore:     cfgStore,
-		api:          api,
+		updater: up,
+		init:    init,
 	}
 	daemon.doTick()
 	runEvery(time.Minute, daemon.doTick)
@@ -83,34 +133,82 @@ func launchDaemon(c *cli.Context) error {
 }
 
 type updateDaemon struct {
-	versionStore      VersionStore
-	launchTargetStore LaunchTargetStore
-	cfgStore          ConfigStore
-	api               ArtifactAPIClient
+	updater
+	init initialiser
 }
 
 func (daemon updateDaemon) doTick() {
-	// TODO: if not initialised, skip until until initialised.
+	if !daemon.init.isInitialised() {
+		log.Println("daemon not ticking, not initialised")
+		return
+	}
 	err := daemon.checkForUpdates()
 	if err != nil {
 		log.Println(err.Error())
 	}
 }
 
-func (daemon updateDaemon) checkForUpdates() error {
-	err := daemon.syncAPIVersions()
+type updater struct {
+	versionStore      VersionStore
+	launchTargetStore LaunchTargetStore
+	cfgStore          ConfigStore
+	api               ArtifactAPIClient
+}
+
+func (up updater) firstUpdate() error {
+	err := up.syncAPIVersions()
 	if err != nil {
 		return err
 	}
-	versions, err := daemon.versionStore.GetVersions()
+	versions, err := up.versionStore.GetVersions()
 	if err != nil {
 		return err
 	}
-	lt, err := daemon.launchTargetStore.GetActiveLaunchTarget()
+	cfg, err := up.cfgStore.GetConfig()
 	if err != nil {
 		return err
 	}
-	cfg, err := daemon.cfgStore.GetConfig()
+	newVersion := FindLatestVersion(cfg, versions)
+
+	if newVersion == nil {
+		return nil
+	}
+
+	return up.createNewLaunchTarget(cfg, *newVersion)
+}
+
+func (up updater) createNewLaunchTarget(cfg Config, v Version) error {
+	newLt := LaunchTarget{}
+	newLt.Path = cfg.NewInstallPath(v.Version)
+	newLt.Version = v
+	newLt.VersionID = v.ID
+	err := newLt.Install()
+	if err != nil {
+		return err
+	}
+
+	err = up.launchTargetStore.Create(newLt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (up updater) checkForUpdates() error {
+	err := up.syncAPIVersions()
+	if err != nil {
+		return err
+	}
+	versions, err := up.versionStore.GetVersions()
+	if err != nil {
+		return err
+	}
+	lt, err := up.launchTargetStore.GetActiveLaunchTarget()
+	if err != nil {
+		return err
+	}
+	cfg, err := up.cfgStore.GetConfig()
 	if err != nil {
 		return err
 	}
@@ -120,30 +218,16 @@ func (daemon updateDaemon) checkForUpdates() error {
 		return nil
 	}
 
-	newLt := LaunchTarget{}
-	newLt.Path = cfg.NewInstallPath(newVersion.Version)
-	newLt.Version = *newVersion
-	newLt.VersionID = newVersion.ID
-	err = newLt.Install()
-	if err != nil {
-		return err
-	}
-
-	err = daemon.launchTargetStore.Create(newLt)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return up.createNewLaunchTarget(cfg, *newVersion)
 }
 
-func (daemon updateDaemon) syncAPIVersions() error {
-	versions, err := daemon.api.FetchVersions()
+func (up updater) syncAPIVersions() error {
+	versions, err := up.api.FetchVersions()
 	if err != nil {
 		return err
 	}
 	for _, version := range versions {
-		err = daemon.versionStore.CreateIfNotExists(version)
+		err = up.versionStore.CreateIfNotExists(version)
 		if err != nil {
 			return err
 		}

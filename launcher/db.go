@@ -13,3 +13,7 @@ func getGormConfig() *gorm.Config {
 func getDBConnection() (*gorm.DB, error) {
 	return gorm.Open(sqlite.Open("timechief-launcher.db"), getGormConfig())
 }
+
+func autoMigrate(db *gorm.DB) error {
+	return db.AutoMigrate(&LaunchTarget{}, &ConfigEntry{}, &Version{})
+}

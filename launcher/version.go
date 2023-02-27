@@ -75,6 +75,17 @@ func FindNewVersion(cfg Config, currentVersion string, versions []Version) *Vers
 	return nil
 }
 
+func FindLatestVersion(cfg Config, versions []Version) *Version {
+	sortVersionsDecreasing(versions)
+	for _, version := range versions {
+		v := version
+		if version.IsSupportedProductStream(cfg) {
+			return &v
+		}
+	}
+	return nil
+}
+
 func (v Version) IsSupportedProductStream(cfg Config) bool {
 	return v.Product == cfg.GetProduct() && v.Stream == cfg.GetStream()
 }
