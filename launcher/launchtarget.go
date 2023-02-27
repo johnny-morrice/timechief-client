@@ -16,10 +16,45 @@ type LaunchTarget struct {
 	IsActive  bool
 }
 
-func GetLaunchTargets(db *gorm.DB) ([]LaunchTarget, error) {
+type LaunchTargetStore struct {
+	db *gorm.DB
+}
+
+func (store LaunchTargetStore) GetLaunchTargets() ([]LaunchTarget, error) {
 	var launchTargets []LaunchTarget
-	result := db.Find(&launchTargets)
+	result := store.db.Find(&launchTargets)
 	return launchTargets, result.Error
+}
+
+func (store LaunchTargetStore) GetActiveLaunchTarget() (LaunchTarget, error) {
+	var launchTarget LaunchTarget
+	result := store.db.First(&launchTarget, "is_active = ?", true)
+	return launchTarget, result.Error
+}
+
+func (store LaunchTargetStore) Save(lt LaunchTarget) error {
+	result := store.db.Save(&lt)
+	return result.Error
+}
+
+func (store LaunchTargetStore) Create(lt LaunchTarget) error {
+	result := store.db.Create(&lt)
+	return result.Error
+}
+
+func (store LaunchTargetStore) SetActive(lt LaunchTarget) error {
+	// Deactivate all other launch targets
+	result := store.db.Model(&LaunchTarget{}).Where("is_active = ?", true).Update("is_active", false)
+	if result.Error != nil {
+		return result.Error
+	}
+	// Activate the specified launch target
+	result = store.db.Model(&lt).Update("is_active", true)
+	return result.Error
+}
+
+func (lt LaunchTarget) Launch() error {
+	return exec.Command(lt.Path + "/" + lt.Version.Command).Run()
 }
 
 func (lt LaunchTarget) Install() error {

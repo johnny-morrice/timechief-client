@@ -1,6 +1,11 @@
 package main
 
-import "gorm.io/gorm"
+import (
+	"path/filepath"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type ConfigEntry struct {
 	gorm.Model
@@ -8,20 +13,19 @@ type ConfigEntry struct {
 	Value string
 }
 
-func GetConfigEntries(db *gorm.DB) ([]ConfigEntry, error) {
-	var configEntries []ConfigEntry
-	result := db.Find(&configEntries)
-	return configEntries, result.Error
-}
-
 type Config struct {
 	Config map[string]string
 }
 
-func GetConfig(db *gorm.DB) (Config, error) {
-	configEntries, err := GetConfigEntries(db)
-	if err != nil {
-		return Config{}, err
+type ConfigStore struct {
+	db *gorm.DB
+}
+
+func (store ConfigStore) GetConfig() (Config, error) {
+	var configEntries []ConfigEntry
+	result := store.db.Find(&configEntries)
+	if result.Error != nil {
+		return Config{}, result.Error
 	}
 	config := make(map[string]string)
 	for _, entry := range configEntries {
@@ -34,6 +38,10 @@ const defaultInstallRoot = "/opt/timechief-launcher"
 const defaultArtifactURL = "https://timechief.io"
 const defaultProduct = "timechief-rpi"
 const defaultStream = "production"
+
+func (cfg Config) NewInstallPath(version string) string {
+	return filepath.Join(cfg.GetInstallRoot(), cfg.GetProduct(), cfg.GetStream(), version, uuid.NewString())
+}
 
 func (cfg Config) GetInstallRoot() string {
 	root, ok := cfg.Config["installRoot"]
