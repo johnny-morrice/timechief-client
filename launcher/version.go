@@ -16,9 +16,10 @@ import (
 
 type Version struct {
 	gorm.Model
-	Version string `gorm:"uniqueIndex"`
-	Product string
-	Stream  string
+	UUID    string `gorm:"uniqueIndex:uuid_idx"`
+	Version string `gorm:"uniqueIndex:version_product_stream_idx"`
+	Product string `gorm:"uniqueIndex:version_product_stream_idx"`
+	Stream  string `gorm:"uniqueIndex:version_product_stream_idx"`
 	URL     string
 	SHA256  []byte
 	Command string
