@@ -18,7 +18,7 @@
     "solid-js": "^1.4.4",
     "uuid": "^8.3.2",
     "vite": "^2.9.12",
-    "vite-plugin-solid": "^2.2.6",
+    "vite-plugin-solid": "^2.6.1",
     "winston": "^3.8.0",
     "solid-app-router": "^0.4.1",
     "qrcode": "^1.5.0"
