@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/johnny-morrice/timechief/client"
-	"github.com/johnny-morrice/timechief/model/viewmodel"
+	"github.com/johnny-morrice/timechief-client/client"
+	"github.com/johnny-morrice/timechief-client/viewmodel"
 	"github.com/pkg/errors"
 )
 

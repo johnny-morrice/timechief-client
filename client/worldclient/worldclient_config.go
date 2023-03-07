@@ -2,8 +2,8 @@ package worldclient
 
 import (
 	"github.com/go-resty/resty/v2"
-	"github.com/johnny-morrice/timechief/client"
-	"github.com/johnny-morrice/timechief/client/framework"
+	"github.com/johnny-morrice/timechief-client/client"
+	"github.com/johnny-morrice/timechief-client/framework"
 	"github.com/sarulabs/di/v2"
 )
 

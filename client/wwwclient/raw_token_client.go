@@ -7,8 +7,8 @@ import (
 	"net/url"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/johnny-morrice/timechief/client"
-	"github.com/johnny-morrice/timechief/model/viewmodel"
+	"github.com/johnny-morrice/timechief-client/client"
+	"github.com/johnny-morrice/timechief-client/viewmodel"
 )
 
 type RawTokenClient struct {

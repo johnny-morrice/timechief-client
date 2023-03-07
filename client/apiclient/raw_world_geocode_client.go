@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/johnny-morrice/timechief/client"
+	"github.com/johnny-morrice/timechief-client/client"
 	"github.com/shopspring/decimal"
 )
 

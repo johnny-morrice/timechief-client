@@ -1,7 +1,7 @@
 package viewmodel
 
 import (
-	"github.com/johnny-morrice/timechief/util"
+	"github.com/johnny-morrice/timechief-client/util"
 	"github.com/pkg/errors"
 )
 

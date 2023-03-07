@@ -1,7 +1,7 @@
 package wwwclient
 
 import (
-	"github.com/johnny-morrice/timechief/client/framework"
+	"github.com/johnny-morrice/timechief-client/framework"
 	"github.com/sarulabs/di/v2"
 )
 

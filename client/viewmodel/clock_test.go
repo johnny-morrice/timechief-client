@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/johnny-morrice/timechief/util"
+	"github.com/johnny-morrice/timechief-client/util"
 )
 
 const UUID1 = "201c0118-66af-4deb-845f-09b87e21020b"

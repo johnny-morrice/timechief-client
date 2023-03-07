@@ -1,10 +1,10 @@
 package apiclient
 
 import (
-	"github.com/johnny-morrice/timechief/client"
-	"github.com/johnny-morrice/timechief/client/authnclient"
-	"github.com/johnny-morrice/timechief/client/framework"
-	"github.com/johnny-morrice/timechief/log"
+	"github.com/johnny-morrice/timechief-client/authnclient"
+	"github.com/johnny-morrice/timechief-client/client"
+	"github.com/johnny-morrice/timechief-client/framework"
+	"github.com/johnny-morrice/timechief-client/log"
 	"github.com/sarulabs/di/v2"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/johnny-morrice/timechief/client"
+	"github.com/johnny-morrice/timechief-client/client"
 )
 
 type GoogleExternalClient struct {

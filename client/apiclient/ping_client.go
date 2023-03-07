@@ -3,7 +3,7 @@ package apiclient
 import (
 	"context"
 
-	"github.com/johnny-morrice/timechief/client"
+	"github.com/johnny-morrice/timechief-client/client"
 )
 
 type PingAPIClient struct {

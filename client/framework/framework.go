@@ -6,6 +6,7 @@ import (
 
 const (
 	Logger = "Logger"
+	Config = "Config"
 
 	RawRestClient      = "RawRestClient"
 	RestClient         = "RestClient"

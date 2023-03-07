@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/johnny-morrice/timechief/client"
+	"github.com/johnny-morrice/timechief-client/client"
 )
 
 type RawWorldLocaleClient struct {
