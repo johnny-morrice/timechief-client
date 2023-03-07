@@ -3,7 +3,7 @@ package apiclient
 import (
 	"context"
 
-	"github.com/johnny-morrice/timechief-client/client"
+	"github.com/johnny-morrice/timechief-client/client/client"
 )
 
 type SessionAPIClient struct {

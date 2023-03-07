@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/johnny-morrice/timechief-client/protocol"
+	"github.com/johnny-morrice/timechief-client/client/protocol"
 	"go.uber.org/zap"
 )
 

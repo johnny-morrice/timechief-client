@@ -3,8 +3,8 @@ package apiclient
 import (
 	"context"
 
-	"github.com/johnny-morrice/timechief-client/client"
-	"github.com/johnny-morrice/timechief-client/viewmodel"
+	"github.com/johnny-morrice/timechief-client/client/client"
+	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 )
 
 type ClockDataAPIClient struct {

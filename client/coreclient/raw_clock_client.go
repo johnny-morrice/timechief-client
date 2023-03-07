@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/johnny-morrice/timechief-client/client"
-	"github.com/johnny-morrice/timechief-client/viewmodel"
+	"github.com/johnny-morrice/timechief-client/client/client"
+	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 )
 
 type RawClockClient struct {

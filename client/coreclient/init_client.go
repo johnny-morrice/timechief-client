@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/johnny-morrice/timechief-client/client"
+	"github.com/johnny-morrice/timechief-client/client/client"
 )
 
 type InitClient struct {

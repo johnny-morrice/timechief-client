@@ -1,8 +1,8 @@
 package log
 
 import (
-	"github.com/johnny-morrice/timechief-client/config"
-	"github.com/johnny-morrice/timechief-client/framework"
+	"github.com/johnny-morrice/timechief-client/client/config"
+	"github.com/johnny-morrice/timechief-client/client/framework"
 	"github.com/pkg/errors"
 	"github.com/sarulabs/di/v2"
 	"go.uber.org/zap"
