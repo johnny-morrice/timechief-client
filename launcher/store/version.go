@@ -1,4 +1,4 @@
-package main
+package store
 
 import (
 	"bytes"
@@ -26,23 +26,23 @@ type Version struct {
 }
 
 type VersionStore struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 func (store VersionStore) GetVersions() ([]Version, error) {
 	var versions []Version
-	result := store.db.Find(&versions)
+	result := store.Db.Find(&versions)
 	return versions, result.Error
 }
 
 func (store VersionStore) CreateIfNotExists(v Version) error {
 	var count int64
-	result := store.db.Model(&Version{}).Where("version = ?", v.Version).Count(&count)
+	result := store.Db.Model(&Version{}).Where("uuid = ?", v.UUID).Count(&count)
 	if result.Error != nil {
 		return result.Error
 	}
 	if count == 0 {
-		result = store.db.Create(&v)
+		result = store.Db.Create(&v)
 		if result.Error != nil {
 			return result.Error
 		}

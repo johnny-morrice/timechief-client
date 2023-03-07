@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -22,8 +22,28 @@ func (api ArtifactAPIClient) GetJSON(url string, obj interface{}) error {
 	return json.NewDecoder(response.Body).Decode(obj)
 }
 
-func (api ArtifactAPIClient) FetchVersions() ([]Version, error) {
-	var versions []Version
+type Page struct {
+	NextCursor string
+	PrevCursor string
+}
+
+type VersionPage struct {
+	Page
+	Versions []Version
+}
+
+type Version struct {
+	UUID    string
+	Version string
+	Product string
+	Stream  string
+	URL     string
+	SHA256  string
+	Command string
+}
+
+func (api ArtifactAPIClient) FetchVersions() (VersionPage, error) {
+	var versions VersionPage
 	err := api.GetJSON("/artifact/versions", &versions)
 	return versions, err
 }

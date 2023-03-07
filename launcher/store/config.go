@@ -1,4 +1,4 @@
-package main
+package store
 
 import (
 	"path/filepath"
@@ -18,12 +18,12 @@ type Config struct {
 }
 
 type ConfigStore struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 func (store ConfigStore) GetConfig() (Config, error) {
 	var configEntries []ConfigEntry
-	result := store.db.Find(&configEntries)
+	result := store.Db.Find(&configEntries)
 	if result.Error != nil {
 		return Config{}, result.Error
 	}

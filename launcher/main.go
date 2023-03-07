@@ -4,6 +4,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
 	"gorm.io/gorm"
 )
@@ -41,11 +43,11 @@ func getCLIApp() *cli.App {
 }
 
 func initialise(c *cli.Context) error {
-	db, err := getDBConnection()
+	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
 	}
-	cfgStore := ConfigStore{db: db}
+	cfgStore := store.ConfigStore{Db: db}
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {
 		return err
@@ -54,9 +56,9 @@ func initialise(c *cli.Context) error {
 		db: db,
 		updater: updater{
 			cfgStore:          cfgStore,
-			api:               ArtifactAPIClient{cfg.GetArtifactURL()},
-			launchTargetStore: LaunchTargetStore{db: db},
-			versionStore:      VersionStore{db: db},
+			api:               api.ArtifactAPIClient{cfg.GetArtifactURL()},
+			launchTargetStore: store.LaunchTargetStore{Db: db},
+			versionStore:      store.VersionStore{Db: db},
 		},
 	}
 	if !init.isInitialised() {
@@ -73,7 +75,7 @@ type initialiser struct {
 }
 
 func (init initialiser) initialise() error {
-	err := autoMigrate(init.db)
+	err := store.AutoMigrate(init.db)
 	if err != nil {
 		return err
 	}
@@ -90,11 +92,11 @@ func launchClient(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	db, err := getDBConnection()
+	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
 	}
-	store := LaunchTargetStore{db: db}
+	store := store.LaunchTargetStore{Db: db}
 	launchTarget, err := store.GetActiveLaunchTarget()
 	if err != nil {
 		return err
@@ -104,19 +106,19 @@ func launchClient(c *cli.Context) error {
 }
 
 func launchDaemon(c *cli.Context) error {
-	db, err := getDBConnection()
+	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
 	}
-	cfgStore := ConfigStore{db: db}
+	cfgStore := store.ConfigStore{Db: db}
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {
 		return err
 	}
-	api := ArtifactAPIClient{cfg.GetArtifactURL()}
+	api := api.ArtifactAPIClient{cfg.GetArtifactURL()}
 	up := updater{
-		versionStore:      VersionStore{db: db},
-		launchTargetStore: LaunchTargetStore{db: db},
+		versionStore:      store.VersionStore{Db: db},
+		launchTargetStore: store.LaunchTargetStore{Db: db},
 		cfgStore:          cfgStore,
 		api:               api,
 	}
@@ -151,10 +153,10 @@ func (daemon updateDaemon) doTick() {
 }
 
 type updater struct {
-	versionStore      VersionStore
-	launchTargetStore LaunchTargetStore
-	cfgStore          ConfigStore
-	api               ArtifactAPIClient
+	versionStore      store.VersionStore
+	launchTargetStore store.LaunchTargetStore
+	cfgStore          store.ConfigStore
+	api               api.ArtifactAPIClient
 }
 
 func (up updater) firstUpdate() error {
@@ -170,7 +172,7 @@ func (up updater) firstUpdate() error {
 	if err != nil {
 		return err
 	}
-	newVersion := FindLatestVersion(cfg, versions)
+	newVersion := store.FindLatestVersion(cfg, versions)
 
 	if newVersion == nil {
 		return nil
@@ -179,8 +181,8 @@ func (up updater) firstUpdate() error {
 	return up.createNewLaunchTarget(cfg, *newVersion)
 }
 
-func (up updater) createNewLaunchTarget(cfg Config, v Version) error {
-	newLt := LaunchTarget{}
+func (up updater) createNewLaunchTarget(cfg store.Config, v store.Version) error {
+	newLt := store.LaunchTarget{}
 	newLt.Path = cfg.NewInstallPath(v.Version)
 	newLt.Version = v
 	newLt.VersionID = v.ID
@@ -214,7 +216,7 @@ func (up updater) checkForUpdates() error {
 	if err != nil {
 		return err
 	}
-	newVersion := FindNewVersion(cfg, lt.Version.Version, versions)
+	newVersion := store.FindNewVersion(cfg, lt.Version.Version, versions)
 
 	if newVersion == nil {
 		return nil
@@ -224,12 +226,28 @@ func (up updater) checkForUpdates() error {
 }
 
 func (up updater) syncAPIVersions() error {
-	versions, err := up.api.FetchVersions()
-	if err != nil {
-		return err
+	var versions []api.Version
+	for true {
+		versionPage, err := up.api.FetchVersions()
+		if err != nil {
+			return err
+		}
+		versions = append(versions, versionPage.Versions...)
+		// TODO load next page
+		break
 	}
+
 	for _, version := range versions {
-		err = up.versionStore.CreateIfNotExists(version)
+		storeVersion := store.Version{
+			Version: version.Version,
+			Product: version.Product,
+			Stream:  version.Stream,
+			URL:     version.URL,
+			SHA256:  []byte(version.SHA256),
+			Command: version.Command,
+		}
+
+		err := up.versionStore.CreateIfNotExists(storeVersion)
 		if err != nil {
 			return err
 		}

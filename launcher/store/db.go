@@ -1,4 +1,4 @@
-package main
+package store
 
 import (
 	"gorm.io/driver/sqlite"
@@ -9,11 +9,11 @@ func getGormConfig() *gorm.Config {
 	return &gorm.Config{}
 }
 
-// getDBConnection gets a GORM database connection for a SQLite3 database.
-func getDBConnection() (*gorm.DB, error) {
+// GetDBConnection gets a GORM database connection for a SQLite3 database.
+func GetDBConnection() (*gorm.DB, error) {
 	return gorm.Open(sqlite.Open("timechief-launcher.db"), getGormConfig())
 }
 
-func autoMigrate(db *gorm.DB) error {
+func AutoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(&LaunchTarget{}, &ConfigEntry{}, &Version{})
 }
