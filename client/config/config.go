@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/johnny-morrice/timechief-client/framework"
+	"github.com/johnny-morrice/timechief-client/client/framework"
 	"github.com/sarulabs/di/v2"
 )
 

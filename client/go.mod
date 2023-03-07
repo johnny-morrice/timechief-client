@@ -1,4 +1,4 @@
-module github.com/johnny-morrice/timechief-client
+module github.com/johnny-morrice/timechief-client/client
 
 go 1.19
 

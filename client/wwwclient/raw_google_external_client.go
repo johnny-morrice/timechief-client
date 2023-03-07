@@ -7,7 +7,7 @@ import (
 	"net/url"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/johnny-morrice/timechief-client/client"
+	"github.com/johnny-morrice/timechief-client/client/client"
 )
 
 type RawGoogleExternalClient struct {
