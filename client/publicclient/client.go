@@ -9,6 +9,7 @@ import (
 
 type Client struct {
 	*client.RestClient
+	Version *VersionClient
 }
 
 func RegisterClient(builder *di.Builder) error {
@@ -29,6 +30,9 @@ func RegisterClient(builder *di.Builder) error {
 				}
 				client := &Client{
 					RestClient: restClient,
+					Version: &VersionClient{
+						RestClient: restClient,
+					},
 				}
 				return client, nil
 			},
