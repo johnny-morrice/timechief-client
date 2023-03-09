@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/client/client"
+	"github.com/johnny-morrice/timechief-client/client/publicclient"
+	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"github.com/johnny-morrice/timechief-client/launcher/api"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
@@ -52,11 +56,15 @@ func initialise(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	clnt, err := api.MakePublicClient(cfg)
+	if err != nil {
+		return err
+	}
 	init := initialiser{
 		db: db,
 		updater: updater{
 			cfgStore:          cfgStore,
-			api:               api.ArtifactAPIClient{cfg.GetArtifactURL()},
+			api:               clnt,
 			launchTargetStore: store.LaunchTargetStore{Db: db},
 			versionStore:      store.VersionStore{Db: db},
 		},
@@ -115,12 +123,15 @@ func launchDaemon(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	api := api.ArtifactAPIClient{cfg.GetArtifactURL()}
+	clnt, err := api.MakePublicClient(cfg)
+	if err != nil {
+		return err
+	}
 	up := updater{
 		versionStore:      store.VersionStore{Db: db},
 		launchTargetStore: store.LaunchTargetStore{Db: db},
 		cfgStore:          cfgStore,
-		api:               api,
+		api:               clnt,
 	}
 
 	init := initialiser{
@@ -156,7 +167,7 @@ type updater struct {
 	versionStore      store.VersionStore
 	launchTargetStore store.LaunchTargetStore
 	cfgStore          store.ConfigStore
-	api               api.ArtifactAPIClient
+	api               *publicclient.Client
 }
 
 func (up updater) firstUpdate() error {
@@ -226,15 +237,25 @@ func (up updater) checkForUpdates() error {
 }
 
 func (up updater) syncAPIVersions() error {
-	var versions []api.Version
-	for true {
-		versionPage, err := up.api.FetchVersions()
+	var versions []*viewmodel.Version
+	ctx := context.Background()
+	cursor := ""
+	for {
+		params := []client.QueryParam{}
+		if cursor != "" {
+			params = append(params, client.CursorParam(cursor))
+		}
+		versionPage, err := up.api.Version.List(ctx, params...)
 		if err != nil {
 			return err
 		}
 		versions = append(versions, versionPage.Versions...)
-		// TODO load next page
-		break
+
+		if versionPage.NextCursor == "" {
+			break
+		}
+
+		cursor = versionPage.NextCursor
 	}
 
 	for _, version := range versions {
