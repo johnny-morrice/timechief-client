@@ -3,6 +3,7 @@ package util
 import (
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 )
 
@@ -25,5 +26,14 @@ func assertIsNil(t *testing.T, value interface{}) {
 	t.Helper()
 	if value != nil {
 		t.Errorf("expected nil but received: %v", value)
+	}
+}
+
+func assertEqual(t *testing.T, expected interface{}, actual interface{}) {
+	t.Helper()
+	diff := cmp.Diff(expected, actual)
+	if diff != "" {
+		t.Logf("expected %v but received %v", expected, actual)
+		t.Fatal(diff)
 	}
 }
