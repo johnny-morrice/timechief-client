@@ -8,11 +8,10 @@ import (
 )
 
 type PublicClientConfig struct {
-	APIKey string
 	client.ClientConfig
 }
 
-func MakePublicClientConfig(apiKey string, cfg client.ClientConfig) PublicClientConfig {
+func MakePublicClientConfig(cfg client.ClientConfig) PublicClientConfig {
 	config := PublicClientConfig{
 		ClientConfig: cfg,
 	}

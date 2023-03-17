@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/sarulabs/di/v2 v2.4.2

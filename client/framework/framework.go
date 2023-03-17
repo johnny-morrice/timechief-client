@@ -27,6 +27,7 @@ const (
 	WwwClient          = "WwwClient"
 	PublicClientConfig = "PublicClientConfig"
 	RawPublicClient    = "RawPublicClient"
+	PublicClient       = "PublicClient"
 )
 
 type RegisterFunc func(*di.Builder) error
