@@ -13,7 +13,7 @@ type VersionClient struct {
 
 func (clnt *VersionClient) Create(ctx context.Context, resource *viewmodel.Version) (*viewmodel.Version, error) {
 	output := &viewmodel.Version{}
-	err := clnt.CreateAndDecode(ctx, "clock", resource, output)
+	err := clnt.CreateAndDecode(ctx, "version", resource, output)
 	if err != nil {
 		return nil, err
 	}
