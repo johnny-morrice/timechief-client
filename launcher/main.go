@@ -26,7 +26,7 @@ func main() {
 // getCLIApp returns a new cli.App instance with two modes, one for launching the timechief client, and the other for running a daemon that downloads updates.
 func getCLIApp() *cli.App {
 	app := cli.NewApp()
-	app.Name = "timechief"
+	app.Name = "timechief-launcher"
 	app.Usage = "Launcher for timechief smartclock"
 	app.Version = "0.0.1"
 	app.Commands = []*cli.Command{
@@ -70,6 +70,9 @@ func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
 	cfg := store.Config{}
 	for _, key := range configKeys {
 		value := c.String(key)
+		if value == "" {
+			continue
+		}
 		cfg.Config[key] = value
 	}
 	return cfg
