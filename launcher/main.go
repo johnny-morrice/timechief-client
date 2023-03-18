@@ -67,7 +67,9 @@ func getCLIApp() *cli.App {
 
 // Read the given configKeys from the cli.Context and return a store.Config instance.
 func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
-	cfg := store.Config{}
+	cfg := store.Config{
+		Config: make(map[string]string),
+	}
 	for _, key := range configKeys {
 		value := c.String(key)
 		if value == "" {
@@ -78,14 +80,14 @@ func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
 	return cfg
 }
 
-func initialiseConfig(c *cli.Context, store store.ConfigStore) error {
+func initialiseConfig(c *cli.Context, cfgStore store.ConfigStore) (store.Config, error) {
 	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
 	cfg := readConfigFromFlags(c, configKeys)
-	err := store.SetConfig(cfg)
+	err := cfgStore.SetConfig(cfg)
 	if err != nil {
-		return err
+		return store.Config{}, err
 	}
-	return nil
+	return cfg, nil
 }
 
 func initialise(c *cli.Context) error {
@@ -93,14 +95,14 @@ func initialise(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
 	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{Db: db}
-	initialiseConfig(c, cfgStore)
-
-	cfg, err := cfgStore.GetConfig()
+	cfg, err := initialiseConfig(c, cfgStore)
 	if err != nil {
 		return err
 	}
+
 	clnt, err := api.MakePublicClient(cfg)
 	if err != nil {
 		return err
