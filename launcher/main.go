@@ -46,6 +46,9 @@ func getCLIApp() *cli.App {
 			Name: "initialise",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
+					Name: "install-root",
+				},
+				&cli.StringFlag{
 					Name: "api-base-url",
 				},
 				&cli.StringFlag{
@@ -73,7 +76,7 @@ func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
 }
 
 func initialiseConfig(c *cli.Context, store store.ConfigStore) error {
-	configKeys := []string{"api-base-url", "product", "stream"}
+	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
 	cfg := readConfigFromFlags(c, configKeys)
 	err := store.SetConfig(cfg)
 	if err != nil {
