@@ -18,6 +18,7 @@ type Client struct {
 	Pairing        *PairingClient
 	Session        *SessionClient
 	Calendar       *CalendarClient
+	Version        *VersionClient
 }
 
 func RegisterClient(builder *di.Builder) error {
@@ -74,6 +75,9 @@ func RegisterClient(builder *di.Builder) error {
 						RawClient: &RawCalendarClient{
 							RawRestClient: restClient.RawRestClient,
 						},
+					},
+					Version: &VersionClient{
+						RestClient: restClient,
 					},
 				}
 				return client, nil
