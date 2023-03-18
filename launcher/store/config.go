@@ -35,7 +35,7 @@ func (store ConfigStore) GetConfig() (Config, error) {
 }
 
 const defaultInstallRoot = "/opt/timechief-launcher"
-const defaultArtifactURL = "https://timechief.io"
+const defaultBaseURL = "https://timechief.io/api/v1"
 const defaultProduct = "timechief-rpi"
 const defaultStream = "production"
 
@@ -51,10 +51,10 @@ func (cfg Config) GetInstallRoot() string {
 	return root
 }
 
-func (cfg Config) GetArtifactURL() string {
-	url, ok := cfg.Config["artifactURL"]
+func (cfg Config) GetAPIBaseURL() string {
+	url, ok := cfg.Config["apiBaseURL"]
 	if !ok {
-		return defaultArtifactURL
+		return defaultBaseURL
 	}
 	return url
 }

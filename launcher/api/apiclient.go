@@ -1,49 +1,39 @@
 package api
 
 import (
-	"encoding/json"
-	"errors"
-	"net/http"
+	"time"
+
+	"github.com/sarulabs/di/v2"
+
+	"github.com/johnny-morrice/timechief-client/client/client"
+	"github.com/johnny-morrice/timechief-client/client/publicclient"
+	"github.com/johnny-morrice/timechief-client/launcher/store"
 )
 
-type ArtifactAPIClient struct {
-	RootURL string
-}
-
-func (api ArtifactAPIClient) GetJSON(url string, obj interface{}) error {
-	response, err := http.Get(api.RootURL + url)
+func MakePublicClient(cfg store.Config) (*publicclient.Client, error) {
+	builder, err := di.NewBuilder()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer response.Body.Close()
-	if response.StatusCode != http.StatusOK {
-		return errors.New("expected 200")
+	// TODO we should load these values from the config.
+	clientConfig := client.ClientConfig{
+		BaseURL:          cfg.GetAPIBaseURL(),
+		HTTPTimeout:      30 * time.Second,
+		RetryWaitTime:    5 * time.Second,
+		RetryMaxWaitTime: 30 * time.Second,
+		RetryCount:       5,
+		DumpHTTP:         true,
 	}
-	return json.NewDecoder(response.Body).Decode(obj)
-}
-
-type Page struct {
-	NextCursor string
-	PrevCursor string
-}
-
-type VersionPage struct {
-	Page
-	Versions []Version
-}
-
-type Version struct {
-	UUID    string
-	Version string
-	Product string
-	Stream  string
-	URL     string
-	SHA256  string
-	Command string
-}
-
-func (api ArtifactAPIClient) FetchVersions() (VersionPage, error) {
-	var versions VersionPage
-	err := api.GetJSON("/artifact/versions", &versions)
-	return versions, err
+	apiConfig := publicclient.MakePublicClientConfig(clientConfig)
+	err = apiConfig.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	err = publicclient.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	app := builder.Build()
+	client := publicclient.GetClient(app)
+	return client, nil
 }
