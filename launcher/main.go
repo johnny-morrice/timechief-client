@@ -38,7 +38,18 @@ func getCLIApp() *cli.App {
 			Action:  launchDaemon,
 		},
 		{
-			Name:   "initialise",
+			Name: "initialise",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name: "api-base-url",
+				},
+				&cli.StringFlag{
+					Name: "product",
+				},
+				&cli.StringFlag{
+					Name: "stream",
+				},
+			},
 			Usage:  "Initialise the database and download the latest version of the timechief client",
 			Action: initialise,
 		},
@@ -46,12 +57,35 @@ func getCLIApp() *cli.App {
 	return app
 }
 
+// Read the given configKeys from the cli.Context and return a store.Config instance.
+func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
+	cfg := store.Config{}
+	for _, key := range configKeys {
+		value := c.String(key)
+		cfg.Config[key] = value
+	}
+	return cfg
+}
+
+func initialiseConfig(c *cli.Context, store store.ConfigStore) error {
+	configKeys := []string{"api-base-url", "product", "stream"}
+	cfg := readConfigFromFlags(c, configKeys)
+	err := store.SetConfig(cfg)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func initialise(c *cli.Context) error {
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
 	}
+	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{Db: db}
+	initialiseConfig(c, cfgStore)
+
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {
 		return err
@@ -104,6 +138,7 @@ func launchClient(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	defer store.CloseDB(db)
 	store := store.LaunchTargetStore{Db: db}
 	launchTarget, err := store.GetActiveLaunchTarget()
 	if err != nil {
@@ -118,6 +153,7 @@ func launchDaemon(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{Db: db}
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {

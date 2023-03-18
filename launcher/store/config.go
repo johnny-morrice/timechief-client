@@ -21,6 +21,18 @@ type ConfigStore struct {
 	Db *gorm.DB
 }
 
+func (store ConfigStore) SetConfig(cfg Config) error {
+	for key, value := range cfg.Config {
+		entry := ConfigEntry{Key: key, Value: value}
+		// Update existing entry or create new entry.
+		result := store.Db.Where("key = ?", key).Assign(entry).FirstOrCreate(&entry)
+		if result.Error != nil {
+			return result.Error
+		}
+	}
+	return nil
+}
+
 func (store ConfigStore) GetConfig() (Config, error) {
 	var configEntries []ConfigEntry
 	result := store.Db.Find(&configEntries)
@@ -44,7 +56,7 @@ func (cfg Config) NewInstallPath(version string) string {
 }
 
 func (cfg Config) GetInstallRoot() string {
-	root, ok := cfg.Config["installRoot"]
+	root, ok := cfg.Config["install-root"]
 	if !ok {
 		return defaultInstallRoot
 	}
@@ -52,7 +64,7 @@ func (cfg Config) GetInstallRoot() string {
 }
 
 func (cfg Config) GetAPIBaseURL() string {
-	url, ok := cfg.Config["apiBaseURL"]
+	url, ok := cfg.Config["api-base-url"]
 	if !ok {
 		return defaultBaseURL
 	}
