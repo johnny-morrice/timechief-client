@@ -80,14 +80,10 @@ func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
 	return cfg
 }
 
-func initialiseConfig(c *cli.Context, cfgStore store.ConfigStore) (store.Config, error) {
+func cfgFlags(c *cli.Context, cfgStore store.ConfigStore) store.Config {
 	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
 	cfg := readConfigFromFlags(c, configKeys)
-	err := cfgStore.SetConfig(cfg)
-	if err != nil {
-		return store.Config{}, err
-	}
-	return cfg, nil
+	return cfg
 }
 
 func initialise(c *cli.Context) error {
@@ -98,10 +94,7 @@ func initialise(c *cli.Context) error {
 
 	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{Db: db}
-	cfg, err := initialiseConfig(c, cfgStore)
-	if err != nil {
-		return err
-	}
+	cfg := cfgFlags(c, cfgStore)
 
 	clnt, err := api.MakePublicClient(cfg)
 	if err != nil {
@@ -118,7 +111,7 @@ func initialise(c *cli.Context) error {
 	}
 	if !init.isInitialised() {
 		log.Println("initialising client")
-		return init.initialise()
+		return init.initialise(cfg)
 	}
 	log.Println("already initialised, skipping initialisation")
 	return nil
@@ -129,8 +122,12 @@ type initialiser struct {
 	updater
 }
 
-func (init initialiser) initialise() error {
+func (init initialiser) initialise(cfg store.Config) error {
 	err := store.AutoMigrate(init.db)
+	if err != nil {
+		return err
+	}
+	err = init.cfgStore.SetConfig(cfg)
 	if err != nil {
 		return err
 	}
