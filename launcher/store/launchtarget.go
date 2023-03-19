@@ -52,7 +52,7 @@ func (store LaunchTargetStore) SetActive(lt LaunchTarget) error {
 		return result.Error
 	}
 	// Activate the specified launch target
-	result = store.Db.Model(&lt).Update("is_active", true)
+	result = store.Db.Model(&lt).Where("id = ?", lt.ID).Update("is_active", true)
 	return result.Error
 }
 
