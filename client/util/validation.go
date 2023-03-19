@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/url"
 
@@ -107,8 +108,13 @@ func ValidateURL(text string) error {
 }
 
 func ValidateSHA256Text(text string) error {
-	if len(text) != 64 {
-		return errors.New("invalid sha256 length")
+	// Decode Base64 SHA256 text
+	data, err := base64.StdEncoding.DecodeString(text)
+	if err != nil {
+		return errors.Wrap(err, "invalid sha256 base64")
+	}
+	if len(data) != 32 {
+		return fmt.Errorf("invalid sha256 length was %d, expected 32", len(data))
 	}
 	return nil
 }
