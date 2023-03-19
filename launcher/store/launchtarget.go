@@ -1,6 +1,8 @@
 package store
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"os/exec"
 
@@ -38,6 +40,7 @@ func (store LaunchTargetStore) Save(lt LaunchTarget) error {
 }
 
 func (store LaunchTargetStore) Create(lt LaunchTarget) error {
+	log.Printf("saving launch target %s in DB", lt.Version.Version)
 	result := store.Db.Create(&lt)
 	return result.Error
 }
@@ -58,17 +61,37 @@ func (lt LaunchTarget) Launch() error {
 }
 
 func (lt LaunchTarget) Install(cfg Config) error {
+	log.Printf("installing version %s to %s", lt.Version.Version, lt.Path)
 	tempFile := lt.versionTempFile()
 	err := lt.Version.Download(cfg, tempFile)
+	if err != nil {
+		return err
+	}
+	err = mkdirp(lt.Path)
 	if err != nil {
 		return err
 	}
 	return extractTarball(tempFile, lt.Path)
 }
 
+// mkdirp creates a directory and all its parents.
+func mkdirp(dirpath string) error {
+	log.Printf("creating directory %s", dirpath)
+	err := os.MkdirAll(dirpath, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+	return nil
+}
+
 // extractTarball shells out to the tar utility to extract a tarball.
 func extractTarball(tarballPath string, destination string) error {
-	return exec.Command("tar", "-xvf", tarballPath, "-C", destination).Run()
+	log.Printf("extracting tarball %s to %s", tarballPath, destination)
+	err := exec.Command("tar", "-xvf", tarballPath, "-C", destination).Run()
+	if err != nil {
+		return fmt.Errorf("failed to extract tarball: %w", err)
+	}
+	return nil
 }
 
 func (lt LaunchTarget) versionTempFile() string {

@@ -132,7 +132,12 @@ func (init initialiser) initialise(cfg store.Config) error {
 	if err != nil {
 		return err
 	}
-	return init.firstUpdate()
+	err = init.firstUpdate()
+	if err != nil {
+		return err
+	}
+	log.Print("initialised client OK")
+	return nil
 }
 
 func (init initialiser) isInitialised() bool {
@@ -141,10 +146,6 @@ func (init initialiser) isInitialised() bool {
 }
 
 func launchClient(c *cli.Context) error {
-	err := initialise(c)
-	if err != nil {
-		return err
-	}
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
@@ -255,6 +256,8 @@ func (up updater) createNewLaunchTarget(cfg store.Config, v store.Version) error
 		return err
 	}
 
+	log.Printf("created launch target for version: %s", v.Version)
+
 	return nil
 }
 
@@ -308,6 +311,7 @@ func (up updater) syncAPIVersions() error {
 
 	for _, version := range versions {
 		// Decode base64 encoded SHA256
+		log.Printf("processing version %s UUID: %s", version.Version, version.UUID)
 		log.Printf("decoding sha %s", version.SHA256)
 		shaBytes, err := base64.StdEncoding.DecodeString(version.SHA256)
 		if err != nil {
@@ -315,6 +319,7 @@ func (up updater) syncAPIVersions() error {
 		}
 		log.Printf("decoded sha %x", shaBytes)
 		storeVersion := store.Version{
+			UUID:    version.UUID,
 			Version: version.Version,
 			Product: version.Product,
 			Stream:  version.Stream,

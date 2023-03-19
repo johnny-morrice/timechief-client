@@ -38,17 +38,20 @@ func (store VersionStore) GetVersions() ([]Version, error) {
 }
 
 func (store VersionStore) CreateIfNotExists(v Version) error {
+	log.Printf("creating version %s if not exists with UUID %s", v.Version, v.UUID)
 	var count int64
 	result := store.Db.Model(&Version{}).Where("uuid = ?", v.UUID).Count(&count)
 	if result.Error != nil {
 		return result.Error
 	}
 	if count == 0 {
+		log.Printf("creating version %s", v.Version)
 		result = store.Db.Create(&v)
 		if result.Error != nil {
 			return result.Error
 		}
 	}
+	log.Printf("version %s exists", v.Version)
 	return nil
 }
 
@@ -97,7 +100,6 @@ func FindNewVersion(cfg Config, currentVersion string, versions []Version) (Vers
 
 func FindLatestVersion(cfg Config, versions []Version) (Version, error) {
 	SortVersionsDecreasing(versions)
-	log.Println(versions)
 	for _, version := range versions {
 		v := version
 		if version.IsSupportedProductStream(cfg) {
@@ -112,6 +114,7 @@ func (v Version) IsSupportedProductStream(cfg Config) bool {
 }
 
 func (v Version) Download(cfg Config, path string) error {
+	log.Printf("downloading %s to %s", v.URL, path)
 	file, err := os.Create(path)
 	if err != nil {
 		return err
