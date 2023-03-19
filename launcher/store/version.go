@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -51,7 +52,7 @@ func (store VersionStore) CreateIfNotExists(v Version) error {
 	return nil
 }
 
-func sortVersionsDecreasing(versions []Version) {
+func SortVersionsDecreasing(versions []Version) {
 	sort.Sort(sort.Reverse(bySemVer(versions)))
 }
 
@@ -66,29 +67,44 @@ func (s bySemVer) Swap(i, j int) {
 }
 
 func (s bySemVer) Less(i, j int) bool {
+	if !semver.IsValid(s[i].Version) && !semver.IsValid(s[j].Version) {
+		log.Printf("Invalid semver: %s, %s", s[i].Version, s[j].Version)
+		return false
+	}
+	if !semver.IsValid(s[i].Version) {
+		log.Printf("Invalid semver: %s", s[i].Version)
+		return true
+	}
+	if !semver.IsValid(s[j].Version) {
+		log.Printf("Invalid semver: %s", s[j].Version)
+		return false
+	}
 	return semver.Compare(s[i].Version, s[j].Version) < 0
 }
 
-func FindNewVersion(cfg Config, currentVersion string, versions []Version) *Version {
-	sortVersionsDecreasing(versions)
+var ErrNoVersion = errors.New("no version found")
+
+func FindNewVersion(cfg Config, currentVersion string, versions []Version) (Version, error) {
+	SortVersionsDecreasing(versions)
 	for _, version := range versions {
 		v := version
 		if version.Version > currentVersion && version.IsSupportedProductStream(cfg) {
-			return &v
+			return v, nil
 		}
 	}
-	return nil
+	return Version{}, ErrNoVersion
 }
 
-func FindLatestVersion(cfg Config, versions []Version) *Version {
-	sortVersionsDecreasing(versions)
+func FindLatestVersion(cfg Config, versions []Version) (Version, error) {
+	SortVersionsDecreasing(versions)
+	log.Println(versions)
 	for _, version := range versions {
 		v := version
 		if version.IsSupportedProductStream(cfg) {
-			return &v
+			return v, nil
 		}
 	}
-	return nil
+	return Version{}, ErrNoVersion
 }
 
 func (v Version) IsSupportedProductStream(cfg Config) bool {

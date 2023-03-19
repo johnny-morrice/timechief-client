@@ -230,16 +230,17 @@ func (up updater) firstUpdate() error {
 	if err != nil {
 		return err
 	}
-	newVersion := store.FindLatestVersion(cfg, versions)
+	newVersion, err := store.FindLatestVersion(cfg, versions)
 
-	if newVersion == nil {
-		return nil
+	if err != nil {
+		return err
 	}
 
-	return up.createNewLaunchTarget(cfg, *newVersion)
+	return up.createNewLaunchTarget(cfg, newVersion)
 }
 
 func (up updater) createNewLaunchTarget(cfg store.Config, v store.Version) error {
+	log.Printf("creating launch target for version: %s", v.Version)
 	newLt := store.LaunchTarget{}
 	newLt.Path = cfg.NewInstallPath(v.Version)
 	newLt.Version = v
@@ -274,13 +275,13 @@ func (up updater) checkForUpdates() error {
 	if err != nil {
 		return err
 	}
-	newVersion := store.FindNewVersion(cfg, lt.Version.Version, versions)
+	newVersion, err := store.FindNewVersion(cfg, lt.Version.Version, versions)
 
-	if newVersion == nil {
-		return nil
+	if err != nil {
+		return err
 	}
 
-	return up.createNewLaunchTarget(cfg, *newVersion)
+	return up.createNewLaunchTarget(cfg, newVersion)
 }
 
 func (up updater) syncAPIVersions() error {
@@ -307,10 +308,12 @@ func (up updater) syncAPIVersions() error {
 
 	for _, version := range versions {
 		// Decode base64 encoded SHA256
+		log.Printf("decoding sha %s", version.SHA256)
 		shaBytes, err := base64.StdEncoding.DecodeString(version.SHA256)
 		if err != nil {
 			return err
 		}
+		log.Printf("decoded sha %x", shaBytes)
 		storeVersion := store.Version{
 			Version: version.Version,
 			Product: version.Product,
