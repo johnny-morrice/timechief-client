@@ -9,5 +9,6 @@ func Register(builder *di.Builder) error {
 	return framework.RegisterAll(
 		builder,
 		RegisterRawClient,
+		RegisterClient,
 	)
 }
