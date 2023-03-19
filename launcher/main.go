@@ -182,13 +182,8 @@ func launchDaemon(c *cli.Context) error {
 		api:               clnt,
 	}
 
-	init := initialiser{
-		db:      db,
-		updater: up,
-	}
 	daemon := updateDaemon{
 		updater: up,
-		init:    init,
 	}
 	daemon.doTick()
 	runEvery(time.Minute, daemon.doTick)
@@ -197,14 +192,9 @@ func launchDaemon(c *cli.Context) error {
 
 type updateDaemon struct {
 	updater
-	init initialiser
 }
 
 func (daemon updateDaemon) doTick() {
-	if !daemon.init.isInitialised() {
-		log.Println("daemon not ticking, not initialised")
-		return
-	}
 	err := daemon.checkForUpdates()
 	if err != nil {
 		log.Println(err.Error())
