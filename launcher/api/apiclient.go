@@ -6,6 +6,8 @@ import (
 	"github.com/sarulabs/di/v2"
 
 	"github.com/johnny-morrice/timechief-client/client/client"
+	"github.com/johnny-morrice/timechief-client/client/config"
+	"github.com/johnny-morrice/timechief-client/client/log"
 	"github.com/johnny-morrice/timechief-client/client/publicclient"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 )
@@ -24,12 +26,25 @@ func MakePublicClient(cfg store.Config) (*publicclient.Client, error) {
 		RetryCount:       5,
 		DumpHTTP:         true,
 	}
+	loggerCfg := config.Config{
+		Logger: config.LoggerConfig{
+			ZapPreset: config.DevelopmentLogger,
+		},
+	}
+	err = loggerCfg.Register(builder)
+	if err != nil {
+		return nil, err
+	}
 	apiConfig := publicclient.MakePublicClientConfig(clientConfig)
 	err = apiConfig.Register(builder)
 	if err != nil {
 		return nil, err
 	}
 	err = publicclient.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	err = log.Register(builder)
 	if err != nil {
 		return nil, err
 	}

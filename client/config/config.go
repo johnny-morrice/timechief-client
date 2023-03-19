@@ -7,6 +7,8 @@ import (
 	"github.com/sarulabs/di/v2"
 )
 
+// TODO refactor this file so it is specific to logger config.
+
 type Config struct {
 	Logger LoggerConfig
 }
