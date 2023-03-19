@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"log"
 	"os"
 	"time"
@@ -305,16 +306,21 @@ func (up updater) syncAPIVersions() error {
 	}
 
 	for _, version := range versions {
+		// Decode base64 encoded SHA256
+		shaBytes, err := base64.StdEncoding.DecodeString(version.SHA256)
+		if err != nil {
+			return err
+		}
 		storeVersion := store.Version{
 			Version: version.Version,
 			Product: version.Product,
 			Stream:  version.Stream,
 			URL:     version.URL,
-			SHA256:  []byte(version.SHA256),
+			SHA256:  shaBytes,
 			Command: version.Command,
 		}
 
-		err := up.versionStore.CreateIfNotExists(storeVersion)
+		err = up.versionStore.CreateIfNotExists(storeVersion)
 		if err != nil {
 			return err
 		}

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -144,7 +145,7 @@ func verifySHA256(expected []byte, path string) error {
 	}
 	actual := hasher.Sum(nil)
 	if !bytes.Equal(expected, actual) {
-		return errors.New("hash mismatch")
+		return fmt.Errorf("hash mismatch for %v: expected %x, got %x", path, expected, actual)
 	}
 	return nil
 }

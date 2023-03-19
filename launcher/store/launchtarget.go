@@ -73,6 +73,6 @@ func extractTarball(tarballPath string, destination string) error {
 
 func (lt LaunchTarget) versionTempFile() string {
 	tempDir := os.TempDir()
-	fileName := "timechief-launcher-" + lt.Version.Version + "-" + uuid.New().String()
+	fileName := "timechief-launcher-" + lt.Version.Version + "-" + uuid.New().String() + ".tar.gz"
 	return tempDir + "/" + fileName
 }
