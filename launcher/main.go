@@ -246,6 +246,11 @@ func (up updater) createNewLaunchTarget(cfg store.Config, v store.Version) error
 		return err
 	}
 
+	err = up.launchTargetStore.SetActive(newLt)
+	if err != nil {
+		return err
+	}
+
 	log.Printf("created launch target for version: %s", v.Version)
 
 	return nil
