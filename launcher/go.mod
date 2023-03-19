@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/johnny-morrice/timechief-client/client v0.0.0-20230309205623-d918b9189eba
+	github.com/johnny-morrice/timechief-client/client v0.0.0-20230319155715-859f7c039157
 	github.com/urfave/cli/v2 v2.24.4
 	golang.org/x/mod v0.9.0
 	gorm.io/driver/sqlite v1.4.4
