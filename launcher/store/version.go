@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"errors"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -35,22 +37,25 @@ func (store VersionStore) GetVersions() ([]Version, error) {
 	return versions, result.Error
 }
 
-func (store VersionStore) CreateIfNotExists(v Version) error {
+func (store VersionStore) CreateIfNotExists(v *Version) error {
+	log.Printf("creating version %s if not exists with UUID %s", v.Version, v.UUID)
 	var count int64
 	result := store.Db.Model(&Version{}).Where("uuid = ?", v.UUID).Count(&count)
 	if result.Error != nil {
 		return result.Error
 	}
 	if count == 0 {
-		result = store.Db.Create(&v)
+		log.Printf("creating version %s", v.Version)
+		result = store.Db.Create(v)
 		if result.Error != nil {
 			return result.Error
 		}
 	}
+	log.Printf("version %s exists", v.Version)
 	return nil
 }
 
-func sortVersionsDecreasing(versions []Version) {
+func SortVersionsDecreasing(versions []Version) {
 	sort.Sort(sort.Reverse(bySemVer(versions)))
 }
 
@@ -65,29 +70,43 @@ func (s bySemVer) Swap(i, j int) {
 }
 
 func (s bySemVer) Less(i, j int) bool {
+	if !semver.IsValid(s[i].Version) && !semver.IsValid(s[j].Version) {
+		log.Printf("Invalid semver: %s, %s", s[i].Version, s[j].Version)
+		return false
+	}
+	if !semver.IsValid(s[i].Version) {
+		log.Printf("Invalid semver: %s", s[i].Version)
+		return true
+	}
+	if !semver.IsValid(s[j].Version) {
+		log.Printf("Invalid semver: %s", s[j].Version)
+		return false
+	}
 	return semver.Compare(s[i].Version, s[j].Version) < 0
 }
 
-func FindNewVersion(cfg Config, currentVersion string, versions []Version) *Version {
-	sortVersionsDecreasing(versions)
+var ErrNoVersion = errors.New("no version found")
+
+func FindNewVersion(cfg Config, currentVersion string, versions []Version) (Version, error) {
+	SortVersionsDecreasing(versions)
 	for _, version := range versions {
 		v := version
 		if version.Version > currentVersion && version.IsSupportedProductStream(cfg) {
-			return &v
+			return v, nil
 		}
 	}
-	return nil
+	return Version{}, ErrNoVersion
 }
 
-func FindLatestVersion(cfg Config, versions []Version) *Version {
-	sortVersionsDecreasing(versions)
+func FindLatestVersion(cfg Config, versions []Version) (Version, error) {
+	SortVersionsDecreasing(versions)
 	for _, version := range versions {
 		v := version
 		if version.IsSupportedProductStream(cfg) {
-			return &v
+			return v, nil
 		}
 	}
-	return nil
+	return Version{}, ErrNoVersion
 }
 
 func (v Version) IsSupportedProductStream(cfg Config) bool {
@@ -95,6 +114,7 @@ func (v Version) IsSupportedProductStream(cfg Config) bool {
 }
 
 func (v Version) Download(cfg Config, path string) error {
+	log.Printf("downloading %s to %s", v.URL, path)
 	file, err := os.Create(path)
 	if err != nil {
 		return err
@@ -144,7 +164,7 @@ func verifySHA256(expected []byte, path string) error {
 	}
 	actual := hasher.Sum(nil)
 	if !bytes.Equal(expected, actual) {
-		return errors.New("hash mismatch")
+		return fmt.Errorf("hash mismatch for %v: expected %x, got %x", path, expected, actual)
 	}
 	return nil
 }

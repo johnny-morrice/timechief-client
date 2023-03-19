@@ -18,6 +18,8 @@ github.com/johnny-morrice/timechief-client/client v0.0.0-20230309204400-0036c538
 github.com/johnny-morrice/timechief-client/client v0.0.0-20230309204400-0036c53882a9/go.mod h1:kbeAjx5HqtRL3PsVwbkGM5tcjqGePLBTk/TiT8waJ44=
 github.com/johnny-morrice/timechief-client/client v0.0.0-20230309205623-d918b9189eba h1:LvfFxmhwaUU5RhmxlIPepvXyTlcLJ0a0S2M3jPR0le0=
 github.com/johnny-morrice/timechief-client/client v0.0.0-20230309205623-d918b9189eba/go.mod h1:kbeAjx5HqtRL3PsVwbkGM5tcjqGePLBTk/TiT8waJ44=
+github.com/johnny-morrice/timechief-client/client v0.0.0-20230319155715-859f7c039157 h1:jTjXbEYBXA1riV47DEkXZxyK1We2tKcVytZ7DAH+oUQ=
+github.com/johnny-morrice/timechief-client/client v0.0.0-20230319155715-859f7c039157/go.mod h1:kbeAjx5HqtRL3PsVwbkGM5tcjqGePLBTk/TiT8waJ44=
 github.com/mattn/go-sqlite3 v1.14.15/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S2DGjv9HUNg=
 github.com/mattn/go-sqlite3 v1.14.16 h1:yOQRA0RpS5PFz/oikGwBEqvAWhWg5ufRz4ETLjwpU1Y=
 github.com/mattn/go-sqlite3 v1.14.16/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S2DGjv9HUNg=
