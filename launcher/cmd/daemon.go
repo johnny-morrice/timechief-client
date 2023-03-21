@@ -3,6 +3,8 @@ package cmd
 import (
 	"context"
 	"encoding/base64"
+	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -49,7 +51,7 @@ type updateDaemon struct {
 }
 
 func (daemon updateDaemon) doTick() {
-	err := daemon.checkForUpdates()
+	err := daemon.update()
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -76,6 +78,10 @@ func (up updater) firstUpdate() error {
 		return err
 	}
 	newVersion, err := store.FindLatestVersion(cfg, versions)
+
+	if errors.Is(err, store.ErrNoVersion) {
+		return fmt.Errorf("cannot initialise, no version available: %w", err)
+	}
 
 	if err != nil {
 		return err
@@ -110,7 +116,7 @@ func (up updater) createNewLaunchTarget(cfg store.Config, v store.Version) error
 	return nil
 }
 
-func (up updater) checkForUpdates() error {
+func (up updater) update() error {
 	err := up.syncAPIVersions()
 	if err != nil {
 		return err
@@ -128,6 +134,10 @@ func (up updater) checkForUpdates() error {
 		return err
 	}
 	newVersion, err := store.FindNewVersion(cfg, lt.Version.Version, versions)
+
+	if errors.Is(err, store.ErrNoVersion) {
+		return nil
+	}
 
 	if err != nil {
 		return err

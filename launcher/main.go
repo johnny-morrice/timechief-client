@@ -56,6 +56,25 @@ func getCLIApp() *cli.App {
 			Action: cmd.Initialise,
 		},
 		{
+			Name: "update",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name: "install-root",
+				},
+				&cli.StringFlag{
+					Name: "api-base-url",
+				},
+				&cli.StringFlag{
+					Name: "product",
+				},
+				&cli.StringFlag{
+					Name: "stream",
+				},
+			},
+			Usage:  "Update the database and download the latest version of the timechief client",
+			Action: cmd.Update,
+		},
+		{
 			Name: "target",
 			Subcommands: []*cli.Command{
 				{
