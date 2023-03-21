@@ -4,6 +4,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/johnny-morrice/timechief-client/launcher/cmd"
+	"github.com/johnny-morrice/timechief-client/launcher/cmd/target"
 	"github.com/urfave/cli/v2"
 )
 
@@ -26,13 +28,19 @@ func getCLIApp() *cli.App {
 			Name:    "run-client",
 			Aliases: []string{"c"},
 			Usage:   "Launch the timechief client",
-			Action:  launchClient,
+			Action:  cmd.RunClient,
 		},
 		{
 			Name:    "daemon",
 			Aliases: []string{"d"},
 			Usage:   "Run the update daemon",
-			Action:  launchDaemon,
+			Action:  cmd.Daemon,
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "install-daemon",
+					Value: defaultInstallDaemon,
+				},
+			},
 		},
 		{
 			Name: "initialise",
@@ -49,10 +57,65 @@ func getCLIApp() *cli.App {
 				&cli.StringFlag{
 					Name: "stream",
 				},
+				&cli.BoolFlag{
+					Name:  "install-daemon",
+					Value: defaultInstallDaemon,
+				},
 			},
 			Usage:  "Initialise the database and download the latest version of the timechief client",
-			Action: initialise,
+			Action: cmd.Initialise,
+		},
+		{
+			Name: "update",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name: "install-root",
+				},
+				&cli.StringFlag{
+					Name: "api-base-url",
+				},
+				&cli.StringFlag{
+					Name: "product",
+				},
+				&cli.StringFlag{
+					Name: "stream",
+				},
+				&cli.BoolFlag{
+					Name:  "install-daemon",
+					Value: defaultInstallDaemon,
+				},
+			},
+			Usage:  "Update the database and download the latest version of the timechief client",
+			Action: cmd.Update,
+		},
+		{
+			Name: "target",
+			Subcommands: []*cli.Command{
+				{
+					Name:   "run",
+					Action: target.Run,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name: "target-root",
+						},
+					},
+				},
+				{
+					Name:   "install",
+					Action: target.Install,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name: "executable",
+						},
+						&cli.StringFlag{
+							Name: "target-root",
+						},
+					},
+				},
+			},
 		},
 	}
 	return app
 }
+
+const defaultInstallDaemon = false

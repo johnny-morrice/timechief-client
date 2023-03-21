@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -10,12 +10,13 @@ import (
 )
 
 // Read the given configKeys from the cli.Context and return a store.Config instance.
-func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
+func cfgFlags(ctx *cli.Context) store.Config {
+	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
 	cfg := store.Config{
 		Config: make(map[string]string),
 	}
 	for _, key := range configKeys {
-		value := c.String(key)
+		value := ctx.String(key)
 		if value == "" {
 			continue
 		}
@@ -24,13 +25,7 @@ func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
 	return cfg
 }
 
-func cfgFlags(c *cli.Context, cfgStore store.ConfigStore) store.Config {
-	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
-	cfg := readConfigFromFlags(c, configKeys)
-	return cfg
-}
-
-func initialise(c *cli.Context) error {
+func Initialise(ctx *cli.Context) error {
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
@@ -38,7 +33,7 @@ func initialise(c *cli.Context) error {
 
 	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{Db: db}
-	cfg := cfgFlags(c, cfgStore)
+	cfg := cfgFlags(ctx)
 
 	clnt, err := api.MakePublicClient(cfg)
 	if err != nil {
@@ -55,7 +50,7 @@ func initialise(c *cli.Context) error {
 	}
 	if !init.isInitialised() {
 		log.Println("initialising client")
-		return init.initialise(cfg)
+		return init.initialise(ctx, cfg)
 	}
 	log.Println("already initialised, skipping initialisation")
 	return nil
@@ -66,7 +61,7 @@ type initialiser struct {
 	updater
 }
 
-func (init initialiser) initialise(cfg store.Config) error {
+func (init initialiser) initialise(ctx *cli.Context, cfg store.Config) error {
 	err := store.AutoMigrate(init.db)
 	if err != nil {
 		return err
@@ -75,7 +70,7 @@ func (init initialiser) initialise(cfg store.Config) error {
 	if err != nil {
 		return err
 	}
-	err = init.firstUpdate()
+	err = init.firstUpdate(ctx)
 	if err != nil {
 		return err
 	}

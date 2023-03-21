@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -67,17 +68,26 @@ func (store LaunchTargetStore) SetActive(lt LaunchTarget) error {
 }
 
 func (lt LaunchTarget) Run() error {
+	return lt.Execute("target", "run", "--target-root", lt.Path)
+}
+
+func (lt LaunchTarget) Execute(args ...string) error {
 	if lt.Version.Command == "" {
 		return fmt.Errorf("no command specified for version %s", lt.Version.Version)
 	}
-	err := exec.Command(lt.Path + "/" + lt.Version.Command).Run()
+	path := lt.targetPath()
+	err := exec.Command(path, args...).Run()
 	if err != nil {
-		return fmt.Errorf("failed to run client: %w", err)
+		return fmt.Errorf("failed to execute launch target at %s with args %v: %w", path, args, err)
 	}
 	return nil
 }
 
-func (lt LaunchTarget) Install(cfg Config) error {
+func (lt LaunchTarget) targetPath() string {
+	return filepath.Join(lt.Path, lt.Version.Command)
+}
+
+func (lt LaunchTarget) Install(cfg Config, doInstallDaemon bool) error {
 	log.Printf("installing version %s to %s", lt.Version.Version, lt.Path)
 	tempFile := lt.versionTempFile()
 	err := lt.Version.Download(cfg, tempFile)
@@ -88,7 +98,16 @@ func (lt LaunchTarget) Install(cfg Config) error {
 	if err != nil {
 		return err
 	}
-	return extractTarball(tempFile, lt.Path)
+	err = extractTarball(tempFile, lt.Path)
+	if err != nil {
+		return err
+	}
+
+	if doInstallDaemon {
+		log.Println("installing daemon")
+		return lt.Execute("target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path)
+	}
+	return nil
 }
 
 // mkdirp creates a directory and all its parents.

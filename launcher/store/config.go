@@ -55,6 +55,17 @@ func (cfg Config) NewInstallPath(version string) string {
 	return filepath.Join(cfg.GetInstallRoot(), cfg.GetProduct(), cfg.GetStream(), version, uuid.NewString())
 }
 
+func (cfg Config) Merge(other Config) Config {
+	newCfg := Config{Config: make(map[string]string)}
+	for key, value := range cfg.Config {
+		newCfg.Config[key] = value
+	}
+	for key, value := range other.Config {
+		newCfg.Config[key] = value
+	}
+	return newCfg
+}
+
 func (cfg Config) GetInstallRoot() string {
 	root, ok := cfg.Config["install-root"]
 	if !ok {
