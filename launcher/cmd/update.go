@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func Update(c *cli.Context) error {
+func Update(ctx *cli.Context) error {
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
@@ -16,7 +16,7 @@ func Update(c *cli.Context) error {
 
 	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{Db: db}
-	flagCfg := cfgFlags(c)
+	flagCfg := cfgFlags(ctx)
 
 	cfg, err := cfgStore.GetConfig()
 
@@ -45,9 +45,9 @@ func Update(c *cli.Context) error {
 	}
 	if !init.isInitialised() {
 		log.Println("initialising client")
-		return init.initialise(cfg)
+		return init.initialise(ctx, cfg)
 	}
 
 	log.Println("updating client")
-	return updater.update()
+	return updater.update(ctx)
 }

@@ -16,7 +16,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func Daemon(c *cli.Context) error {
+func Daemon(ctx *cli.Context) error {
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
@@ -41,8 +41,8 @@ func Daemon(c *cli.Context) error {
 	daemon := updateDaemon{
 		updater: up,
 	}
-	daemon.doTick()
-	runEvery(time.Minute, daemon.doTick)
+	daemon.doTick(ctx)
+	runEvery(time.Minute, func() { daemon.doTick(ctx) })
 	return nil
 }
 
@@ -50,8 +50,8 @@ type updateDaemon struct {
 	updater
 }
 
-func (daemon updateDaemon) doTick() {
-	err := daemon.update()
+func (daemon updateDaemon) doTick(ctx *cli.Context) {
+	err := daemon.update(ctx)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -64,7 +64,7 @@ type updater struct {
 	api               *publicclient.Client
 }
 
-func (up updater) firstUpdate() error {
+func (up updater) firstUpdate(ctx *cli.Context) error {
 	err := up.syncAPIVersions()
 	if err != nil {
 		return err
@@ -87,16 +87,17 @@ func (up updater) firstUpdate() error {
 		return err
 	}
 
-	return up.createNewLaunchTarget(cfg, newVersion)
+	return up.createNewLaunchTarget(ctx, cfg, newVersion)
 }
 
-func (up updater) createNewLaunchTarget(cfg store.Config, v store.Version) error {
+func (up updater) createNewLaunchTarget(ctx *cli.Context, cfg store.Config, v store.Version) error {
 	log.Printf("creating launch target for version: %s", v.Version)
 	newLt := store.LaunchTarget{}
 	newLt.Path = cfg.NewInstallPath(v.Version)
 	newLt.Version = v
 	newLt.VersionID = v.ID
-	err := newLt.Install(cfg)
+	doInstallDaemon := ctx.Bool("install-daemon")
+	err := newLt.Install(cfg, doInstallDaemon)
 	if err != nil {
 		return err
 	}
@@ -116,7 +117,7 @@ func (up updater) createNewLaunchTarget(cfg store.Config, v store.Version) error
 	return nil
 }
 
-func (up updater) update() error {
+func (up updater) update(ctx *cli.Context) error {
 	err := up.syncAPIVersions()
 	if err != nil {
 		return err
@@ -143,7 +144,7 @@ func (up updater) update() error {
 		return err
 	}
 
-	return up.createNewLaunchTarget(cfg, newVersion)
+	return up.createNewLaunchTarget(ctx, cfg, newVersion)
 }
 
 func (up updater) syncAPIVersions() error {

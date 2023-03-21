@@ -35,6 +35,12 @@ func getCLIApp() *cli.App {
 			Aliases: []string{"d"},
 			Usage:   "Run the update daemon",
 			Action:  cmd.Daemon,
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "install-daemon",
+					Value: defaultInstallDaemon,
+				},
+			},
 		},
 		{
 			Name: "initialise",
@@ -50,6 +56,10 @@ func getCLIApp() *cli.App {
 				},
 				&cli.StringFlag{
 					Name: "stream",
+				},
+				&cli.BoolFlag{
+					Name:  "install-daemon",
+					Value: defaultInstallDaemon,
 				},
 			},
 			Usage:  "Initialise the database and download the latest version of the timechief client",
@@ -70,12 +80,21 @@ func getCLIApp() *cli.App {
 				&cli.StringFlag{
 					Name: "stream",
 				},
+				&cli.BoolFlag{
+					Name:  "install-daemon",
+					Value: defaultInstallDaemon,
+				},
 			},
 			Usage:  "Update the database and download the latest version of the timechief client",
 			Action: cmd.Update,
 		},
 		{
 			Name: "target",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name: "target-root",
+				},
+			},
 			Subcommands: []*cli.Command{
 				{
 					Name:   "run",
@@ -84,9 +103,16 @@ func getCLIApp() *cli.App {
 				{
 					Name:   "install",
 					Action: target.Install,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name: "executable",
+						},
+					},
 				},
 			},
 		},
 	}
 	return app
 }
+
+const defaultInstallDaemon = false
