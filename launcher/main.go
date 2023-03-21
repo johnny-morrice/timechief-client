@@ -4,6 +4,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/johnny-morrice/timechief-client/launcher/cmd"
+	"github.com/johnny-morrice/timechief-client/launcher/cmd/target"
 	"github.com/urfave/cli/v2"
 )
 
@@ -26,13 +28,13 @@ func getCLIApp() *cli.App {
 			Name:    "run-client",
 			Aliases: []string{"c"},
 			Usage:   "Launch the timechief client",
-			Action:  launchClient,
+			Action:  cmd.RunClient,
 		},
 		{
 			Name:    "daemon",
 			Aliases: []string{"d"},
 			Usage:   "Run the update daemon",
-			Action:  launchDaemon,
+			Action:  cmd.Daemon,
 		},
 		{
 			Name: "initialise",
@@ -51,7 +53,20 @@ func getCLIApp() *cli.App {
 				},
 			},
 			Usage:  "Initialise the database and download the latest version of the timechief client",
-			Action: initialise,
+			Action: cmd.Initialise,
+		},
+		{
+			Name: "target",
+			Subcommands: []*cli.Command{
+				{
+					Name:   "run",
+					Action: target.Run,
+				},
+				{
+					Name:   "install",
+					Action: target.Install,
+				},
+			},
 		},
 	}
 	return app

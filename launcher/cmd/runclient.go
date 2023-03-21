@@ -1,11 +1,11 @@
-package main
+package cmd
 
 import (
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
 )
 
-func launchClient(c *cli.Context) error {
+func RunClient(c *cli.Context) error {
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -30,7 +30,7 @@ func cfgFlags(c *cli.Context, cfgStore store.ConfigStore) store.Config {
 	return cfg
 }
 
-func initialise(c *cli.Context) error {
+func Initialise(c *cli.Context) error {
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err

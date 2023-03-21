@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func launchDaemon(c *cli.Context) error {
+func Daemon(c *cli.Context) error {
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err

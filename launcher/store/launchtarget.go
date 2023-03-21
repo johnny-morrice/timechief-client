@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -67,14 +68,22 @@ func (store LaunchTargetStore) SetActive(lt LaunchTarget) error {
 }
 
 func (lt LaunchTarget) Run() error {
+	return lt.Execute("target", "run")
+}
+
+func (lt LaunchTarget) Execute(args ...string) error {
 	if lt.Version.Command == "" {
 		return fmt.Errorf("no command specified for version %s", lt.Version.Version)
 	}
-	err := exec.Command(lt.Path + "/" + lt.Version.Command).Run()
+	err := exec.Command(lt.targetPath(), args...).Run()
 	if err != nil {
 		return fmt.Errorf("failed to run client: %w", err)
 	}
 	return nil
+}
+
+func (lt LaunchTarget) targetPath() string {
+	return filepath.Join(lt.Path, lt.Version.Command)
 }
 
 func (lt LaunchTarget) Install(cfg Config) error {
@@ -88,7 +97,12 @@ func (lt LaunchTarget) Install(cfg Config) error {
 	if err != nil {
 		return err
 	}
-	return extractTarball(tempFile, lt.Path)
+	err = extractTarball(tempFile, lt.Path)
+	if err != nil {
+		return err
+	}
+
+	return lt.Execute("target", "install")
 }
 
 // mkdirp creates a directory and all its parents.
