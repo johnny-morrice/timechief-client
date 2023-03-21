@@ -10,7 +10,8 @@ import (
 )
 
 // Read the given configKeys from the cli.Context and return a store.Config instance.
-func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
+func cfgFlags(c *cli.Context) store.Config {
+	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
 	cfg := store.Config{
 		Config: make(map[string]string),
 	}
@@ -24,12 +25,6 @@ func readConfigFromFlags(c *cli.Context, configKeys []string) store.Config {
 	return cfg
 }
 
-func cfgFlags(c *cli.Context, cfgStore store.ConfigStore) store.Config {
-	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
-	cfg := readConfigFromFlags(c, configKeys)
-	return cfg
-}
-
 func Initialise(c *cli.Context) error {
 	db, err := store.GetDBConnection()
 	if err != nil {
@@ -38,7 +33,7 @@ func Initialise(c *cli.Context) error {
 
 	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{Db: db}
-	cfg := cfgFlags(c, cfgStore)
+	cfg := cfgFlags(c)
 
 	clnt, err := api.MakePublicClient(cfg)
 	if err != nil {

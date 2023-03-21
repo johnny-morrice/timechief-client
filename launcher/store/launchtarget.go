@@ -102,7 +102,7 @@ func (lt LaunchTarget) Install(cfg Config) error {
 		return err
 	}
 
-	return lt.Execute("target", "install")
+	return lt.Execute("target", "install", "--executable", lt.targetPath())
 }
 
 // mkdirp creates a directory and all its parents.
