@@ -76,7 +76,8 @@ func (lt LaunchTarget) Execute(args ...string) error {
 		return fmt.Errorf("no command specified for version %s", lt.Version.Version)
 	}
 	path := lt.targetPath()
-	err := exec.Command(path, args...).Run()
+	output, err := exec.Command(path, args...).CombinedOutput()
+	log.Printf("launch target output: %s", output)
 	if err != nil {
 		return fmt.Errorf("failed to execute launch target at %s with args %v: %w", path, args, err)
 	}
