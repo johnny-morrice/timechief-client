@@ -90,15 +90,15 @@ func getCLIApp() *cli.App {
 		},
 		{
 			Name: "target",
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name: "target-root",
-				},
-			},
 			Subcommands: []*cli.Command{
 				{
 					Name:   "run",
 					Action: target.Run,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name: "target-root",
+						},
+					},
 				},
 				{
 					Name:   "install",
@@ -106,6 +106,9 @@ func getCLIApp() *cli.App {
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name: "executable",
+						},
+						&cli.StringFlag{
+							Name: "target-root",
 						},
 					},
 				},
