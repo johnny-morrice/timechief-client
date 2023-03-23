@@ -1,4 +1,4 @@
-//go:build !windows
+//go:build windows
 
 package target
 
@@ -12,14 +12,14 @@ import (
 )
 
 const tarDirectory = "timechief-client-bundle"
-const execName = "timechief-client"
+const scriptName = "timechief-client.ps1"
 
 func Run(ctx *cli.Context) error {
 	targetRoot := ctx.String("target-root")
 	logFile := ctx.String("log-file")
 	targetBundle := filepath.Join(targetRoot, tarDirectory)
-	clientExecutable := filepath.Join(targetBundle, execName)
-	out, err := exec.Command(clientExecutable, targetBundle, logFile).CombinedOutput()
+	script := filepath.Join(targetBundle, execName)
+	out, err := exec.Command("powershell", script, targetBundle, logFile).CombinedOutput()
 	log.Println("client output: ", string(out))
 	if err != nil {
 		return fmt.Errorf("failed to run client at %s: %w", clientExecutable, err)
