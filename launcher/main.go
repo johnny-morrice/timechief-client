@@ -6,6 +6,7 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/launcher/cmd"
 	"github.com/johnny-morrice/timechief-client/launcher/cmd/target"
+	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
 )
 
@@ -31,7 +32,8 @@ func getCLIApp() *cli.App {
 			Action:  cmd.RunClient,
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name: "install-root",
+					Name:  "install-root",
+					Value: store.DefaultInstallRoot,
 				},
 				&cli.BoolFlag{
 					Name:  "standalone",
@@ -50,7 +52,8 @@ func getCLIApp() *cli.App {
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name: "install-root",
+					Name:  "install-root",
+					Value: store.DefaultInstallRoot,
 				},
 				&cli.BoolFlag{
 					Name:  "install-daemon",
@@ -62,16 +65,20 @@ func getCLIApp() *cli.App {
 			Name: "initialise",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name: "install-root",
+					Name:  "install-root",
+					Value: store.DefaultInstallRoot,
 				},
 				&cli.StringFlag{
-					Name: "api-base-url",
+					Name:  "api-base-url",
+					Value: store.DefaultBaseURL,
 				},
 				&cli.StringFlag{
-					Name: "product",
+					Name:  "product",
+					Value: store.DefaultProduct,
 				},
 				&cli.StringFlag{
-					Name: "stream",
+					Name:  "stream",
+					Value: store.DefaultStream,
 				},
 				&cli.BoolFlag{
 					Name:  "install-daemon",
@@ -85,16 +92,20 @@ func getCLIApp() *cli.App {
 			Name: "update",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name: "install-root",
+					Name:  "install-root",
+					Value: store.DefaultInstallRoot,
 				},
 				&cli.StringFlag{
-					Name: "api-base-url",
+					Name:  "api-base-url",
+					Value: store.DefaultBaseURL,
 				},
 				&cli.StringFlag{
-					Name: "product",
+					Name:  "product",
+					Value: store.DefaultProduct,
 				},
 				&cli.StringFlag{
-					Name: "stream",
+					Name:  "stream",
+					Value: store.DefaultStream,
 				},
 				&cli.BoolFlag{
 					Name:  "install-daemon",

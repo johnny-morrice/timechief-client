@@ -46,10 +46,10 @@ func (store ConfigStore) GetConfig() (Config, error) {
 	return Config{config}, nil
 }
 
-const defaultInstallRoot = "/opt/timechief-launcher"
-const defaultBaseURL = "https://timechief.io/api/v1"
-const defaultProduct = "timechief-rpi"
-const defaultStream = "production"
+const DefaultInstallRoot = "/opt/timechief-launcher"
+const DefaultBaseURL = "https://timechief.io/api/v1"
+const DefaultProduct = "timechief-rpi"
+const DefaultStream = "production"
 
 func (cfg Config) NewInstallPath(version string) string {
 	return filepath.Join(cfg.GetInstallRoot(), cfg.GetProduct(), cfg.GetStream(), version, uuid.NewString())
@@ -69,7 +69,7 @@ func (cfg Config) Merge(other Config) Config {
 func (cfg Config) GetInstallRoot() string {
 	root, ok := cfg.Config["install-root"]
 	if !ok {
-		return defaultInstallRoot
+		return DefaultInstallRoot
 	}
 	return root
 }
@@ -77,7 +77,7 @@ func (cfg Config) GetInstallRoot() string {
 func (cfg Config) GetAPIBaseURL() string {
 	url, ok := cfg.Config["api-base-url"]
 	if !ok {
-		return defaultBaseURL
+		return DefaultBaseURL
 	}
 	return url
 }
@@ -85,7 +85,7 @@ func (cfg Config) GetAPIBaseURL() string {
 func (cfg Config) GetProduct() string {
 	product, ok := cfg.Config["product"]
 	if !ok {
-		return defaultProduct
+		return DefaultProduct
 	}
 	return product
 }
@@ -93,7 +93,7 @@ func (cfg Config) GetProduct() string {
 func (cfg Config) GetStream() string {
 	stream, ok := cfg.Config["stream"]
 	if !ok {
-		return defaultStream
+		return DefaultStream
 	}
 	return stream
 }
