@@ -9,9 +9,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const tarDirectory = "timechief-client-bundle"
-const execName = "timechief-client"
-
 func Run(ctx *cli.Context) error {
 	targetRoot := ctx.String("target-root")
 	logFile := ctx.String("log-file")

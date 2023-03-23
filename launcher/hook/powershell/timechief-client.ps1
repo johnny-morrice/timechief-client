@@ -3,7 +3,7 @@ $WORK_DIR = $args[0]
 $LOG_FILE = $args[1]
 
 if (-not($WORK_DIR) -or -not($LOG_FILE)) {
-  Write-Host "Usage: timechief-client <work-dir> <log-file>"
+  Write-Host "Usage: timechief-client.ps1 <work-dir> <log-file>"
   exit 1
 }
 
