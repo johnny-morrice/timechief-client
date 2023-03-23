@@ -14,9 +14,10 @@ const execName = "timechief-client"
 
 func Run(ctx *cli.Context) error {
 	targetRoot := ctx.String("target-root")
+	logFile := ctx.String("log-file")
 	targetBundle := filepath.Join(targetRoot, tarDirectory)
 	clientExecutable := filepath.Join(targetBundle, execName)
-	out, err := exec.Command(clientExecutable, targetBundle).CombinedOutput()
+	out, err := exec.Command(clientExecutable, targetBundle, logFile).CombinedOutput()
 	log.Println("client output: ", string(out))
 	if err != nil {
 		return fmt.Errorf("failed to run client at %s: %w", clientExecutable, err)

@@ -29,6 +29,16 @@ func getCLIApp() *cli.App {
 			Aliases: []string{"c"},
 			Usage:   "Launch the timechief client",
 			Action:  cmd.RunClient,
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "standalone",
+					Value: true,
+				},
+				&cli.StringFlag{
+					Name:  "daemon-base-url",
+					Value: "http://localhost:8080",
+				},
+			},
 		},
 		{
 			Name:    "daemon",
@@ -97,6 +107,9 @@ func getCLIApp() *cli.App {
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name: "target-root",
+						},
+						&cli.StringFlag{
+							Name: "log-file",
 						},
 					},
 				},

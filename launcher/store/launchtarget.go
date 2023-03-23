@@ -67,8 +67,9 @@ func (store LaunchTargetStore) SetActive(lt LaunchTarget) error {
 	return result.Error
 }
 
-func (lt LaunchTarget) Run() error {
-	return lt.Execute("target", "run", "--target-root", lt.Path)
+func (lt LaunchTarget) Run(cfg Config) error {
+	logFile := filepath.Join(cfg.GetInstallRoot(), "timechief-client.log")
+	return lt.Execute("target", "run", "--target-root", lt.Path, "--log-file", logFile)
 }
 
 func (lt LaunchTarget) Execute(args ...string) error {

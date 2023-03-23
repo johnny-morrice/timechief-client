@@ -6,16 +6,26 @@ import (
 )
 
 func RunClient(c *cli.Context) error {
+	standalone := c.Bool("standalone")
+	if !standalone {
+		panic("not implemented")
+	}
 	db, err := store.GetDBConnection()
 	if err != nil {
 		return err
 	}
 	defer store.CloseDB(db)
-	store := store.LaunchTargetStore{Db: db}
-	launchTarget, err := store.GetActiveLaunchTarget()
+	ltStore := store.LaunchTargetStore{Db: db}
+	launchTarget, err := ltStore.GetActiveLaunchTarget()
 	if err != nil {
 		return err
 	}
+	cfgStore := store.ConfigStore{Db: db}
+	cfg, err := cfgStore.GetConfig()
+	if err != nil {
+		return err
+	}
+
 	// TODO rollback if launch fails.
-	return launchTarget.Run()
+	return launchTarget.Run(cfg)
 }
