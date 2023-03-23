@@ -125,7 +125,8 @@ func mkdirp(dirpath string) error {
 // extractTarball shells out to the tar utility to extract a tarball.
 func extractTarball(tarballPath string, destination string) error {
 	log.Printf("extracting tarball %s to %s", tarballPath, destination)
-	err := exec.Command("tar", "-xvf", tarballPath, "-C", destination).Run()
+	output, err := exec.Command("tar", "-xvf", tarballPath, "-C", destination).CombinedOutput()
+	log.Printf("tar output: %s", output)
 	if err != nil {
 		return fmt.Errorf("failed to extract tarball: %w", err)
 	}
