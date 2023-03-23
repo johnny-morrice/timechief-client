@@ -26,7 +26,7 @@ func cfgFlags(ctx *cli.Context) store.Config {
 }
 
 func Initialise(ctx *cli.Context) error {
-	db, err := store.GetDBConnection()
+	db, err := store.GetDBConnection(ctx)
 	if err != nil {
 		return err
 	}

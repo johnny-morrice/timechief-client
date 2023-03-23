@@ -30,6 +30,9 @@ func getCLIApp() *cli.App {
 			Usage:   "Launch the timechief client",
 			Action:  cmd.RunClient,
 			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name: "install-root",
+				},
 				&cli.BoolFlag{
 					Name:  "standalone",
 					Value: true,
@@ -46,6 +49,9 @@ func getCLIApp() *cli.App {
 			Usage:   "Run the update daemon",
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name: "install-root",
+				},
 				&cli.BoolFlag{
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,

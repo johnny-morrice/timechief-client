@@ -12,12 +12,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func RunClient(c *cli.Context) error {
-	standalone := c.Bool("standalone")
+func RunClient(ctx *cli.Context) error {
+	standalone := ctx.Bool("standalone")
 	if !standalone {
 		panic("not implemented")
 	}
-	db, err := store.GetDBConnection()
+	db, err := store.GetDBConnection(ctx)
 	if err != nil {
 		return err
 	}
