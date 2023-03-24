@@ -8,4 +8,4 @@ if (-not($WORK_DIR) -or -not($LOG_FILE)) {
 }
 
 Set-Location $WORK_DIR
-./timechief-client-x64.exe . 2>&1 >> $LOG_FILE
+./timechief.exe . 2>&1 >> $LOG_FILE
