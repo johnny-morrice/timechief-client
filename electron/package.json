@@ -6,7 +6,7 @@
   "scripts": {
     "build": "vite build",
     "start": "electron .",
-    "dist": "vite build && electron-builder "
+    "dist": "vite build && electron-builder --config .electron-builder.config.js"
   },
   "build": {
     "appId": "io.timechief.app"
