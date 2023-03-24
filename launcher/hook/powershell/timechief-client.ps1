@@ -9,4 +9,4 @@ if (-not($WORK_DIR) -or -not($LOG_FILE)) {
 
 Set-Location $WORK_DIR
 Set-Location win-unpacked
-./timechief.exe . 2>&1 >> $LOG_FILE
+./timechief.exe .
