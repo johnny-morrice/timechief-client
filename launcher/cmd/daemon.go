@@ -17,7 +17,7 @@ import (
 )
 
 func Daemon(ctx *cli.Context) error {
-	db, err := store.GetDBConnection()
+	db, err := store.GetDBConnection(ctx)
 	if err != nil {
 		return err
 	}

@@ -62,14 +62,14 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, '../renderer/preload.js'),
+      preload: path.join(__dirname, '../preload/preload.js'),
     },
     autoHideMenuBar: true,
     fullscreen: true,
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('dist/index.html');
+  mainWindow.loadFile(path.join(__dirname, '../../frontend-dist/index.html'));
 }
 
 // This method will be called when Electron has finished

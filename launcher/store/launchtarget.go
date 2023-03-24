@@ -67,8 +67,9 @@ func (store LaunchTargetStore) SetActive(lt LaunchTarget) error {
 	return result.Error
 }
 
-func (lt LaunchTarget) Run() error {
-	return lt.Execute("target", "run", "--target-root", lt.Path)
+func (lt LaunchTarget) Run(cfg Config) error {
+	logFile := filepath.Join(cfg.GetInstallRoot(), "timechief-client.log")
+	return lt.Execute("target", "run", "--target-root", lt.Path, "--log-file", logFile)
 }
 
 func (lt LaunchTarget) Execute(args ...string) error {
@@ -117,16 +118,6 @@ func mkdirp(dirpath string) error {
 	err := os.MkdirAll(dirpath, 0755)
 	if err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
-	}
-	return nil
-}
-
-// extractTarball shells out to the tar utility to extract a tarball.
-func extractTarball(tarballPath string, destination string) error {
-	log.Printf("extracting tarball %s to %s", tarballPath, destination)
-	err := exec.Command("tar", "-xvf", tarballPath, "-C", destination).Run()
-	if err != nil {
-		return fmt.Errorf("failed to extract tarball: %w", err)
 	}
 	return nil
 }

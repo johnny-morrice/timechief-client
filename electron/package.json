@@ -5,22 +5,45 @@
   "main": "src/main/main.js",
   "scripts": {
     "build": "vite build",
-    "start": "electron ."
+    "start": "electron .",
+    "dist-debug": "vite build && electron-builder --dir --config.asar=false",
+    "dist-dir": "vite build && electron-builder --dir",
+    "dist": "vite build && electron-builder"
+  },
+  "build": {
+    "directories": {
+      "output": "dist",
+      "buildResources": "buildResources"
+    },
+    "appId": "io.timechief.app",
+    "files": [
+      "src/main/main.js",
+      "src/preload/preload.js",
+      "frontend-dist/**",
+      "package.json"
+    ],
+    "win": {
+      "artifactName": "timechief-client-${arch}.${ext}"
+    },
+    "linux": {
+      "artifactName": "timechief-client"
+    }
   },
   "author": "GitHub",
   "license": "all-rights-reserved",
   "devDependencies": {
-    "electron": "^19.0.6"
+    "electron": "^19.0.6",
+    "electron-builder": "^23.6.0"
   },
   "dependencies": {
     "axios": "^0.27.2",
     "axios-debug-log": "^0.8.4",
+    "qrcode": "^1.5.0",
+    "solid-app-router": "^0.4.1",
     "solid-js": "^1.4.4",
     "uuid": "^8.3.2",
     "vite": "^4.2.1",
     "vite-plugin-solid": "^2.6.1",
-    "winston": "^3.8.0",
-    "solid-app-router": "^0.4.1",
-    "qrcode": "^1.5.0"
+    "winston": "^3.8.0"
   }
 }
