@@ -22,7 +22,10 @@
       "package.json"
     ],
     "win": {
-      "artifactName": "${name}-${version}-${arch}.${ext}"
+      "artifactName": "timechief-client-${arch}.${ext}"
+    },
+    "linux": {
+      "artifactName": "timechief-client"
     }
   },
   "author": "GitHub",
