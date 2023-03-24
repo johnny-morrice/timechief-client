@@ -1,0 +1,191 @@
+@font-face {
+    font-family: 'Share Tech Mono';
+    src: url('../webfonts/ShareTechMono-Regular.woff2') format('woff2'),
+        url('../webfonts/ShareTechMono-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    src: url('../webfonts/TitilliumWeb-Regular.woff2') format('woff2'),
+        url('../webfonts/TitilliumWeb-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Seven Segment';
+    src: url('../webfonts/7segment.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+button {
+    background-color: green;
+    color: black;
+    border: none;
+}
+
+button.nav-button {
+    padding: 10pt;
+    font-size: 22pt;
+}
+
+div#taskbar {
+    margin-top: 10pt;
+    position: fixed;
+    bottom: 0;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    font-size: 20pt;
+    background-color: black;
+    color: green;
+    font-family: 'Titillium Web';
+    line-height: 1.3;
+}
+
+div.table-color-flip {
+    background-color: green;
+    color: black;
+}
+
+div.phat {
+    padding: 10pt;
+}
+
+div.section-name {
+    font-weight: bold;
+    font-size: 28pt;
+}
+
+div.home-weather-title {
+    font-weight: bolder;
+    font-size: 34pt;
+}
+
+div.data-name {
+    font-weight: bold;
+}
+
+div#home-location {
+    font-weight: bold;
+    font-size: 40pt;
+}
+
+div.home-error {
+    color: red;
+}
+
+div.home-major-data {
+    text-align: right;
+    font-size: 40pt;
+    font-weight: bold;
+    height: 40pt;
+}
+
+div.home-major-data-column {
+    align-content: flex-end;
+    line-height: 40pt;
+}
+
+div.home-major-data-fields-column {
+    align-content: flex-start;
+    line-height: 40pt;
+}
+
+
+div#time {
+    font-family: 'Seven Segment';
+    font-size: 90pt;
+}
+
+div#date {
+    font-size: 34pt;
+}
+
+div#home-data {
+    margin-left: 5pt;
+    margin-top: 5pt;
+}
+
+div.next-event-time {
+    display: flex;
+    flex-direction: row;
+    gap: 5pt;
+}
+
+div.underline {
+    padding-bottom: 10pt;
+    border-bottom: 2pt solid green;
+}
+
+div.time-border {
+    border-left: 2pt solid green;
+    padding-bottom: 32pt;
+    padding-left: 20pt;
+}
+
+div.weather-icon {
+    font-size: 30pt;
+}
+
+div.column-flex {
+    display: flex;
+    flex-direction: column;
+}
+
+div.row-flex {
+    display: flex;
+    flex: row;
+}
+
+div.column-flex > div.flex-element {
+    margin-bottom: 10pt;
+}
+
+div.row-flex > div.flex-element {
+    margin-right: 10pt;
+}
+
+div.status-bar {
+    height: 10pt;
+    font-size: 8pt;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 5pt;
+    margin-right: 5pt;
+}
+
+i.is-error.api-error-indicator {
+    color: red;
+}
+
+hr.status-line {
+    background-color: green;
+    height: 2pt;
+    border: none;
+    margin-top: 2pt;
+    margin-bottom: 0;
+}
+
+div.next-event-time {
+    font-weight: bold;
+}
+
+div.calendar-day-date {
+    font-size: 25pt;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+div.calendar-event-when {
+    font-weight: bold;
+}
