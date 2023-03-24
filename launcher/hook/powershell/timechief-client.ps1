@@ -8,4 +8,4 @@ if (-not($WORK_DIR) -or -not($LOG_FILE)) {
 }
 
 Set-Location $WORK_DIR
-./electron.exe . 2>&1 >> $LOG_FILE
+./timechief-x64.exe . 2>&1 >> $LOG_FILE
