@@ -6,10 +6,22 @@
   "scripts": {
     "build": "vite build",
     "start": "electron .",
-    "dist": "vite build && electron-builder --config .electron-builder.config.js"
+    "dist": "vite build && electron-builder"
   },
   "build": {
-    "appId": "io.timechief.app"
+    "appId": "io.timechief.app",
+    "files": [
+      "src/main/main.js",
+      "frontend_dist/**",
+      "package.json"
+    ],
+    "win": {
+      "artifactName": "${name}-${version}-portable.${ext}",
+      "target": [
+        "portable", 
+        "nsis"
+      ]
+    }
   },
   "author": "GitHub",
   "license": "all-rights-reserved",
