@@ -17,6 +17,7 @@
     "appId": "io.timechief.app",
     "files": [
       "src/main/main.js",
+      "src/preload/preload.js",
       "frontend-dist/**",
       "package.json"
     ],
