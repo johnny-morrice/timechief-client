@@ -8,14 +8,6 @@ module.exports = async function () {
             output: 'dist',
             buildResources: 'buildResources',
         },
-        files: ['src/main/main.js'],
-        extraMetadata: {
-            version: getVersion(),
-        },
-
-        // Specify linux target just for disabling snap compilation
-        linux: {
-            target: 'deb',
-        },
+        files: ['src/main/main.js', 'frontend-dist/**'],
     };
 };
