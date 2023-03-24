@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "start": "electron .",
-    "dir": "vite build && electron-builder --dir --config.asar=false",
+    "dist-debug": "vite build && electron-builder --dir --config.asar=false",
+    "dist-dir": "vite build && electron-builder --dir",
     "dist": "vite build && electron-builder"
   },
   "build": {
