@@ -6,10 +6,27 @@
   "scripts": {
     "build": "vite build",
     "start": "electron .",
+    "dir": "vite build && electron-builder --dir --config.asar=false",
     "dist": "vite build && electron-builder"
   },
   "build": {
-    "appId": "io.timechief.app"
+    "directories": {
+      "output": "dist",
+      "buildResources": "buildResources"
+    },
+    "appId": "io.timechief.app",
+    "files": [
+      "src/main/main.js",
+      "src/preload/preload.js",
+      "frontend-dist/**",
+      "package.json"
+    ],
+    "win": {
+      "artifactName": "timechief-client-${arch}.${ext}"
+    },
+    "linux": {
+      "artifactName": "timechief-client"
+    }
   },
   "author": "GitHub",
   "license": "all-rights-reserved",
