@@ -9,4 +9,4 @@ if [ -z "$WORK_DIR" ] || [ -z "$LOG_FILE" ] ; then
 fi
 
 cd $WORK_DIR
-./electron . 2>&1 >> $LOG_FILE
+./timechief-client-electron . 2>&1 >> $LOG_FILE
