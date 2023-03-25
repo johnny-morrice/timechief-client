@@ -26,7 +26,8 @@
       "artifactName": "timechief-client-${arch}.${ext}"
     },
     "linux": {
-      "artifactName": "timechief-client-electron"
+      "artifactName": "timechief-client-electron",
+      "target": "AppImage"
     }
   },
   "author": "GitHub",
