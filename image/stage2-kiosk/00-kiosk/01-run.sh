@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
+set -e
+set -x
 
 . "${BASE_DIR}/config"
 on_chroot << EOF
@@ -10,10 +12,8 @@ echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 export DEBIAN_FRONTEND=noninteractive
 EOF
 
-
-
 install -m 644 files/config.txt "${ROOTFS_DIR}/boot/"
 install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/"
 
 cp -r "${TIMECHIEF_ROOT}" "${ROOTFS_DIR}/opt"
-find "${ROOTFS_DIR}/opt/timechief-launcher" | xargs chown 1000:1000
+find "${ROOTFS_DIR}/opt/timechief-launcher" | xargs chown 0:0
