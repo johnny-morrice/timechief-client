@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/johnny-morrice/timechief-client/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/client"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -27,7 +27,7 @@ func Update(ctx *cli.Context) error {
 	cfg = cfg.Merge(flagCfg)
 	cfgStore.SetConfig(cfg)
 
-	clnt, err := api.MakePublicClient(cfg)
+	clnt, err := client.MakePublicClient(cfg)
 	if err != nil {
 		return err
 	}

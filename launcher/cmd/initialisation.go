@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/johnny-morrice/timechief-client/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/client"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
 	"gorm.io/gorm"
@@ -35,7 +35,7 @@ func Initialise(ctx *cli.Context) error {
 	cfgStore := store.ConfigStore{Db: db}
 	cfg := cfgFlags(ctx)
 
-	clnt, err := api.MakePublicClient(cfg)
+	clnt, err := client.MakePublicClient(cfg)
 	if err != nil {
 		return err
 	}

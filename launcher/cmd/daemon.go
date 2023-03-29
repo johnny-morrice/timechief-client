@@ -11,7 +11,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/client/client"
 	"github.com/johnny-morrice/timechief-client/client/publicclient"
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
-	"github.com/johnny-morrice/timechief-client/launcher/api"
+	myclient "github.com/johnny-morrice/timechief-client/launcher/client"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -27,7 +27,7 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	clnt, err := api.MakePublicClient(cfg)
+	clnt, err := myclient.MakePublicClient(cfg)
 	if err != nil {
 		return err
 	}
