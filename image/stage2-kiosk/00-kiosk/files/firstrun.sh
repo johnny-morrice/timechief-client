@@ -9,7 +9,7 @@ sudo raspi-config nonint enable_bootro
 
 echo
 echo ">> Removing First Run Script"
-rm ./firstrun.sh
+touch not_first_run
 
 echo
 echo ">> Rebooting"
