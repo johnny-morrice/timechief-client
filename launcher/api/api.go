@@ -62,7 +62,17 @@ func (api API) HandleGetDeviceData(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api API) HandleRecoverTargetStatus(w http.ResponseWriter, r *http.Request) {
-	// TODO: implement
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	target, err := api.Service.GetTarget()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("Failed to get target: %v", err)
+		return
+	}
+	writeJSON(w, target)
 }
 
 func writeJSON(w http.ResponseWriter, obj interface{}) {
