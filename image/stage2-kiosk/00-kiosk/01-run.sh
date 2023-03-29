@@ -16,4 +16,4 @@ install -m 644 files/config.txt "${ROOTFS_DIR}/boot/"
 install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/"
 
 cp -r "${TIMECHIEF_ROOT}" "${ROOTFS_DIR}/opt"
-find "${ROOTFS_DIR}/opt/timechief-launcher" | xargs chown 0:0
+find "${ROOTFS_DIR}/opt/timechief-launcher" | xargs chown 1000:1000
