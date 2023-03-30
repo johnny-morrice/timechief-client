@@ -26,14 +26,6 @@ alias l='ls -CF'
 alias s='sudo'
 alias sus='sudo -s'
 
-# If the file "not-first-run" does not exist, then run ./firstrun.sh.
-# This is a hack to run the firstrun.sh script only once.
-# The firstrun.sh script will create the file "not-first-run" and
-# then this script will not run it again.
-if [ ! -f ./not-first-run ]; then
-    ./firstrun.sh
-fi
-
 # silent startx on video console
 
 if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
