@@ -29,6 +29,6 @@ alias sus='sudo -s'
 # silent startx on video console
 
 if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
-  startx > /dev/null 2>&1
+  startx -- -nocursor > /dev/null 2>&1
   exit
 fi
