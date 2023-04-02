@@ -66,6 +66,7 @@ function createWindow() {
     },
     autoHideMenuBar: true,
     fullscreen: true,
+    backgroundColor: '#000000',
   })
 
   // and load the index.html of the app.
