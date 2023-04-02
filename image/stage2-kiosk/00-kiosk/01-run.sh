@@ -25,6 +25,13 @@ install -m 755 -o 1000 -g 1000 -d "${HOME}/bin/"
 cp -r "${TIMECHIEF_ROOT}" "${ROOTFS_DIR}/opt"
 find "${ROOTFS_DIR}/opt/timechief-launcher" | xargs chown 1000:1000
 
+# If the environment variable $CURSOR is "yes", then install the .cursor file.
+# This will cause the cursor to be visible on the screen.
+if [ "$CURSOR" = "yes" ]; then
+    install -m 644 -o 1000 -g 1000 files/.cursor "${HOME}/"
+fi
+
+
 # Autologin
 
 on_chroot << EOF

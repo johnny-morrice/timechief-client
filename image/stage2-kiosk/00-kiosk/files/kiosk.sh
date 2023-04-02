@@ -10,4 +10,4 @@ xset s off -dpms
 feh --bg-scale splash.png
 
 # start the cec-client & browser
-/opt/timechief-launcher/bin/timechief-launcher run-client
+/opt/timechief-launcher/bin/timechief-launcher run-client >> /opt/timechief-launcher/timechief-launcher.log 2>&1
