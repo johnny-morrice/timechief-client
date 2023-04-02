@@ -32,6 +32,6 @@ on_chroot << EOF
     cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << CATEND
 [Service]
 ExecStart=
-ExecStart=-/sbin/agetty --noissue --autologin $FIRST_USER_NAME --noclear %I \$TERM
+ExecStart=-/sbin/agetty --noissue --skip-login --autologin $FIRST_USER_NAME --noclear %I \$TERM
 CATEND
 EOF
