@@ -64,6 +64,8 @@ if (process.env.NODE_ENV !== 'production') {
 let isDevMode = process.env.devMode == 'true';
 
 let mainWindow;
+logger.info(`Starting in ${isDevMode ? 'dev' : 'prod'} mode`);
+logger.info(`Width: ${getWidth()} Height: ${getHeight()}`);
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
