@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/google/uuid"
@@ -82,6 +83,25 @@ func (cfg Config) GetAPIBaseURL() string {
 	return url
 }
 
+var ErrCfgNotFound = fmt.Errorf("config item not found")
+
+func (cfg Config) GetAccessToken() (string, error) {
+	token, ok := cfg.Config["access-token"]
+	if !ok {
+		return "", fmt.Errorf("access-token not found: %w", ErrCfgNotFound)
+	}
+	return token, nil
+}
+
+// TODO this will potentially go away with the new API.
+func (cfg Config) GetDeviceCredentials() (string, error) {
+	credentials, ok := cfg.Config["device-credentials"]
+	if !ok {
+		return "", fmt.Errorf("device-credentials not found: %w", ErrCfgNotFound)
+	}
+	return credentials, nil
+}
+
 func (cfg Config) GetProduct() string {
 	product, ok := cfg.Config["product"]
 	if !ok {
@@ -99,5 +119,5 @@ func (cfg Config) GetStream() string {
 }
 
 func (cfg Config) GetBundleToken() string {
-	return cfg.Config["bundleToken"]
+	return cfg.Config["bundle-token"]
 }
