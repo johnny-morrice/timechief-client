@@ -34,10 +34,14 @@ func Daemon(ctx *cli.Context) error {
 		Client:            clnt,
 	}
 
-	daemon := daemon.UpdateDaemon{
+	updateDaemon := daemon.Update{
 		Updater: up,
 	}
-	go daemon.Start(ctx)
+	deviceDataDaemon := daemon.DeviceData{
+		DeviceDataStore: store.DeviceDataStore{Db: db},
+	}
+	go updateDaemon.Start(ctx)
+	go deviceDataDaemon.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()

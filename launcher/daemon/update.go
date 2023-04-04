@@ -9,21 +9,28 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type UpdateDaemon struct {
+type Update struct {
 	Updater        update.Updater
 	StateFlagStore store.StateFlagStore
 }
 
-func (daemon UpdateDaemon) Start(ctx *cli.Context) {
-	daemon.doTick(ctx)
-	runEvery(time.Minute, func() { daemon.doTick(ctx) })
-}
-
-func (daemon UpdateDaemon) doTick(ctx *cli.Context) {
-	err := daemon.StateFlagStore.CreateIfNotExists(UpdatingFlag)
+func (daemon Update) Start(ctx *cli.Context) {
+	err := daemon.doTick(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		return
+	}
+	runEvery(time.Minute, func() {
+		err := daemon.doTick(ctx)
+		if err != nil {
+			log.Println(err.Error())
+		}
+	})
+}
+
+func (daemon Update) doTick(ctx *cli.Context) error {
+	err := daemon.StateFlagStore.CreateIfNotExists(UpdatingFlag)
+	if err != nil {
+		return err
 	}
 	defer func() {
 		err := daemon.StateFlagStore.Delete(UpdatingFlag)
@@ -34,8 +41,9 @@ func (daemon UpdateDaemon) doTick(ctx *cli.Context) {
 
 	err = daemon.Updater.Update(ctx)
 	if err != nil {
-		log.Println(err.Error())
+		return err
 	}
+	return nil
 }
 
 func runEvery(duration time.Duration, f func()) {
