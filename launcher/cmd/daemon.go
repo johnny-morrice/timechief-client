@@ -1,10 +1,12 @@
 package cmd
 
 import (
-	"log"
-	"time"
+	"net/http"
 
+	"github.com/johnny-morrice/timechief-client/launcher/api"
 	myclient "github.com/johnny-morrice/timechief-client/launcher/client"
+	"github.com/johnny-morrice/timechief-client/launcher/daemon"
+	"github.com/johnny-morrice/timechief-client/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/update"
 	"github.com/urfave/cli/v2"
@@ -32,27 +34,16 @@ func Daemon(ctx *cli.Context) error {
 		Client:            clnt,
 	}
 
-	daemon := updateDaemon{
+	daemon := daemon.UpdateDaemon{
 		Updater: up,
 	}
-	daemon.doTick(ctx)
-	runEvery(time.Minute, func() { daemon.doTick(ctx) })
-	return nil
-}
+	go daemon.Start(ctx)
 
-type updateDaemon struct {
-	update.Updater
-}
-
-func (daemon updateDaemon) doTick(ctx *cli.Context) {
-	err := daemon.Update(ctx)
-	if err != nil {
-		log.Println(err.Error())
+	addr := ctx.String("listen-addr")
+	mux := http.NewServeMux()
+	api := api.API{
+		Service: service.APIService{},
 	}
-}
-
-func runEvery(duration time.Duration, f func()) {
-	for range time.Tick(duration) {
-		f()
-	}
+	api.AddRoutes(mux)
+	return http.ListenAndServe(addr, mux)
 }

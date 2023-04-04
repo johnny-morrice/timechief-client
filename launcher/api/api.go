@@ -6,13 +6,14 @@ import (
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
+	"github.com/johnny-morrice/timechief-client/launcher/service"
 )
 
 type API struct {
 	Service APIService
 }
 
-func AddToGroup(group *http.ServeMux, api *API) {
+func (api *API) AddRoutes(group *http.ServeMux) {
 	group.HandleFunc("/api/device", api.HandleGetDeviceData)
 	group.HandleFunc("/api/target", api.HandleGetTarget)
 	group.HandleFunc("/api/target/recover", api.HandleRecoverTargetStatus)
@@ -20,17 +21,8 @@ func AddToGroup(group *http.ServeMux, api *API) {
 
 type APIService interface {
 	GetDeviceData() (*viewmodel.ClockData, error)
-	GetTarget() (Target, error)
-	RecoverTarget() (TargetStatus, error)
-}
-
-type Target struct {
-	TargetRoot string
-	LogFile    string
-}
-
-type TargetStatus struct {
-	Ready bool
+	GetTarget() (service.Target, error)
+	RecoverTarget() (service.TargetStatus, error)
 }
 
 func (api API) HandleGetTarget(w http.ResponseWriter, r *http.Request) {

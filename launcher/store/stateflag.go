@@ -38,3 +38,11 @@ func (store StateFlagStore) CreateIfNotExists(flag string) error {
 	}
 	return nil
 }
+
+func (store StateFlagStore) Delete(flag string) error {
+	result := store.Db.Where("state = ?", flag).Delete(&StateFlag{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

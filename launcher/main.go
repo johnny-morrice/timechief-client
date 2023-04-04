@@ -59,6 +59,10 @@ func getCLIApp() *cli.App {
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
 				},
+				&cli.StringFlag{
+					Name:  "listen-addr",
+					Value: "0.0.0.0:8080",
+				},
 			},
 		},
 		{
