@@ -1,6 +1,6 @@
 import { render } from "solid-js/web";
 import { onCleanup } from 'solid-js';
-import { hashIntegration, Router, Routes, Route } from "solid-app-router";
+import { hashIntegration, Router, Routes, Route } from "@solidjs/router";
 import { initializeIPC, sendClockDataRequest } from './ipc';
 import { HomePage } from "./homePage";
 import { DevicePage } from "./devicePage";

@@ -9,4 +9,6 @@ FIRST_USER_PASS="timechief"
 ENABLE_SSH=1
 PUBKEY_SSH_FIRST_USER=""
 STAGE_LIST="stage0 stage1 stage2 stage2-kiosk"
+CURSOR="yes"
 TIMECHIEF_ROOT="/opt/timechief-launcher"
+DEPLOY_COMPRESSION="none"

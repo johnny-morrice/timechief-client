@@ -29,6 +29,14 @@ function getWwwBaseURL() {
   return process.env.wwwBaseURL;
 }
 
+function getWidth() {
+  return process.env.width || 800;
+}
+
+function getHeight() {
+  return process.env.height || 600;
+}
+
 const logger = winston.createLogger({
   level: 'debug',
   format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
@@ -56,16 +64,19 @@ if (process.env.NODE_ENV !== 'production') {
 let isDevMode = process.env.devMode == 'true';
 
 let mainWindow;
+logger.info(`Starting in ${isDevMode ? 'dev' : 'prod'} mode`);
+logger.info(`Width: ${getWidth()} Height: ${getHeight()}`);
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: getWidth(),
+    height: getHeight(),
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
     },
     autoHideMenuBar: true,
     fullscreen: true,
+    backgroundColor: '#000000',
   })
 
   // and load the index.html of the app.
