@@ -31,7 +31,13 @@ func (store ConfigStore) SetConfig(cfg Config) error {
 			return result.Error
 		}
 	}
-	return nil
+	// Delete all other entries that do not have keys in cfg.
+	keys := make([]string, 0, len(cfg.Config))
+	for key := range cfg.Config {
+		keys = append(keys, key)
+	}
+	result := store.Db.Where("key NOT IN ?", keys).Delete(&ConfigEntry{})
+	return result.Error
 }
 
 func (store ConfigStore) GetConfig() (Config, error) {

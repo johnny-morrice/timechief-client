@@ -6,22 +6,25 @@ import (
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/service"
+	"github.com/johnny-morrice/timechief-client/launcher/store"
 )
 
 type API struct {
 	Service APIService
 }
 
-func (api *API) AddRoutes(group *http.ServeMux) {
-	group.HandleFunc("/api/device", api.HandleGetDeviceData)
-	group.HandleFunc("/api/target", api.HandleGetTarget)
-	group.HandleFunc("/api/target/recover", api.HandleRecoverTargetStatus)
+func (api *API) AddRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("/api/device", api.HandleGetDeviceData)
+	mux.HandleFunc("/api/config", api.HandleGetConfig)
+	mux.HandleFunc("/api/target", api.HandleGetTarget)
+	mux.HandleFunc("/api/target/recover", api.HandleRecoverTargetStatus)
 }
 
 type APIService interface {
 	GetDeviceData() (service.DeviceData, error)
 	GetTarget() (service.LaunchTarget, error)
 	RecoverTarget() (service.TargetStatus, error)
+	GetConfig() (store.Config, error)
 }
 
 func (api API) HandleGetTarget(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +39,20 @@ func (api API) HandleGetTarget(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, target)
+}
+
+func (api API) HandleGetConfig(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	config, err := api.Service.GetConfig()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("Failed to get target: %v", err)
+		return
+	}
+	writeJSON(w, config)
 }
 
 func (api API) HandleGetDeviceData(w http.ResponseWriter, r *http.Request) {

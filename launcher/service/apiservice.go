@@ -47,22 +47,23 @@ func (svc APIService) GetDeviceData() (DeviceData, error) {
 }
 
 func (svc APIService) GetTarget() (LaunchTarget, error) {
-	// target, err := svc.LaunchTargetStore.GetActiveLaunchTarget()
-	// if err != nil {
-	// 	return Target{}, err
-	// }
-	// cfg, err := svc.CfgStore.GetConfig()
-	// if err != nil {
-	// 	return Target{}, err
-	// }
+	target, err := svc.LaunchTargetStore.GetActiveLaunchTarget()
+	if err != nil {
+		return LaunchTarget{}, err
+	}
 
-	// result := Target{
-	// 	TargetRoot: target.Path,
-	// 	LogFile:    cfg.GetClientLogFilePath(),
-	// }
+	result := LaunchTargetFromStore(target)
 
-	// return result, nil
-	panic("not implemented")
+	return result, nil
+}
+
+func (svc APIService) GetConfig() (store.Config, error) {
+	config, err := svc.CfgStore.GetConfig()
+	if err != nil {
+		return store.Config{}, err
+	}
+
+	return config, nil
 }
 
 func (svc APIService) RecoverTarget() (TargetStatus, error) {

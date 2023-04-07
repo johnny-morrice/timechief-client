@@ -30,11 +30,29 @@ func runClientWithDaemon(ctx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("error recovering client: %w", err)
 	}
-	panic("not implemented")
+	cfg, err := dc.GetConfig()
+	if err != nil {
+		return fmt.Errorf("error getting config: %w", err)
+	}
+
+	target, err := dc.GetTarget()
+	if err != nil {
+		return fmt.Errorf("error getting target: %w", err)
+	}
+
+	return target.Run(cfg)
 }
 
 func recoverClient(dc daemonclient.DaemonClient) error {
-	panic("not implemented")
+	recoverInterval := 500 * time.Millisecond
+	recoverLimit := 10 * time.Second
+	return pollUntil(recoverInterval, recoverLimit, func() (bool, error) {
+		targetStatus, err := dc.PostTargetRecover()
+		if err != nil {
+			return false, err
+		}
+		return targetStatus.Ready, nil
+	})
 }
 
 func pollUntil(duration time.Duration, limit time.Duration, f func() (bool, error)) error {

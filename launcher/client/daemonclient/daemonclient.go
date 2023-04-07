@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/service"
+	"github.com/johnny-morrice/timechief-client/launcher/store"
 )
 
 type DaemonClient struct {
@@ -30,6 +31,22 @@ func (dc DaemonClient) GetDeviceData() (service.DeviceData, error) {
 	err = unmarsalJSON(resp, &result)
 	if err != nil {
 		return service.DeviceData{}, err
+	}
+
+	return result, nil
+}
+
+func (dc DaemonClient) GetConfig() (store.Config, error) {
+	resp, err := http.Get(dc.makeURL("/api/config"))
+	if err != nil {
+		return store.Config{}, err
+	}
+	defer resp.Body.Close()
+
+	result := store.Config{}
+	err = unmarsalJSON(resp, &result)
+	if err != nil {
+		return store.Config{}, err
 	}
 
 	return result, nil
