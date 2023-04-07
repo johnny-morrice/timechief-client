@@ -5,12 +5,22 @@ import (
 
 	"github.com/sarulabs/di/v2"
 
+	"github.com/johnny-morrice/timechief-client/client/apiclient"
+	"github.com/johnny-morrice/timechief-client/client/authnclient"
 	"github.com/johnny-morrice/timechief-client/client/client"
 	"github.com/johnny-morrice/timechief-client/client/config"
 	"github.com/johnny-morrice/timechief-client/client/log"
 	"github.com/johnny-morrice/timechief-client/client/publicclient"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 )
+
+func MakeAuthnClient(cfg store.Config) (*authnclient.Client, error) {
+	panic("not implemented")
+}
+
+func MakeAPIClient(cfg store.Config, token string) (*apiclient.Client, error) {
+	panic("not implemented")
+}
 
 func MakePublicClient(cfg store.Config) (*publicclient.Client, error) {
 	builder, err := di.NewBuilder()
