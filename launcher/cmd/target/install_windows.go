@@ -1,4 +1,4 @@
-//go:build !windows
+//go:build windows
 
 package target
 
@@ -14,7 +14,7 @@ func Install(ctx *cli.Context) error {
 	targetExe := ctx.String("executable")
 	installRoot := ctx.String("install-root")
 
-	systemExe := filepath.Join(installRoot, "bin/timechief-launcher")
+	systemExe := filepath.Join(installRoot, "bin/timechief-launcher.exe")
 
 	// If an old launcher exists, delete the old launcher exe.
 	_, err := os.Stat(systemExe)
@@ -27,10 +27,32 @@ func Install(ctx *cli.Context) error {
 		}
 	}
 
-	// Symbolically link the new launcher exe to the old location.
-	err = os.Symlink(targetExe, systemExe)
+	return copyFile(targetExe, systemExe)
+}
+
+// copyFile copies a file from src to dst.
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
 	if err != nil {
 		return err
 	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+
+	err = out.Close()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

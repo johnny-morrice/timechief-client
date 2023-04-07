@@ -144,6 +144,9 @@ func getCLIApp() *cli.App {
 						&cli.StringFlag{
 							Name: "target-root",
 						},
+						&cli.StringFlag{
+							Name: "install-root",
+						},
 					},
 				},
 			},
@@ -152,4 +155,4 @@ func getCLIApp() *cli.App {
 	return app
 }
 
-const defaultInstallDaemon = false
+const defaultInstallDaemon = true

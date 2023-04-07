@@ -65,7 +65,7 @@ func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
 
 	if doInstallDaemon {
 		log.Println("installing daemon")
-		return lt.Execute("target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path)
+		return lt.Execute("target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path, "--install-root", cfg.GetInstallRoot())
 	}
 	return nil
 }
