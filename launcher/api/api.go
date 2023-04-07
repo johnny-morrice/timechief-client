@@ -74,13 +74,13 @@ func (api API) HandleRecoverTargetStatus(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	target, err := api.Service.GetTarget()
+	recoveryState, err := api.Service.RecoverTarget()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		log.Printf("Failed to get target: %v", err)
 		return
 	}
-	writeJSON(w, target)
+	writeJSON(w, recoveryState)
 }
 
 func writeJSON(w http.ResponseWriter, obj interface{}) {
