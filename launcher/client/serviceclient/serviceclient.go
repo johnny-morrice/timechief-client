@@ -81,8 +81,18 @@ func MakeAPIClient(cfg store.Config, token string) (*apiclient.Client, error) {
 	creds := apiclient.APICredentialsConfig{
 		JWT: token,
 	}
+	authnConfig := authnclient.MakeAuthnClientConfig(clientConfig)
+	err = authnConfig.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+
 	apiConfig := apiclient.MakeAPIClientConfig(creds, clientConfig)
 	err = apiConfig.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	err = authnclient.Register(builder)
 	if err != nil {
 		return nil, err
 	}

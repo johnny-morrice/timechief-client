@@ -17,20 +17,7 @@ func (store StateFlagStore) List() ([]string, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	var stateFlags []string
-	for _, flag := range flags {
-		stateFlags = append(stateFlags, flag.State)
-	}
-	return stateFlags, nil
-}
-
-func (store StateFlagStore) GetFlags() ([]string, error) {
-	var flags []StateFlag
-	result := store.Db.Find(&flags)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	var stateFlags []string
+	stateFlags := []string{}
 	for _, flag := range flags {
 		stateFlags = append(stateFlags, flag.State)
 	}
