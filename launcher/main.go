@@ -63,6 +63,10 @@ func getCLIApp() *cli.App {
 					Name:  "listen-addr",
 					Value: "0.0.0.0:8080",
 				},
+				&cli.BoolFlag{
+					Name:  "auto-migrate",
+					Value: true,
+				},
 			},
 		},
 		{

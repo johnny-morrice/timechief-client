@@ -18,6 +18,15 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 	defer store.CloseDB(db)
+
+	isAutoMigrate := ctx.Bool("auto-migrate")
+	if isAutoMigrate {
+		err = store.AutoMigrate(db)
+		if err != nil {
+			return err
+		}
+	}
+
 	cfgStore := store.ConfigStore{Db: db}
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {
