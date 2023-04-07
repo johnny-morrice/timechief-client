@@ -15,11 +15,88 @@ import (
 )
 
 func MakeAuthnClient(cfg store.Config) (*authnclient.Client, error) {
-	panic("not implemented")
+	builder, err := di.NewBuilder()
+	if err != nil {
+		return nil, err
+	}
+	// TODO we should load these values from the config.
+	clientConfig := client.ClientConfig{
+		BaseURL:          cfg.GetAPIBaseURL(),
+		HTTPTimeout:      30 * time.Second,
+		RetryWaitTime:    5 * time.Second,
+		RetryMaxWaitTime: 30 * time.Second,
+		RetryCount:       5,
+		DumpHTTP:         true,
+	}
+	loggerCfg := config.Config{
+		Logger: config.LoggerConfig{
+			ZapPreset: config.DevelopmentLogger,
+		},
+	}
+	err = loggerCfg.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	apiConfig := authnclient.MakeAuthnClientConfig(clientConfig)
+	err = apiConfig.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	err = authnclient.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	err = log.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	app := builder.Build()
+	client := authnclient.GetAuthnClient(app)
+	return client, nil
 }
 
 func MakeAPIClient(cfg store.Config, token string) (*apiclient.Client, error) {
-	panic("not implemented")
+	builder, err := di.NewBuilder()
+	if err != nil {
+		return nil, err
+	}
+	// TODO we should load these values from the config.
+	clientConfig := client.ClientConfig{
+		BaseURL:          cfg.GetAPIBaseURL(),
+		HTTPTimeout:      30 * time.Second,
+		RetryWaitTime:    5 * time.Second,
+		RetryMaxWaitTime: 30 * time.Second,
+		RetryCount:       5,
+		DumpHTTP:         true,
+	}
+	loggerCfg := config.Config{
+		Logger: config.LoggerConfig{
+			ZapPreset: config.DevelopmentLogger,
+		},
+	}
+	err = loggerCfg.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	creds := apiclient.APICredentialsConfig{
+		JWT: token,
+	}
+	apiConfig := apiclient.MakeAPIClientConfig(creds, clientConfig)
+	err = apiConfig.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	err = apiclient.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	err = log.Register(builder)
+	if err != nil {
+		return nil, err
+	}
+	app := builder.Build()
+	client := apiclient.GetAPIClient(app)
+	return client, nil
 }
 
 func MakePublicClient(cfg store.Config) (*publicclient.Client, error) {
