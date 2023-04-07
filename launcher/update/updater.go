@@ -80,7 +80,7 @@ func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v st
 }
 
 func (up Updater) Update(ctx *cli.Context) error {
-	err := up.SyncAPIVersions()
+	err := up.SyncAPIVersions(ctx)
 	if err != nil {
 		return err
 	}
