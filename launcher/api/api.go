@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"github.com/johnny-morrice/timechief-client/launcher/service"
 )
 
@@ -20,7 +19,7 @@ func (api *API) AddRoutes(group *http.ServeMux) {
 }
 
 type APIService interface {
-	GetDeviceData() (*viewmodel.ClockData, error)
+	GetDeviceData() (service.DeviceData, error)
 	GetTarget() (service.Target, error)
 	RecoverTarget() (service.TargetStatus, error)
 }

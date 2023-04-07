@@ -121,3 +121,7 @@ func (cfg Config) GetStream() string {
 func (cfg Config) GetBundleToken() string {
 	return cfg.Config["bundle-token"]
 }
+
+func (cfg Config) GetClientLogFilePath() string {
+	return filepath.Join(cfg.GetInstallRoot(), "timechief-client.log")
+}

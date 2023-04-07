@@ -4,11 +4,24 @@ import "gorm.io/gorm"
 
 type StateFlag struct {
 	gorm.Model
-	State string
+	State string `gorm:"uniqueIndex"`
 }
 
 type StateFlagStore struct {
 	Db *gorm.DB
+}
+
+func (store StateFlagStore) List() ([]string, error) {
+	var flags []StateFlag
+	result := store.Db.Find(&flags)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	var stateFlags []string
+	for _, flag := range flags {
+		stateFlags = append(stateFlags, flag.State)
+	}
+	return stateFlags, nil
 }
 
 func (store StateFlagStore) GetFlags() ([]string, error) {
