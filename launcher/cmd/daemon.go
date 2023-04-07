@@ -36,6 +36,9 @@ func Daemon(ctx *cli.Context) error {
 
 	updateDaemon := daemon.Update{
 		Updater: up,
+		StateFlagStore: store.StateFlagStore{
+			Db: db,
+		},
 	}
 	deviceDataDaemon := daemon.DeviceData{
 		DeviceDataStore: store.DeviceDataStore{Db: db},
@@ -46,7 +49,12 @@ func Daemon(ctx *cli.Context) error {
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
 	api := api.API{
-		Service: service.APIService{},
+		Service: service.APIService{
+			DeviceDataStore:   store.DeviceDataStore{Db: db},
+			LaunchTargetStore: store.LaunchTargetStore{Db: db},
+			StateFlagStore:    store.StateFlagStore{Db: db},
+			CfgStore:          cfgStore,
+		},
 	}
 	api.AddRoutes(mux)
 	return http.ListenAndServe(addr, mux)
