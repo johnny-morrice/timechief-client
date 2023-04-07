@@ -67,6 +67,10 @@ func getCLIApp() *cli.App {
 					Name:  "auto-migrate",
 					Value: true,
 				},
+				&cli.BoolFlag{
+					Name:  "clear-state",
+					Value: true,
+				},
 			},
 		},
 		{

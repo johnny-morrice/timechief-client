@@ -59,3 +59,11 @@ func (store StateFlagStore) Delete(flag string) error {
 	}
 	return nil
 }
+
+func (store StateFlagStore) DeleteAll() error {
+	result := store.Db.Unscoped().Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&StateFlag{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

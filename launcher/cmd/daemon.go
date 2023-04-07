@@ -27,6 +27,15 @@ func Daemon(ctx *cli.Context) error {
 		}
 	}
 
+	isClearState := ctx.Bool("clear-state")
+	if isClearState {
+		flagStore := store.StateFlagStore{Db: db}
+		err = flagStore.DeleteAll()
+		if err != nil {
+			return err
+		}
+	}
+
 	cfgStore := store.ConfigStore{Db: db}
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {
