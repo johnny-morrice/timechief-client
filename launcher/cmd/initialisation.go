@@ -3,15 +3,15 @@ package cmd
 import (
 	"log"
 
-	"github.com/johnny-morrice/timechief-client/launcher/api"
+	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/update"
 	"github.com/urfave/cli/v2"
-	"gorm.io/gorm"
 )
 
 // Read the given configKeys from the cli.Context and return a store.Config instance.
 func cfgFlags(ctx *cli.Context) store.Config {
-	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
+	configKeys := []string{"install-root", "api-base-url", "product", "stream", "device-credentials"}
 	cfg := store.Config{
 		Config: make(map[string]string),
 	}
@@ -35,50 +35,24 @@ func Initialise(ctx *cli.Context) error {
 	cfgStore := store.ConfigStore{Db: db}
 	cfg := cfgFlags(ctx)
 
-	clnt, err := api.MakePublicClient(cfg)
+	clnt, err := client.MakePublicClient(cfg)
 	if err != nil {
 		return err
 	}
-	init := initialiser{
-		db: db,
-		updater: updater{
-			cfgStore:          cfgStore,
-			api:               clnt,
-			launchTargetStore: store.LaunchTargetStore{Db: db},
-			versionStore:      store.VersionStore{Db: db},
+	init := update.Initialiser{
+		DB: db,
+		Updater: update.Updater{
+			CfgStore:          cfgStore,
+			Client:            clnt,
+			LaunchTargetStore: store.LaunchTargetStore{Db: db},
+			VersionStore:      store.VersionStore{Db: db},
+			RequestTimeout:    ctx.Duration("service-request-timeout"),
 		},
 	}
-	if !init.isInitialised() {
+	if !init.IsInitialised() {
 		log.Println("initialising client")
-		return init.initialise(ctx, cfg)
+		return init.Initialise(ctx, cfg)
 	}
 	log.Println("already initialised, skipping initialisation")
 	return nil
-}
-
-type initialiser struct {
-	db *gorm.DB
-	updater
-}
-
-func (init initialiser) initialise(ctx *cli.Context, cfg store.Config) error {
-	err := store.AutoMigrate(init.db)
-	if err != nil {
-		return err
-	}
-	err = init.cfgStore.SetConfig(cfg)
-	if err != nil {
-		return err
-	}
-	err = init.firstUpdate(ctx)
-	if err != nil {
-		return err
-	}
-	log.Print("initialised client OK")
-	return nil
-}
-
-func (init initialiser) isInitialised() bool {
-	lt, err := init.launchTargetStore.GetActiveLaunchTarget()
-	return err == nil && lt.ID != 0
 }

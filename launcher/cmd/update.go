@@ -3,8 +3,9 @@ package cmd
 import (
 	"log"
 
-	"github.com/johnny-morrice/timechief-client/launcher/api"
+	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/update"
 	"github.com/urfave/cli/v2"
 )
 
@@ -27,27 +28,28 @@ func Update(ctx *cli.Context) error {
 	cfg = cfg.Merge(flagCfg)
 	cfgStore.SetConfig(cfg)
 
-	clnt, err := api.MakePublicClient(cfg)
+	clnt, err := client.MakePublicClient(cfg)
 	if err != nil {
 		return err
 	}
 
-	updater := updater{
-		cfgStore:          cfgStore,
-		api:               clnt,
-		launchTargetStore: store.LaunchTargetStore{Db: db},
-		versionStore:      store.VersionStore{Db: db},
+	updater := update.Updater{
+		CfgStore:          cfgStore,
+		Client:            clnt,
+		LaunchTargetStore: store.LaunchTargetStore{Db: db},
+		VersionStore:      store.VersionStore{Db: db},
+		RequestTimeout:    ctx.Duration("service-request-timeout"),
 	}
 
-	init := initialiser{
-		db:      db,
-		updater: updater,
+	init := update.Initialiser{
+		DB:      db,
+		Updater: updater,
 	}
-	if !init.isInitialised() {
+	if !init.IsInitialised() {
 		log.Println("initialising client")
-		return init.initialise(ctx, cfg)
+		return init.Initialise(ctx, cfg)
 	}
 
 	log.Println("updating client")
-	return updater.update(ctx)
+	return updater.Update(ctx)
 }

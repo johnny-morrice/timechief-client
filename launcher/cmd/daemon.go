@@ -1,18 +1,14 @@
 package cmd
 
 import (
-	"context"
-	"encoding/base64"
-	"errors"
-	"fmt"
-	"log"
-	"time"
+	"net/http"
 
-	"github.com/johnny-morrice/timechief-client/client/client"
-	"github.com/johnny-morrice/timechief-client/client/publicclient"
-	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"github.com/johnny-morrice/timechief-client/launcher/api"
+	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
+	"github.com/johnny-morrice/timechief-client/launcher/daemon"
+	"github.com/johnny-morrice/timechief-client/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/update"
 	"github.com/urfave/cli/v2"
 )
 
@@ -22,182 +18,67 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 	defer store.CloseDB(db)
+
+	isAutoMigrate := ctx.Bool("auto-migrate")
+	if isAutoMigrate {
+		err = store.AutoMigrate(db)
+		if err != nil {
+			return err
+		}
+	}
+
+	isClearState := ctx.Bool("clear-state")
+	if isClearState {
+		flagStore := store.StateFlagStore{Db: db}
+		err = flagStore.DeleteAll()
+		if err != nil {
+			return err
+		}
+	}
+
 	cfgStore := store.ConfigStore{Db: db}
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {
 		return err
 	}
-	clnt, err := api.MakePublicClient(cfg)
+	clnt, err := client.MakePublicClient(cfg)
 	if err != nil {
 		return err
 	}
-	up := updater{
-		versionStore:      store.VersionStore{Db: db},
-		launchTargetStore: store.LaunchTargetStore{Db: db},
-		cfgStore:          cfgStore,
-		api:               clnt,
+	up := update.Updater{
+		VersionStore:      store.VersionStore{Db: db},
+		LaunchTargetStore: store.LaunchTargetStore{Db: db},
+		CfgStore:          cfgStore,
+		Client:            clnt,
+		RequestTimeout:    ctx.Duration("service-request-timeout"),
 	}
 
-	daemon := updateDaemon{
-		updater: up,
+	updateDaemon := daemon.Update{
+		Updater: up,
+		StateFlagStore: store.StateFlagStore{
+			Db: db,
+		},
+		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
-	daemon.doTick(ctx)
-	runEvery(time.Minute, func() { daemon.doTick(ctx) })
-	return nil
-}
-
-type updateDaemon struct {
-	updater
-}
-
-func (daemon updateDaemon) doTick(ctx *cli.Context) {
-	err := daemon.update(ctx)
-	if err != nil {
-		log.Println(err.Error())
+	deviceDataDaemon := daemon.DeviceData{
+		DeviceDataStore: store.DeviceDataStore{Db: db},
+		CfgStore:        cfgStore,
+		RequestTimeout:  ctx.Duration("service-request-timeout"),
+		RefreshInterval: ctx.Duration("service-refresh-interval"),
 	}
-}
+	go updateDaemon.Start(ctx)
+	go deviceDataDaemon.Start(ctx)
 
-type updater struct {
-	versionStore      store.VersionStore
-	launchTargetStore store.LaunchTargetStore
-	cfgStore          store.ConfigStore
-	api               *publicclient.Client
-}
-
-func (up updater) firstUpdate(ctx *cli.Context) error {
-	err := up.syncAPIVersions()
-	if err != nil {
-		return err
+	addr := ctx.String("listen-addr")
+	mux := http.NewServeMux()
+	api := api.API{
+		Service: service.APIService{
+			DeviceDataStore:   store.DeviceDataStore{Db: db},
+			LaunchTargetStore: store.LaunchTargetStore{Db: db},
+			StateFlagStore:    store.StateFlagStore{Db: db},
+			CfgStore:          cfgStore,
+		},
 	}
-	versions, err := up.versionStore.GetVersions()
-	if err != nil {
-		return err
-	}
-	cfg, err := up.cfgStore.GetConfig()
-	if err != nil {
-		return err
-	}
-	newVersion, err := store.FindLatestVersion(cfg, versions)
-
-	if errors.Is(err, store.ErrNoVersion) {
-		return fmt.Errorf("cannot initialise, no version available: %w", err)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return up.createNewLaunchTarget(ctx, cfg, newVersion)
-}
-
-func (up updater) createNewLaunchTarget(ctx *cli.Context, cfg store.Config, v store.Version) error {
-	log.Printf("creating launch target for version: %s", v.Version)
-	newLt := store.LaunchTarget{}
-	newLt.Path = cfg.NewInstallPath(v.Version)
-	newLt.Version = v
-	newLt.VersionID = v.ID
-	doInstallDaemon := ctx.Bool("install-daemon")
-	err := newLt.Install(cfg, doInstallDaemon)
-	if err != nil {
-		return err
-	}
-
-	err = up.launchTargetStore.Create(&newLt)
-	if err != nil {
-		return err
-	}
-
-	err = up.launchTargetStore.SetActive(newLt)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("created launch target for version: %s", v.Version)
-
-	return nil
-}
-
-func (up updater) update(ctx *cli.Context) error {
-	err := up.syncAPIVersions()
-	if err != nil {
-		return err
-	}
-	versions, err := up.versionStore.GetVersions()
-	if err != nil {
-		return err
-	}
-	lt, err := up.launchTargetStore.GetActiveLaunchTarget()
-	if err != nil {
-		return err
-	}
-	cfg, err := up.cfgStore.GetConfig()
-	if err != nil {
-		return err
-	}
-	newVersion, err := store.FindNewVersion(cfg, lt.Version.Version, versions)
-
-	if errors.Is(err, store.ErrNoVersion) {
-		return nil
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return up.createNewLaunchTarget(ctx, cfg, newVersion)
-}
-
-func (up updater) syncAPIVersions() error {
-	var versions []*viewmodel.Version
-	ctx := context.Background()
-	cursor := ""
-	for {
-		params := []client.QueryParam{}
-		if cursor != "" {
-			params = append(params, client.CursorParam(cursor))
-		}
-		versionPage, err := up.api.Version.List(ctx, params...)
-		if err != nil {
-			return err
-		}
-		versions = append(versions, versionPage.Versions...)
-
-		if versionPage.NextCursor == "" {
-			break
-		}
-
-		cursor = versionPage.NextCursor
-	}
-
-	for _, version := range versions {
-		// Decode base64 encoded SHA256
-		log.Printf("processing version %s UUID: %s Command: %v", version.Version, version.UUID, version.Command)
-		log.Printf("decoding sha %s", version.SHA256)
-		shaBytes, err := base64.StdEncoding.DecodeString(version.SHA256)
-		if err != nil {
-			return err
-		}
-		log.Printf("decoded sha %x", shaBytes)
-		storeVersion := store.Version{
-			UUID:    version.UUID,
-			Version: version.Version,
-			Product: version.Product,
-			Stream:  version.Stream,
-			URL:     version.URL,
-			SHA256:  shaBytes,
-			Command: version.Command,
-		}
-
-		err = up.versionStore.CreateIfNotExists(&storeVersion)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func runEvery(duration time.Duration, f func()) {
-	for range time.Tick(duration) {
-		f()
-	}
+	api.AddRoutes(mux)
+	return http.ListenAndServe(addr, mux)
 }

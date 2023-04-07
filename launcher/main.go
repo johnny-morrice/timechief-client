@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/cmd"
 	"github.com/johnny-morrice/timechief-client/launcher/cmd/target"
@@ -59,6 +60,30 @@ func getCLIApp() *cli.App {
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
 				},
+				&cli.StringFlag{
+					Name:  "listen-addr",
+					Value: "0.0.0.0:8080",
+				},
+				&cli.BoolFlag{
+					Name:  "auto-migrate",
+					Value: true,
+				},
+				&cli.BoolFlag{
+					Name:  "clear-state",
+					Value: true,
+				},
+				&cli.DurationFlag{
+					Name:  "service-request-timeout",
+					Value: 20 * time.Second,
+				},
+				&cli.DurationFlag{
+					Name:  "service-refresh-interval",
+					Value: 20 * time.Second,
+				},
+				&cli.DurationFlag{
+					Name:  "version-update-interval",
+					Value: 1 * time.Minute,
+				},
 			},
 		},
 		{
@@ -83,6 +108,13 @@ func getCLIApp() *cli.App {
 				&cli.BoolFlag{
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
+				},
+				&cli.StringFlag{
+					Name: "device-credentials",
+				},
+				&cli.DurationFlag{
+					Name:  "service-request-timeout",
+					Value: 20 * time.Second,
 				},
 			},
 			Usage:  "Initialise the database and download the latest version of the timechief client",
@@ -110,6 +142,13 @@ func getCLIApp() *cli.App {
 				&cli.BoolFlag{
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
+				},
+				&cli.StringFlag{
+					Name: "device-credentials",
+				},
+				&cli.DurationFlag{
+					Name:  "service-request-timeout",
+					Value: 20 * time.Second,
 				},
 			},
 			Usage:  "Update the database and download the latest version of the timechief client",
@@ -140,6 +179,9 @@ func getCLIApp() *cli.App {
 						&cli.StringFlag{
 							Name: "target-root",
 						},
+						&cli.StringFlag{
+							Name: "install-root",
+						},
 					},
 				},
 			},
@@ -148,4 +190,4 @@ func getCLIApp() *cli.App {
 	return app
 }
 
-const defaultInstallDaemon = false
+const defaultInstallDaemon = true
