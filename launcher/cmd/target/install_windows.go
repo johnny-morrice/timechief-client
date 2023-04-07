@@ -17,14 +17,9 @@ func Install(ctx *cli.Context) error {
 	systemExe := filepath.Join(installRoot, "bin/timechief-launcher.exe")
 
 	// If an old launcher exists, delete the old launcher exe.
-	_, err := os.Stat(systemExe)
+	err := os.Remove(systemExe)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
-	} else if err == nil {
-		err := os.Remove(systemExe)
-		if err != nil {
-			return err
-		}
 	}
 
 	return copyFile(targetExe, systemExe)
