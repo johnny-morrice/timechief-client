@@ -20,7 +20,7 @@ func (api *API) AddRoutes(group *http.ServeMux) {
 
 type APIService interface {
 	GetDeviceData() (service.DeviceData, error)
-	GetTarget() (service.Target, error)
+	GetTarget() (service.LaunchTarget, error)
 	RecoverTarget() (service.TargetStatus, error)
 }
 

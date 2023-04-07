@@ -16,11 +16,6 @@ type LauncherState struct {
 	Flags []string
 }
 
-type Target struct {
-	TargetRoot string
-	LogFile    string
-}
-
 type TargetStatus struct {
 	Ready bool
 }
@@ -51,22 +46,23 @@ func (svc APIService) GetDeviceData() (DeviceData, error) {
 	return result, nil
 }
 
-func (svc APIService) GetTarget() (Target, error) {
-	target, err := svc.LaunchTargetStore.GetActiveLaunchTarget()
-	if err != nil {
-		return Target{}, err
-	}
-	cfg, err := svc.CfgStore.GetConfig()
-	if err != nil {
-		return Target{}, err
-	}
+func (svc APIService) GetTarget() (LaunchTarget, error) {
+	// target, err := svc.LaunchTargetStore.GetActiveLaunchTarget()
+	// if err != nil {
+	// 	return Target{}, err
+	// }
+	// cfg, err := svc.CfgStore.GetConfig()
+	// if err != nil {
+	// 	return Target{}, err
+	// }
 
-	result := Target{
-		TargetRoot: target.Path,
-		LogFile:    cfg.GetClientLogFilePath(),
-	}
+	// result := Target{
+	// 	TargetRoot: target.Path,
+	// 	LogFile:    cfg.GetClientLogFilePath(),
+	// }
 
-	return result, nil
+	// return result, nil
+	panic("not implemented")
 }
 
 func (svc APIService) RecoverTarget() (TargetStatus, error) {

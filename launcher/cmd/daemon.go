@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/api"
-	myclient "github.com/johnny-morrice/timechief-client/launcher/client"
+	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
@@ -23,7 +23,7 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	clnt, err := myclient.MakePublicClient(cfg)
+	clnt, err := client.MakePublicClient(cfg)
 	if err != nil {
 		return err
 	}

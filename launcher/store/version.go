@@ -1,15 +1,8 @@
 package store
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"errors"
-	"fmt"
-	"io"
 	"log"
-	"net/http"
-	"net/url"
-	"os"
 	"sort"
 
 	"golang.org/x/mod/semver"
@@ -111,60 +104,4 @@ func FindLatestVersion(cfg Config, versions []Version) (Version, error) {
 
 func (v Version) IsSupportedProductStream(cfg Config) bool {
 	return v.Product == cfg.GetProduct() && v.Stream == cfg.GetStream()
-}
-
-func (v Version) Download(cfg Config, path string) error {
-	log.Printf("downloading %s to %s", v.URL, path)
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	netURL, err := url.Parse(v.URL)
-	if err != nil {
-		return err
-	}
-	headers := http.Header{}
-	if cfg.GetBundleToken() != "" {
-		headers.Add("Authorisation", cfg.GetBundleToken())
-	}
-	req := &http.Request{
-		Method: "GET",
-		URL:    netURL,
-		Header: headers,
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return errors.New("expected 200")
-	}
-	defer resp.Body.Close()
-	_, err = io.Copy(file, resp.Body)
-
-	if err != nil {
-		return err
-	}
-
-	return verifySHA256(v.SHA256, path)
-}
-
-// verifySHA256 verifies that the SHA256 of the file at path matches the given hash.
-func verifySHA256(expected []byte, path string) error {
-	hasher := sha256.New()
-	file, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = io.Copy(hasher, file)
-	if err != nil {
-		return err
-	}
-	actual := hasher.Sum(nil)
-	if !bytes.Equal(expected, actual) {
-		return fmt.Errorf("hash mismatch for %v: expected %x, got %x", path, expected, actual)
-	}
-	return nil
 }

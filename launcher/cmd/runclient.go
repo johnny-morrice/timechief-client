@@ -7,23 +7,62 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/client/daemonclient"
+	"github.com/johnny-morrice/timechief-client/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
 )
 
 func RunClient(ctx *cli.Context) error {
 	standalone := ctx.Bool("standalone")
-	if !standalone {
-		panic("not implemented")
+	if standalone {
+		return runStandaloneClient(ctx)
 	}
+	return runClientWithDaemon(ctx)
+}
+
+func runClientWithDaemon(ctx *cli.Context) error {
+	baseURL := ctx.String("daemon-base-url")
+	dc := daemonclient.NewDaemonClient(baseURL)
+	err := recoverClient(dc)
+	if err != nil {
+		return fmt.Errorf("error recovering client: %w", err)
+	}
+	panic("not implemented")
+}
+
+func recoverClient(dc daemonclient.DaemonClient) error {
+	panic("not implemented")
+}
+
+func pollUntil(duration time.Duration, limit time.Duration, f func() (bool, error)) error {
+	start := time.Now()
+	endTime := start.Add(limit)
+	for {
+		res, err := f()
+		if err != nil {
+			return err
+		}
+		if res {
+			return nil
+		}
+		if time.Now().After(endTime) {
+			return errors.New("polling timed out")
+		}
+		time.Sleep(duration)
+	}
+}
+
+func runStandaloneClient(ctx *cli.Context) error {
 	db, err := store.GetDBConnection(ctx)
 	if err != nil {
 		return err
 	}
 	defer store.CloseDB(db)
 	ltStore := store.LaunchTargetStore{Db: db}
-	launchTarget, err := ltStore.GetActiveLaunchTarget()
+	storeTarget, err := ltStore.GetActiveLaunchTarget()
 	if err != nil {
 		return err
 	}
@@ -42,6 +81,8 @@ func RunClient(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	launchTarget := service.LaunchTargetFromStore(storeTarget)
 
 	// TODO rollback if launch fails.
 	return launchTarget.Run(cfg)

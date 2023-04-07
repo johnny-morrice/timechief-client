@@ -10,6 +10,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/client/client"
 	"github.com/johnny-morrice/timechief-client/client/publicclient"
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
+	"github.com/johnny-morrice/timechief-client/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -34,6 +35,7 @@ func (up Updater) FirstUpdate(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
 	newVersion, err := store.FindLatestVersion(cfg, versions)
 
 	if errors.Is(err, store.ErrNoVersion) {
@@ -49,22 +51,23 @@ func (up Updater) FirstUpdate(ctx *cli.Context) error {
 
 func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v store.Version) error {
 	log.Printf("creating launch target for version: %s", v.Version)
-	newLt := store.LaunchTarget{}
-	newLt.Path = cfg.NewInstallPath(v.Version)
-	newLt.Version = v
-	newLt.VersionID = v.ID
+	newStoreLt := store.LaunchTarget{}
+	newStoreLt.Path = cfg.NewInstallPath(v.Version)
+	newStoreLt.Version = v
+	newStoreLt.VersionID = v.ID
 	doInstallDaemon := ctx.Bool("install-daemon")
-	err := newLt.Install(cfg, doInstallDaemon)
+	lt := service.LaunchTargetFromStore(newStoreLt)
+	err := lt.Install(cfg, doInstallDaemon)
 	if err != nil {
 		return err
 	}
 
-	err = up.LaunchTargetStore.Create(&newLt)
+	err = up.LaunchTargetStore.Create(&newStoreLt)
 	if err != nil {
 		return err
 	}
 
-	err = up.LaunchTargetStore.SetActive(newLt)
+	err = up.LaunchTargetStore.SetActive(newStoreLt)
 	if err != nil {
 		return err
 	}
