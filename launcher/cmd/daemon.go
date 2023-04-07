@@ -50,6 +50,7 @@ func Daemon(ctx *cli.Context) error {
 		LaunchTargetStore: store.LaunchTargetStore{Db: db},
 		CfgStore:          cfgStore,
 		Client:            clnt,
+		RequestTimeout:    ctx.Duration("service-request-timeout"),
 	}
 
 	updateDaemon := daemon.Update{
@@ -57,9 +58,13 @@ func Daemon(ctx *cli.Context) error {
 		StateFlagStore: store.StateFlagStore{
 			Db: db,
 		},
+		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
 	deviceDataDaemon := daemon.DeviceData{
 		DeviceDataStore: store.DeviceDataStore{Db: db},
+		CfgStore:        cfgStore,
+		RequestTimeout:  ctx.Duration("service-request-timeout"),
+		RefreshInterval: ctx.Duration("service-refresh-interval"),
 	}
 	go updateDaemon.Start(ctx)
 	go deviceDataDaemon.Start(ctx)

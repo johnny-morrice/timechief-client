@@ -46,6 +46,7 @@ func Initialise(ctx *cli.Context) error {
 			Client:            clnt,
 			LaunchTargetStore: store.LaunchTargetStore{Db: db},
 			VersionStore:      store.VersionStore{Db: db},
+			RequestTimeout:    ctx.Duration("service-request-timeout"),
 		},
 	}
 	if !init.IsInitialised() {

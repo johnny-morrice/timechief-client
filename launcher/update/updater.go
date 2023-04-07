@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/client/client"
 	"github.com/johnny-morrice/timechief-client/client/publicclient"
@@ -20,10 +21,11 @@ type Updater struct {
 	LaunchTargetStore store.LaunchTargetStore
 	CfgStore          store.ConfigStore
 	Client            *publicclient.Client
+	RequestTimeout    time.Duration
 }
 
 func (up Updater) FirstUpdate(ctx *cli.Context) error {
-	err := up.SyncAPIVersions()
+	err := up.SyncAPIVersions(ctx)
 	if err != nil {
 		return err
 	}
@@ -107,16 +109,17 @@ func (up Updater) Update(ctx *cli.Context) error {
 	return up.CreateNewLaunchTarget(ctx, cfg, newVersion)
 }
 
-func (up Updater) SyncAPIVersions() error {
+func (up Updater) SyncAPIVersions(ctx *cli.Context) error {
 	var versions []*viewmodel.Version
-	ctx := context.Background()
 	cursor := ""
 	for {
 		params := []client.QueryParam{}
 		if cursor != "" {
 			params = append(params, client.CursorParam(cursor))
 		}
-		versionPage, err := up.Client.Version.List(ctx, params...)
+		requestContext, cancel := context.WithTimeout(context.Background(), up.RequestTimeout)
+		defer cancel()
+		versionPage, err := up.Client.Version.List(requestContext, params...)
 		if err != nil {
 			return err
 		}

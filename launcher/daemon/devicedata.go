@@ -17,12 +17,13 @@ import (
 type DeviceData struct {
 	DeviceDataStore store.DeviceDataStore
 	CfgStore        store.ConfigStore
+	RequestTimeout  time.Duration
+	RefreshInterval time.Duration
 }
 
 func (dd DeviceData) Start(ctx *cli.Context) {
 	dd.doTick(ctx)
-	const interval = time.Second * 15
-	runEvery(interval, func() { dd.doTick(ctx) })
+	runEvery(dd.RefreshInterval, func() { dd.doTick(ctx) })
 }
 
 func (dd DeviceData) doTick(ctx *cli.Context) error {
@@ -54,7 +55,7 @@ func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
 		return viewmodel.ClockData{}, err
 	}
 
-	token, err := getToken(authnClient, cfg, credentials)
+	token, err := dd.getToken(authnClient, cfg, credentials)
 
 	if err != nil {
 		return viewmodel.ClockData{}, err
@@ -65,7 +66,7 @@ func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
 		return viewmodel.ClockData{}, err
 	}
 
-	clockData, err := getClockData(apiClient)
+	clockData, err := dd.getClockData(apiClient)
 
 	if err != nil {
 		return viewmodel.ClockData{}, err
@@ -74,10 +75,8 @@ func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
 	return *clockData, nil
 }
 
-func getClockData(apiClient *apiclient.Client) (*viewmodel.ClockData, error) {
-	// TODO make timeout configurable
-	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
+func (dd DeviceData) getClockData(apiClient *apiclient.Client) (*viewmodel.ClockData, error) {
+	ctx, cancel := dd.newClientContext()
 	defer cancel()
 	clockData, err := apiClient.ClockData.GetClockData(ctx)
 
@@ -88,7 +87,7 @@ func getClockData(apiClient *apiclient.Client) (*viewmodel.ClockData, error) {
 	return clockData, nil
 }
 
-func getToken(authnClient *authnclient.Client, cfg store.Config, credentials string) (string, error) {
+func (dd DeviceData) getToken(authnClient *authnclient.Client, cfg store.Config, credentials string) (string, error) {
 	credentialParts := strings.Split(credentials, ":")
 	if len(credentialParts) != 2 {
 		return "", errors.New("expected device credentials to be in form serial:secret")
@@ -97,9 +96,7 @@ func getToken(authnClient *authnclient.Client, cfg store.Config, credentials str
 	serial := credentialParts[0]
 	secret := credentialParts[1]
 
-	// TODO make timeout configurable
-	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
+	ctx, cancel := dd.newClientContext()
 	defer cancel()
 	tokenResp, err := authnClient.Token.CreateToken(ctx, &viewmodel.TokenRequest{
 		DeviceSerial: serial,
@@ -111,4 +108,10 @@ func getToken(authnClient *authnclient.Client, cfg store.Config, credentials str
 	}
 
 	return tokenResp.JWT, nil
+}
+
+func (dd DeviceData) newClientContext() (context.Context, func()) {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, dd.RequestTimeout)
+	return ctx, cancel
 }

@@ -10,8 +10,9 @@ import (
 )
 
 type Update struct {
-	Updater        update.Updater
-	StateFlagStore store.StateFlagStore
+	Updater               update.Updater
+	StateFlagStore        store.StateFlagStore
+	VersionUpdateInterval time.Duration
 }
 
 func (daemon Update) Start(ctx *cli.Context) {
@@ -19,7 +20,7 @@ func (daemon Update) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	runEvery(time.Minute, func() {
+	runEvery(daemon.VersionUpdateInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
 			log.Println(err.Error())

@@ -38,6 +38,7 @@ func Update(ctx *cli.Context) error {
 		Client:            clnt,
 		LaunchTargetStore: store.LaunchTargetStore{Db: db},
 		VersionStore:      store.VersionStore{Db: db},
+		RequestTimeout:    ctx.Duration("service-request-timeout"),
 	}
 
 	init := update.Initialiser{

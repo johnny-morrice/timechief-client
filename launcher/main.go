@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/cmd"
 	"github.com/johnny-morrice/timechief-client/launcher/cmd/target"
@@ -71,6 +72,18 @@ func getCLIApp() *cli.App {
 					Name:  "clear-state",
 					Value: true,
 				},
+				&cli.DurationFlag{
+					Name:  "service-request-timeout",
+					Value: 20 * time.Second,
+				},
+				&cli.DurationFlag{
+					Name:  "service-refresh-interval",
+					Value: 20 * time.Second,
+				},
+				&cli.DurationFlag{
+					Name:  "version-update-interval",
+					Value: 1 * time.Minute,
+				},
 			},
 		},
 		{
@@ -98,6 +111,10 @@ func getCLIApp() *cli.App {
 				},
 				&cli.StringFlag{
 					Name: "device-credentials",
+				},
+				&cli.DurationFlag{
+					Name:  "service-request-timeout",
+					Value: 20 * time.Second,
 				},
 			},
 			Usage:  "Initialise the database and download the latest version of the timechief client",
@@ -128,6 +145,10 @@ func getCLIApp() *cli.App {
 				},
 				&cli.StringFlag{
 					Name: "device-credentials",
+				},
+				&cli.DurationFlag{
+					Name:  "service-request-timeout",
+					Value: 20 * time.Second,
 				},
 			},
 			Usage:  "Update the database and download the latest version of the timechief client",
