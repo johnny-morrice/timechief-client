@@ -96,6 +96,9 @@ func getCLIApp() *cli.App {
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
 				},
+				&cli.StringFlag{
+					Name: "device-credentials",
+				},
 			},
 			Usage:  "Initialise the database and download the latest version of the timechief client",
 			Action: cmd.Initialise,
@@ -122,6 +125,9 @@ func getCLIApp() *cli.App {
 				&cli.BoolFlag{
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
+				},
+				&cli.StringFlag{
+					Name: "device-credentials",
 				},
 			},
 			Usage:  "Update the database and download the latest version of the timechief client",
