@@ -24,6 +24,15 @@ func (store StateFlagStore) List() ([]string, error) {
 	return stateFlags, nil
 }
 
+func (store StateFlagStore) Exists(flag string) (bool, error) {
+	var count int64
+	result := store.Db.Model(&StateFlag{}).Where("state = ?", flag).Count(&count)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return count > 0, nil
+}
+
 func (store StateFlagStore) CreateIfNotExists(flag string) error {
 	var count int64
 	result := store.Db.Model(&StateFlag{}).Where("state = ?", flag).Count(&count)

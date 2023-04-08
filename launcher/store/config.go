@@ -103,6 +103,22 @@ func (cfg Config) GetAccessToken() (string, error) {
 	return token, nil
 }
 
+func (cfg Config) SetPairingCode(code string) {
+	cfg.Config["pairing-code"] = code
+}
+
+func (cfg Config) GetPairingCode() (string, error) {
+	code, ok := cfg.Config["pairing-code"]
+	if !ok {
+		return "", fmt.Errorf("pairing-code not found: %w", ErrCfgNotFound)
+	}
+	return code, nil
+}
+
+func (cfg Config) ClearPairingCode() {
+	delete(cfg.Config, "pairing-code")
+}
+
 // TODO this will potentially go away with the new API.
 func (cfg Config) GetDeviceCredentials() (string, error) {
 	credentials, ok := cfg.Config["device-credentials"]
