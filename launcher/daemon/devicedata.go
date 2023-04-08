@@ -3,6 +3,7 @@ package daemon
 import (
 	"context"
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -22,8 +23,16 @@ type DeviceData struct {
 }
 
 func (dd DeviceData) Start(ctx *cli.Context) {
-	dd.doTick(ctx)
-	runEvery(dd.RefreshInterval, func() { dd.doTick(ctx) })
+	err := dd.doTick(ctx)
+	if err != nil {
+		log.Printf("device data daemon tick error: %s", err)
+	}
+	runEvery(dd.RefreshInterval, func() {
+		err := dd.doTick(ctx)
+		if err != nil {
+			log.Printf("device data daemon tick error: %s", err)
+		}
+	})
 }
 
 func (dd DeviceData) doTick(ctx *cli.Context) error {
@@ -61,6 +70,12 @@ func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
 		return viewmodel.ClockData{}, err
 	}
 
+	err = dd.saveToken(token)
+
+	if err != nil {
+		return viewmodel.ClockData{}, err
+	}
+
 	apiClient, err := serviceclient.MakeAPIClient(cfg, token)
 	if err != nil {
 		return viewmodel.ClockData{}, err
@@ -73,6 +88,22 @@ func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
 	}
 
 	return *clockData, nil
+}
+
+func (dd DeviceData) saveToken(token string) error {
+	cfg, err := dd.CfgStore.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	cfg.SetAccessToken(token)
+
+	err = dd.CfgStore.SetConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (dd DeviceData) getClockData(apiClient *apiclient.Client) (*viewmodel.ClockData, error) {

@@ -91,6 +91,10 @@ func (cfg Config) GetAPIBaseURL() string {
 
 var ErrCfgNotFound = fmt.Errorf("config item not found")
 
+func (cfg Config) SetAccessToken(token string) {
+	cfg.Config["access-token"] = token
+}
+
 func (cfg Config) GetAccessToken() (string, error) {
 	token, ok := cfg.Config["access-token"]
 	if !ok {

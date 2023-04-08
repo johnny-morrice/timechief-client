@@ -26,7 +26,7 @@ func MakeAuthnClient(cfg store.Config) (*authnclient.Client, error) {
 		RetryWaitTime:    5 * time.Second,
 		RetryMaxWaitTime: 30 * time.Second,
 		RetryCount:       5,
-		DumpHTTP:         true,
+		DumpHTTP:         false,
 	}
 	loggerCfg := config.Config{
 		Logger: config.LoggerConfig{
@@ -67,7 +67,7 @@ func MakeAPIClient(cfg store.Config, token string) (*apiclient.Client, error) {
 		RetryWaitTime:    5 * time.Second,
 		RetryMaxWaitTime: 30 * time.Second,
 		RetryCount:       5,
-		DumpHTTP:         true,
+		DumpHTTP:         false,
 	}
 	loggerCfg := config.Config{
 		Logger: config.LoggerConfig{
@@ -121,7 +121,7 @@ func MakePublicClient(cfg store.Config) (*publicclient.Client, error) {
 		RetryWaitTime:    5 * time.Second,
 		RetryMaxWaitTime: 30 * time.Second,
 		RetryCount:       5,
-		DumpHTTP:         true,
+		DumpHTTP:         false,
 	}
 	loggerCfg := config.Config{
 		Logger: config.LoggerConfig{
