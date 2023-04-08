@@ -101,7 +101,7 @@ func (dd DeviceData) getToken(authnClient *authnclient.Client, cfg store.Config,
 	tokenResp, err := authnClient.Token.CreateToken(ctx, &viewmodel.TokenRequest{
 		DeviceSerial: serial,
 		DeviceSecret: secret,
-		Scopes:       []string{"clock-data:read"},
+		Scopes:       []string{"clock-data:read", "pairing:get", "pairing:create", "pairing:complete"},
 		TokenPolicy:  viewmodel.DevicePolicy,
 	})
 
