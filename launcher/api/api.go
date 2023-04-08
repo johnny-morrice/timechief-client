@@ -25,6 +25,8 @@ type APIService interface {
 	GetTarget() (service.LaunchTarget, error)
 	RecoverTarget() (service.TargetStatus, error)
 	GetConfig() (store.Config, error)
+	PairDevice() error
+	GetPairingStatus() (service.PairingStatus, error)
 }
 
 func (api API) HandleGetTarget(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +69,34 @@ func (api API) HandleGetDeviceData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, data)
+}
+
+func (api API) HandlePostPairing(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	err := api.Service.PairDevice()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("Failed to get target: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (api API) HandleGetPairing(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	status, err := api.Service.GetPairingStatus()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("Failed to get target: %v", err)
+		return
+	}
+	writeJSON(w, status)
 }
 
 func (api API) HandleRecoverTargetStatus(w http.ResponseWriter, r *http.Request) {

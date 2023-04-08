@@ -2,6 +2,7 @@ package daemon
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -52,6 +53,17 @@ func (p Pairing) doTick(ctx *cli.Context) error {
 	}
 
 	if isPairingRequested {
+		cfg, err := p.ConfigStore.GetConfig()
+		if err != nil {
+			return fmt.Errorf("error getting config: %s", err)
+		}
+		_, err = cfg.GetPairingCode()
+		if err != nil && !errors.Is(err, store.ErrCfgNotFound) {
+			return fmt.Errorf("error getting pairing code: %s", err)
+		} else if errors.Is(err, store.ErrCfgNotFound) {
+			return p.createPairing()
+		}
+
 		status, err := p.getPairingState()
 		if err != nil {
 			return fmt.Errorf("error getting pairing state: %s", err)
@@ -64,6 +76,33 @@ func (p Pairing) doTick(ctx *cli.Context) error {
 		case "linked":
 			return p.handlePairingLinked()
 		}
+	}
+	return nil
+}
+
+func (p Pairing) createPairing() error {
+	cfg, err := p.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("error getting config: %s", err)
+	}
+	token, err := cfg.GetAccessToken()
+	if err != nil {
+		return fmt.Errorf("error getting access token: %s", err)
+	}
+	client, err := serviceclient.MakeAPIClient(cfg, token)
+	if err != nil {
+		return fmt.Errorf("error making api client: %s", err)
+	}
+	ctx, cancel := p.newClientContext()
+	defer cancel()
+	code, err := client.Pairing.CreatePairing(ctx)
+	if err != nil {
+		return fmt.Errorf("error creating pairing: %s", err)
+	}
+	cfg.SetPairingCode(code.Code)
+	err = p.ConfigStore.SetConfig(cfg)
+	if err != nil {
+		return fmt.Errorf("error setting config: %s", err)
 	}
 	return nil
 }

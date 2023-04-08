@@ -27,9 +27,10 @@ func Daemon(ctx *cli.Context) error {
 		}
 	}
 
+	flagStore := store.StateFlagStore{Db: db}
+
 	isClearState := ctx.Bool("clear-state")
 	if isClearState {
-		flagStore := store.StateFlagStore{Db: db}
 		err = flagStore.DeleteAll()
 		if err != nil {
 			return err
@@ -54,10 +55,8 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	updateDaemon := daemon.Update{
-		Updater: up,
-		StateFlagStore: store.StateFlagStore{
-			Db: db,
-		},
+		Updater:               up,
+		StateFlagStore:        flagStore,
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
 	deviceDataDaemon := daemon.DeviceData{
@@ -66,8 +65,16 @@ func Daemon(ctx *cli.Context) error {
 		RequestTimeout:  ctx.Duration("service-request-timeout"),
 		RefreshInterval: ctx.Duration("service-refresh-interval"),
 	}
+	pairingDaemon := daemon.Pairing{
+		ConfigStore:          cfgStore,
+		StateFlagStore:       flagStore,
+		PairingCheckInterval: ctx.Duration("pairing-check-interval"),
+		RequestTimeout:       ctx.Duration("service-request-timeout"),
+	}
+
 	go updateDaemon.Start(ctx)
 	go deviceDataDaemon.Start(ctx)
+	go pairingDaemon.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
