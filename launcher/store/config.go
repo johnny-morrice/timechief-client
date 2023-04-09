@@ -13,7 +13,7 @@ type ConfigEntry struct {
 	ID        uint `gorm:"primarykey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Key       string
+	Key       string `gorm:"uniqueIndex"`
 	Value     string
 }
 
