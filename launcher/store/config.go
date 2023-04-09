@@ -3,15 +3,18 @@ package store
 import (
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type ConfigEntry struct {
-	gorm.Model
-	Key   string
-	Value string
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Key       string
+	Value     string
 }
 
 type Config struct {
