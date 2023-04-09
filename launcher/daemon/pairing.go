@@ -53,6 +53,7 @@ func (p Pairing) doTick(ctx *cli.Context) error {
 	}
 
 	if isPairingRequested {
+		log.Println("handling pairing request")
 		cfg, err := p.ConfigStore.GetConfig()
 		if err != nil {
 			return fmt.Errorf("error getting config: %s", err)

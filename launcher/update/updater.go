@@ -134,13 +134,13 @@ func (up Updater) SyncAPIVersions(ctx *cli.Context) error {
 
 	for _, version := range versions {
 		// Decode base64 encoded SHA256
-		log.Printf("processing version %s UUID: %s Command: %v", version.Version, version.UUID, version.Command)
-		log.Printf("decoding sha %s", version.SHA256)
+		// log.Printf("processing version %s UUID: %s Command: %v", version.Version, version.UUID, version.Command)
+		// log.Printf("decoding sha %s", version.SHA256)
 		shaBytes, err := base64.StdEncoding.DecodeString(version.SHA256)
 		if err != nil {
 			return err
 		}
-		log.Printf("decoded sha %x", shaBytes)
+		// log.Printf("decoded sha %x", shaBytes)
 		storeVersion := store.Version{
 			UUID:    version.UUID,
 			Version: version.Version,

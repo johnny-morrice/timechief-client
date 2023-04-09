@@ -31,7 +31,7 @@ func (store VersionStore) GetVersions() ([]Version, error) {
 }
 
 func (store VersionStore) CreateIfNotExists(v *Version) error {
-	log.Printf("creating version %s if not exists with UUID %s", v.Version, v.UUID)
+	// log.Printf("creating version %s if not exists with UUID %s", v.Version, v.UUID)
 	var count int64
 	result := store.Db.Model(&Version{}).Where("uuid = ?", v.UUID).Count(&count)
 	if result.Error != nil {
@@ -44,7 +44,7 @@ func (store VersionStore) CreateIfNotExists(v *Version) error {
 			return result.Error
 		}
 	}
-	log.Printf("version %s exists", v.Version)
+	// log.Printf("version %s exists", v.Version)
 	return nil
 }
 

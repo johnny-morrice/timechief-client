@@ -36,6 +36,7 @@ func (dd DeviceData) Start(ctx *cli.Context) {
 }
 
 func (dd DeviceData) doTick(ctx *cli.Context) error {
+	log.Println("downloading device data")
 	data, err := dd.FetchLatest()
 	if err != nil {
 		return err
