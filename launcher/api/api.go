@@ -18,6 +18,7 @@ func (api *API) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/config", api.HandleGetConfig)
 	mux.HandleFunc("/api/target", api.HandleGetTarget)
 	mux.HandleFunc("/api/target/recover", api.HandleRecoverTargetStatus)
+	mux.HandleFunc("/api/pairing", api.HandlePairing)
 }
 
 type APIService interface {
@@ -69,6 +70,17 @@ func (api API) HandleGetDeviceData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, data)
+}
+
+func (api API) HandlePairing(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		api.HandleGetPairing(w, r)
+	case "POST":
+		api.HandlePostPairing(w, r)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
 }
 
 func (api API) HandlePostPairing(w http.ResponseWriter, r *http.Request) {
