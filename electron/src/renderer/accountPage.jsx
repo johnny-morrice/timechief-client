@@ -43,6 +43,13 @@ export const AccountPage = () => {
             if (hasPairingCode(pairingCode)) {
                 sendPairingGetRequest(accountSignals.pairingCode());
             }
+            // Pairing is complete if we've got a code and the state is now none.
+            if (data["State"] == "none" && accountSignals.pairingCode() && accountSignals.pairingCode.length > 0) {
+                accountSignals.setPairingCode("");
+                if (pairingGetInterval != null) {
+                    clearInterval(pairingGetInterval);
+                }
+            }
             if (pairingQrCodeCanvas == null) {
                 let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
                 pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
@@ -51,17 +58,7 @@ export const AccountPage = () => {
             }
         }, 300);
     });
-    addPairingCompleteCallback((data) => {
-        if (data["ok"]) {
-            accountSignals.setPairingCode("");
-            if (pairingGetInterval != null) {
-                clearInterval(pairingGetInterval);
-            }
-            sendSessionRemoveRequest();
-        }
 
-        
-    });
     addPairingGetCallback((data) => {
         if (data["Status"] == "linked") {
             let pairingCode = accountSignals.pairingCode();
