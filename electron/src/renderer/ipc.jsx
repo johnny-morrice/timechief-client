@@ -31,9 +31,7 @@ class APIResultReceiver {
 
 export const pairingCreateReceiver = new APIResultReceiver("pairingCreateResult");
 export const pairingGetReceiver = new APIResultReceiver("pairingGetResult");
-export const pairingCompleteReceiver = new APIResultReceiver("pairingCompleteResult");
 export const clockDataReceiver = new APIResultReceiver("clockDataResult");
-export const sessionRemoveReceiver = new APIResultReceiver("sessionRemoveResult");
 
 const deviceCallbacks = [];
 function receiveRedeployStatus() {
