@@ -39,33 +39,22 @@ export const AccountPage = () => {
         console.log(`pairing create result: ${JSON.stringify(data)}`);
         accountSignals.setPairingCode(data["Code"]);
         pairingGetInterval = setInterval(() => {
-            let pairingCode = accountSignals.pairingCode();
-            if (hasPairingCode(pairingCode)) {
-                sendPairingGetRequest(accountSignals.pairingCode());
-            }
-            // Pairing is complete if we've got a code and the state is now none.
-            if (data["State"] == "none" && accountSignals.pairingCode() && accountSignals.pairingCode.length > 0) {
-                accountSignals.setPairingCode("");
-                if (pairingGetInterval != null) {
-                    clearInterval(pairingGetInterval);
-                }
-            }
-            if (pairingQrCodeCanvas == null) {
-                let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
-                pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
-                canvasWrapper.appendChild(pairingQrCodeCanvas);
-                toCanvas(pairingQrCodeCanvas, `${accountSignals.wwwBaseURL()}/pairing?pairingCode=${encodeURIComponent(pairingCode)}`);
-            }
+                sendPairingGetRequest();
         }, 300);
     });
 
     addPairingGetCallback((data) => {
-        if (data["Status"] == "linked") {
-            let pairingCode = accountSignals.pairingCode();
-            if (hasPairingCode(pairingCode)) {
-                sendPairingCompleteRequest(pairingCode);
-            } else {
-                console.log("cannot complete pairing, lost pairing code");
+        if (pairingQrCodeCanvas == null) {
+            let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
+            pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
+            canvasWrapper.appendChild(pairingQrCodeCanvas);
+            toCanvas(pairingQrCodeCanvas, `${accountSignals.wwwBaseURL()}/pairing?pairingCode=${encodeURIComponent(pairingCode)}`);
+        }
+        // Pairing is complete if we've got a code and the state is now none.
+        if (data["Status"] == "none" && hasPairingCode(accountSignals.pairingCode())) {
+            accountSignals.setPairingCode("");
+            if (pairingGetInterval != null) {
+                clearInterval(pairingGetInterval);
             }
         }
     });
