@@ -60,14 +60,6 @@ export function addPairingGetCallback(cb) {
     pairingGetReceiver.addCallback(cb);
 }
 
-export function addPairingCompleteCallback(cb) {
-    pairingCompleteReceiver.addCallback(cb);
-}
-
-export function addSessionRemoveCallback(cb) {
-    sessionRemoveReceiver.addCallback(cb);
-}
-
 export function triggerRedeploy() {
     console.log("triggering redeploy...");
     window.device.send("deviceCommand", {'command': 'redeploy'});
@@ -87,14 +79,6 @@ export function sendPairingCreateRequest() {
 
 export function sendPairingGetRequest(pairingCode) {
     window.api.send("pairingGet", pairingCode);
-}
-
-export function sendPairingCompleteRequest(pairingCode) {
-    window.api.send("pairingComplete", pairingCode);
-}
-
-export function sendSessionRemoveRequest() {
-    window.api.send("sessionRemove");
 }
 
 export function initializeIPC() {

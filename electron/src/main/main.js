@@ -6,6 +6,7 @@ const axios = require('axios');
 const { exec } = require('child_process');
 const winston = require('winston');
 const { networkInterfaces } = require('os');
+import { LauncherClient } from './launcherclient';
 
 function getIpAddress() {
   const nets = networkInterfaces();
@@ -128,160 +129,7 @@ function callAPI(config) {
   return axiosAPI(config);
 }
 
-class API {
-  constructor() {
-    this.jwt = "Bearer UninitialisedGarbage";
-    this.authorised = false;
-    this.clockSerial = process.env.clockSerial;
-    this.clockSecret = process.env.clockSecret;
-    this.baseURL = process.env.clockAPIBaseURL;
-    this.jwtTimeout = new Date();
-  }
-
-  timeoutNow() {
-    this.jwtTimeout = new Date();
-  }
-
-  incrementJwtTimeout() {
-    let duration =  23 * 60 * 60 * 1000;
-    this.jwtTimeout = new Date(this.jwtTimeout.getTime() + duration);
-  }
-
-  doGetClockData(jwt) {
-    let apiURL = this.baseURL + '/api/clockdata';
-    let config = {
-      url: apiURL,
-      method: "get",
-    };
-    addAuthHeader(config, jwt);
-    return callAPI(config).then(resp => {
-      if (resp.status == 200) {
-        return resp.data;
-      }
-    });
-  }
-
-  doSessionRemove(jwt) {
-    let self = this;
-    let apiURL = self.baseURL + '/api/session';
-    let config = {
-      url: apiURL,
-      method: "delete",
-    };
-    addAuthHeader(config, jwt);
-    return callAPI(config).then(resp => {
-      self.timeoutNow();
-      return {"ok" : resp.status == 204};
-    });
-  }
-
-  doPairingCreate(jwt) {
-    let apiURL = this.baseURL + '/api/pairing';
-    let config = {
-      url: apiURL,
-      method: "post",
-    };
-    addAuthHeader(config, jwt);
-    return callAPI(config).then(resp => {
-      if (resp.status == 200) {
-        return resp.data;
-      }
-    });
-  }
-
-  doPairingGet(jwt, pairingCode) {
-    let apiURL = this.baseURL + '/api/pairing/' + encodeURIComponent(pairingCode);
-    let config = {
-      url: apiURL,
-      method: "get",
-    };
-    addAuthHeader(config, jwt);
-    return callAPI(config).then(resp => {
-      if (resp.status == 200) {
-        return resp.data;
-      }
-    });
-  }
-
-  doPairingComplete(jwt, pairingCode) {
-    let apiURL = this.baseURL + '/api/pairing/' + encodeURIComponent(pairingCode);
-    let config = {
-      url: apiURL,
-      method: "post",
-    };
-    addAuthHeader(config, jwt);
-    return callAPI(config).then(resp => {
-      return {"ok" : resp.status == 204};
-    });
-  }
-
-  getClockData() {
-    let self = this;
-    return self.callAPIWithJWT((jwt) => self.doGetClockData(jwt));
-  }
-
-  pairingCreate() {
-    let self = this;
-    return self.callAPIWithJWT((jwt) => self.doPairingCreate(jwt));
-  }
-
-  pairingGet(pairingCode) {
-    let self = this;
-    return self.callAPIWithJWT((jwt) => self.doPairingGet(jwt, pairingCode));
-  }
-
-  pairingComplete(pairingCode) {
-    let self = this;
-    return self.callAPIWithJWT((jwt) => self.doPairingComplete(jwt, pairingCode));
-  }
-
-  sessionRemove() {
-    let self = this;
-    return self.callAPIWithJWT((jwt) => self.doSessionRemove(jwt));
-  }
-
-  callAPIWithJWT(cb) {
-    let self = this;
-    // Get a JWT if the old one has timed out.
-    // The easiest way to be robust is simply to refresh login every so often.
-    let now = new Date();
-    if (self.jwtTimeout.getTime() < now.getTime()) {
-      let authnURL = this.baseURL + '/authn/token';
-      let authBody = {
-        'DeviceSerial': this.clockSerial,
-        'DeviceSecret': this.clockSecret,
-        'TokenPolicy': 'Device',
-        'Scopes': ['clock-data:read', 'pairing:create', 'pairing:get', 'pairing:complete']
-      }
-      let setJwtCache = (response) => {
-        if (response.status == 401) {
-          logger.error("bad serial or secret");
-        } else if (response.status == 200) {
-          logger.info("success getting JWT")
-          self.jwt = `Bearer ${response.data["JWT"]}`;
-          self.incrementJwtTimeout();
-        } else {
-          logger.error(`bad status getting jwt: ${response.status}`)
-        }
-        return self.jwt;
-      }
-      const authnConfig = {
-        url: authnURL,
-        method: 'post',
-        data: authBody,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      };
-      return callAPI(authnConfig).then(setJwtCache).then(jwt => cb(jwt));
-    }
-
-    return cb(self.jwt);
-  }
-
-};
-
-var api = new API()
+var client = new LauncherClient();
 
 function redeployDevEnvironment(callback) {
   exec(process.env.redeployCommand, (err, stdout, stderr) => {
@@ -315,18 +163,15 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
         mainWindow.webContents.send(receiveChan, json)
       })
       .catch(error => {
-        api.timeoutNow();
         logger.error(`error calling ${sendChan} API: ${error}`)
         mainWindow.webContents.send(receiveChan, {"APIError": error});
       });
   });
 }
 
-handleIPCAPICall("pairingCreate", "pairingCreateResult", () => api.pairingCreate());
-handleIPCAPICall("pairingGet", "pairingGetResult", (pairingCode) => api.pairingGet(pairingCode));
-handleIPCAPICall("pairingComplete", "pairingCompleteResult", (pairingCode) => api.pairingComplete(pairingCode));
-handleIPCAPICall("getClockData", "clockDataResult", () => api.getClockData());
-handleIPCAPICall("sessionRemove", "sessionRemoveResult", () => api.sessionRemove());
+handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.pairingCreate());
+handleIPCAPICall("pairingGet", "pairingGetResult", (pairingCode) => client.pairingGet(pairingCode));
+handleIPCAPICall("getClockData", "clockDataResult", () => client.getClockData());
 
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {

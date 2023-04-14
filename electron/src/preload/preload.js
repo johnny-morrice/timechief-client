@@ -3,13 +3,13 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld(
     "api", {
         send: (channel, ...args) => {
-            let validChannels = ["getClockData", "pairingCreate", "pairingGet", "pairingComplete", "sessionRemove"];
+            let validChannels = ["getClockData", "pairingCreate", "pairingGet"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, ...args);
             }
         },
         receive: (channel, func) => {
-            let validChannels = ["clockDataResult", "pairingCreateResult", "pairingGetResult", "pairingCompleteResult", "sessionRemoveResult"];
+            let validChannels = ["clockDataResult", "pairingCreateResult", "pairingGetResult"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.on(channel, (event, ...args) => func(...args));
             }
