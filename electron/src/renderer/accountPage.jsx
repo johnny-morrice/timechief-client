@@ -56,6 +56,7 @@ export const AccountPage = () => {
             if (pairingGetInterval != null) {
                 clearInterval(pairingGetInterval);
             }
+            removeQrCode();
         }
     });
     initialised = true;

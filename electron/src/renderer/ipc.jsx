@@ -75,8 +75,8 @@ export function sendPairingCreateRequest() {
     window.api.send("pairingCreate");
 }
 
-export function sendPairingGetRequest(pairingCode) {
-    window.api.send("pairingGet", pairingCode);
+export function sendPairingGetRequest() {
+    window.api.send("pairingGet");
 }
 
 export function initializeIPC() {
