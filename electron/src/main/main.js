@@ -128,7 +128,7 @@ class LauncherClient {
 
   getPairing() {
     let cfg = {
-      url: this.baseURL + '/api;/pairing',
+      url: this.baseURL + '/api/pairing',
       method: 'get'
     };
     return this.axios(cfg).then(resp => {
