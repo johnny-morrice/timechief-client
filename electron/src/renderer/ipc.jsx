@@ -47,7 +47,11 @@ export function addDeviceStatusCallback(cb) {
 }
 
 export function addClockDataCallback(cb) {
-    clockDataReceiver.addCallback(cb);
+    clockDataReceiver.addCallback((data) => {
+        if ("ServiceData" in data) {
+            cb(data["ServiceData"])
+        }
+    });
 }
 
 export function addPairingCreateCallback(cb) {
@@ -94,6 +98,5 @@ export function initializeIPC() {
     clockDataReceiver.receive();
     pairingCreateReceiver.receive();
     pairingGetReceiver.receive();
-    pairingCompleteReceiver.receive();
     return [deviceInterval, apiInterval];
 }

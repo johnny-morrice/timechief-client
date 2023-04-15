@@ -19,7 +19,7 @@ function updateSignals(signals, data) {
     let calendar = data["Calendar"];
     let calendarLastUpdated = calendar["LastUpdated"];
     var calendarLastDate = null;
-    if (calendarLastUpdated != 0) {
+    if (calendarLastUpdated && calendarLastUpdated != 0) {
         calendarLastDate = new Date(calendarLastUpdated * 1000);
     }
     signals.setCalendarExists(isCalendarExists(data));
