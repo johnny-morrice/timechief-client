@@ -1,5 +1,5 @@
 import { createSignal, Show } from 'solid-js';
-import { addClockDataCallback } from './ipc';
+import { addServiceDataCallback } from './ipc';
 import { kelvinToCelsiusText } from './temperature';
 import { weatherIconStyleClass } from './weatherIcon';
 
@@ -73,7 +73,7 @@ let forecastSignals = new ForecastPageSignals();
 export const ForecastPage = () => {
   
   if (!initialised) {
-    addClockDataCallback((data) => updateForecastPageSignals(forecastSignals, data));
+    addServiceDataCallback((data) => updateForecastPageSignals(forecastSignals, data));
     initialised = true;
   }
 

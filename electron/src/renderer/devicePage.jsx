@@ -12,7 +12,8 @@ class DeviceSignals {
 }
 
 function getDeviceStatus(signals) {
-    let launcherState = signals.launcherState()
+    let launcherState = signals.launcherState();
+    console.log("launcher state: ", JSON.stringify(launcherState));
     if ("Flags" in launcherState) {
         let isUpdating = launcherState["Flags"].includes("updating");
         if (isUpdating) {
