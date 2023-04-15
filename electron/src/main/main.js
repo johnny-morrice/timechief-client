@@ -30,6 +30,10 @@ function getWwwBaseURL() {
   return process.env.wwwBaseURL;
 }
 
+function getAPIBaseURL() {
+  return process.env.clockAPIBaseURL;
+}
+
 function getWidth() {
   return process.env.width || 800;
 }
@@ -107,11 +111,12 @@ app.on('window-all-closed', function () {
 class LauncherClient {
   constructor(axios) {
     this.axios = axios;
+    this.baseURL = getAPIBaseURL();
   }
 
   createPairing() {
     let cfg = {
-      url: getWwwBaseURL() + '/api/pairing',
+      url: this.baseURL + '/api/pairing',
       method: 'post'
     };
     return this.axios(cfg).then(resp => {
@@ -123,7 +128,7 @@ class LauncherClient {
 
   getPairing() {
     let cfg = {
-      url: getWwwBaseURL() + '/api/pairing',
+      url: this.baseURL + '/api;/pairing',
       method: 'get'
     };
     return this.axios(cfg).then(resp => {
@@ -134,7 +139,7 @@ class LauncherClient {
   }
   getDeviceData() {
     let cfg = {
-      url: getWwwBaseURL() + '/api/device',
+      url: this.baseURL + '/api/device',
       method: 'get'
     };
     return this.axios(cfg).then(resp => {
@@ -192,7 +197,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
 
 handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.pairingCreate());
 handleIPCAPICall("pairingGet", "pairingGetResult", (pairingCode) => client.pairingGet(pairingCode));
-handleIPCAPICall("getClockData", "clockDataResult", () => client.getClockData());
+handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());
 
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {
