@@ -46,12 +46,16 @@ export function addDeviceStatusCallback(cb) {
     deviceCallbacks.push(cb);
 }
 
-export function addClockDataCallback(cb) {
+export function addServiceDataCallback(cb) {
     clockDataReceiver.addCallback((data) => {
         if ("ServiceData" in data) {
             cb(data["ServiceData"])
         }
     });
+}
+
+export function addDataCallback(cb) {
+    clockDataReceiver.addCallback(cb);
 }
 
 export function addPairingCreateCallback(cb) {

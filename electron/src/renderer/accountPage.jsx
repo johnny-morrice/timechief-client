@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addClockDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, addPairingGetCallback, addPairingCreateCallback } from './ipc';
+import { addServiceDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, addPairingGetCallback, addPairingCreateCallback } from './ipc';
 import { toCanvas } from 'qrcode';
 
 class AccountPageSignals {
@@ -33,7 +33,7 @@ export const AccountPage = () => {
     removeQrCode();
   });
   if (!initialised) {
-    addClockDataCallback((data) => updateAccountPageSignals(accountSignals, data));
+    addServiceDataCallback((data) => updateAccountPageSignals(accountSignals, data));
     addDeviceStatusCallback((data) => updateAccountPageSignalsFromDevice(accountSignals, data));
     addPairingCreateCallback(() => {
         pairingGetInterval = setInterval(() => {

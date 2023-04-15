@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addClockDataCallback, addDeviceStatusCallback, triggerRedeploy } from './ipc';
+import { addServiceDataCallback, addDeviceStatusCallback, triggerRedeploy } from './ipc';
 
 class DevicePageSignals {
   constructor() {
@@ -38,7 +38,7 @@ let deviceSignals = new DeviceSignals();
 export const DevicePage = () => {
 
   if (!initialised) {
-    addClockDataCallback((data) => updateDevicePageSignals(configSignals, data));
+    addServiceDataCallback((data) => updateDevicePageSignals(configSignals, data));
     addDeviceStatusCallback((status) => updateDeviceSignals(deviceSignals, status));
     initialised = true;
   }

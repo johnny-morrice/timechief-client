@@ -1,6 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { isCalendarExists } from './calendarHelper';
-import { addClockDataCallback } from './ipc';
+import { addServiceDataCallback } from './ipc';
 import { apiErrorTimeout, calendarErrorTimeout, second } from './timing'
 
 class StatusBarSignals {
@@ -57,7 +57,7 @@ var initialised = false;
 export const StatusBar = () => {
     let signals = new StatusBarSignals();
     if (!initialised) {
-        addClockDataCallback((data) => updateSignals(signals, data));
+        addServiceDataCallback((data) => updateSignals(signals, data));
         initialised = true;
     }
     let updateRefreshTimeInterval = setInterval(
