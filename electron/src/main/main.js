@@ -150,7 +150,7 @@ const axiosAPI = axios.create({
 });
 require('axios-debug-log').addLogger(axiosAPI, logger.debug);
 
-var client = new launcherclient.LauncherClient(axiosAPI);
+var client = new LauncherClient(axiosAPI);
 
 function redeployDevEnvironment(callback) {
   exec(process.env.redeployCommand, (err, stdout, stderr) => {
