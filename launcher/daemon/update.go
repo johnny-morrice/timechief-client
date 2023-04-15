@@ -35,6 +35,7 @@ func (daemon Update) doTick(ctx *cli.Context) error {
 		return err
 	}
 	defer func() {
+		log.Println("update done")
 		err := daemon.StateFlagStore.Delete(UpdatingFlag)
 		if err != nil {
 			log.Println(err.Error())
