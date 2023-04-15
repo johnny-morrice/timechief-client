@@ -1,4 +1,4 @@
-export class LauncherClient {
+class LauncherClient {
     createPairing() {
 
     }

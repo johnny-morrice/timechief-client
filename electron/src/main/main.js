@@ -6,7 +6,7 @@ const axios = require('axios');
 const { exec } = require('child_process');
 const winston = require('winston');
 const { networkInterfaces } = require('os');
-import { LauncherClient } from './launcherclient';
+const { launcherClient } = require('./launcherclient')
 
 function getIpAddress() {
   const nets = networkInterfaces();
@@ -104,19 +104,44 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-function addFishTag(options) {
-  if (!("headers" in options)) {
-    options["headers"] = {};
+class LauncherClient {
+  constructor(axios) {
+    this.axios = axios;
   }
-  options["headers"]["X-Fish-Tag"] = uuidv4();
-}
 
-function addAuthHeader(options, authHeader) {
-  if (!("headers" in options)) {
-    options["headers"] = {};
+  createPairing() {
+    let cfg = {
+      url: getWwwBaseURL() + '/api/pairing',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 204) {
+        return resp.data;
+      }
+    });
   }
-  if (authHeader) {
-    options["headers"]["Authorization"] = authHeader;
+
+  getPairing() {
+    let cfg = {
+      url: getWwwBaseURL() + '/api/pairing',
+      method: 'get'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return {};
+      }
+    });
+  }
+  getDeviceData() {
+    let cfg = {
+      url: getWwwBaseURL() + '/api/device',
+      method: 'get'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return resp.data;
+      }
+    });
   }
 }
 
@@ -124,12 +149,8 @@ const axiosAPI = axios.create({
     timeout: 10 * 1000,
 });
 require('axios-debug-log').addLogger(axiosAPI, logger.debug);
-function callAPI(config) {
-  addFishTag(config);
-  return axiosAPI(config);
-}
 
-var client = new LauncherClient();
+var client = new launcherclient.LauncherClient(axiosAPI);
 
 function redeployDevEnvironment(callback) {
   exec(process.env.redeployCommand, (err, stdout, stderr) => {

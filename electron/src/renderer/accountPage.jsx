@@ -35,15 +35,17 @@ export const AccountPage = () => {
   if (!initialised) {
     addClockDataCallback((data) => updateAccountPageSignals(accountSignals, data));
     addDeviceStatusCallback((data) => updateAccountPageSignalsFromDevice(accountSignals, data));
-    addPairingCreateCallback((data) => {
-        console.log(`pairing create result: ${JSON.stringify(data)}`);
-        accountSignals.setPairingCode(data["Code"]);
+    addPairingCreateCallback(() => {
         pairingGetInterval = setInterval(() => {
                 sendPairingGetRequest();
         }, 300);
     });
 
     addPairingGetCallback((data) => {
+        if (hasPairingCode(data["Code"])) {
+            accountSignals.setPairingCode(data["Code"]);
+        }
+        
         if (pairingQrCodeCanvas == null) {
             let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
             pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
@@ -77,7 +79,7 @@ export const AccountPage = () => {
   }
 
   function hasPairingCode(pairingCode) {
-      return pairingCode.length > 0;
+      return pairingCode && pairingCode.length > 0;
   }
 
   function onClickLinkAccountButton() {
