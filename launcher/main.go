@@ -171,6 +171,9 @@ func getCLIApp() *cli.App {
 						&cli.StringFlag{
 							Name: "log-file",
 						},
+						&cli.StringFlag{
+							Name: "version",
+						},
 					},
 				},
 				{
