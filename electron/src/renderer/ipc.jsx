@@ -98,6 +98,8 @@ export function initializeIPC() {
     },
         apiRefreshInterval
     );
+    sendClockDataRequest();
+    sendDeviceHeartbeat();
     receiveRedeployStatus();
     clockDataReceiver.receive();
     pairingCreateReceiver.receive();
