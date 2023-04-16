@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"sort"
 
@@ -104,4 +105,8 @@ func FindLatestVersion(cfg Config, versions []Version) (Version, error) {
 
 func (v Version) IsSupportedProductStream(cfg Config) bool {
 	return v.Product == cfg.GetProduct() && v.Stream == cfg.GetStream()
+}
+
+func (v Version) Details() string {
+	return fmt.Sprintf("%s %s %s", v.Product, v.Stream, v.Version)
 }

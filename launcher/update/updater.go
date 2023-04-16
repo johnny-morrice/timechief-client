@@ -52,7 +52,7 @@ func (up Updater) FirstUpdate(ctx *cli.Context) error {
 }
 
 func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v store.Version) error {
-	log.Printf("creating launch target for version: %s", v.Version)
+	log.Printf("creating launch target for version: %s", v.Details())
 	newStoreLt := store.LaunchTarget{}
 	newStoreLt.Path = cfg.NewInstallPath(v.Version)
 	newStoreLt.Version = v
@@ -74,7 +74,7 @@ func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v st
 		return err
 	}
 
-	log.Printf("created launch target for version: %s", v.Version)
+	log.Printf("created launch target for version: %s", v.Details())
 
 	return nil
 }
@@ -92,6 +92,7 @@ func (up Updater) Update(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("update seeking newer version than %s", lt.Version.Details())
 	cfg, err := up.CfgStore.GetConfig()
 	if err != nil {
 		return err
@@ -99,6 +100,7 @@ func (up Updater) Update(ctx *cli.Context) error {
 	newVersion, err := store.FindNewVersion(cfg, lt.Version.Version, versions)
 
 	if errors.Is(err, store.ErrNoVersion) {
+		log.Printf("no new version found")
 		return nil
 	}
 

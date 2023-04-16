@@ -48,7 +48,7 @@ func (lt LaunchTarget) targetPath() string {
 }
 
 func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
-	log.Printf("installing version %s to %s", lt.Version.Version, lt.Path)
+	log.Printf("installing version %s %s %s to %s", lt.Version.Version, lt.Version.Product, lt.Version.Stream, lt.Path)
 	tempFile := lt.versionTempFile()
 	err := lt.Version.Download(cfg, tempFile)
 	if err != nil {
