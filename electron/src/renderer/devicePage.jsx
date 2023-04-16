@@ -17,7 +17,7 @@ function getDeviceStatus(signals) {
     if ("Flags" in launcherState) {
         let isUpdating = launcherState["Flags"].includes("updating");
         if (isUpdating) {
-            return "Updating";
+            return "updating";
         }
     }
     return signals.deviceStatus();
