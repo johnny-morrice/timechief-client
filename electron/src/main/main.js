@@ -1,12 +1,10 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain } = require('electron')
-const { v4: uuidv4 } = require('uuid');
 const path = require('path')
 const axios = require('axios');
 const { exec } = require('child_process');
 const winston = require('winston');
 const { networkInterfaces } = require('os');
-const { launcherClient } = require('./launcherclient')
 
 function getIpAddress() {
   const nets = networkInterfaces();
