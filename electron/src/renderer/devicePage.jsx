@@ -1,6 +1,5 @@
 import { createSignal } from 'solid-js';
 import { addDataCallback, addDeviceStatusCallback, triggerRedeploy } from './ipc';
-const semver = require('semver')
 
 class DeviceSignals {
     constructor() {
