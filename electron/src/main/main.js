@@ -198,8 +198,8 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   });
 }
 
-handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.pairingCreate());
-handleIPCAPICall("pairingGet", "pairingGetResult", (pairingCode) => client.pairingGet(pairingCode));
+handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.createPairing());
+handleIPCAPICall("pairingGet", "pairingGetResult", () => client.getPairing());
 handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());
 
 ipcMain.on("deviceCommand", (event, command) => {
