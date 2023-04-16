@@ -86,7 +86,7 @@ func getCLIApp() *cli.App {
 				},
 				&cli.DurationFlag{
 					Name:  "pairing-check-interval",
-					Value: 1 * time.Second,
+					Value: 5 * time.Second,
 				},
 			},
 		},
