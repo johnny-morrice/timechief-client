@@ -1,5 +1,6 @@
 import { createSignal } from 'solid-js';
 import { addDataCallback, addDeviceStatusCallback, triggerRedeploy } from './ipc';
+const semver = require('semver')
 
 class DeviceSignals {
     constructor() {
@@ -8,6 +9,7 @@ class DeviceSignals {
         [this.deviceStatus, this.setDeviceStatus] = createSignal("unknown");
         [this.launcherState, this.setLauncherState] = createSignal({});
         [this.ipAddress, this.setIpAddress] = createSignal("unknown");
+        [this.clientVersion, this.setClientVersion] = createSignal("");
     }
 }
 
@@ -18,6 +20,13 @@ function getDeviceStatus(signals) {
         let isUpdating = launcherState["Flags"].includes("updating");
         if (isUpdating) {
             return "updating";
+        }
+    }
+    if ("ActiveTargetVersion" in launcherState) {
+        let activeTargetVersion = launcherState["ActiveTargetVersion"];
+        let currentVersion = signals.clientVersion();
+        if (activeTargetVersion !== currentVersion) {
+            return "restart to update";
         }
     }
     return signals.deviceStatus();
@@ -40,6 +49,8 @@ function updateSignalsForElectronStatus(signals, statusResponse) {
     let isEnabled = statusResponse["redeploy_enabled"];
     const status = statusResponse["status"];
     const ipAddress = statusResponse["ip_address"];
+    const clientVersion = statusResponse["client_version"];
+    signals.setClientVersion(clientVersion);
     signals.setDeployEnabled(isEnabled);
     signals.setDeviceStatus(status);
     signals.setIpAddress(ipAddress);

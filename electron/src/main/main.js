@@ -172,12 +172,17 @@ function redeployDevEnvironment(callback) {
   });
 }
 
+function getClientVersion() {
+  return process.env.clientVersion;
+}
+
 function baseDeviceStatus() {
   return {
     "redeploy_enabled": isDevMode,
     "status": "ok",
     "ip_address": getIpAddress(),
-    "www_base_url": getWwwBaseURL()
+    "www_base_url": getWwwBaseURL(),
+    "client_version": getClientVersion()
   }
 }
 
