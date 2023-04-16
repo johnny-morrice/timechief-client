@@ -85,7 +85,8 @@ func FindNewVersion(cfg Config, currentVersion string, versions []Version) (Vers
 	SortVersionsDecreasing(versions)
 	for _, version := range versions {
 		v := version
-		if version.Version > currentVersion && version.IsSupportedProductStream(cfg) {
+		isGt := semver.Compare(version.Version, currentVersion) > 0
+		if isGt && version.IsSupportedProductStream(cfg) {
 			return v, nil
 		}
 	}
