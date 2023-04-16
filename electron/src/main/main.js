@@ -119,7 +119,7 @@ class LauncherClient {
     };
     return this.axios(cfg).then(resp => {
       if (resp.status == 204) {
-        return resp.data;
+        return {};
       }
     });
   }
@@ -131,7 +131,7 @@ class LauncherClient {
     };
     return this.axios(cfg).then(resp => {
       if (resp.status == 200) {
-        return {};
+        return resp.data;
       }
     });
   }
