@@ -16,7 +16,8 @@ type APIService struct {
 }
 
 type LauncherState struct {
-	Flags []string
+	Flags               []string
+	ActiveTargetVersion string
 }
 
 type TargetStatus struct {
@@ -91,10 +92,17 @@ func (svc APIService) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, err
 	}
 
+	target, err := svc.LaunchTargetStore.GetActiveLaunchTarget()
+
+	if err != nil {
+		return DeviceData{}, err
+	}
+
 	result := DeviceData{
 		ServiceData: clockData,
 		LauncherState: LauncherState{
-			Flags: flags,
+			Flags:               flags,
+			ActiveTargetVersion: target.Version.Details(),
 		},
 	}
 
