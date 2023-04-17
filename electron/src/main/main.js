@@ -33,11 +33,11 @@ function getAPIBaseURL() {
 }
 
 function getWidth() {
-  return process.env.width || 800;
+  return process.env.timechief_width || 800;
 }
 
 function getHeight() {
-  return process.env.height || 600;
+  return process.env.timechief_height || 480;
 }
 
 const logger = winston.createLogger({
