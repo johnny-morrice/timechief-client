@@ -40,6 +40,10 @@ function getHeight() {
   return process.env.timechief_height || 480;
 }
 
+function isFullScreen() {
+  return process.env.timechief_fullscreen == 'true';
+}
+
 const logger = winston.createLogger({
   level: 'debug',
   format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
@@ -69,6 +73,7 @@ let isDevMode = process.env.devMode == 'true';
 let mainWindow;
 logger.info(`Starting in ${isDevMode ? 'dev' : 'prod'} mode`);
 logger.info(`Width: ${getWidth()} Height: ${getHeight()}`);
+logger.info(`Fullscreen: ${isFullScreen()}`);
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -78,7 +83,7 @@ function createWindow() {
       preload: path.join(__dirname, '../preload/preload.js'),
     },
     autoHideMenuBar: true,
-    fullscreen: true,
+    fullscreen: isFullScreen(),
     backgroundColor: '#000000',
   })
 
