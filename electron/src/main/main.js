@@ -85,10 +85,15 @@ function createWindow() {
     autoHideMenuBar: true,
     fullscreen: isFullScreen(),
     backgroundColor: '#000000',
+    show: false,
   })
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, '../../frontend-dist/index.html'));
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()
+  })
 }
 
 // This method will be called when Electron has finished
