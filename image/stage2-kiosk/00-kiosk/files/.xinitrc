@@ -1,1 +1,1 @@
-./kiosk.sh
+/opt/timechief/bin/timechief-bootstrap.sh

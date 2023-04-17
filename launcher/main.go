@@ -189,6 +189,14 @@ func getCLIApp() *cli.App {
 						&cli.StringFlag{
 							Name: "install-root",
 						},
+						&cli.IntFlag{
+							Name:    "splash-width",
+							EnvVars: []string{"timechief_width"},
+						},
+						&cli.IntFlag{
+							Name:    "splash-height",
+							EnvVars: []string{"timechief_height"},
+						},
 					},
 				},
 			},
