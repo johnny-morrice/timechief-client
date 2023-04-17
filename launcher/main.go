@@ -38,7 +38,7 @@ func getCLIApp() *cli.App {
 				},
 				&cli.BoolFlag{
 					Name:  "standalone",
-					Value: true,
+					Value: false,
 				},
 				&cli.StringFlag{
 					Name:  "daemon-base-url",
