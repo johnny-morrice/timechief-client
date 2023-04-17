@@ -26,6 +26,16 @@ func LaunchTargetFromStore(storeLT store.LaunchTarget) LaunchTarget {
 }
 
 func (lt LaunchTarget) Run(cfg store.Config) error {
+	clientConfig, err := ReadClientConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	err = clientConfig.ExportEnv()
+	if err != nil {
+		return err
+	}
+
 	logFile := cfg.GetClientLogFilePath()
 	return lt.Execute("target", "run", "--target-root", lt.Path, "--log-file", logFile, "--version", lt.Version.Details())
 }

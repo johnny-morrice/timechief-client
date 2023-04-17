@@ -86,16 +86,6 @@ func runStandaloneClient(ctx *cli.Context) error {
 		return err
 	}
 
-	clientConfig, err := service.ReadClientConfig(cfg)
-	if err != nil {
-		return err
-	}
-
-	err = clientConfig.ExportEnv()
-	if err != nil {
-		return err
-	}
-
 	launchTarget := service.LaunchTargetFromStore(storeTarget)
 
 	// TODO rollback if launch fails.
