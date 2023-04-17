@@ -33,11 +33,11 @@ function getAPIBaseURL() {
 }
 
 function getWidth() {
-  return process.env.timechief_width || 800;
+  return parseInt(process.env.timechief_width);
 }
 
 function getHeight() {
-  return process.env.timechief_height || 480;
+  return parseInt(process.env.timechief_height);
 }
 
 function isFullScreen() {
