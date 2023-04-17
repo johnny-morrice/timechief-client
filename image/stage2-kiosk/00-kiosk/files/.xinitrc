@@ -1,1 +1,1 @@
-/opt/timechief/bin/timechief-bootstrap.sh
+/opt/timechief/bin/timechief-bootstrap
