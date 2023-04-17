@@ -18,8 +18,8 @@ func Install(ctx *cli.Context) error {
 
 	systemExe := filepath.Join(installRoot, "bin/timechief-launcher")
 
-	targetBootstrap := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-bootstrap.sh")
-	systemBootstrap := filepath.Join(installRoot, "bin/timechief-bootstrap.sh")
+	targetBootstrap := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-bootstrap")
+	systemBootstrap := filepath.Join(installRoot, "bin/timechief-bootstrap")
 
 	splashWidth := ctx.Int("splash-width")
 	splashHeight := ctx.Int("splash-height")
