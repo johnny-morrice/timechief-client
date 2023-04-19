@@ -32,9 +32,11 @@ class APIResultReceiver {
 export const pairingCreateReceiver = new APIResultReceiver("pairingCreateResult");
 export const pairingGetReceiver = new APIResultReceiver("pairingGetResult");
 export const clockDataReceiver = new APIResultReceiver("clockDataResult");
+export const rebootReceiver = new APIResultReceiver("rebootResult");
+export const shutdownReceiver = new APIResultReceiver("shutdownResult");
 
 const deviceCallbacks = [];
-function receiveRedeployStatus() {
+function receiveDeviceStatus() {
     window.device.receive("deviceStatus", (status) => {
         deviceCallbacks.forEach(cb => {
             cb(status)
@@ -66,11 +68,6 @@ export function addPairingGetCallback(cb) {
     pairingGetReceiver.addCallback(cb);
 }
 
-export function triggerRedeploy() {
-    console.log("triggering redeploy...");
-    window.device.send("deviceCommand", {'command': 'redeploy'});
-}
-
 export function sendDeviceHeartbeat() {
     window.device.send("deviceCommand", {'command': 'heartbeat'});
 }
@@ -87,6 +84,14 @@ export function sendPairingGetRequest() {
     window.api.send("pairingGet");
 }
 
+export function sendReboot() {
+    window.api.send("reboot");
+}
+
+export function sendShutdown() {
+    window.api.send("shutdown");
+}
+
 export function initializeIPC() {
     let deviceInterval = setInterval(() => {
         sendDeviceHeartbeat();
@@ -100,9 +105,11 @@ export function initializeIPC() {
     );
     sendClockDataRequest();
     sendDeviceHeartbeat();
-    receiveRedeployStatus();
+    receiveDeviceStatus();
     clockDataReceiver.receive();
     pairingCreateReceiver.receive();
     pairingGetReceiver.receive();
+    rebootReceiver.receive();
+    shutdownReceiver.receive();
     return [deviceInterval, apiInterval];
 }

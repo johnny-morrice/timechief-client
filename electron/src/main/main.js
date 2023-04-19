@@ -122,6 +122,38 @@ class LauncherClient {
     this.baseURL = getAPIBaseURL();
   }
 
+  reboot() {
+    let cfg = {
+      url: this.baseURL + '/api/system/reboot',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status != 204) {
+        logger.error(`reboot failed: ${resp.status}`);
+        return {
+          "APIError": "reboot failed"
+        }
+      }
+      return {};
+    });
+  }
+
+  shutdown() {
+    let cfg = {
+      url: this.baseURL + '/api/system/shutdown',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status != 204) {
+        logger.error(`shutdown failed: ${resp.status}`);
+        return {
+          "APIError": "shutdown failed"
+        }
+      }
+      return {};
+    });
+  }
+
   createPairing() {
     let cfg = {
       url: this.baseURL + '/api/pairing',
@@ -165,28 +197,12 @@ require('axios-debug-log').addLogger(axiosAPI, logger.debug);
 
 var client = new LauncherClient(axiosAPI);
 
-function redeployDevEnvironment(callback) {
-  exec(process.env.redeployCommand, (err, stdout, stderr) => {
-    const deviceStatus = baseDeviceStatus();
-
-    if (err) {
-      deviceStatus["status"] = "command failed";
-      deviceStatus["error"] = err;
-    }
-    callback(deviceStatus);
-    // the *entire* stdout and stderr (buffered)
-    logger.info(`redeploy stdout: ${stdout}`);
-    logger.info(`redeploy stderr: ${stderr}`);
-  });
-}
-
 function getClientVersion() {
   return process.env.clientVersion;
 }
 
 function baseDeviceStatus() {
   return {
-    "redeploy_enabled": isDevMode,
     "status": "ok",
     "ip_address": getIpAddress(),
     "www_base_url": getWwwBaseURL(),
@@ -211,22 +227,11 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
 handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.createPairing());
 handleIPCAPICall("pairingGet", "pairingGetResult", () => client.getPairing());
 handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());
+handleIPCAPICall("reboot", "rebootResult", () => client.reboot());
+handleIPCAPICall("shutdown", "shutdownResult", () => client.shutdown());
 
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {
-    case "redeploy":
-      if (isDevMode) {
-        logger.warn("redeploying device");
-        redeployDevEnvironment(function (redeployStatus) {
-          mainWindow.webContents.send("deviceStatus", redeployStatus);
-        });
-      } else {
-        logger.error("requested redeploy but not dev mode");
-        const deviceStatus = baseDeviceStatus();
-        deviceStatus["status"] = "command failed";
-        mainWindow.webContents.send("deviceStatus", deviceStatus)
-      }
-      break;
     case "heartbeat":
       logger.debug("handling device heartbeat")
       mainWindow.webContents.send("deviceStatus", baseDeviceStatus());
