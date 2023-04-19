@@ -57,7 +57,6 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 CATEND
-    systemctl daemon-reload
     systemctl enable timechief-launcher
 EOF
 
