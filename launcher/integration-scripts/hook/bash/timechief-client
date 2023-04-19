@@ -11,4 +11,4 @@ fi
 
 cd $WORK_DIR
 export clientVersion=$CLIENT_VERSION
-./timechief-client-electron . 2>&1 >> $LOG_FILE
+./timechief-client-electron . 2>&1 | multilog t s10485760 n10 $LOG_FILE
