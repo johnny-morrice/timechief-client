@@ -140,5 +140,5 @@ func (svc APIService) Reboot() error {
 }
 
 func (svc APIService) Shutdown() error {
-	return svc.System.Reboot()
+	return svc.System.Shutdown()
 }
