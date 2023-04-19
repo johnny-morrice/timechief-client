@@ -10,4 +10,4 @@ gir1.2-webkit2-4.0
 xdotool
 vim
 daemontools
-daemontools-run
+openssh-server

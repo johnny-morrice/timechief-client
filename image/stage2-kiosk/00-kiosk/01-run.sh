@@ -40,3 +40,8 @@ ExecStart=
 ExecStart=-/sbin/agetty --noissue --skip-login --autologin $FIRST_USER_NAME --noclear %I \$TERM
 CATEND
 EOF
+
+# SSH
+on_chroot << EOF
+    systemctl enable ssh
+EOF
