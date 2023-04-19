@@ -42,7 +42,7 @@ EOF
 
 # timechief-launcher daemon.
 on_chroot << EOF
-cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << CATEND
+cat > /etc/systemd/system/timechief-launcher.service << CATEND
 [Unit]
 Description=TimeChief Launcher Service
 After=network.target
