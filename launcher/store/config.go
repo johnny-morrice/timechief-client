@@ -152,5 +152,5 @@ func (cfg Config) GetBundleToken() string {
 }
 
 func (cfg Config) GetClientLogFilePath() string {
-	return filepath.Join(cfg.GetInstallRoot(), "logs", "timechief-client.log")
+	return filepath.Join(cfg.GetInstallRoot(), "logs", "timechief-client")
 }
