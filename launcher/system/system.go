@@ -11,8 +11,8 @@ import (
 )
 
 type System struct {
-	DB  *gorm.DB
-	Cfg store.Config
+	DB          *gorm.DB
+	ConfigStore store.ConfigStore
 }
 
 func (sys System) stopApp() error {
@@ -20,7 +20,11 @@ func (sys System) stopApp() error {
 }
 
 func (sys System) runScript(path string) error {
-	root := sys.Cfg.GetInstallRoot()
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	root := cfg.GetInstallRoot()
 	script := filepath.Join(root, path)
 	output, err := exec.Command(script).CombinedOutput()
 	log.Printf("system script %s output: %s", script, output)

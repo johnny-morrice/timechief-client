@@ -8,6 +8,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/johnny-morrice/timechief-client/launcher/update"
 	"github.com/urfave/cli/v2"
 )
@@ -84,6 +85,10 @@ func Daemon(ctx *cli.Context) error {
 			LaunchTargetStore: store.LaunchTargetStore{Db: db},
 			StateFlagStore:    store.StateFlagStore{Db: db},
 			CfgStore:          cfgStore,
+			System: system.System{
+				DB:          db,
+				ConfigStore: cfgStore,
+			},
 		},
 	}
 	api.AddRoutes(mux)
