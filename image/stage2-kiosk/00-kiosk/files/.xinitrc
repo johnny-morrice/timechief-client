@@ -1,1 +1,1 @@
-/opt/timechief/bin/timechief-bootstrap
+/opt/timechief-launcher/bin/timechief-bootstrap
