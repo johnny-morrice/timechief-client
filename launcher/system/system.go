@@ -19,11 +19,7 @@ func (sys System) stopApp() error {
 	return store.CloseDB(sys.DB)
 }
 
-func (sys System) runScript(path string) error {
-	cfg, err := sys.ConfigStore.GetConfig()
-	if err != nil {
-		return fmt.Errorf("failed to get config: %w", err)
-	}
+func (sys System) runScript(cfg store.Config, path string) error {
 	root := cfg.GetInstallRoot()
 	script := filepath.Join(root, path)
 	output, err := exec.Command(script).CombinedOutput()
@@ -35,19 +31,29 @@ func (sys System) runScript(path string) error {
 }
 
 func (sys System) doShutdown() error {
-	err := sys.stopApp()
+	log.Printf("shutting down")
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	err = sys.stopApp()
 	if err != nil {
 		return err
 	}
-	return sys.runScript("bin/timechief-shutdown")
+	return sys.runScript(cfg, "bin/timechief-shutdown")
 }
 
 func (sys System) doReboot() error {
-	err := sys.stopApp()
+	log.Printf("rebooting")
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	err = sys.stopApp()
 	if err != nil {
 		return err
 	}
-	return sys.runScript("bin/timechief-reboot")
+	return sys.runScript(cfg, "bin/timechief-reboot")
 }
 
 func (sys System) Shutdown() error {
