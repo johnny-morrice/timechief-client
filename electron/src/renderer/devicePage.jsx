@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown} from './ipc';
+import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown } from './ipc';
 
 class DeviceSignals {
     constructor() {
@@ -13,7 +13,6 @@ class DeviceSignals {
 
 function getDeviceStatus(signals) {
     let launcherState = signals.launcherState();
-    console.log("launcher state: ", JSON.stringify(launcherState));
     if ("Flags" in launcherState) {
         let isUpdating = launcherState["Flags"].includes("updating");
         if (isUpdating) {
@@ -52,32 +51,42 @@ function updateSignalsForElectronStatus(signals, statusResponse) {
     signals.setIpAddress(ipAddress);
 }
 
+function onClickShutdown() {
+    console.log("shutdown clicked")
+    sendShutdown();
+}
+
+function onClickReboot() {
+    console.log("reboot clicked")
+    sendReboot()
+}
+
 var initialised = false;
 let deviceSignals = new DeviceSignals();
 
 export const DevicePage = () => {
 
-  if (!initialised) {
-    addDataCallback((data) => updateSignalsForAPIData(deviceSignals, data));
-    addDeviceStatusCallback((status) => updateSignalsForElectronStatus(deviceSignals, status));
-    initialised = true;
-  }
-  
-  return <div id="config-screen">
+    if (!initialised) {
+        addDataCallback((data) => updateSignalsForAPIData(deviceSignals, data));
+        addDeviceStatusCallback((status) => updateSignalsForElectronStatus(deviceSignals, status));
+        initialised = true;
+    }
+
+    return <div id="config-screen">
         <div class="column-flex">
             <div class='flex-element section-name underline'>About this device</div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Reboot</div>
-                <button class='flex-element' onClick={sendReboot}><i class='fa-solid fa-refresh'></i></button>
+                <button class='flex-element' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
             </div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Shutdown</div>
-                <button class='flex-element' onClick={sendShutdown}><i class='fa-solid fa-refresh'></i></button>
+                <button class='flex-element' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
             </div>
             <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Device status</div>
-                    <div class='flex-element'>{getDeviceStatus(deviceSignals)}</div>
-                </div>
+                <div class='flex-element data-name'>Device status</div>
+                <div class='flex-element'>{getDeviceStatus(deviceSignals)}</div>
+            </div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device Serial Number</div>
                 <div class='flex-element'>{deviceSignals.deviceSerial}</div>
@@ -87,5 +96,5 @@ export const DevicePage = () => {
                 <div class='flex-element'>{deviceSignals.ipAddress}</div>
             </div>
         </div>
-  </div>;
+    </div>;
 };

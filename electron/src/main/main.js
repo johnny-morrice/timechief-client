@@ -2,7 +2,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const axios = require('axios');
-const { exec } = require('child_process');
 const winston = require('winston');
 const { networkInterfaces } = require('os');
 
@@ -26,6 +25,10 @@ function getIpAddress() {
 
 function getWwwBaseURL() {
   return process.env.wwwBaseURL;
+}
+
+function isShowDevTools() {
+  return process.env.showDevTools == 'true';
 }
 
 function getAPIBaseURL() {
@@ -92,7 +95,10 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, '../../frontend-dist/index.html'));
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow.show();
+    if (isShowDevTools()) {
+      mainWindow.webContents.openDevTools();
+    }
   })
 }
 
@@ -219,7 +225,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
       })
       .catch(error => {
         logger.error(`error calling ${sendChan} API: ${error}`)
-        mainWindow.webContents.send(receiveChan, {"APIError": error});
+        mainWindow.webContents.send(receiveChan, {"APIError": "error calling API"});
       });
   });
 }

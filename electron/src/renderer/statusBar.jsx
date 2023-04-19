@@ -27,8 +27,6 @@ function updateSignals(signals, data) {
     let principal = data["LinkedPrincipal"];
     let accountLinked = "PrincipalSerial" in principal && principal["PrincipalSerial"] != null && principal["PrincipalSerial"] != "";
     signals.setAccountLinked(accountLinked);
-    console.log(`calendar exists: ${isCalendarExists(data)}, accountLinked: ${accountLinked}`);
-    console.log(`signal calendar exists: ${signals.isCalendarExists()} accountLinked: ${signals.isAccountLinked()}`);
 }
 
 function isCalendarErrorTimeout(signals) {
