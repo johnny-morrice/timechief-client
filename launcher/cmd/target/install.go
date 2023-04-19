@@ -25,7 +25,7 @@ func Install(ctx *cli.Context) error {
 	systemReboot := filepath.Join(installRoot, "bin/timechief-reboot")
 
 	targetShutdown := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-shutdown")
-	systemShutdown := filepath.Join(installRoot, "bin/timechief-shudtown")
+	systemShutdown := filepath.Join(installRoot, "bin/timechief-shutdown")
 
 	splashWidth := ctx.Int("splash-width")
 	splashHeight := ctx.Int("splash-height")
