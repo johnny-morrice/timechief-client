@@ -64,3 +64,8 @@ EOF
 on_chroot << EOF
     systemctl enable ssh
 EOF
+
+# Shutdown without password
+on_chroot << EOF
+echo "user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown" >> /etc/sudoers
+EOF
