@@ -56,6 +56,13 @@ func installLinks(links []link) error {
 			return fmt.Errorf("failed to remove old link: %w", err)
 		}
 
+		// Create the directory for the new link.
+		dirname := filepath.Dir(link.newPath)
+		err = os.MkdirAll(dirname, 0755)
+		if err != nil {
+			return fmt.Errorf("failed to create directory for link: %w", err)
+		}
+
 		// Symbolically link the path.
 		err = os.Symlink(link.oldPath, link.newPath)
 		if err != nil {
