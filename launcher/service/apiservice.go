@@ -6,6 +6,7 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/system"
 )
 
 type APIService struct {
@@ -13,6 +14,7 @@ type APIService struct {
 	LaunchTargetStore store.LaunchTargetStore
 	StateFlagStore    store.StateFlagStore
 	CfgStore          store.ConfigStore
+	System            system.System
 }
 
 type LauncherState struct {
@@ -131,4 +133,12 @@ func (svc APIService) GetConfig() (store.Config, error) {
 
 func (svc APIService) RecoverTarget() (TargetStatus, error) {
 	return TargetStatus{Ready: true}, nil
+}
+
+func (svc APIService) Reboot() error {
+	return svc.System.Reboot()
+}
+
+func (svc APIService) Shutdown() error {
+	return svc.System.Reboot()
 }

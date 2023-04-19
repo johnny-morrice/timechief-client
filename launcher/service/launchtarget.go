@@ -26,6 +26,15 @@ func LaunchTargetFromStore(storeLT store.LaunchTarget) LaunchTarget {
 }
 
 func (lt LaunchTarget) Run(cfg store.Config) error {
+	logFile := cfg.GetClientLogFilePath()
+	return lt.Execute(cfg, "target", "run", "--target-root", lt.Path, "--log-file", logFile, "--version", lt.Version.Details())
+}
+
+func (lt LaunchTarget) Execute(cfg store.Config, args ...string) error {
+	if lt.Version.Command == "" {
+		return fmt.Errorf("no command specified for version %s", lt.Version.Version)
+	}
+
 	clientConfig, err := ReadClientConfig(cfg)
 	if err != nil {
 		return err
@@ -36,14 +45,6 @@ func (lt LaunchTarget) Run(cfg store.Config) error {
 		return err
 	}
 
-	logFile := cfg.GetClientLogFilePath()
-	return lt.Execute("target", "run", "--target-root", lt.Path, "--log-file", logFile, "--version", lt.Version.Details())
-}
-
-func (lt LaunchTarget) Execute(args ...string) error {
-	if lt.Version.Command == "" {
-		return fmt.Errorf("no command specified for version %s", lt.Version.Version)
-	}
 	path := lt.targetPath()
 	output, err := exec.Command(path, args...).CombinedOutput()
 	log.Printf("launch target output: %s", output)
@@ -73,20 +74,9 @@ func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
 		return err
 	}
 
-	// Read client config and export environment variables.
-	clientConfig, err := ReadClientConfig(cfg)
-	if err != nil {
-		return err
-	}
-
-	err = clientConfig.ExportEnv()
-	if err != nil {
-		return err
-	}
-
 	if doInstallDaemon {
 		log.Println("installing daemon")
-		return lt.Execute("target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path, "--install-root", cfg.GetInstallRoot())
+		return lt.Execute(cfg, "target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path, "--install-root", cfg.GetInstallRoot())
 	}
 	return nil
 }

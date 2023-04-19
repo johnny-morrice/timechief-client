@@ -21,6 +21,12 @@ func Install(ctx *cli.Context) error {
 	targetBootstrap := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-bootstrap")
 	systemBootstrap := filepath.Join(installRoot, "bin/timechief-bootstrap")
 
+	targetReboot := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-reboot")
+	systemReboot := filepath.Join(installRoot, "bin/timechief-reboot")
+
+	targetShutdown := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-shutdown")
+	systemShutdown := filepath.Join(installRoot, "bin/timechief-shudtown")
+
 	splashWidth := ctx.Int("splash-width")
 	splashHeight := ctx.Int("splash-height")
 	targetSplash := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images",
@@ -31,6 +37,8 @@ func Install(ctx *cli.Context) error {
 		{oldPath: targetExe, newPath: systemExe},
 		{oldPath: targetSplash, newPath: systemSplash},
 		{oldPath: targetBootstrap, newPath: systemBootstrap},
+		{oldPath: targetReboot, newPath: systemReboot},
+		{oldPath: targetShutdown, newPath: systemShutdown},
 	}
 	return installLinks(links)
 }
