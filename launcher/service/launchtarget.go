@@ -64,6 +64,12 @@ func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
 	defer system.Unlock()
 	log.Printf("installing version %s %s %s to %s", lt.Version.Version, lt.Version.Product, lt.Version.Stream, lt.Path)
 	tempFile := lt.versionTempFile()
+	defer func() {
+		err := os.Remove(tempFile)
+		if err != nil {
+			log.Printf("failed to remove temp file %s: %v", tempFile, err)
+		}
+	}()
 	err := lt.Version.Download(cfg, tempFile)
 	if err != nil {
 		return err
