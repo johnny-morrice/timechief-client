@@ -16,6 +16,8 @@ type System struct {
 }
 
 func (sys System) stopApp() error {
+	Lock()
+	defer Unlock()
 	return store.CloseDB(sys.DB)
 }
 

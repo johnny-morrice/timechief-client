@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/system"
 )
 
 type LaunchTarget struct {
@@ -59,6 +60,8 @@ func (lt LaunchTarget) targetPath() string {
 }
 
 func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
+	system.Lock()
+	defer system.Unlock()
 	log.Printf("installing version %s %s %s to %s", lt.Version.Version, lt.Version.Product, lt.Version.Stream, lt.Path)
 	tempFile := lt.versionTempFile()
 	err := lt.Version.Download(cfg, tempFile)
