@@ -65,6 +65,10 @@ max_framebuffers=2
 # Flip LCD
 # lcd_rotate=2
 
+# Workaround for LCD I2C issue
+# https://github.com/raspberrypi/linux/issues/4686
+dtparam=i2c_vc_baudrate=50000
+
 # Disable compensation for displays with overscan
 disable_overscan=1
 
