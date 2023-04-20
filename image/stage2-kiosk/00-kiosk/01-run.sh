@@ -69,3 +69,10 @@ EOF
 on_chroot << EOF
 echo "user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown" >> /etc/sudoers
 EOF
+
+# Change issue
+on_chroot << EOF
+echo "Timechief Linux \n \l" > /etc/issue
+echo >> /etc/issue
+echo "Timechief Linux" > /etc/issue.net
+EOF
