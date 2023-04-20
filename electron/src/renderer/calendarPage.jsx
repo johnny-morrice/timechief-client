@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js';
 import { CalendarEvent, makeCanonicalDateText, sortCalendarEvents } from './calendarEvent';
-import { addClockDataCallback } from './ipc';
+import { addServiceDataCallback } from './ipc';
 import { day } from './timing';
 
 class CalendarPageSignals {
@@ -132,7 +132,7 @@ let calendarSignals = new CalendarPageSignals();
 export const CalendarPage = () => {
   
   if (!initialised) {
-    addClockDataCallback((data) => updateCalendarPageSignals(calendarSignals, data));
+    addServiceDataCallback((data) => updateCalendarPageSignals(calendarSignals, data));
     initialised = true;
   }
 

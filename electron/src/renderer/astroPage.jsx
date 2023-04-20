@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addClockDataCallback } from './ipc';
+import { addServiceDataCallback } from './ipc';
 
 class AstroPageSignals {
   constructor() {
@@ -73,7 +73,7 @@ let astroSignals = new AstroPageSignals();
 export const AstroPage = () => {
   
   if (!initialised) {
-    addClockDataCallback((data) => updateAstroPageSignals(astroSignals, data));
+    addServiceDataCallback((data) => updateAstroPageSignals(astroSignals, data));
     initialised = true;
   }
 

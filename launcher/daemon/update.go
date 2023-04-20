@@ -29,11 +29,13 @@ func (daemon Update) Start(ctx *cli.Context) {
 }
 
 func (daemon Update) doTick(ctx *cli.Context) error {
+	log.Println("checking for updates")
 	err := daemon.StateFlagStore.CreateIfNotExists(UpdatingFlag)
 	if err != nil {
 		return err
 	}
 	defer func() {
+		log.Println("update done")
 		err := daemon.StateFlagStore.Delete(UpdatingFlag)
 		if err != nil {
 			log.Println(err.Error())

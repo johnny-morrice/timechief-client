@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+WORK_DIR=$1
+LOG_FILE=$2
+CLIENT_VERSION=$3
+
+if [ -z "$WORK_DIR" ] || [ -z "$LOG_FILE" ] || [ -z "$CLIENT_VERSION" ] ; then
+  echo "Usage: $0 <work-dir> <log-file> <client-version>"
+  exit 1
+fi
+
+cd $WORK_DIR
+export clientVersion=$CLIENT_VERSION
+./timechief-client-electron . 2>&1 | multilog T s10485760 n10 $LOG_FILE

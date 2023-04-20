@@ -4,6 +4,7 @@ package target
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -12,20 +13,61 @@ import (
 
 func Install(ctx *cli.Context) error {
 	targetExe := ctx.String("executable")
+	targetRoot := ctx.String("target-root")
 	installRoot := ctx.String("install-root")
 
 	systemExe := filepath.Join(installRoot, "bin/timechief-launcher")
 
-	// If an old launcher exists, delete the old launcher exe.
-	err := os.Remove(systemExe)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return err
-	}
+	targetBootstrap := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-bootstrap")
+	systemBootstrap := filepath.Join(installRoot, "bin/timechief-bootstrap")
 
-	// Symbolically link the new launcher exe to the old location.
-	err = os.Symlink(targetExe, systemExe)
-	if err != nil {
-		return err
+	targetReboot := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-reboot")
+	systemReboot := filepath.Join(installRoot, "bin/timechief-reboot")
+
+	targetShutdown := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-shutdown")
+	systemShutdown := filepath.Join(installRoot, "bin/timechief-shutdown")
+
+	splashWidth := ctx.Int("splash-width")
+	splashHeight := ctx.Int("splash-height")
+	targetSplash := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images",
+		fmt.Sprintf("splash-%d-%d.png", splashWidth, splashHeight))
+	systemSplash := filepath.Join(installRoot, "assets", "images", "splash.png")
+
+	links := []link{
+		{oldPath: targetExe, newPath: systemExe},
+		{oldPath: targetSplash, newPath: systemSplash},
+		{oldPath: targetBootstrap, newPath: systemBootstrap},
+		{oldPath: targetReboot, newPath: systemReboot},
+		{oldPath: targetShutdown, newPath: systemShutdown},
+	}
+	return installLinks(links)
+}
+
+type link struct {
+	oldPath string
+	newPath string
+}
+
+func installLinks(links []link) error {
+	for _, link := range links {
+		// If an old link exists, remove it.
+		err := os.Remove(link.newPath)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("failed to remove old link: %w", err)
+		}
+
+		// Create the directory for the new link.
+		dirname := filepath.Dir(link.newPath)
+		err = os.MkdirAll(dirname, 0755)
+		if err != nil {
+			return fmt.Errorf("failed to create directory for link: %w", err)
+		}
+
+		// Symbolically link the path.
+		err = os.Symlink(link.oldPath, link.newPath)
+		if err != nil {
+			return fmt.Errorf("failed to create link: %w", err)
+		}
 	}
 	return nil
 }

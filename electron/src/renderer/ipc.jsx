@@ -13,7 +13,7 @@ class APIResultReceiver {
                 console.log(`error calling API for channel ${this.channel}: ${data["APIError"]}`);
             } else {
                 this.lastData = data;
-                console.log(`received data for channel: ${this.channel}: ${JSON.stringify(data)}`);
+                // console.log(`received data for channel: ${this.channel}: ${JSON.stringify(data)}`);
                 this.callbacks.forEach(cb => {
                     cb(data);
                 });
@@ -31,12 +31,12 @@ class APIResultReceiver {
 
 export const pairingCreateReceiver = new APIResultReceiver("pairingCreateResult");
 export const pairingGetReceiver = new APIResultReceiver("pairingGetResult");
-export const pairingCompleteReceiver = new APIResultReceiver("pairingCompleteResult");
 export const clockDataReceiver = new APIResultReceiver("clockDataResult");
-export const sessionRemoveReceiver = new APIResultReceiver("sessionRemoveResult");
+export const rebootReceiver = new APIResultReceiver("rebootResult");
+export const shutdownReceiver = new APIResultReceiver("shutdownResult");
 
 const deviceCallbacks = [];
-function receiveRedeployStatus() {
+function receiveDeviceStatus() {
     window.device.receive("deviceStatus", (status) => {
         deviceCallbacks.forEach(cb => {
             cb(status)
@@ -48,7 +48,15 @@ export function addDeviceStatusCallback(cb) {
     deviceCallbacks.push(cb);
 }
 
-export function addClockDataCallback(cb) {
+export function addServiceDataCallback(cb) {
+    clockDataReceiver.addCallback((data) => {
+        if ("ServiceData" in data) {
+            cb(data["ServiceData"])
+        }
+    });
+}
+
+export function addDataCallback(cb) {
     clockDataReceiver.addCallback(cb);
 }
 
@@ -58,19 +66,6 @@ export function addPairingCreateCallback(cb) {
 
 export function addPairingGetCallback(cb) {
     pairingGetReceiver.addCallback(cb);
-}
-
-export function addPairingCompleteCallback(cb) {
-    pairingCompleteReceiver.addCallback(cb);
-}
-
-export function addSessionRemoveCallback(cb) {
-    sessionRemoveReceiver.addCallback(cb);
-}
-
-export function triggerRedeploy() {
-    console.log("triggering redeploy...");
-    window.device.send("deviceCommand", {'command': 'redeploy'});
 }
 
 export function sendDeviceHeartbeat() {
@@ -85,16 +80,16 @@ export function sendPairingCreateRequest() {
     window.api.send("pairingCreate");
 }
 
-export function sendPairingGetRequest(pairingCode) {
-    window.api.send("pairingGet", pairingCode);
+export function sendPairingGetRequest() {
+    window.api.send("pairingGet");
 }
 
-export function sendPairingCompleteRequest(pairingCode) {
-    window.api.send("pairingComplete", pairingCode);
+export function sendReboot() {
+    window.api.send("reboot");
 }
 
-export function sendSessionRemoveRequest() {
-    window.api.send("sessionRemove");
+export function sendShutdown() {
+    window.api.send("shutdown");
 }
 
 export function initializeIPC() {
@@ -108,10 +103,13 @@ export function initializeIPC() {
     },
         apiRefreshInterval
     );
-    receiveRedeployStatus();
+    sendClockDataRequest();
+    sendDeviceHeartbeat();
+    receiveDeviceStatus();
     clockDataReceiver.receive();
     pairingCreateReceiver.receive();
     pairingGetReceiver.receive();
-    pairingCompleteReceiver.receive();
+    rebootReceiver.receive();
+    shutdownReceiver.receive();
     return [deviceInterval, apiInterval];
 }

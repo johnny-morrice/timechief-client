@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addClockDataCallback, addSessionRemoveCallback, addDeviceStatusCallback, sendSessionRemoveRequest, sendPairingCreateRequest, sendPairingGetRequest, sendPairingCompleteRequest, addPairingGetCallback, addPairingCompleteCallback, addPairingCreateCallback } from './ipc';
+import { addServiceDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, addPairingGetCallback, addPairingCreateCallback } from './ipc';
 import { toCanvas } from 'qrcode';
 
 class AccountPageSignals {
@@ -33,44 +33,32 @@ export const AccountPage = () => {
     removeQrCode();
   });
   if (!initialised) {
-    addSessionRemoveCallback((data) => {});
-    addClockDataCallback((data) => updateAccountPageSignals(accountSignals, data));
+    addServiceDataCallback((data) => updateAccountPageSignals(accountSignals, data));
     addDeviceStatusCallback((data) => updateAccountPageSignalsFromDevice(accountSignals, data));
-    addPairingCreateCallback((data) => {
-        console.log(`pairing create result: ${JSON.stringify(data)}`);
-        accountSignals.setPairingCode(data["Code"]);
+    addPairingCreateCallback(() => {
         pairingGetInterval = setInterval(() => {
-            let pairingCode = accountSignals.pairingCode();
-            if (hasPairingCode(pairingCode)) {
-                sendPairingGetRequest(accountSignals.pairingCode());
-            }
-            if (pairingQrCodeCanvas == null) {
-                let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
-                pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
-                canvasWrapper.appendChild(pairingQrCodeCanvas);
-                toCanvas(pairingQrCodeCanvas, `${accountSignals.wwwBaseURL()}/pairing?pairingCode=${encodeURIComponent(pairingCode)}`);
-            }
+                sendPairingGetRequest();
         }, 300);
     });
-    addPairingCompleteCallback((data) => {
-        if (data["ok"]) {
+
+    addPairingGetCallback((data) => {
+        if (hasPairingCode(data["Code"])) {
+            accountSignals.setPairingCode(data["Code"]);
+        }
+        
+        if (pairingQrCodeCanvas == null) {
+            let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
+            pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
+            canvasWrapper.appendChild(pairingQrCodeCanvas);
+            toCanvas(pairingQrCodeCanvas, `${accountSignals.wwwBaseURL()}/pairing?pairingCode=${encodeURIComponent(pairingCode)}`);
+        }
+        // Pairing is complete if we've got a code and the state is now none.
+        if (data["Status"] == "none" && hasPairingCode(accountSignals.pairingCode())) {
             accountSignals.setPairingCode("");
             if (pairingGetInterval != null) {
                 clearInterval(pairingGetInterval);
             }
-            sendSessionRemoveRequest();
-        }
-
-        
-    });
-    addPairingGetCallback((data) => {
-        if (data["Status"] == "linked") {
-            let pairingCode = accountSignals.pairingCode();
-            if (hasPairingCode(pairingCode)) {
-                sendPairingCompleteRequest(pairingCode);
-            } else {
-                console.log("cannot complete pairing, lost pairing code");
-            }
+            removeQrCode();
         }
     });
     initialised = true;
@@ -91,7 +79,7 @@ export const AccountPage = () => {
   }
 
   function hasPairingCode(pairingCode) {
-      return pairingCode.length > 0;
+      return pairingCode && pairingCode.length > 0;
   }
 
   function onClickLinkAccountButton() {

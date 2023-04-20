@@ -15,11 +15,9 @@ EOF
 install -m 644 files/config.txt "${ROOTFS_DIR}/boot/"
 install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/"
 HOME="${ROOTFS_DIR}/home/${FIRST_USER_NAME}"
-install -m 755 -o 1000 -g 1000 files/kiosk.sh "${HOME}/"
 install -m 644 -o 1000 -g 1000 files/.profile "${HOME}/"
 install -m 644 -o 1000 -g 1000 files/.xinitrc "${HOME}/"
 install -m 644 -o 1000 -g 1000 files/.hushlogin "${HOME}/"
-install -m 755 -o 1000 -g 1000 files/splash.png "${HOME}/"
 install -m 755 -o 1000 -g 1000 -d "${HOME}/bin/"
 
 cp -r "${TIMECHIEF_ROOT}" "${ROOTFS_DIR}/opt"
@@ -31,9 +29,7 @@ if [ "$CURSOR" = "yes" ]; then
     install -m 644 -o 1000 -g 1000 files/.cursor "${HOME}/"
 fi
 
-
 # Autologin
-
 on_chroot << EOF
     systemctl --quiet set-default multi-user.target
     cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << CATEND
@@ -41,4 +37,35 @@ on_chroot << EOF
 ExecStart=
 ExecStart=-/sbin/agetty --noissue --skip-login --autologin $FIRST_USER_NAME --noclear %I \$TERM
 CATEND
+EOF
+
+
+# timechief-launcher daemon.
+on_chroot << EOF
+cat > /etc/systemd/system/timechief-launcher.service << CATEND
+[Unit]
+Description=TimeChief Launcher Service
+After=network.target
+
+[Service]
+User=$FIRST_USER_NAME
+Group=$FIRST_USER_NAME
+WorkingDirectory=/opt/timechief-launcher
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+CATEND
+    systemctl enable timechief-launcher
+EOF
+
+# SSH
+on_chroot << EOF
+    systemctl enable ssh
+EOF
+
+# Shutdown without password
+on_chroot << EOF
+echo "user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown" >> /etc/sudoers
 EOF

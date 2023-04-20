@@ -1,7 +1,7 @@
 import { onCleanup } from 'solid-js';
 import { createSignal } from 'solid-js';
 import { isCalendarExists } from './calendarHelper';
-import { addClockDataCallback } from './ipc';
+import { addServiceDataCallback } from './ipc';
 import { showHome, showAstro, showDevice, showForecast, showAccount, showLocale, showCalendar } from './routes';
 
 class TaskBarSignals {
@@ -20,7 +20,7 @@ let taskBarSignals = new TaskBarSignals();
 
 export const TaskBar = () => {
     if (!initialised) {
-        addClockDataCallback((data) => updateTaskBarSignals(taskBarSignals, data));
+        addServiceDataCallback((data) => updateTaskBarSignals(taskBarSignals, data));
         initialised = true;
     }
     onCleanup(() => {

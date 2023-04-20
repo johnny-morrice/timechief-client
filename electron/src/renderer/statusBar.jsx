@@ -1,6 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { isCalendarExists } from './calendarHelper';
-import { addClockDataCallback } from './ipc';
+import { addServiceDataCallback } from './ipc';
 import { apiErrorTimeout, calendarErrorTimeout, second } from './timing'
 
 class StatusBarSignals {
@@ -19,7 +19,7 @@ function updateSignals(signals, data) {
     let calendar = data["Calendar"];
     let calendarLastUpdated = calendar["LastUpdated"];
     var calendarLastDate = null;
-    if (calendarLastUpdated != 0) {
+    if (calendarLastUpdated && calendarLastUpdated != 0) {
         calendarLastDate = new Date(calendarLastUpdated * 1000);
     }
     signals.setCalendarExists(isCalendarExists(data));
@@ -27,8 +27,6 @@ function updateSignals(signals, data) {
     let principal = data["LinkedPrincipal"];
     let accountLinked = "PrincipalSerial" in principal && principal["PrincipalSerial"] != null && principal["PrincipalSerial"] != "";
     signals.setAccountLinked(accountLinked);
-    console.log(`calendar exists: ${isCalendarExists(data)}, accountLinked: ${accountLinked}`);
-    console.log(`signal calendar exists: ${signals.isCalendarExists()} accountLinked: ${signals.isAccountLinked()}`);
 }
 
 function isCalendarErrorTimeout(signals) {
@@ -57,7 +55,7 @@ var initialised = false;
 export const StatusBar = () => {
     let signals = new StatusBarSignals();
     if (!initialised) {
-        addClockDataCallback((data) => updateSignals(signals, data));
+        addServiceDataCallback((data) => updateSignals(signals, data));
         initialised = true;
     }
     let updateRefreshTimeInterval = setInterval(

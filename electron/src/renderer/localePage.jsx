@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addClockDataCallback, addDeviceStatusCallback, triggerRedeploy } from './ipc';
+import { addServiceDataCallback, addDeviceStatusCallback } from './ipc';
 
 class Signals {
     constructor() {
@@ -27,7 +27,7 @@ let signals = new Signals();
 export const LocalePage = () => {
     
     if (!initialised) {
-        addClockDataCallback((data) => updateSignals(signals, data));
+        addServiceDataCallback((data) => updateSignals(signals, data));
         initialised = true;
     }
 

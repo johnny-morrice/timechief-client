@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"sort"
 
@@ -31,7 +32,7 @@ func (store VersionStore) GetVersions() ([]Version, error) {
 }
 
 func (store VersionStore) CreateIfNotExists(v *Version) error {
-	log.Printf("creating version %s if not exists with UUID %s", v.Version, v.UUID)
+	// log.Printf("creating version %s if not exists with UUID %s", v.Version, v.UUID)
 	var count int64
 	result := store.Db.Model(&Version{}).Where("uuid = ?", v.UUID).Count(&count)
 	if result.Error != nil {
@@ -44,7 +45,7 @@ func (store VersionStore) CreateIfNotExists(v *Version) error {
 			return result.Error
 		}
 	}
-	log.Printf("version %s exists", v.Version)
+	// log.Printf("version %s exists", v.Version)
 	return nil
 }
 
@@ -84,7 +85,8 @@ func FindNewVersion(cfg Config, currentVersion string, versions []Version) (Vers
 	SortVersionsDecreasing(versions)
 	for _, version := range versions {
 		v := version
-		if version.Version > currentVersion && version.IsSupportedProductStream(cfg) {
+		isGt := semver.Compare(version.Version, currentVersion) > 0
+		if isGt && version.IsSupportedProductStream(cfg) {
 			return v, nil
 		}
 	}
@@ -104,4 +106,8 @@ func FindLatestVersion(cfg Config, versions []Version) (Version, error) {
 
 func (v Version) IsSupportedProductStream(cfg Config) bool {
 	return v.Product == cfg.GetProduct() && v.Stream == cfg.GetStream()
+}
+
+func (v Version) Details() string {
+	return fmt.Sprintf("%s %s %s", v.Product, v.Stream, v.Version)
 }

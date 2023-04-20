@@ -36,6 +36,10 @@ func VersionFromStore(storeVersion store.Version) Version {
 	}
 }
 
+func (v Version) Details() string {
+	return fmt.Sprintf("%s %s %s", v.Product, v.Stream, v.Version)
+}
+
 func (v Version) Download(cfg store.Config, path string) error {
 	log.Printf("downloading %s to %s", v.URL, path)
 	file, err := os.Create(path)

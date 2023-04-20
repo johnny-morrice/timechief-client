@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addClockDataCallback } from './ipc';
+import { addServiceDataCallback } from './ipc';
 import { weatherIconStyleClass } from './weatherIcon';
 import { kelvinToCelsiusText } from './temperature';
 import { apiErrorTimeout, second } from './timing';
@@ -174,7 +174,7 @@ let homePageSignals = new HomePageSignals();
 export const HomePage = () => {
 
   if (!initialised) {
-    addClockDataCallback((data) => updateHomePageSignals(homePageSignals, data));
+    addServiceDataCallback((data) => updateHomePageSignals(homePageSignals, data));
     initialised = true;
   }
   

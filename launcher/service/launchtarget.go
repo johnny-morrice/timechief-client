@@ -27,13 +27,24 @@ func LaunchTargetFromStore(storeLT store.LaunchTarget) LaunchTarget {
 
 func (lt LaunchTarget) Run(cfg store.Config) error {
 	logFile := cfg.GetClientLogFilePath()
-	return lt.Execute("target", "run", "--target-root", lt.Path, "--log-file", logFile)
+	return lt.Execute(cfg, "target", "run", "--target-root", lt.Path, "--log-file", logFile, "--version", lt.Version.Details())
 }
 
-func (lt LaunchTarget) Execute(args ...string) error {
+func (lt LaunchTarget) Execute(cfg store.Config, args ...string) error {
 	if lt.Version.Command == "" {
 		return fmt.Errorf("no command specified for version %s", lt.Version.Version)
 	}
+
+	clientConfig, err := ReadClientConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	err = clientConfig.ExportEnv()
+	if err != nil {
+		return err
+	}
+
 	path := lt.targetPath()
 	output, err := exec.Command(path, args...).CombinedOutput()
 	log.Printf("launch target output: %s", output)
@@ -48,7 +59,7 @@ func (lt LaunchTarget) targetPath() string {
 }
 
 func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
-	log.Printf("installing version %s to %s", lt.Version.Version, lt.Path)
+	log.Printf("installing version %s %s %s to %s", lt.Version.Version, lt.Version.Product, lt.Version.Stream, lt.Path)
 	tempFile := lt.versionTempFile()
 	err := lt.Version.Download(cfg, tempFile)
 	if err != nil {
@@ -65,7 +76,7 @@ func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
 
 	if doInstallDaemon {
 		log.Println("installing daemon")
-		return lt.Execute("target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path, "--install-root", cfg.GetInstallRoot())
+		return lt.Execute(cfg, "target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path, "--install-root", cfg.GetInstallRoot())
 	}
 	return nil
 }

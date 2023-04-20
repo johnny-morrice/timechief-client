@@ -1,69 +1,100 @@
 import { createSignal } from 'solid-js';
-import { addClockDataCallback, addDeviceStatusCallback, triggerRedeploy } from './ipc';
-
-class DevicePageSignals {
-  constructor() {
-      [this.deviceSerial, this.setDeviceSerial] = createSignal("");
-  }
-}
+import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown } from './ipc';
 
 class DeviceSignals {
     constructor() {
-        [this.isDeployEnabled, this.setDeployEnabled] = createSignal(false);
+        [this.deviceSerial, this.setDeviceSerial] = createSignal("");
         [this.deviceStatus, this.setDeviceStatus] = createSignal("unknown");
+        [this.launcherState, this.setLauncherState] = createSignal({});
         [this.ipAddress, this.setIpAddress] = createSignal("unknown");
+        [this.clientVersion, this.setClientVersion] = createSignal("");
     }
 }
 
-function updateDevicePageSignals(signals, data) {
-    let clock = data["Clock"];
-    let location = clock["Location"];
-    let deviceSerial = clock["DeviceSerial"];
-    signals.setDeviceSerial(deviceSerial);
+function getDeviceStatus(signals) {
+    let launcherState = signals.launcherState();
+    if ("Flags" in launcherState) {
+        let isUpdating = launcherState["Flags"].includes("updating");
+        if (isUpdating) {
+            return "updating";
+        }
+    }
+    if ("ActiveTargetVersion" in launcherState) {
+        let activeTargetVersion = launcherState["ActiveTargetVersion"];
+        let currentVersion = signals.clientVersion();
+        if (currentVersion && activeTargetVersion && activeTargetVersion !== currentVersion) {
+            return "restart to update";
+        }
+    }
+    return signals.deviceStatus();
 }
 
-function updateDeviceSignals(signals, statusResponse) {
-    let isEnabled = statusResponse["redeploy_enabled"];
+function updateSignalsForAPIData(signals, data) {
+    if ("ServiceData" in data) {
+        let serviceData = data["ServiceData"];
+        let clock = serviceData["Clock"];
+        let deviceSerial = clock["DeviceSerial"];
+        signals.setDeviceSerial(deviceSerial);
+    }
+    if ("LauncherState" in data) {
+        let launcherState = data["LauncherState"];
+        signals.setLauncherState(launcherState);
+    }
+}
+
+function updateSignalsForElectronStatus(signals, statusResponse) {
     const status = statusResponse["status"];
     const ipAddress = statusResponse["ip_address"];
-    signals.setDeployEnabled(isEnabled);
+    const clientVersion = statusResponse["client_version"];
+    signals.setClientVersion(clientVersion);
     signals.setDeviceStatus(status);
     signals.setIpAddress(ipAddress);
 }
 
+function onClickShutdown() {
+    console.log("shutdown clicked")
+    sendShutdown();
+}
+
+function onClickReboot() {
+    console.log("reboot clicked")
+    sendReboot()
+}
+
 var initialised = false;
-let configSignals = new DevicePageSignals();
 let deviceSignals = new DeviceSignals();
 
 export const DevicePage = () => {
 
-  if (!initialised) {
-    addClockDataCallback((data) => updateDevicePageSignals(configSignals, data));
-    addDeviceStatusCallback((status) => updateDeviceSignals(deviceSignals, status));
-    initialised = true;
-  }
-  
-  return <div id="config-screen">
+    if (!initialised) {
+        addDataCallback((data) => updateSignalsForAPIData(deviceSignals, data));
+        addDeviceStatusCallback((status) => updateSignalsForElectronStatus(deviceSignals, status));
+        initialised = true;
+    }
+
+    return <div id="config-screen">
         <div class="column-flex">
             <div class='flex-element section-name underline'>About this device</div>
-            <Show when={deviceSignals.isDeployEnabled()}>
-                <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Redeploy device</div>
-                    <button class='flex-element' onClick={triggerRedeploy}><i class='fa-solid fa-refresh'></i></button>
-                </div>
-            </Show>
             <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Device status</div>
-                    <div class='flex-element'>{deviceSignals.deviceStatus}</div>
-                </div>
+                <div class='flex-element data-name'>Reboot</div>
+                <button class='flex-element' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
+            </div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Shutdown</div>
+                <button class='flex-element' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
+            </div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Device status</div>
+                <div class='flex-element'>{getDeviceStatus(deviceSignals)}</div>
+            </div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device Serial Number</div>
-                <div class='flex-element'>{configSignals.deviceSerial}</div>
+                <div class='flex-element'>{deviceSignals.deviceSerial}</div>
             </div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device IP Address</div>
                 <div class='flex-element'>{deviceSignals.ipAddress}</div>
             </div>
         </div>
-  </div>;
+    </div>;
 };

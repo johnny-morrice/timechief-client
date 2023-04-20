@@ -1,10 +1,16 @@
 package store
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type StateFlag struct {
-	gorm.Model
-	State string `gorm:"uniqueIndex"`
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	State     string `gorm:"uniqueIndex"`
 }
 
 type StateFlagStore struct {
@@ -22,6 +28,15 @@ func (store StateFlagStore) List() ([]string, error) {
 		stateFlags = append(stateFlags, flag.State)
 	}
 	return stateFlags, nil
+}
+
+func (store StateFlagStore) Exists(flag string) (bool, error) {
+	var count int64
+	result := store.Db.Model(&StateFlag{}).Where("state = ?", flag).Count(&count)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return count > 0, nil
 }
 
 func (store StateFlagStore) CreateIfNotExists(flag string) error {
@@ -48,7 +63,7 @@ func (store StateFlagStore) Delete(flag string) error {
 }
 
 func (store StateFlagStore) DeleteAll() error {
-	result := store.Db.Unscoped().Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&StateFlag{})
+	result := store.Db.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&StateFlag{})
 	if result.Error != nil {
 		return result.Error
 	}

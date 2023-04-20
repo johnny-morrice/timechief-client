@@ -38,7 +38,7 @@ func getCLIApp() *cli.App {
 				},
 				&cli.BoolFlag{
 					Name:  "standalone",
-					Value: true,
+					Value: false,
 				},
 				&cli.StringFlag{
 					Name:  "daemon-base-url",
@@ -83,6 +83,10 @@ func getCLIApp() *cli.App {
 				&cli.DurationFlag{
 					Name:  "version-update-interval",
 					Value: 1 * time.Minute,
+				},
+				&cli.DurationFlag{
+					Name:  "pairing-check-interval",
+					Value: 5 * time.Second,
 				},
 			},
 		},
@@ -167,6 +171,9 @@ func getCLIApp() *cli.App {
 						&cli.StringFlag{
 							Name: "log-file",
 						},
+						&cli.StringFlag{
+							Name: "version",
+						},
 					},
 				},
 				{
@@ -181,6 +188,14 @@ func getCLIApp() *cli.App {
 						},
 						&cli.StringFlag{
 							Name: "install-root",
+						},
+						&cli.IntFlag{
+							Name:    "splash-width",
+							EnvVars: []string{"timechief_width"},
+						},
+						&cli.IntFlag{
+							Name:    "splash-height",
+							EnvVars: []string{"timechief_height"},
 						},
 					},
 				},

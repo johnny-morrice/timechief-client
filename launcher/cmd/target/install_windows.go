@@ -4,6 +4,8 @@ package target
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -16,13 +18,10 @@ func Install(ctx *cli.Context) error {
 
 	systemExe := filepath.Join(installRoot, "bin/timechief-launcher.exe")
 
-	// If an old launcher exists, delete the old launcher exe.
-	err := os.Remove(systemExe)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return err
+	links := []link{
+		{oldPath: targetExe, newPath: systemExe},
 	}
-
-	return copyFile(targetExe, systemExe)
+	return installLinks(links)
 }
 
 // copyFile copies a file from src to dst.
@@ -49,5 +48,27 @@ func copyFile(src, dst string) error {
 		return err
 	}
 
+	return nil
+}
+
+type link struct {
+	oldPath string
+	newPath string
+}
+
+func installLinks(links []link) error {
+	for _, link := range links {
+		// If an old link exists, remove it.
+		err := os.Remove(link.newPath)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("failed to remove old link: %w", err)
+		}
+
+		// Symbolically link the path.
+		err = copyFile(link.oldPath, link.newPath)
+		if err != nil {
+			return fmt.Errorf("failed to create link: %w", err)
+		}
+	}
 	return nil
 }

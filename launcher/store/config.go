@@ -3,15 +3,18 @@ package store
 import (
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type ConfigEntry struct {
-	gorm.Model
-	Key   string
-	Value string
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Key       string `gorm:"uniqueIndex"`
+	Value     string
 }
 
 type Config struct {
@@ -91,12 +94,32 @@ func (cfg Config) GetAPIBaseURL() string {
 
 var ErrCfgNotFound = fmt.Errorf("config item not found")
 
+func (cfg Config) SetAccessToken(token string) {
+	cfg.Config["access-token"] = token
+}
+
 func (cfg Config) GetAccessToken() (string, error) {
 	token, ok := cfg.Config["access-token"]
 	if !ok {
 		return "", fmt.Errorf("access-token not found: %w", ErrCfgNotFound)
 	}
 	return token, nil
+}
+
+func (cfg Config) SetPairingCode(code string) {
+	cfg.Config["pairing-code"] = code
+}
+
+func (cfg Config) GetPairingCode() (string, error) {
+	code, ok := cfg.Config["pairing-code"]
+	if !ok {
+		return "", fmt.Errorf("pairing-code not found: %w", ErrCfgNotFound)
+	}
+	return code, nil
+}
+
+func (cfg Config) ClearPairingCode() {
+	delete(cfg.Config, "pairing-code")
 }
 
 // TODO this will potentially go away with the new API.
@@ -129,5 +152,5 @@ func (cfg Config) GetBundleToken() string {
 }
 
 func (cfg Config) GetClientLogFilePath() string {
-	return filepath.Join(cfg.GetInstallRoot(), "timechief-client.log")
+	return filepath.Join(cfg.GetInstallRoot(), "logs", "timechief-client")
 }
