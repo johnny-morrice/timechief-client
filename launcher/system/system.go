@@ -16,8 +16,6 @@ type System struct {
 }
 
 func (sys System) stopApp() error {
-	Lock()
-	defer Unlock()
 	return store.CloseDB(sys.DB)
 }
 
@@ -59,6 +57,8 @@ func (sys System) doReboot() error {
 }
 
 func (sys System) Shutdown() error {
+	Lock()
+	defer Unlock()
 	err := sys.doShutdown()
 	if err != nil {
 		log.Printf("shutdown error: %v", err)
@@ -67,6 +67,8 @@ func (sys System) Shutdown() error {
 }
 
 func (sys System) Reboot() error {
+	Lock()
+	defer Unlock()
 	err := sys.doReboot()
 	if err != nil {
 		log.Printf("reboot error: %v", err)
