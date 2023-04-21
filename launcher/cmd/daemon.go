@@ -11,6 +11,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/johnny-morrice/timechief-client/launcher/update"
 	"github.com/urfave/cli/v2"
+	"gorm.io/gorm"
 )
 
 func Daemon(ctx *cli.Context) error {
@@ -78,20 +79,39 @@ func Daemon(ctx *cli.Context) error {
 	go deviceDataDaemon.Start(ctx)
 	go pairingDaemon.Start(ctx)
 
+	return serveAPI(ctx, cfgStore, db)
+}
+
+type apiPackage interface {
+	AddRoutes(mux *http.ServeMux)
+}
+
+func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, db *gorm.DB) error {
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
-	api := api.API{
-		Service: service.APIService{
-			DeviceDataStore:   store.DeviceDataStore{Db: db},
-			LaunchTargetStore: store.LaunchTargetStore{Db: db},
-			StateFlagStore:    store.StateFlagStore{Db: db},
-			CfgStore:          cfgStore,
-			System: system.System{
-				DB:          db,
-				ConfigStore: cfgStore,
-			},
+	apiService := service.APIService{
+		DeviceDataStore:   store.DeviceDataStore{Db: db},
+		LaunchTargetStore: store.LaunchTargetStore{Db: db},
+		StateFlagStore:    store.StateFlagStore{Db: db},
+		CfgStore:          cfgStore,
+		System: system.System{
+			DB:          db,
+			ConfigStore: cfgStore,
 		},
 	}
-	api.AddRoutes(mux)
+	packages := []apiPackage{
+		api.System{
+			Service: apiService,
+		},
+		api.Data{
+			Service: apiService,
+		},
+		api.Launcher{
+			Service: apiService,
+		},
+	}
+	for _, pkg := range packages {
+		pkg.AddRoutes(mux)
+	}
 	return http.ListenAndServe(addr, mux)
 }

@@ -20,6 +20,7 @@ type APIService struct {
 type LauncherState struct {
 	Flags               []string
 	ActiveTargetVersion string
+	SetupComplete       bool
 }
 
 type TargetStatus struct {
