@@ -91,7 +91,7 @@ func toStoreCards(cards []WifiCard) []*store.WifiCard {
 	for i := 0; i < len(cards); i++ {
 		card := cards[i]
 		storeCard := &store.WifiCard{
-			MAC: card.MAC,
+			AdapterName: card.AdapterName,
 		}
 		storeCards[i] = storeCard
 	}
@@ -120,10 +120,15 @@ func (sys System) GetActiveWifiCard() (WifiCard, error) {
 	if len(cards) == 0 {
 		return WifiCard{}, ErrNoWifi
 	}
+	err = sys.WifiCardStore.DeleteAll()
+	if err != nil {
+		return WifiCard{}, err
+	}
+
 	storeCards := toStoreCards(cards)
 	for i := 0; i < len(cards); i++ {
 		card := storeCards[i]
-		err = sys.WifiCardStore.CreateIfNotExists(card)
+		err = sys.WifiCardStore.Create(card)
 		if err != nil {
 			return WifiCard{}, err
 		}
@@ -143,7 +148,7 @@ func (sys System) GetActiveWifiCard() (WifiCard, error) {
 	}
 
 	card := WifiCard{
-		MAC: active.MAC,
+		AdapterName: active.AdapterName,
 	}
 	return card, nil
 }
@@ -178,7 +183,7 @@ func (sys System) SyncWifiNetworks() error {
 }
 
 type WifiCard struct {
-	MAC string
+	AdapterName string
 }
 
 func (sys WifiCard) ScanWifiNetworks() ([]WifiNetwork, error) {

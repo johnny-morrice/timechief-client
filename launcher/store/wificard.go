@@ -8,22 +8,22 @@ import (
 )
 
 type WifiCard struct {
-	ID        uint `gorm:"primarykey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	MAC       string `gorm:"uniqueIndex"`
-	Active    bool
+	ID          uint `gorm:"primarykey"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	AdapterName string `gorm:"uniqueIndex"`
+	Active      bool
 }
 
 type WifiCardStore struct {
 	DB *gorm.DB
 }
 
-// CreateIfNotExists creates a new WIFI card in the store if it does not exist.
-func (store WifiCardStore) CreateIfNotExists(card *WifiCard) error {
-	err := store.DB.Where("mac = ?", card.MAC).Assign(card).FirstOrCreate(&card).Error
+// CreateIfNotExists creates a new WIFI card in the store.
+func (store WifiCardStore) Create(card *WifiCard) error {
+	err := store.DB.Create(card).Error
 	if err != nil {
-		return fmt.Errorf("failed to activate WIFI card: %w", err)
+		return fmt.Errorf("failed to create WIFI network: %w", err)
 	}
 	return nil
 }
@@ -56,4 +56,13 @@ func (store WifiCardStore) GetActive() (WifiCard, error) {
 		return WifiCard{}, result.Error
 	}
 	return card, nil
+}
+
+// DeleteAll deletes all wifi cards from the store.
+func (store WifiCardStore) DeleteAll() error {
+	result := store.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&WifiCard{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
