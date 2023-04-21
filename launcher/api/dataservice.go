@@ -4,13 +4,13 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/johnny-morrice/timechief-client/launcher/service"
+	"github.com/johnny-morrice/timechief-client/launcher/service/data"
 )
 
 type DataService interface {
-	GetDeviceData() (service.DeviceData, error)
+	GetDeviceData() (data.DeviceData, error)
 	PairDevice() error
-	GetPairingStatus() (service.PairingStatus, error)
+	GetPairingStatus() (data.PairingStatus, error)
 }
 
 type Data struct {

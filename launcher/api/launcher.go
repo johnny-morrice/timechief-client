@@ -5,13 +5,14 @@ import (
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/service"
+	"github.com/johnny-morrice/timechief-client/launcher/service/launcher"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 )
 
 type LauncherService interface {
 	GetConfig() (store.Config, error)
 	GetTarget() (service.LaunchTarget, error)
-	RecoverTarget() (service.TargetStatus, error)
+	RecoverTarget() (launcher.TargetStatus, error)
 }
 
 type Launcher struct {

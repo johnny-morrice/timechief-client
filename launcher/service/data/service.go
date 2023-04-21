@@ -1,4 +1,4 @@
-package service
+package data
 
 import (
 	"errors"
@@ -6,25 +6,19 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
-	"github.com/johnny-morrice/timechief-client/launcher/system"
 )
 
-type APIService struct {
+type Service struct {
 	DeviceDataStore   store.DeviceDataStore
 	LaunchTargetStore store.LaunchTargetStore
 	StateFlagStore    store.StateFlagStore
 	CfgStore          store.ConfigStore
-	System            system.System
 }
 
 type LauncherState struct {
 	Flags               []string
 	ActiveTargetVersion string
 	SetupComplete       bool
-}
-
-type TargetStatus struct {
-	Ready bool
 }
 
 type DeviceData struct {
@@ -37,7 +31,7 @@ type PairingStatus struct {
 	Code   string
 }
 
-func (svc APIService) PairDevice() error {
+func (svc Service) PairDevice() error {
 	cfg, err := svc.CfgStore.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)
@@ -54,7 +48,7 @@ func (svc APIService) PairDevice() error {
 	return nil
 }
 
-func (svc APIService) GetPairingStatus() (PairingStatus, error) {
+func (svc Service) GetPairingStatus() (PairingStatus, error) {
 	config, err := svc.CfgStore.GetConfig()
 	if err != nil {
 		return PairingStatus{}, fmt.Errorf("failed to get config: %w", err)
@@ -84,7 +78,7 @@ func (svc APIService) GetPairingStatus() (PairingStatus, error) {
 	return result, nil
 }
 
-func (svc APIService) GetDeviceData() (DeviceData, error) {
+func (svc Service) GetDeviceData() (DeviceData, error) {
 	clockData, err := svc.DeviceDataStore.GetDeviceData()
 	if err != nil {
 		return DeviceData{}, err
@@ -110,36 +104,4 @@ func (svc APIService) GetDeviceData() (DeviceData, error) {
 	}
 
 	return result, nil
-}
-
-func (svc APIService) GetTarget() (LaunchTarget, error) {
-	target, err := svc.LaunchTargetStore.GetActiveLaunchTarget()
-	if err != nil {
-		return LaunchTarget{}, err
-	}
-
-	result := LaunchTargetFromStore(target)
-
-	return result, nil
-}
-
-func (svc APIService) GetConfig() (store.Config, error) {
-	config, err := svc.CfgStore.GetConfig()
-	if err != nil {
-		return store.Config{}, err
-	}
-
-	return config, nil
-}
-
-func (svc APIService) RecoverTarget() (TargetStatus, error) {
-	return TargetStatus{Ready: true}, nil
-}
-
-func (svc APIService) Reboot() error {
-	return svc.System.Reboot()
-}
-
-func (svc APIService) Shutdown() error {
-	return svc.System.Shutdown()
 }

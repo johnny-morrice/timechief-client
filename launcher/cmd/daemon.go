@@ -6,7 +6,8 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/api"
 	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/daemon"
-	"github.com/johnny-morrice/timechief-client/launcher/service"
+	"github.com/johnny-morrice/timechief-client/launcher/service/data"
+	"github.com/johnny-morrice/timechief-client/launcher/service/launcher"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/johnny-morrice/timechief-client/launcher/update"
@@ -89,25 +90,27 @@ type apiPackage interface {
 func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, db *gorm.DB) error {
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
-	apiService := service.APIService{
-		DeviceDataStore:   store.DeviceDataStore{Db: db},
-		LaunchTargetStore: store.LaunchTargetStore{Db: db},
-		StateFlagStore:    store.StateFlagStore{Db: db},
-		CfgStore:          cfgStore,
-		System: system.System{
-			DB:          db,
-			ConfigStore: cfgStore,
-		},
-	}
 	packages := []apiPackage{
 		api.System{
-			Service: apiService,
+			Service: system.System{
+				ConfigStore: cfgStore,
+				DB:          db,
+			},
 		},
 		api.Data{
-			Service: apiService,
+			Service: data.Service{
+				DeviceDataStore:   store.DeviceDataStore{Db: db},
+				LaunchTargetStore: store.LaunchTargetStore{Db: db},
+				StateFlagStore:    store.StateFlagStore{Db: db},
+				CfgStore:          cfgStore,
+			},
 		},
 		api.Launcher{
-			Service: apiService,
+			Service: launcher.Service{
+				LaunchTargetStore: store.LaunchTargetStore{Db: db},
+				StateFlagStore:    store.StateFlagStore{Db: db},
+				CfgStore:          cfgStore,
+			},
 		},
 	}
 	for _, pkg := range packages {
