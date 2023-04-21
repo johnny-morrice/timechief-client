@@ -91,7 +91,7 @@ func toStoreCards(cards []WifiCard) []*store.WifiCard {
 	for i := 0; i < len(cards); i++ {
 		card := cards[i]
 		storeCard := &store.WifiCard{
-			AdapterName: card.AdapterName,
+			Interface: card.Interface,
 		}
 		storeCards[i] = storeCard
 	}
@@ -112,7 +112,7 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 	return storeNets
 }
 
-func (sys System) GetActiveWifiCard() (WifiCard, error) {
+func (sys System) SyncWifiCard() (WifiCard, error) {
 	cards, err := sys.ReadWifiCards()
 	if err != nil {
 		return WifiCard{}, err
@@ -148,7 +148,7 @@ func (sys System) GetActiveWifiCard() (WifiCard, error) {
 	}
 
 	card := WifiCard{
-		AdapterName: active.AdapterName,
+		Interface: active.Interface,
 	}
 	return card, nil
 }
@@ -156,7 +156,7 @@ func (sys System) GetActiveWifiCard() (WifiCard, error) {
 var ErrNoWifiNetworks error = errors.New("no wifi networks found")
 
 func (sys System) SyncWifiNetworks() error {
-	card, err := sys.GetActiveWifiCard()
+	card, err := sys.SyncWifiCard()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
 	}
@@ -182,15 +182,40 @@ func (sys System) SyncWifiNetworks() error {
 	return nil
 }
 
-type WifiCard struct {
-	AdapterName string
+func (sys System) Connect() error {
+	storeCard, err := sys.WifiCardStore.GetActive()
+	if err != nil {
+		return fmt.Errorf("failed to get active wifi card: %w", err)
+	}
+	storeNetwork, err := sys.WifiNetworkStore.GetActive()
+	if err != nil {
+		return fmt.Errorf("failed to get active wifi network: %w", err)
+	}
+	card := WifiCard{
+		Interface: storeCard.Interface,
+	}
+	network := WifiNetwork{
+		ESSID: storeNetwork.ESSID,
+		BSSID: storeNetwork.BSSID,
+		Key:   storeNetwork.Key,
+	}
+	return card.Connect(network)
 }
 
-func (sys WifiCard) ScanWifiNetworks() ([]WifiNetwork, error) {
+type WifiCard struct {
+	Interface string
+}
+
+func (card WifiCard) ScanWifiNetworks() ([]WifiNetwork, error) {
+	panic("not implemented")
+}
+
+func (card WifiCard) Connect(net WifiNetwork) error {
 	panic("not implemented")
 }
 
 type WifiNetwork struct {
 	ESSID string
 	BSSID string
+	Key   string
 }

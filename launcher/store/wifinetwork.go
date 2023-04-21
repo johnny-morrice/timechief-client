@@ -51,6 +51,16 @@ func (store WifiNetworkStore) SetActive(network *WifiNetwork) error {
 	return nil
 }
 
+// GetActive returns the active WIFI network.
+func (store WifiNetworkStore) GetActive() (WifiNetwork, error) {
+	var network WifiNetwork
+	result := store.DB.Where("active = ?", true).First(&network)
+	if result.Error != nil {
+		return WifiNetwork{}, result.Error
+	}
+	return network, nil
+}
+
 // List returns all WIFI networks in the store, sorted by ESSID, BSSID, and UUID.
 func (store WifiNetworkStore) List() ([]WifiNetwork, error) {
 	var networks []WifiNetwork

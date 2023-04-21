@@ -8,11 +8,11 @@ import (
 )
 
 type WifiCard struct {
-	ID          uint `gorm:"primarykey"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	AdapterName string `gorm:"uniqueIndex"`
-	Active      bool
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Interface string `gorm:"uniqueIndex"`
+	Active    bool
 }
 
 type WifiCardStore struct {
