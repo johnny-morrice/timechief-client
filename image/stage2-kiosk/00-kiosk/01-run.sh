@@ -76,3 +76,9 @@ echo "Timechief Linux \n \l" > /etc/issue
 echo >> /etc/issue
 echo "Timechief Linux" > /etc/issue.net
 EOF
+
+# Set wifi country.
+# TODO: we need to do this dynamically at runtime based on the user's location.
+on_chroot << EOF
+raspi-config nonint do_wifi_country GB
+EOF
