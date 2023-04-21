@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/service"
+	"github.com/johnny-morrice/timechief-client/launcher/service/launcher"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 )
 
@@ -20,24 +21,8 @@ func (dc DaemonClient) makeURL(path string) string {
 	return dc.BaseURL + path
 }
 
-func (dc DaemonClient) GetDeviceData() (service.DeviceData, error) {
-	resp, err := http.Get(dc.makeURL("/api/device"))
-	if err != nil {
-		return service.DeviceData{}, err
-	}
-	defer resp.Body.Close()
-
-	result := service.DeviceData{}
-	err = unmarsalJSON(resp, &result)
-	if err != nil {
-		return service.DeviceData{}, err
-	}
-
-	return result, nil
-}
-
 func (dc DaemonClient) GetConfig() (store.Config, error) {
-	resp, err := http.Get(dc.makeURL("/api/config"))
+	resp, err := http.Get(dc.makeURL("/api/launcher/config"))
 	if err != nil {
 		return store.Config{}, err
 	}
@@ -53,7 +38,7 @@ func (dc DaemonClient) GetConfig() (store.Config, error) {
 }
 
 func (dc DaemonClient) GetTarget() (service.LaunchTarget, error) {
-	resp, err := http.Get(dc.makeURL("/api/target"))
+	resp, err := http.Get(dc.makeURL("/api/launcher/target"))
 	if err != nil {
 		return service.LaunchTarget{}, err
 	}
@@ -68,17 +53,17 @@ func (dc DaemonClient) GetTarget() (service.LaunchTarget, error) {
 	return result, nil
 }
 
-func (dc DaemonClient) PostTargetRecover() (service.TargetStatus, error) {
-	resp, err := http.Post(dc.makeURL("/api/target/recover"), "", nil)
+func (dc DaemonClient) PostTargetRecover() (launcher.TargetStatus, error) {
+	resp, err := http.Post(dc.makeURL("/api/launcher/target/recover"), "", nil)
 	if err != nil {
-		return service.TargetStatus{}, err
+		return launcher.TargetStatus{}, err
 	}
 	defer resp.Body.Close()
 
-	result := service.TargetStatus{}
+	result := launcher.TargetStatus{}
 	err = unmarsalJSON(resp, &result)
 	if err != nil {
-		return service.TargetStatus{}, err
+		return launcher.TargetStatus{}, err
 	}
 
 	return result, nil
