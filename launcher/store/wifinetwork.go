@@ -12,8 +12,7 @@ type WifiNetwork struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	UUID      string `gorm:"uniqueIndex"`
-	ESSID     string
-	BSSID     string
+	SSID      string
 	Key       string
 	Active    bool
 }

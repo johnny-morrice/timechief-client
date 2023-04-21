@@ -97,9 +97,9 @@ func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, keyValueStore store.
 	packages := []apiPackage{
 		api.System{
 			Service: system.System{
-				ConfigStore:   cfgStore,
-				WifiCardStore: store.WifiCardStore{DB: db},
-				DB:            db,
+				ConfigStore:        cfgStore,
+				WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
+				DB:                 db,
 			},
 		},
 		api.Data{

@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type WifiCard struct {
+type WifiInterface struct {
 	ID        uint `gorm:"primarykey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -15,26 +15,26 @@ type WifiCard struct {
 	Active    bool
 }
 
-type WifiCardStore struct {
+type WifiInterfaceStore struct {
 	DB *gorm.DB
 }
 
 // CreateIfNotExists creates a new WIFI card in the store.
-func (store WifiCardStore) Create(card *WifiCard) error {
+func (store WifiInterfaceStore) Create(card *WifiInterface) error {
 	err := store.DB.Create(card).Error
 	if err != nil {
-		return fmt.Errorf("failed to create WIFI network: %w", err)
+		return fmt.Errorf("failed to create WIFI interface: %w", err)
 	}
 	return nil
 }
 
 // SetActive sets the active flag of a WIFI card to true, and sets all other cards to false.
-func (store WifiCardStore) SetActive(card *WifiCard) error {
+func (store WifiInterfaceStore) SetActive(card *WifiInterface) error {
 	if card.ID == 0 {
 		return fmt.Errorf("cannot activate WIFI card with ID 0")
 	}
 	// Deactivate all other WIFI cards
-	result := store.DB.Model(&WifiCard{}).Where("active = ?", true).Update("active", false)
+	result := store.DB.Model(&WifiInterface{}).Where("active = ?", true).Update("active", false)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -49,18 +49,18 @@ func (store WifiCardStore) SetActive(card *WifiCard) error {
 }
 
 // GetActive returns the active WIFI card.
-func (store WifiCardStore) GetActive() (WifiCard, error) {
-	var card WifiCard
+func (store WifiInterfaceStore) GetActive() (WifiInterface, error) {
+	var card WifiInterface
 	result := store.DB.Where("active = ?", true).First(&card)
 	if result.Error != nil {
-		return WifiCard{}, result.Error
+		return WifiInterface{}, result.Error
 	}
 	return card, nil
 }
 
 // DeleteAll deletes all wifi cards from the store.
-func (store WifiCardStore) DeleteAll() error {
-	result := store.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&WifiCard{})
+func (store WifiInterfaceStore) DeleteAll() error {
+	result := store.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&WifiInterface{})
 	if result.Error != nil {
 		return result.Error
 	}

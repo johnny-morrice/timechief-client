@@ -13,10 +13,10 @@ import (
 )
 
 type System struct {
-	DB               *gorm.DB
-	ConfigStore      store.ConfigStore
-	WifiCardStore    store.WifiCardStore
-	WifiNetworkStore store.WifiNetworkStore
+	DB                 *gorm.DB
+	ConfigStore        store.ConfigStore
+	WifiInterfaceStore store.WifiInterfaceStore
+	WifiNetworkStore   store.WifiNetworkStore
 }
 
 func (sys System) stopApp() error {
@@ -82,15 +82,15 @@ func (sys System) Reboot() error {
 
 var ErrNoWifi error = errors.New("no wifi card found")
 
-func (sys System) ReadWifiCards() ([]WifiCard, error) {
+func (sys System) ReadWifiCards() ([]WifiInterface, error) {
 	panic("not implemented")
 }
 
-func toStoreCards(cards []WifiCard) []*store.WifiCard {
-	storeCards := make([]*store.WifiCard, len(cards))
+func toStoreCards(cards []WifiInterface) []*store.WifiInterface {
+	storeCards := make([]*store.WifiInterface, len(cards))
 	for i := 0; i < len(cards); i++ {
 		card := cards[i]
-		storeCard := &store.WifiCard{
+		storeCard := &store.WifiInterface{
 			Interface: card.Interface,
 		}
 		storeCards[i] = storeCard
@@ -103,51 +103,50 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 	for i := 0; i < len(nets); i++ {
 		net := nets[i]
 		storeNet := &store.WifiNetwork{
-			UUID:  uuid.NewString(),
-			ESSID: net.ESSID,
-			BSSID: net.BSSID,
+			UUID: uuid.NewString(),
+			SSID: net.SSID,
 		}
 		storeNets[i] = storeNet
 	}
 	return storeNets
 }
 
-func (sys System) SyncWifiCard() (WifiCard, error) {
-	cards, err := ReadWifiCards()
+func (sys System) SyncWifiCard() (WifiInterface, error) {
+	cards, err := ReadWifiInterfaces()
 	if err != nil {
-		return WifiCard{}, err
+		return WifiInterface{}, err
 	}
 	if len(cards) == 0 {
-		return WifiCard{}, ErrNoWifi
+		return WifiInterface{}, ErrNoWifi
 	}
-	err = sys.WifiCardStore.DeleteAll()
+	err = sys.WifiInterfaceStore.DeleteAll()
 	if err != nil {
-		return WifiCard{}, err
+		return WifiInterface{}, err
 	}
 
 	storeCards := toStoreCards(cards)
 	for i := 0; i < len(cards); i++ {
 		card := storeCards[i]
-		err = sys.WifiCardStore.Create(card)
+		err = sys.WifiInterfaceStore.Create(card)
 		if err != nil {
-			return WifiCard{}, err
+			return WifiInterface{}, err
 		}
 	}
 
-	active, err := sys.WifiCardStore.GetActive()
+	active, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			active = *storeCards[0]
-			err = sys.WifiCardStore.SetActive(&active)
+			err = sys.WifiInterfaceStore.SetActive(&active)
 			if err != nil {
-				return WifiCard{}, fmt.Errorf("failed to set active wifi card: %w", err)
+				return WifiInterface{}, fmt.Errorf("failed to set active wifi card: %w", err)
 			}
 		} else {
-			return WifiCard{}, fmt.Errorf("failed to get active wifi card: %w", err)
+			return WifiInterface{}, fmt.Errorf("failed to get active wifi card: %w", err)
 		}
 	}
 
-	card := WifiCard{
+	card := WifiInterface{
 		Interface: active.Interface,
 	}
 	return card, nil
@@ -183,7 +182,7 @@ func (sys System) SyncWifiNetworks() error {
 }
 
 func (sys System) Connect() error {
-	storeCard, err := sys.WifiCardStore.GetActive()
+	storeCard, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
 	}
@@ -191,13 +190,12 @@ func (sys System) Connect() error {
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi network: %w", err)
 	}
-	card := WifiCard{
+	card := WifiInterface{
 		Interface: storeCard.Interface,
 	}
 	network := WifiNetwork{
-		ESSID: storeNetwork.ESSID,
-		BSSID: storeNetwork.BSSID,
-		Key:   storeNetwork.Key,
+		SSID: storeNetwork.SSID,
+		Key:  storeNetwork.Key,
 	}
 	return card.Connect(network)
 }
