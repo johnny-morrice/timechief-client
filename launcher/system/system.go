@@ -1,6 +1,7 @@
 package system
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
@@ -11,8 +12,9 @@ import (
 )
 
 type System struct {
-	DB          *gorm.DB
-	ConfigStore store.ConfigStore
+	DB            *gorm.DB
+	ConfigStore   store.ConfigStore
+	WifiCardStore store.WifiCardStore
 }
 
 func (sys System) stopApp() error {
@@ -76,7 +78,65 @@ func (sys System) Reboot() error {
 	return nil
 }
 
-func (sys System) GetWifiNetworks() ([]WifiNetwork, error) {
+var ErrNoWifi error = errors.New("no wifi card found")
+
+func (sys System) ReadWifiCards() ([]WifiCard, error) {
+	panic("not implemented")
+}
+
+func toStoreCards(cards []WifiCard) []*store.WifiCard {
+	storeCards := make([]*store.WifiCard, len(cards))
+	for i := 0; i < len(cards); i++ {
+		card := cards[i]
+		storeCard := &store.WifiCard{
+			MAC: card.MAC,
+		}
+		storeCards[i] = storeCard
+	}
+	return storeCards
+}
+
+func (sys System) GetActiveWifiCard() (WifiCard, error) {
+	cards, err := sys.ReadWifiCards()
+	if err != nil {
+		return WifiCard{}, err
+	}
+	if len(cards) == 0 {
+		return WifiCard{}, ErrNoWifi
+	}
+	storeCards := toStoreCards(cards)
+	for i := 0; i < len(cards); i++ {
+		card := storeCards[i]
+		err = sys.WifiCardStore.CreateIfNotExists(card)
+		if err != nil {
+			return WifiCard{}, err
+		}
+	}
+
+	active, err := sys.WifiCardStore.GetActive()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			active = *storeCards[0]
+			err = sys.WifiCardStore.SetActive(&active)
+			if err != nil {
+				return WifiCard{}, fmt.Errorf("failed to set active wifi card: %w", err)
+			}
+		} else {
+			return WifiCard{}, fmt.Errorf("failed to get active wifi card: %w", err)
+		}
+	}
+
+	card := WifiCard{
+		MAC: active.MAC,
+	}
+	return card, nil
+}
+
+type WifiCard struct {
+	MAC string
+}
+
+func (sys WifiCard) ScanWifiNetworks() ([]WifiNetwork, error) {
 	panic("not implemented")
 }
 

@@ -97,8 +97,9 @@ func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, keyValueStore store.
 	packages := []apiPackage{
 		api.System{
 			Service: system.System{
-				ConfigStore: cfgStore,
-				DB:          db,
+				ConfigStore:   cfgStore,
+				KeyValueStore: keyValueStore,
+				DB:            db,
 			},
 		},
 		api.Data{
