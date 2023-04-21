@@ -18,6 +18,7 @@ import (
 type DeviceData struct {
 	DeviceDataStore store.DeviceDataStore
 	CfgStore        store.ConfigStore
+	StateFlagStore  store.StateFlagStore
 	RequestTimeout  time.Duration
 	RefreshInterval time.Duration
 }
@@ -49,7 +50,58 @@ func (dd DeviceData) doTick(ctx *cli.Context) error {
 
 }
 
+var DeviceDataErrorState = "device-data-error"
+var CalendarErrorState = "calendar-error"
+var principalLinkedState = "principal-linked"
+
 func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
+	clockData, err := dd.doFetchLatest()
+	if err != nil {
+		myErr := dd.StateFlagStore.CreateIfNotExists(DeviceDataErrorState)
+		if myErr != nil {
+			log.Printf("error setting device data error state: %s", myErr)
+		}
+		return viewmodel.ClockData{}, err
+	}
+
+	myErr := dd.StateFlagStore.Delete(DeviceDataErrorState)
+	if myErr != nil {
+		log.Printf("error clearing device data error state: %s", myErr)
+	}
+
+	if clockData.Calendar.Calendar != nil {
+		const calendarErrorTimeout = 30 * time.Minute
+		lastUpdated := time.Unix(clockData.Calendar.LastUpdated, 0)
+		now := time.Now()
+		if now.Sub(lastUpdated) > calendarErrorTimeout {
+			myErr := dd.StateFlagStore.CreateIfNotExists(CalendarErrorState)
+			if myErr != nil {
+				log.Printf("error setting calendar error state: %s", myErr)
+			}
+		} else {
+			myErr := dd.StateFlagStore.Delete(CalendarErrorState)
+			if myErr != nil {
+				log.Printf("error clearing calendar error state: %s", myErr)
+			}
+		}
+	}
+
+	if clockData.LinkedPrincipal.PrincipalSerial != "" {
+		myErr := dd.StateFlagStore.CreateIfNotExists(principalLinkedState)
+		if myErr != nil {
+			log.Printf("error setting linked principal state: %s", myErr)
+		}
+	} else {
+		myErr := dd.StateFlagStore.Delete(principalLinkedState)
+		if myErr != nil {
+			log.Printf("error clearing linked principal state: %s", myErr)
+		}
+	}
+
+	return clockData, nil
+}
+
+func (dd DeviceData) doFetchLatest() (viewmodel.ClockData, error) {
 	cfg, err := dd.CfgStore.GetConfig()
 	if err != nil {
 		return viewmodel.ClockData{}, err

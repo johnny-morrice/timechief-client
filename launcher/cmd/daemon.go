@@ -61,6 +61,7 @@ func Daemon(ctx *cli.Context) error {
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
 	deviceDataDaemon := daemon.DeviceData{
+		StateFlagStore:  flagStore,
 		DeviceDataStore: store.DeviceDataStore{Db: db},
 		CfgStore:        cfgStore,
 		RequestTimeout:  ctx.Duration("service-request-timeout"),
