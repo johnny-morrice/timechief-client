@@ -7,14 +7,16 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"gorm.io/gorm"
 )
 
 type System struct {
-	DB            *gorm.DB
-	ConfigStore   store.ConfigStore
-	WifiCardStore store.WifiCardStore
+	DB               *gorm.DB
+	ConfigStore      store.ConfigStore
+	WifiCardStore    store.WifiCardStore
+	WifiNetworkStore store.WifiNetworkStore
 }
 
 func (sys System) stopApp() error {
@@ -96,6 +98,20 @@ func toStoreCards(cards []WifiCard) []*store.WifiCard {
 	return storeCards
 }
 
+func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
+	storeNets := make([]*store.WifiNetwork, len(nets))
+	for i := 0; i < len(nets); i++ {
+		net := nets[i]
+		storeNet := &store.WifiNetwork{
+			UUID:  uuid.NewString(),
+			ESSID: net.ESSID,
+			BSSID: net.BSSID,
+		}
+		storeNets[i] = storeNet
+	}
+	return storeNets
+}
+
 func (sys System) GetActiveWifiCard() (WifiCard, error) {
 	cards, err := sys.ReadWifiCards()
 	if err != nil {
@@ -130,6 +146,35 @@ func (sys System) GetActiveWifiCard() (WifiCard, error) {
 		MAC: active.MAC,
 	}
 	return card, nil
+}
+
+var ErrNoWifiNetworks error = errors.New("no wifi networks found")
+
+func (sys System) SyncWifiNetworks() error {
+	card, err := sys.GetActiveWifiCard()
+	if err != nil {
+		return fmt.Errorf("failed to get active wifi card: %w", err)
+	}
+	networks, err := card.ScanWifiNetworks()
+	if err != nil {
+		return fmt.Errorf("failed to scan wifi networks: %w", err)
+	}
+	if len(networks) == 0 {
+		return ErrNoWifiNetworks
+	}
+	err = sys.WifiNetworkStore.DeleteAll()
+	if err != nil {
+		return fmt.Errorf("failed to delete all wifi networks: %w", err)
+	}
+	storeNets := toStoreNetworks(networks)
+	for i := 0; i < len(storeNets); i++ {
+		net := storeNets[i]
+		err = sys.WifiNetworkStore.Create(net)
+		if err != nil {
+			return fmt.Errorf("failed to create wifi network: %w", err)
+		}
+	}
+	return nil
 }
 
 type WifiCard struct {
