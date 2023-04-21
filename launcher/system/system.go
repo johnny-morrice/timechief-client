@@ -113,7 +113,7 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 }
 
 func (sys System) SyncWifiCard() (WifiCard, error) {
-	cards, err := sys.ReadWifiCards()
+	cards, err := ReadWifiCards()
 	if err != nil {
 		return WifiCard{}, err
 	}
@@ -200,22 +200,4 @@ func (sys System) Connect() error {
 		Key:   storeNetwork.Key,
 	}
 	return card.Connect(network)
-}
-
-type WifiCard struct {
-	Interface string
-}
-
-func (card WifiCard) ScanWifiNetworks() ([]WifiNetwork, error) {
-	panic("not implemented")
-}
-
-func (card WifiCard) Connect(net WifiNetwork) error {
-	panic("not implemented")
-}
-
-type WifiNetwork struct {
-	ESSID string
-	BSSID string
-	Key   string
 }
