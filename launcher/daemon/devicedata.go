@@ -69,18 +69,20 @@ func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
 		log.Printf("error clearing device data error state: %s", myErr)
 	}
 
-	const calendarErrorTimeout = 30 * time.Minute
-	lastUpdated := time.Unix(clockData.Calendar.LastUpdated, 0)
-	now := time.Now()
-	if now.Sub(lastUpdated) > calendarErrorTimeout {
-		myErr := dd.StateFlagStore.CreateIfNotExists(CalendarErrorState)
-		if myErr != nil {
-			log.Printf("error setting calendar error state: %s", myErr)
-		}
-	} else {
-		myErr := dd.StateFlagStore.Delete(CalendarErrorState)
-		if myErr != nil {
-			log.Printf("error clearing calendar error state: %s", myErr)
+	if clockData.Calendar.Calendar != nil {
+		const calendarErrorTimeout = 30 * time.Minute
+		lastUpdated := time.Unix(clockData.Calendar.LastUpdated, 0)
+		now := time.Now()
+		if now.Sub(lastUpdated) > calendarErrorTimeout {
+			myErr := dd.StateFlagStore.CreateIfNotExists(CalendarErrorState)
+			if myErr != nil {
+				log.Printf("error setting calendar error state: %s", myErr)
+			}
+		} else {
+			myErr := dd.StateFlagStore.Delete(CalendarErrorState)
+			if myErr != nil {
+				log.Printf("error clearing calendar error state: %s", myErr)
+			}
 		}
 	}
 
