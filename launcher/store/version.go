@@ -22,25 +22,25 @@ type Version struct {
 }
 
 type VersionStore struct {
-	Db *gorm.DB
+	DB *gorm.DB
 }
 
 func (store VersionStore) GetVersions() ([]Version, error) {
 	var versions []Version
-	result := store.Db.Find(&versions)
+	result := store.DB.Find(&versions)
 	return versions, result.Error
 }
 
 func (store VersionStore) CreateIfNotExists(v *Version) error {
 	// log.Printf("creating version %s if not exists with UUID %s", v.Version, v.UUID)
 	var count int64
-	result := store.Db.Model(&Version{}).Where("uuid = ?", v.UUID).Count(&count)
+	result := store.DB.Model(&Version{}).Where("uuid = ?", v.UUID).Count(&count)
 	if result.Error != nil {
 		return result.Error
 	}
 	if count == 0 {
 		log.Printf("creating version %s", v.Version)
-		result = store.Db.Create(v)
+		result = store.DB.Create(v)
 		if result.Error != nil {
 			return result.Error
 		}

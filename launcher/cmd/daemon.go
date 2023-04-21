@@ -30,7 +30,7 @@ func Daemon(ctx *cli.Context) error {
 		}
 	}
 
-	flagStore := store.StateFlagStore{Db: db}
+	flagStore := store.StateFlagStore{DB: db}
 
 	isClearState := ctx.Bool("clear-state")
 	if isClearState {
@@ -40,7 +40,7 @@ func Daemon(ctx *cli.Context) error {
 		}
 	}
 
-	cfgStore := store.ConfigStore{Db: db}
+	cfgStore := store.ConfigStore{DB: db}
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {
 		return err
@@ -50,12 +50,14 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 	up := update.Updater{
-		VersionStore:      store.VersionStore{Db: db},
-		LaunchTargetStore: store.LaunchTargetStore{Db: db},
+		VersionStore:      store.VersionStore{DB: db},
+		LaunchTargetStore: store.LaunchTargetStore{DB: db},
 		CfgStore:          cfgStore,
 		Client:            clnt,
 		RequestTimeout:    ctx.Duration("service-request-timeout"),
 	}
+
+	keyValueStore := store.KeyValueStore{DB: db}
 
 	updateDaemon := daemon.Update{
 		Updater:               up,
@@ -64,14 +66,16 @@ func Daemon(ctx *cli.Context) error {
 	}
 	deviceDataDaemon := daemon.DeviceData{
 		StateFlagStore:  flagStore,
-		DeviceDataStore: store.DeviceDataStore{Db: db},
+		DeviceDataStore: store.DeviceDataStore{DB: db},
 		CfgStore:        cfgStore,
+		KeyValueStore:   keyValueStore,
 		RequestTimeout:  ctx.Duration("service-request-timeout"),
 		RefreshInterval: ctx.Duration("service-refresh-interval"),
 	}
 	pairingDaemon := daemon.Pairing{
 		ConfigStore:          cfgStore,
 		StateFlagStore:       flagStore,
+		KeyValueStore:        keyValueStore,
 		PairingCheckInterval: ctx.Duration("pairing-check-interval"),
 		RequestTimeout:       ctx.Duration("service-request-timeout"),
 	}
@@ -80,14 +84,14 @@ func Daemon(ctx *cli.Context) error {
 	go deviceDataDaemon.Start(ctx)
 	go pairingDaemon.Start(ctx)
 
-	return serveAPI(ctx, cfgStore, db)
+	return serveAPI(ctx, cfgStore, keyValueStore, db)
 }
 
 type apiPackage interface {
 	AddRoutes(mux *http.ServeMux)
 }
 
-func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, db *gorm.DB) error {
+func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, keyValueStore store.KeyValueStore, db *gorm.DB) error {
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
 	packages := []apiPackage{
@@ -99,16 +103,16 @@ func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, db *gorm.DB) error {
 		},
 		api.Data{
 			Service: data.Service{
-				DeviceDataStore:   store.DeviceDataStore{Db: db},
-				LaunchTargetStore: store.LaunchTargetStore{Db: db},
-				StateFlagStore:    store.StateFlagStore{Db: db},
-				CfgStore:          cfgStore,
+				DeviceDataStore:   store.DeviceDataStore{DB: db},
+				LaunchTargetStore: store.LaunchTargetStore{DB: db},
+				StateFlagStore:    store.StateFlagStore{DB: db},
+				KeyValueStore:     keyValueStore,
 			},
 		},
 		api.Launcher{
 			Service: launcher.Service{
-				LaunchTargetStore: store.LaunchTargetStore{Db: db},
-				StateFlagStore:    store.StateFlagStore{Db: db},
+				LaunchTargetStore: store.LaunchTargetStore{DB: db},
+				StateFlagStore:    store.StateFlagStore{DB: db},
 				CfgStore:          cfgStore,
 			},
 		},

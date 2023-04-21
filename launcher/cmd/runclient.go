@@ -75,12 +75,12 @@ func runStandaloneClient(ctx *cli.Context) error {
 		return err
 	}
 	defer store.CloseDB(db)
-	ltStore := store.LaunchTargetStore{Db: db}
+	ltStore := store.LaunchTargetStore{DB: db}
 	storeTarget, err := ltStore.GetActiveLaunchTarget()
 	if err != nil {
 		return err
 	}
-	cfgStore := store.ConfigStore{Db: db}
+	cfgStore := store.ConfigStore{DB: db}
 	cfg, err := cfgStore.GetConfig()
 	if err != nil {
 		return err

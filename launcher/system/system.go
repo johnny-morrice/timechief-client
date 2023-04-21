@@ -75,3 +75,12 @@ func (sys System) Reboot() error {
 	}
 	return nil
 }
+
+func (sys System) GetWifiNetworks() ([]WifiNetwork, error) {
+	panic("not implemented")
+}
+
+type WifiNetwork struct {
+	ESSID string
+	BSSID string
+}

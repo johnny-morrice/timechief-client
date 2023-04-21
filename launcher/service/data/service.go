@@ -6,13 +6,14 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"gorm.io/gorm"
 )
 
 type Service struct {
 	DeviceDataStore   store.DeviceDataStore
 	LaunchTargetStore store.LaunchTargetStore
 	StateFlagStore    store.StateFlagStore
-	CfgStore          store.ConfigStore
+	KeyValueStore     store.KeyValueStore
 }
 
 type LauncherState struct {
@@ -32,14 +33,9 @@ type PairingStatus struct {
 }
 
 func (svc Service) PairDevice() error {
-	cfg, err := svc.CfgStore.GetConfig()
+	err := svc.KeyValueStore.Delete(store.PairingCodeKey)
 	if err != nil {
-		return fmt.Errorf("failed to get config: %w", err)
-	}
-	cfg.ClearPairingCode()
-	err = svc.CfgStore.SetConfig(cfg)
-	if err != nil {
-		return fmt.Errorf("failed to set config: %w", err)
+		return fmt.Errorf("failed to delete pairing code: %w", err)
 	}
 	err = svc.StateFlagStore.CreateIfNotExists("pairing-requested")
 	if err != nil {
@@ -49,13 +45,8 @@ func (svc Service) PairDevice() error {
 }
 
 func (svc Service) GetPairingStatus() (PairingStatus, error) {
-	config, err := svc.CfgStore.GetConfig()
-	if err != nil {
-		return PairingStatus{}, fmt.Errorf("failed to get config: %w", err)
-	}
-
-	code, err := config.GetPairingCode()
-	if err != nil && !errors.Is(err, store.ErrCfgNotFound) {
+	code, err := svc.KeyValueStore.Get(store.PairingCodeKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
 	}
 
