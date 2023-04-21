@@ -111,17 +111,17 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 	return storeNets
 }
 
-func (sys System) SyncWifiCard() (WifiInterface, error) {
+func (sys System) SyncWifiInterfaces() error {
 	cards, err := ReadWifiInterfaces()
 	if err != nil {
-		return WifiInterface{}, err
+		return err
 	}
 	if len(cards) == 0 {
-		return WifiInterface{}, ErrNoWifi
+		return ErrNoWifi
 	}
 	err = sys.WifiInterfaceStore.DeleteAll()
 	if err != nil {
-		return WifiInterface{}, err
+		return err
 	}
 
 	storeCards := toStoreCards(cards)
@@ -129,7 +129,7 @@ func (sys System) SyncWifiCard() (WifiInterface, error) {
 		card := storeCards[i]
 		err = sys.WifiInterfaceStore.Create(card)
 		if err != nil {
-			return WifiInterface{}, err
+			return err
 		}
 	}
 
@@ -139,27 +139,31 @@ func (sys System) SyncWifiCard() (WifiInterface, error) {
 			active = *storeCards[0]
 			err = sys.WifiInterfaceStore.SetActive(&active)
 			if err != nil {
-				return WifiInterface{}, fmt.Errorf("failed to set active wifi card: %w", err)
+				return fmt.Errorf("failed to set active wifi card: %w", err)
 			}
 		} else {
-			return WifiInterface{}, fmt.Errorf("failed to get active wifi card: %w", err)
+			return fmt.Errorf("failed to get active wifi card: %w", err)
 		}
 	}
 
-	card := WifiInterface{
-		Interface: active.Interface,
-	}
-	return card, nil
+	return nil
 }
 
 var ErrNoWifiNetworks error = errors.New("no wifi networks found")
 
 func (sys System) SyncWifiNetworks() error {
-	card, err := sys.SyncWifiCard()
+	err := sys.SyncWifiInterfaces()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
 	}
-	networks, err := card.ScanWifiNetworks()
+	storeIFace, err := sys.WifiInterfaceStore.GetActive()
+	if err != nil {
+		return fmt.Errorf("failed to get active wifi card: %w", err)
+	}
+	iFace := WifiInterface{
+		Interface: storeIFace.Interface,
+	}
+	networks, err := iFace.ScanWifiNetworks()
 	if err != nil {
 		return fmt.Errorf("failed to scan wifi networks: %w", err)
 	}
