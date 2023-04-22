@@ -15,6 +15,7 @@ import (
 type System struct {
 	DB                 *gorm.DB
 	ConfigStore        store.ConfigStore
+	KeyValueStore      store.KeyValueStore
 	WifiInterfaceStore store.WifiInterfaceStore
 	WifiNetworkStore   store.WifiNetworkStore
 }
@@ -111,8 +112,12 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 	return storeNets
 }
 
-func (sys System) SyncWifiInterfaces() error {
-	cards, err := ReadWifiInterfaces()
+func (sys System) syncWifiInterfaces() error {
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	cards, err := ReadWifiInterfaces(cfg)
 	if err != nil {
 		return err
 	}
@@ -152,7 +157,7 @@ func (sys System) SyncWifiInterfaces() error {
 var ErrNoWifiNetworks error = errors.New("no wifi networks found")
 
 func (sys System) SyncWifiNetworks() error {
-	err := sys.SyncWifiInterfaces()
+	err := sys.syncWifiInterfaces()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
 	}
@@ -202,4 +207,27 @@ func (sys System) Connect() error {
 		Key:  storeNetwork.Key,
 	}
 	return card.Connect(network)
+}
+
+func (sys System) Hotspot() error {
+	storeCard, err := sys.WifiInterfaceStore.GetActive()
+	if err != nil {
+		return fmt.Errorf("failed to get active wifi card: %w", err)
+	}
+	ssid, err := sys.KeyValueStore.Get(store.HotspotSSID)
+	if err != nil {
+		return fmt.Errorf("failed to get hotspot ssid: %w", err)
+	}
+	key, err := sys.KeyValueStore.Get(store.HotspotKey)
+	if err != nil {
+		return fmt.Errorf("failed to get hotspot key: %w", err)
+	}
+	card := WifiInterface{
+		Interface: storeCard.Interface,
+	}
+	network := WifiNetwork{
+		SSID: ssid,
+		Key:  key,
+	}
+	return card.Hotspot(network)
 }
