@@ -231,3 +231,14 @@ func (sys System) Hotspot() error {
 	}
 	return card.Hotspot(network)
 }
+
+func (sys System) GetIPAddress() (string, error) {
+	storeCard, err := sys.WifiInterfaceStore.GetActive()
+	if err != nil {
+		return "", fmt.Errorf("failed to get active wifi card: %w", err)
+	}
+	card := WifiInterface{
+		Interface: storeCard.Interface,
+	}
+	return card.GetIPAddress()
+}
