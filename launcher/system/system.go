@@ -156,7 +156,7 @@ func (sys System) syncWifiInterfaces() error {
 
 var ErrNoWifiNetworks error = errors.New("no wifi networks found")
 
-func (sys System) SyncWifiNetworks() error {
+func (sys System) WifiScan() error {
 	err := sys.syncWifiInterfaces()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
@@ -190,7 +190,7 @@ func (sys System) SyncWifiNetworks() error {
 	return nil
 }
 
-func (sys System) Connect() error {
+func (sys System) WifiConnect() error {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
@@ -209,7 +209,7 @@ func (sys System) Connect() error {
 	return card.Connect(network)
 }
 
-func (sys System) Hotspot() error {
+func (sys System) WifiHotspot() error {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
@@ -232,13 +232,25 @@ func (sys System) Hotspot() error {
 	return card.Hotspot(network)
 }
 
-func (sys System) GetIPAddress() (string, error) {
+func (sys System) LoadNetworkStatus() error {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
-		return "", fmt.Errorf("failed to get active wifi card: %w", err)
+		return fmt.Errorf("failed to get active wifi card: %w", err)
 	}
 	card := WifiInterface{
 		Interface: storeCard.Interface,
 	}
-	return card.GetIPAddress()
+	status, err := card.NetworkStatus()
+	if err != nil {
+		return fmt.Errorf("failed to get network status: %w", err)
+	}
+	err = sys.KeyValueStore.Set(store.IPAddressKey, status.IPV4Address)
+	if err != nil {
+		return fmt.Errorf("failed to set ip address: %w", err)
+	}
+	err = sys.KeyValueStore.Set(store.NetworkModeKey, status.Mode)
+	if err != nil {
+		return fmt.Errorf("failed to set network mode: %w", err)
+	}
+	return nil
 }

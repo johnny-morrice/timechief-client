@@ -24,6 +24,8 @@ const PairingCodeKey = "pairing-code"
 const AccessTokenKey = "access-token"
 const HotspotSSID = "hotspot-ssid"
 const HotspotKey = "hotspot-key"
+const IPAddressKey = "ip-address"
+const NetworkModeKey = "network-mode"
 
 // Set a key-value pair in the store.
 func (store KeyValueStore) Set(key string, value string) error {

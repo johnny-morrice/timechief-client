@@ -60,12 +60,21 @@ func (card WifiInterface) Hotspot(net WifiNetwork) error {
 	return nil
 }
 
-func (card WifiInterface) GetIPAddress() (string, error) {
+func (card WifiInterface) NetworkStatus() (NetworkStatus, error) {
 	net, err := card.netCmd().ReadWifiInterface(card.Interface)
 	if err != nil {
-		return "", fmt.Errorf("failed to read wifi interface: %w", err)
+		return NetworkStatus{}, fmt.Errorf("failed to read wifi interface: %w", err)
 	}
-	return net.IPV4Address, nil
+	status := NetworkStatus{
+		IPV4Address: net.IPV4Address,
+		Mode:        net.Mode,
+	}
+	return status, nil
+}
+
+type NetworkStatus struct {
+	IPV4Address string
+	Mode        string
 }
 
 type WifiNetwork struct {
