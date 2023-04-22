@@ -39,6 +39,26 @@ func ConnectToWifi(ssid, password, ifname string) (WiFiConnectResult, error) {
 	return result, nil
 }
 
+func Hotspot(ssid, password, ifname string) (HotspotConnection, error) {
+	// nmcli device wifi hotspot ssid <SSID> password <password> ifname <interface>
+	result := HotspotConnection{}
+	err := parseExecute(&result, "nmcli", "-g", "json", "device", "wifi", "hotspot", "ssid", ssid, "password", password, "ifname", ifname)
+	if err != nil {
+		return HotspotConnection{}, err
+	}
+	return result, nil
+}
+
+func NetworkInterface(ifname string) (NetInterface, error) {
+	// nmcli -g json device show <interface>
+	result := NetInterface{}
+	err := parseExecute(&result, "nmcli", "-g", "json", "device", "show", ifname)
+	if err != nil {
+		return NetInterface{}, err
+	}
+	return result, nil
+}
+
 func parseExecute(out interface{}, command string, args ...string) error {
 	bs, err := execute(command, args...)
 	if err != nil {
@@ -74,6 +94,35 @@ func execute(command string, args ...string) ([]byte, error) {
 	return stdoutBuf.Bytes(), nil
 }
 
+type NetInterface struct {
+	Device struct {
+		Type   string `json:"type"`
+		Name   string `json:"name"`
+		Driver string `json:"driver"`
+		State  string `json:"state"`
+		IP4    struct {
+			Address []struct {
+				IP      string `json:"ip"`
+				Prefix  int    `json:"prefix"`
+				Gateway string `json:"gateway"`
+			} `json:"address"`
+		} `json:"ip4"`
+		IP6 struct {
+			Address []struct {
+				IP     string `json:"ip"`
+				Prefix int    `json:"prefix"`
+				Scope  string `json:"scope"`
+			} `json:"address"`
+		} `json:"ip6"`
+		Wifi struct {
+			SSID string `json:"ssid"`
+			Mode string `json:"mode"`
+			Chan int    `json:"chan"`
+			Rate int    `json:"rate"`
+		} `json:"wifi"`
+	} `json:"device"`
+}
+
 type WiFiInterface struct {
 	Device   string `json:"device"`
 	State    string `json:"state"`
@@ -97,4 +146,43 @@ type WiFiNetwork struct {
 type WiFiConnectResult struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
+}
+
+type HotspotConnection struct {
+	Connection              HotpotConnectionSettings             `json:"connection"`
+	NM80211Wireless         Hotspot80211WirelessSettings         `json:"802-11-wireless"`
+	NM80211WirelessSecurity Hotspot80211WirelessSecuritySettings `json:"802-11-wireless-security"`
+	IPv4                    HotspotIPv4Settings                  `json:"ipv4"`
+	IPv6                    HotspotIPv6Settings                  `json:"ipv6"`
+}
+
+type HotpotConnectionSettings struct {
+	ID          string   `json:"id"`
+	UUID        string   `json:"uuid"`
+	Type        string   `json:"type"`
+	AutoConnect string   `json:"autoconnect"`
+	Permissions []string `json:"permissions"`
+}
+
+type Hotspot80211WirelessSettings struct {
+	SSID       string `json:"ssid"`
+	Mode       string `json:"mode"`
+	Security   string `json:"security"`
+	MACAddress string `json:"mac-address"`
+}
+
+type Hotspot80211WirelessSecuritySettings struct {
+	KeyManagement string `json:"key-mgmt"`
+	PSK           string `json:"psk"`
+}
+
+type HotspotIPv4Settings struct {
+	Method     string   `json:"method"`
+	Addressing string   `json:"addressing"`
+	DNS        []string `json:"dns"`
+}
+
+type HotspotIPv6Settings struct {
+	Method     string `json:"method"`
+	Addressing string `json:"addressing"`
 }
