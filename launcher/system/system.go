@@ -112,7 +112,7 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 	return storeNets
 }
 
-func (sys System) syncWifiInterfaces() error {
+func (sys System) WifiLoadInterfaces() error {
 	cfg, err := sys.ConfigStore.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)
@@ -157,10 +157,6 @@ func (sys System) syncWifiInterfaces() error {
 var ErrNoWifiNetworks error = errors.New("no wifi networks found")
 
 func (sys System) WifiScan() error {
-	err := sys.syncWifiInterfaces()
-	if err != nil {
-		return fmt.Errorf("failed to get active wifi card: %w", err)
-	}
 	storeIFace, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)

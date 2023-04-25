@@ -8,13 +8,13 @@ import (
 )
 
 type WifiNetwork struct {
-	ID        uint `gorm:"primarykey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	UUID      string `gorm:"uniqueIndex"`
-	SSID      string
-	Key       string
-	Active    bool
+	ID             uint `gorm:"primarykey"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	SSID           string
+	SignalStrength int
+	Key            string
+	Active         bool
 }
 
 type WifiNetworkStore struct {

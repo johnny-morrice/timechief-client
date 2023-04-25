@@ -10,16 +10,29 @@ import (
 )
 
 type Service struct {
-	DeviceDataStore   store.DeviceDataStore
-	LaunchTargetStore store.LaunchTargetStore
-	StateFlagStore    store.StateFlagStore
-	KeyValueStore     store.KeyValueStore
+	DeviceDataStore    store.DeviceDataStore
+	LaunchTargetStore  store.LaunchTargetStore
+	StateFlagStore     store.StateFlagStore
+	KeyValueStore      store.KeyValueStore
+	WifiInterfaceStore store.WifiInterfaceStore
+	WifiNetworkStore   store.WifiNetworkStore
 }
 
 type LauncherState struct {
 	Flags               []string
 	ActiveTargetVersion string
-	SetupComplete       bool
+	WifiState           WifiState
+}
+
+type WifiState struct {
+	ActiveWifiInterface string
+	ActiveSSID          string
+	WifiNetworks        []WifiNetwork
+}
+
+type WifiNetwork struct {
+	SSID           string
+	SignalStrength int
 }
 
 type DeviceData struct {
@@ -86,11 +99,39 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, err
 	}
 
+	wifiInterface, err := svc.WifiInterfaceStore.GetActive()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, err
+	}
+
+	storeNets, err := svc.WifiNetworkStore.List()
+	if err != nil {
+		return DeviceData{}, err
+	}
+
+	activeNet, err := svc.WifiNetworkStore.GetActive()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, err
+	}
+
+	networks := make([]WifiNetwork, len(storeNets))
+	for i, storeNet := range storeNets {
+		networks[i] = WifiNetwork{
+			SSID:           storeNet.SSID,
+			SignalStrength: storeNet.SignalStrength,
+		}
+	}
+
 	result := DeviceData{
 		ServiceData: clockData,
 		LauncherState: LauncherState{
 			Flags:               flags,
 			ActiveTargetVersion: target.Version.Details(),
+			WifiState: WifiState{
+				ActiveWifiInterface: wifiInterface.Interface,
+				ActiveSSID:          activeNet.SSID,
+				WifiNetworks:        networks,
+			},
 		},
 	}
 

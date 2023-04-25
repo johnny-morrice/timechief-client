@@ -80,27 +80,50 @@ func Daemon(ctx *cli.Context) error {
 		RequestTimeout:       ctx.Duration("service-request-timeout"),
 	}
 
+	system := system.System{
+		ConfigStore:        cfgStore,
+		WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
+		DB:                 db,
+	}
+
+	wifiLoad := daemon.WifiLoadInterfaces{
+		StateFlagStore: flagStore,
+		System:         system,
+	}
+	wifiConn := daemon.WifiConnect{
+		StateFlagStore: flagStore,
+		System:         system,
+	}
+	wifiScan := daemon.WifiScan{
+		StateFlagStore: flagStore,
+		System:         system,
+	}
+	wifiHotspot := daemon.WifiHotspot{
+		StateFlagStore: flagStore,
+		System:         system,
+	}
+
+	go wifiLoad.Start(ctx)
+	go wifiConn.Start(ctx)
+	go wifiScan.Start(ctx)
+	go wifiHotspot.Start(ctx)
 	go updateDaemon.Start(ctx)
 	go deviceDataDaemon.Start(ctx)
 	go pairingDaemon.Start(ctx)
 
-	return serveAPI(ctx, cfgStore, keyValueStore, db)
+	return serveAPI(ctx, cfgStore, system, keyValueStore, db)
 }
 
 type apiPackage interface {
 	AddRoutes(mux *http.ServeMux)
 }
 
-func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, keyValueStore store.KeyValueStore, db *gorm.DB) error {
+func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, system system.System, keyValueStore store.KeyValueStore, db *gorm.DB) error {
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
 	packages := []apiPackage{
 		api.System{
-			Service: system.System{
-				ConfigStore:        cfgStore,
-				WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
-				DB:                 db,
-			},
+			Service: system,
 		},
 		api.Data{
 			Service: data.Service{

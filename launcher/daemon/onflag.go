@@ -20,6 +20,9 @@ func (daemon onFlag) start(ctx *cli.Context, action func(ctx *cli.Context) error
 	if err != nil {
 		log.Printf("daemon tick error: %s", err)
 	}
+	if daemon.refreshInterval == 0 {
+		daemon.refreshInterval = time.Second
+	}
 	runEvery(daemon.refreshInterval, func() {
 		err := daemon.doTick(ctx, action)
 		if err != nil {
