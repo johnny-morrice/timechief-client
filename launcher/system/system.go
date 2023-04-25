@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"gorm.io/gorm"
 )
@@ -104,7 +103,6 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 	for i := 0; i < len(nets); i++ {
 		net := nets[i]
 		storeNet := &store.WifiNetwork{
-			UUID: uuid.NewString(),
 			SSID: net.SSID,
 		}
 		storeNets[i] = storeNet
