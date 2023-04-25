@@ -22,10 +22,16 @@ type LauncherState struct {
 	Flags               []string
 	ActiveTargetVersion string
 	WifiState           WifiState
+	NetworkState        NetworkState
+}
+
+type NetworkState struct {
+	IPAddress string
 }
 
 type WifiState struct {
 	ActiveWifiInterface string
+	InterfaceMode       string
 	ActiveSSID          string
 	WifiNetworks        []WifiNetwork
 }
@@ -122,6 +128,16 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		}
 	}
 
+	ipAddress, err := svc.KeyValueStore.Get(store.IPAddressKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, err
+	}
+
+	interfaceMode, err := svc.KeyValueStore.Get(store.InterfaceModeKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, err
+	}
+
 	result := DeviceData{
 		ServiceData: clockData,
 		LauncherState: LauncherState{
@@ -129,8 +145,12 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			ActiveTargetVersion: target.Version.Details(),
 			WifiState: WifiState{
 				ActiveWifiInterface: wifiInterface.Interface,
+				InterfaceMode:       interfaceMode,
 				ActiveSSID:          activeNet.SSID,
 				WifiNetworks:        networks,
+			},
+			NetworkState: NetworkState{
+				IPAddress: ipAddress,
 			},
 		},
 	}

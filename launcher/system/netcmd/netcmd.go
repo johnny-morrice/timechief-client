@@ -31,7 +31,7 @@ func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
 func (nc NetCmd) ReadWifiInterfaces() ([]WiFiInterface, error) {
 	// nmcli -g json device wifi list
 	result := []WiFiInterface{}
-	err := parseExecute(&result, nc.scriptPath("wifi-interfaces"))
+	err := parseExecute(&result, nc.scriptPath("timechief-wifi-interfaces"))
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (nc NetCmd) ReadWifiInterfaces() ([]WiFiInterface, error) {
 func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) (NetResult, error) {
 	// nmcli -g json device wifi connect <SSID> password <password> ifname <interface>
 	result := NetResult{}
-	err := parseExecute(&result, nc.scriptPath("connect"), ssid, password, ifname)
+	err := parseExecute(&result, nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
 	if err != nil {
 		return NetResult{}, err
 	}
@@ -51,7 +51,7 @@ func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) (NetResult, error)
 func (nc NetCmd) Hotspot(ssid, password, ifname string) (NetResult, error) {
 	// nmcli device wifi hotspot ssid <SSID> password <password> ifname <interface>
 	result := NetResult{}
-	err := parseExecute(&result, nc.scriptPath("hotspot"), ssid, password, ifname)
+	err := parseExecute(&result, nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname)
 	if err != nil {
 		return NetResult{}, err
 	}
@@ -61,7 +61,7 @@ func (nc NetCmd) Hotspot(ssid, password, ifname string) (NetResult, error) {
 func (nc NetCmd) ReadWifiInterface(ifname string) (WiFiInterface, error) {
 	// nmcli -g json device show <interface>
 	result := WiFiInterface{}
-	err := parseExecute(&result, nc.scriptPath("wifi-interface"), ifname)
+	err := parseExecute(&result, nc.scriptPath("timechief-wifi-interface"), ifname)
 	if err != nil {
 		return WiFiInterface{}, err
 	}

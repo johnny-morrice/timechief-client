@@ -228,8 +228,11 @@ func (sys System) WifiHotspot() error {
 
 func (sys System) LoadNetworkStatus() error {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil
 	}
 	card := WifiInterface{
 		Interface: storeCard.Interface,
@@ -242,7 +245,7 @@ func (sys System) LoadNetworkStatus() error {
 	if err != nil {
 		return fmt.Errorf("failed to set ip address: %w", err)
 	}
-	err = sys.KeyValueStore.Set(store.NetworkModeKey, status.Mode)
+	err = sys.KeyValueStore.Set(store.InterfaceModeKey, status.Mode)
 	if err != nil {
 		return fmt.Errorf("failed to set network mode: %w", err)
 	}
