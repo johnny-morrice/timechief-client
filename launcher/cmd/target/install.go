@@ -18,15 +18,6 @@ func Install(ctx *cli.Context) error {
 
 	systemExe := filepath.Join(installRoot, "bin/timechief-launcher")
 
-	targetBootstrap := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-bootstrap")
-	systemBootstrap := filepath.Join(installRoot, "bin/timechief-bootstrap")
-
-	targetReboot := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-reboot")
-	systemReboot := filepath.Join(installRoot, "bin/timechief-reboot")
-
-	targetShutdown := filepath.Join(targetRoot, "timechief-client-bundle", "timechief-shutdown")
-	systemShutdown := filepath.Join(installRoot, "bin/timechief-shutdown")
-
 	splashWidth := ctx.Int("splash-width")
 	splashHeight := ctx.Int("splash-height")
 	targetSplash := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images",
@@ -36,10 +27,25 @@ func Install(ctx *cli.Context) error {
 	links := []link{
 		{oldPath: targetExe, newPath: systemExe},
 		{oldPath: targetSplash, newPath: systemSplash},
-		{oldPath: targetBootstrap, newPath: systemBootstrap},
-		{oldPath: targetReboot, newPath: systemReboot},
-		{oldPath: targetShutdown, newPath: systemShutdown},
 	}
+
+	binScripts := []string{
+		"timechief-bootstrap",
+		"timechief-reboot",
+		"timechief-shutdown",
+		"timechief-wifi-connect",
+		"timechief-wifi-hotspot",
+		"timechief-wifi-interface",
+		"timechief-wifi-interfaces",
+		"timechief-wifi-scan",
+	}
+
+	for _, script := range binScripts {
+		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", script)
+		systemScript := filepath.Join(installRoot, "bin", script)
+		links = append(links, link{oldPath: targetScript, newPath: systemScript})
+	}
+
 	return installLinks(links)
 }
 

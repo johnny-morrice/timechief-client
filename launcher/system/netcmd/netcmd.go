@@ -21,7 +21,7 @@ func (nc NetCmd) scriptPath(scriptName string) string {
 func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
 	// nmcli -g json device wifi rescan ifname <interface>
 	result := []WiFiNetwork{}
-	err := parseExecute(&result, nc.scriptPath("scan"), ifname)
+	err := parseExecute(&result, nc.scriptPath("timechief-wifi-scan"), ifname)
 	if err != nil {
 		return nil, err
 	}
