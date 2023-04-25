@@ -18,28 +18,8 @@ func (nc NetCmd) scriptPath(scriptName string) string {
 	return filepath.Join(nc.BasePath, scriptName)
 }
 
-func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
-	// nmcli -g json device wifi rescan ifname <interface>
-	result := []WiFiNetwork{}
-	err := parseExecute(&result, nc.scriptPath("timechief-wifi-scan"), ifname)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-func (nc NetCmd) ReadWifiInterfaces() ([]WiFiInterface, error) {
-	// nmcli -g json device wifi list
-	result := []WiFiInterface{}
-	err := parseExecute(&result, nc.scriptPath("timechief-wifi-interfaces"))
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) (NetResult, error) {
-	// nmcli -g json device wifi connect <SSID> password <password> ifname <interface>
+	// nmcli device wifi connect <SSID> password <password> ifname <interface>
 	result := NetResult{}
 	err := parseExecute(&result, nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
 	if err != nil {
@@ -59,11 +39,31 @@ func (nc NetCmd) Hotspot(ssid, password, ifname string) (NetResult, error) {
 }
 
 func (nc NetCmd) ReadWifiInterface(ifname string) (WiFiInterface, error) {
-	// nmcli -g json device show <interface>
+	// nmcli device show <interface>
 	result := WiFiInterface{}
 	err := parseExecute(&result, nc.scriptPath("timechief-wifi-interface"), ifname)
 	if err != nil {
 		return WiFiInterface{}, err
+	}
+	return result, nil
+}
+
+func (nc NetCmd) ReadWifiInterfaces() ([]WiFiInterface, error) {
+	// nmcli device wifi list
+	result := []WiFiInterface{}
+	err := parseExecute(&result, nc.scriptPath("timechief-wifi-interfaces"))
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
+	// nmcli device wifi rescan ifname <interface>
+	result := []WiFiNetwork{}
+	err := parseExecute(&result, nc.scriptPath("timechief-wifi-scan"), ifname)
+	if err != nil {
+		return nil, err
 	}
 	return result, nil
 }
@@ -113,8 +113,7 @@ type WiFiInterface struct {
 
 type WiFiNetwork struct {
 	SSID     string
-	Mode     string
-	Signal   string
+	Signal   int
 	Security string
 }
 

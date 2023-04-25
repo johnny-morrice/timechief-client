@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 
 	"github.com/johnny-morrice/timechief-client/launcher/store"
@@ -31,8 +32,13 @@ func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
 	}
 	result := make([]WifiNetwork, len(nmNets))
 	for i, nmNet := range nmNets {
+		if nmNet.Security != "WPA2" {
+			log.Printf("Skipping network %s with security %s", nmNet.SSID, nmNet.Security)
+			continue
+		}
 		result[i] = WifiNetwork{
-			SSID: nmNet.SSID,
+			SSID:   nmNet.SSID,
+			Signal: nmNet.Signal,
 		}
 	}
 	return result, nil
@@ -78,8 +84,9 @@ type NetworkStatus struct {
 }
 
 type WifiNetwork struct {
-	SSID string
-	Key  string
+	SSID   string
+	Key    string
+	Signal int
 }
 
 func ReadWifiInterfaces(cfg store.Config) ([]WifiInterface, error) {
@@ -90,6 +97,7 @@ func ReadWifiInterfaces(cfg store.Config) ([]WifiInterface, error) {
 	result := make([]WifiInterface, len(nmIfaces))
 	for i, nmIface := range nmIfaces {
 		result[i] = WifiInterface{
+			Config:    cfg,
 			Interface: nmIface.Device,
 		}
 	}
