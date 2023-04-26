@@ -16,7 +16,7 @@ type WifiHotspot struct {
 
 func (w WifiHotspot) Start(ctx *cli.Context) {
 	daemon := onFlag{
-		flagName:        "wifi-hotstop",
+		flagName:        "wifi-hotspot",
 		stateFlagStore:  w.StateFlagStore,
 		refreshInterval: w.RefreshInterval,
 	}

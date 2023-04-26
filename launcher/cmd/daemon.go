@@ -83,6 +83,7 @@ func Daemon(ctx *cli.Context) error {
 
 	system := system.System{
 		ConfigStore:        cfgStore,
+		KeyValueStore:      keyValueStore,
 		WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
 		WifiNetworkStore:   store.WifiNetworkStore{DB: db},
 		DB:                 db,
@@ -104,6 +105,9 @@ func Daemon(ctx *cli.Context) error {
 		StateFlagStore: flagStore,
 		System:         system,
 	}
+	networkStatus := daemon.NetworkStatus{
+		System: system,
+	}
 
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
@@ -112,6 +116,7 @@ func Daemon(ctx *cli.Context) error {
 	go updateDaemon.Start(ctx)
 	go deviceDataDaemon.Start(ctx)
 	go pairingDaemon.Start(ctx)
+	go networkStatus.Start(ctx)
 
 	return serveAPI(ctx, db)
 }

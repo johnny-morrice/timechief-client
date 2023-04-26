@@ -13,7 +13,7 @@ type NetworkStatus struct {
 	RefreshInterval time.Duration
 }
 
-func (daemon NetworkStatus) start(ctx *cli.Context) {
+func (daemon NetworkStatus) Start(ctx *cli.Context) {
 	err := daemon.doTick(ctx)
 	if err != nil {
 		log.Printf("daemon tick error: %s", err)

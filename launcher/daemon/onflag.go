@@ -43,6 +43,7 @@ func (daemon onFlag) doTick(ctx *cli.Context, action func(ctx *cli.Context) erro
 	if !isFlagSet {
 		return nil
 	}
+	log.Printf("performing daemon action for flag: %s", daemon.flagName)
 	err = action(ctx)
 	if err != nil {
 		return fmt.Errorf("error performing daemon action: %s", err)

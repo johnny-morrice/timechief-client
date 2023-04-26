@@ -42,6 +42,9 @@ func (store WifiNetworkStore) SetActive(ssid string) error {
 	if result.Error != nil {
 		return result.Error
 	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("failed to set active WIFI network %s: %w", ssid, gorm.ErrRecordNotFound)
+	}
 	return nil
 }
 
