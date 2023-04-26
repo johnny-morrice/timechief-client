@@ -31,22 +31,17 @@ func (store WifiNetworkStore) Create(network *WifiNetwork) error {
 }
 
 // SetActive sets the active flag of a WIFI network to true, and sets all other networks to false.
-func (store WifiNetworkStore) SetActive(network *WifiNetwork) error {
-	if network.ID == 0 {
-		return fmt.Errorf("cannot activate WIFI network with ID 0")
-	}
+func (store WifiNetworkStore) SetActive(ssid string) error {
 	// Deactivate all other WIFI networks
 	result := store.DB.Model(&WifiNetwork{}).Where("active = ?", true).Update("active", false)
 	if result.Error != nil {
 		return result.Error
 	}
 	// Activate the network
-	result = store.DB.Model(&network).Where("id = ?", network.ID).Update("active", true)
+	result = store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("active", true)
 	if result.Error != nil {
 		return result.Error
 	}
-	// Hack to update the network in memory
-	network.Active = true
 	return nil
 }
 
