@@ -111,15 +111,20 @@ func Daemon(ctx *cli.Context) error {
 	go deviceDataDaemon.Start(ctx)
 	go pairingDaemon.Start(ctx)
 
-	return serveAPI(ctx, cfgStore, system, keyValueStore, db)
+	return serveAPI(ctx, db)
 }
 
 type apiPackage interface {
 	AddRoutes(mux *http.ServeMux)
 }
 
-func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, system system.System, keyValueStore store.KeyValueStore, db *gorm.DB) error {
+func serveAPI(ctx *cli.Context, db *gorm.DB) error {
 	addr := ctx.String("listen-addr")
+	system := system.System{
+		ConfigStore:        store.ConfigStore{DB: db},
+		WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
+		DB:                 db,
+	}
 	mux := http.NewServeMux()
 	packages := []apiPackage{
 		api.System{
@@ -127,17 +132,19 @@ func serveAPI(ctx *cli.Context, cfgStore store.ConfigStore, system system.System
 		},
 		api.Data{
 			Service: data.Service{
-				DeviceDataStore:   store.DeviceDataStore{DB: db},
-				LaunchTargetStore: store.LaunchTargetStore{DB: db},
-				StateFlagStore:    store.StateFlagStore{DB: db},
-				KeyValueStore:     keyValueStore,
+				DeviceDataStore:    store.DeviceDataStore{DB: db},
+				LaunchTargetStore:  store.LaunchTargetStore{DB: db},
+				StateFlagStore:     store.StateFlagStore{DB: db},
+				WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
+				WifiNetworkStore:   store.WifiNetworkStore{DB: db},
+				KeyValueStore:      store.KeyValueStore{DB: db},
 			},
 		},
 		api.Launcher{
 			Service: launcher.Service{
 				LaunchTargetStore: store.LaunchTargetStore{DB: db},
 				StateFlagStore:    store.StateFlagStore{DB: db},
-				CfgStore:          cfgStore,
+				CfgStore:          store.ConfigStore{DB: db},
 			},
 		},
 	}

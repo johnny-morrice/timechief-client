@@ -18,6 +18,9 @@ func (daemon NetworkStatus) start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("daemon tick error: %s", err)
 	}
+	if daemon.RefreshInterval == 0 {
+		daemon.RefreshInterval = 5 * time.Second
+	}
 	runEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
