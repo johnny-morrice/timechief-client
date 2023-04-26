@@ -8,6 +8,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/service/launcher"
+	syssvc "github.com/johnny-morrice/timechief-client/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/johnny-morrice/timechief-client/launcher/update"
@@ -128,7 +129,10 @@ func serveAPI(ctx *cli.Context, db *gorm.DB) error {
 	mux := http.NewServeMux()
 	packages := []apiPackage{
 		api.System{
-			Service: system,
+			Service: syssvc.Service{
+				System:         system,
+				StateFlagStore: store.StateFlagStore{DB: db},
+			},
 		},
 		api.Data{
 			Service: data.Service{
