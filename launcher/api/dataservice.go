@@ -30,7 +30,7 @@ func (api Data) HandleGetDeviceData(w http.ResponseWriter, r *http.Request) {
 	data, err := api.Service.GetDeviceData()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to get device data: %v", err)
+		log.Printf("failed to get device data: %v", err)
 		return
 	}
 	writeJSON(w, data)
@@ -55,7 +55,7 @@ func (api Data) HandlePostPairing(w http.ResponseWriter, r *http.Request) {
 	err := api.Service.PairDevice()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to create pairing: %v", err)
+		log.Printf("failed to create pairing: %v", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -69,7 +69,7 @@ func (api Data) HandleGetPairing(w http.ResponseWriter, r *http.Request) {
 	status, err := api.Service.GetPairingStatus()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to get target: %v", err)
+		log.Printf("failed to get target: %v", err)
 		return
 	}
 	writeJSON(w, status)

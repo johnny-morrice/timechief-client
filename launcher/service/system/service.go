@@ -1,13 +1,16 @@
 package system
 
 import (
+	"errors"
+
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 )
 
 type Service struct {
-	System         system.System
-	StateFlagStore store.StateFlagStore
+	System           system.System
+	StateFlagStore   store.StateFlagStore
+	WifiNetworkStore store.WifiNetworkStore
 }
 
 func (svc Service) Reboot() error {
@@ -19,6 +22,17 @@ func (svc Service) Shutdown() error {
 
 func (svc Service) WifiConnect() error {
 	return svc.StateFlagStore.CreateIfNotExists("wifi-connect")
+}
+
+func (svc Service) WifiSetActiveNetwork(ssid string) error {
+	if ssid == "" {
+		return errors.New("expected non-empty SSID")
+	}
+	err := svc.WifiNetworkStore.SetActive(ssid)
+	if err != nil {
+		return err
+	}
+	return svc.WifiConnect()
 }
 
 func (svc Service) WifiScan() error {

@@ -33,7 +33,7 @@ func (api Launcher) HandleGetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := api.Service.GetConfig()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to get config: %v", err)
+		log.Printf("failed to get config: %v", err)
 		return
 	}
 	writeJSON(w, config)
@@ -47,7 +47,7 @@ func (api Launcher) HandleGetTarget(w http.ResponseWriter, r *http.Request) {
 	target, err := api.Service.GetTarget()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to get target: %v", err)
+		log.Printf("failed to get target: %v", err)
 		return
 	}
 	writeJSON(w, target)
@@ -61,7 +61,7 @@ func (api Launcher) HandleRecoverTargetStatus(w http.ResponseWriter, r *http.Req
 	recoveryState, err := api.Service.RecoverTarget()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to recover target: %v", err)
+		log.Printf("failed to recover target: %v", err)
 		return
 	}
 	writeJSON(w, recoveryState)

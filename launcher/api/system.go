@@ -26,6 +26,32 @@ type SystemService interface {
 	WifiHotspot() error
 	WifiLoadInterfaces() error
 	WifiScan() error
+	WifiSetActiveNetwork(ssid string) error
+}
+
+type WifiActivationRequest struct {
+	SSID string
+}
+
+func (api System) HandleWifiSetActiveNetwork(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	req := WifiActivationRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		log.Printf("failed to decode wifi activation request: %v", err)
+		return
+	}
+	err = api.Service.WifiSetActiveNetwork(req.SSID)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to handle wifi set active network: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (api System) HandleWifiConnect(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +62,7 @@ func (api System) HandleWifiConnect(w http.ResponseWriter, r *http.Request) {
 	err := api.Service.WifiConnect()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to handle wifi connect: %v", err)
+		log.Printf("failed to handle wifi connect: %v", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -50,7 +76,7 @@ func (api System) HandleWifiHotspot(w http.ResponseWriter, r *http.Request) {
 	err := api.Service.WifiHotspot()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to handle wifi hotspot: %v", err)
+		log.Printf("failed to handle wifi hotspot: %v", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -64,7 +90,7 @@ func (api System) HandleWifiLoadInterfaces(w http.ResponseWriter, r *http.Reques
 	err := api.Service.WifiLoadInterfaces()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to handle wifi load interfaces: %v", err)
+		log.Printf("failed to handle wifi load interfaces: %v", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -78,7 +104,7 @@ func (api System) HandleWifiScan(w http.ResponseWriter, r *http.Request) {
 	err := api.Service.WifiScan()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to handle wifi scan: %v", err)
+		log.Printf("failed to handle wifi scan: %v", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -92,7 +118,7 @@ func (api System) HandleReboot(w http.ResponseWriter, r *http.Request) {
 	err := api.Service.Reboot()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to reboot: %v", err)
+		log.Printf("failed to reboot: %v", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -106,7 +132,7 @@ func (api System) HandleShutdown(w http.ResponseWriter, r *http.Request) {
 	err := api.Service.Shutdown()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		log.Printf("Failed to shutdown: %v", err)
+		log.Printf("failed to shutdown: %v", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -116,6 +142,6 @@ func writeJSON(w http.ResponseWriter, obj interface{}) {
 	enc := json.NewEncoder(w)
 	err := enc.Encode(obj)
 	if err != nil {
-		log.Printf("Failed to encode JSON to HTTP writer: %v", err)
+		log.Printf("failed to encode JSON to HTTP writer: %v", err)
 	}
 }

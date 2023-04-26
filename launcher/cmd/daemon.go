@@ -132,8 +132,9 @@ func serveAPI(ctx *cli.Context, db *gorm.DB) error {
 	packages := []apiPackage{
 		api.System{
 			Service: syssvc.Service{
-				System:         system,
-				StateFlagStore: store.StateFlagStore{DB: db},
+				System:           system,
+				StateFlagStore:   store.StateFlagStore{DB: db},
+				WifiNetworkStore: store.WifiNetworkStore{DB: db},
 			},
 		},
 		api.Data{
