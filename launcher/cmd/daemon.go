@@ -139,6 +139,7 @@ func serveAPI(ctx *cli.Context, db *gorm.DB) error {
 			Service: syssvc.Service{
 				System:           system,
 				StateFlagStore:   store.StateFlagStore{DB: db},
+				KeyValueStore:    store.KeyValueStore{DB: db},
 				WifiNetworkStore: store.WifiNetworkStore{DB: db},
 			},
 		},
