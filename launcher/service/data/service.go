@@ -124,7 +124,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	for i, storeNet := range storeNets {
 		networks[i] = WifiNetwork{
 			SSID:           storeNet.SSID,
-			SignalStrength: storeNet.SignalStrength,
+			SignalStrength: storeNet.Signal,
 		}
 	}
 

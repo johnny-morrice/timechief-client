@@ -8,13 +8,13 @@ import (
 )
 
 type WifiNetwork struct {
-	ID             uint `gorm:"primarykey"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	SSID           string `gorm:"column:ssid"`
-	SignalStrength int
-	Key            string
-	Active         bool
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	SSID      string `gorm:"column:ssid"`
+	Signal    int
+	Key       string
+	Active    bool
 }
 
 type WifiNetworkStore struct {
@@ -63,7 +63,7 @@ func (store WifiNetworkStore) GetActive() (WifiNetwork, error) {
 // List returns all WIFI networks in the store, sorted by ESSID, BSSID, and UUID.
 func (store WifiNetworkStore) List() ([]WifiNetwork, error) {
 	var networks []WifiNetwork
-	result := store.DB.Order("signal_strength, ssid").Find(&networks)
+	result := store.DB.Order("signal, ssid").Find(&networks)
 	if result.Error != nil {
 		return []WifiNetwork{}, result.Error
 	}

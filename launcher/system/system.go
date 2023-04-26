@@ -103,7 +103,8 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 	for i := 0; i < len(nets); i++ {
 		net := nets[i]
 		storeNet := &store.WifiNetwork{
-			SSID: net.SSID,
+			SSID:   net.SSID,
+			Signal: net.Signal,
 		}
 		storeNets[i] = storeNet
 	}
