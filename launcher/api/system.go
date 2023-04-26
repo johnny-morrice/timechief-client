@@ -16,6 +16,7 @@ func (api System) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/system/wifi/connect", api.HandleWifiConnect)
 	mux.HandleFunc("/api/system/wifi/hotspot", api.HandleWifiHotspot)
 	mux.HandleFunc("/api/system/wifi/load-interfaces", api.HandleWifiLoadInterfaces)
+	mux.HandleFunc("/api/system/wifi/network", api.HandleWifiSetActiveNetwork)
 	mux.HandleFunc("/api/system/wifi/scan", api.HandleWifiScan)
 }
 

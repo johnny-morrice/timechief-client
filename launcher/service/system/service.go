@@ -28,11 +28,7 @@ func (svc Service) WifiSetActiveNetwork(ssid string) error {
 	if ssid == "" {
 		return errors.New("expected non-empty SSID")
 	}
-	err := svc.WifiNetworkStore.SetActive(ssid)
-	if err != nil {
-		return err
-	}
-	return svc.WifiConnect()
+	return svc.WifiSetActiveNetwork(ssid)
 }
 
 func (svc Service) WifiScan() error {
