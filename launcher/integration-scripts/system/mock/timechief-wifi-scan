@@ -5,7 +5,7 @@ cat << EOF
     {
         "SSID": "TimeChiefSSID",
         "Signal": 10,
-        "Security": "WPA2",
+        "Security": "WPA2"
     }
 ]
 EOF

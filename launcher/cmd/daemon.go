@@ -84,6 +84,7 @@ func Daemon(ctx *cli.Context) error {
 	system := system.System{
 		ConfigStore:        cfgStore,
 		WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
+		WifiNetworkStore:   store.WifiNetworkStore{DB: db},
 		DB:                 db,
 	}
 
@@ -124,6 +125,7 @@ func serveAPI(ctx *cli.Context, db *gorm.DB) error {
 	system := system.System{
 		ConfigStore:        store.ConfigStore{DB: db},
 		WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
+		WifiNetworkStore:   store.WifiNetworkStore{DB: db},
 		DB:                 db,
 	}
 	mux := http.NewServeMux()
