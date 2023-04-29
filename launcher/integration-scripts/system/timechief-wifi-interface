@@ -15,7 +15,7 @@ iwconfig_output = subprocess.check_output(['sudo', 'iwconfig', device_name]).dec
 ssid = None
 mode = None
 for line in iwconfig_output.split('\n'):
-    ssid_re = r'ESSID:(\S+)'
+    ssid_re = r'ESSID:"(\S+)"'
     mode_re = r'Mode:(\S+)'
     if re.search(ssid_re, line):
         ssid = re.search(ssid_re, line).group(1)

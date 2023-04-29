@@ -4,24 +4,44 @@ import json
 import sys
 
 def connect_wifi(ssid, password, ifname):
-    # Form the command to connect to the Wi-Fi network
-    cmd = ['sudo', 'iwconfig', ifname, 'essid', ssid, 'key', password]
+    # Create the wpa_supplicant configuration using wpa_passphrase
+    wpa_config = subprocess.run(["sudo", "wpa_passphrase", ssid, password], capture_output=True)
+    if wpa_config.returncode != 0:
+        # Print subprocess output to stderr
+        sys.stderr.buffer.write(wpa_config.stdout)
+        sys.stderr.buffer.write(wpa_config.stderr)
+        return json.dumps({"Success": False, "Message": wpa_config.stdout.decode("utf-8").strip()})
 
-    # Execute the command and capture the output
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = proc.communicate()
+    suppliant_tmp = "/tmp/wpa_supplicant.conf"
+    # Write the wpa_supplicant configuration to a temporary file
+    with open(suppliant_tmp, "wb") as f:
+        f.write(wpa_config.stdout)
 
-    # Check if the connection was successful
-    if err:
-        return json.dumps({"Success": False, "Message": err.decode()})
-    else:
-        return json.dumps({"Success": True, "Message": out.decode()})
+    # Start wpa_supplicant with the configuration passed through the temporary file
+    cmd = ["sudo", "wpa_supplicant", "-B", "-i", ifname, "-c", suppliant_tmp]
+    wpa_supplicant = subprocess.run(cmd, capture_output=True)
 
-# Read the ssid, password, and ifname from the command line arguments
+    # Check if wpa_supplicant started successfully
+    if wpa_supplicant.returncode != 0:
+        # Print subprocess output to stderr
+        sys.stderr.buffer.write(wpa_supplicant.stdout)
+        sys.stderr.buffer.write(wpa_supplicant.stderr)
+        return json.dumps({"Success": False, "Message": wpa_supplicant.stdout.decode("utf-8").strip()})
+
+    # Obtain IP address using DHCPD
+    dhclient = subprocess.run(["sudo", "dhclient", ifname], capture_output=True)
+    sys.stderr.buffer.write(dhclient.stdout)
+    sys.stderr.buffer.write(dhclient.stderr)
+    if dhclient.returncode != 0:
+        return json.dumps({"Success": False, "Message": dhclient.stdout.decode("utf-8").strip()})
+
+    # Return success message
+    return json.dumps({"Success": True, "Message": f"Connected to {ssid} successfully"})
+
+# Get the SSID, password, and interface name from the command-line arguments
 ssid = sys.argv[1]
 password = sys.argv[2]
 ifname = sys.argv[3]
 
 # Call the connect_wifi function and print the result
-result = connect_wifi(ssid, password, ifname)
-print(result)
+print(connect_wifi(ssid, password, ifname))
