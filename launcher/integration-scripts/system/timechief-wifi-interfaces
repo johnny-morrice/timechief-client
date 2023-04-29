@@ -1,0 +1,15 @@
+#!/usr/bin/python
+
+import subprocess
+import json
+
+# Run the 'ls' command to get the list of wifi device names
+output = subprocess.check_output('ls /sys/class/ieee80211/*/device/net/', shell=True).decode().strip().split('\n')
+
+# Create a list of dictionaries for each device
+devices = []
+for device in output:
+    devices.append({'Device': device})
+
+# Print the list as a JSON array
+print(json.dumps(devices, indent=4))

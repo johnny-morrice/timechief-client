@@ -1,0 +1,48 @@
+#!/usr/bin/python
+import subprocess
+import json
+import sys
+import re
+
+# Get the device name from the command-line argument
+device_name = sys.argv[1]
+
+# Get the device state from /sys/class/net/wlan0/operstate
+state = open(f'/sys/class/net/{device_name}/operstate').read().strip()
+
+# Get the device SSID and mode from iwconfig
+iwconfig_output = subprocess.check_output(['sudo', 'iwconfig', device_name]).decode()
+ssid = None
+mode = None
+for line in iwconfig_output.split('\n'):
+    ssid_re = r'ESSID:(\S+)'
+    mode_re = r'Mode:(\S+)'
+    if re.search(ssid_re, line):
+        ssid = re.search(ssid_re, line).group(1)
+    elif re.search(mode_re, line):
+        mode = re.search(mode_re, line).group(1)
+    if ssid_re == None:
+        ssid_re = ""
+    if mode == None:
+        mode = ""
+
+# Get the device IP address from ip addr
+ip_addr_output = subprocess.check_output(['ip', 'addr', 'show', device_name]).decode()
+ip_address = None
+for line in ip_addr_output.split('\n'):
+    if 'inet ' in line and ' brd ' not in line:
+        ip_address = line.split()[1].split('/')[0]
+if ip_address == None:
+    ip_address = ""
+
+# Create a dictionary of the device information
+device_info = {
+    'Device': device_name,
+    'State': state,
+    'SSID': ssid,
+    'Mode': mode,
+    'IPV4Address': ip_address
+}
+
+# Print the dictionary as a JSON object
+print(json.dumps(device_info, indent=4))
