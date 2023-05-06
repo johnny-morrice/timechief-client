@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 # This script is to configure raspberry pi to join a wifi network.
 
@@ -40,4 +41,4 @@ sudo wpa_passphrase $SSID $PASSWORD > /tmp/wpa_supplicant.conf
 sudo wpa_supplicant -B -i $IFNAME -c /tmp/wpa_supplicant.conf
 
 # Now start dhcpcd.
-sudo systemctl start dhcpcd-timechief
+sudo systemctl start dhcpcd
