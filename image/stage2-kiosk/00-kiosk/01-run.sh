@@ -107,6 +107,10 @@ EOF
 # Disable wpa_supplicant.
 on_chroot << EOF
     systemctl disable wpa_supplicant
+    cat >> /etc/dhcpcd.conf << ENDCAT
+interface wlan0
+nohook wpa_supplicant
+ENDCAT
 EOF
 
 # Shutdown without password
