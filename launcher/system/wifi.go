@@ -45,23 +45,19 @@ func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
 }
 
 func (card WifiInterface) Connect(net WifiNetwork) error {
-	result, err := card.netCmd().ConnectToWifi(net.SSID, net.Key, card.Interface)
+	err := card.netCmd().ConnectToWifi(net.SSID, net.Key, card.Interface)
 	if err != nil {
 		return fmt.Errorf("failed to connect to wifi: %w", err)
-	}
-	if !result.Success {
-		return fmt.Errorf("failed to connect to wifi: %s", result.Message)
 	}
 	return nil
 }
 
+const accessPointIPAddress = "172.16.0.1/24"
+
 func (card WifiInterface) Hotspot(net WifiNetwork) error {
-	result, err := card.netCmd().Hotspot(net.SSID, net.Key, card.Interface)
+	err := card.netCmd().Hotspot(net.SSID, net.Key, card.Interface, accessPointIPAddress)
 	if err != nil {
 		return fmt.Errorf("failed to create hotspot: %w", err)
-	}
-	if !result.Success {
-		return fmt.Errorf("failed to create hotspot: %s", result.Message)
 	}
 	return nil
 }

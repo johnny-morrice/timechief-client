@@ -1,27 +1,79 @@
-#!/usr/bin/python
-import subprocess
-import json
-import sys
+#!/bin/bash
+set -e
 
-def launch_hotspot(ssid, password, ifname):
-    # Form the command to launch the Wi-Fi hotspot
-    cmd = ['sudo', 'iwconfig', ifname, 'mode', 'Master', 'essid', ssid, 'key', password]
+SSID=$1
+PASSWORD=$2
+IFNAME=$3
+# AP_IP is IP address in form 192.168.0.1/24.
+AP_IP=$4
+DHCP_RANGE=$5
 
-    # Execute the command and capture the output
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = proc.communicate()
+if [ -z "$SSID" ]; then
+    echo "SSID is required"
+    exit 1
+fi
 
-    # Check if the hotspot was launched successfully
-    if err:
-        return json.dumps({"Success": False, "Message": err.decode()})
-    else:
-        return json.dumps({"Success": True, "Message": out.decode()})
+if [ -z "$PASSWORD" ]; then
+    echo "PASSWORD is required"
+    exit 1
+fi
 
-# Read the ssid, password, and ifname from the command line arguments
-ssid = sys.argv[1]
-password = sys.argv[2]
-ifname = sys.argv[3]
+if [ -z "$IFNAME" ]; then
+    echo "IFNAME is required"
+    exit 1
+fi
 
-# Call the launch_hotspot function and print the result
-result = launch_hotspot(ssid, password, ifname)
-print(result)
+if [ -z "$AP_IP" ]; then
+    echo "AP_IP is required"
+    exit 1
+fi
+
+if [ -z "$DHCP_RANGE" ]; then
+    echo "DHCP_RANGE is required"
+    exit 1
+fi
+
+# This script is to configure a wifi hotspot on raspberry pi.
+
+# Disable dhcpcd on the interface.
+sudo systemctl stop dhcpcd
+
+# Create dnsmasq config file.
+sudo cat > /tmp/dnsmasq.conf <<EOF
+interface=$IFNAME
+dhcp-range=$DHCP_RANGE
+EOF
+
+# Create hostapd config file.
+sudo cat > /tmp/hostapd.conf <<EOF
+interface=$IFNAME
+driver=nl80211
+ssid=$SSID
+hw_mode=g
+channel=6
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=$PASSWORD
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+EOF
+
+# Disable wpa_supplicant on the interface.
+sudo wpa_cli -i $IFNAME terminate
+
+# Configure the interface.
+sudo ip addr flush dev $IFNAME
+sudo ip link set $IFNAME down
+sudo ip link set $IFNAME up
+sudo ip addr add $AP_IP dev $IFNAME
+
+# Start dnsmasq with systemd.
+sudo systemctl start dnsmasq
+
+# Start hostapd with systemd.
+sudo systemctl start hostapd
+
+

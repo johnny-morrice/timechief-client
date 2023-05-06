@@ -18,24 +18,12 @@ func (nc NetCmd) scriptPath(scriptName string) string {
 	return filepath.Join(nc.BasePath, scriptName)
 }
 
-func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) (NetResult, error) {
-	// nmcli device wifi connect <SSID> password <password> ifname <interface>
-	result := NetResult{}
-	err := parseExecute(&result, nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
-	if err != nil {
-		return NetResult{}, err
-	}
-	return result, nil
+func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) error {
+	return logExecute(nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
 }
 
-func (nc NetCmd) Hotspot(ssid, password, ifname string) (NetResult, error) {
-	// nmcli device wifi hotspot ssid <SSID> password <password> ifname <interface>
-	result := NetResult{}
-	err := parseExecute(&result, nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname)
-	if err != nil {
-		return NetResult{}, err
-	}
-	return result, nil
+func (nc NetCmd) Hotspot(ssid, password, ifname, accessPointIP string) error {
+	return logExecute(nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname)
 }
 
 func (nc NetCmd) ReadWifiInterface(ifname string) (WiFiInterface, error) {
@@ -69,7 +57,7 @@ func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
 }
 
 func parseExecute(out interface{}, command string, args ...string) error {
-	bs, err := execute(command, args...)
+	bs, err := executeReturningStdout(command, args...)
 	if err != nil {
 		return err
 	}
@@ -80,8 +68,36 @@ func parseExecute(out interface{}, command string, args ...string) error {
 	return nil
 }
 
-// execute uses os.exec to execute a command.
-func execute(command string, args ...string) ([]byte, error) {
+func logExecute(command string, args ...string) error {
+	msg, err := executeReturningCombinedOutput(command, args...)
+	if err != nil {
+		return err
+	}
+	if len(msg) > 0 {
+		log.Printf("%s %s: %s", command, strings.Join(args, " "), msg)
+	}
+	return nil
+}
+
+func executeReturningCombinedOutput(command string, args ...string) ([]byte, error) {
+	stderrBuf := bytes.Buffer{}
+	stdoutBuf := bytes.Buffer{}
+	cmd := exec.Cmd{
+		Path:   command,
+		Args:   args,
+		Stderr: &stderrBuf,
+		Stdout: &stdoutBuf,
+	}
+	bs, err := cmd.CombinedOutput()
+	if err != nil {
+		return bs, fmt.Errorf("failed to execute %s %s: %w", command, strings.Join(args, " "), err)
+	}
+
+	return bs, nil
+}
+
+// executeReturningStdout uses os.exec to executeReturningStdout a command.
+func executeReturningStdout(command string, args ...string) ([]byte, error) {
 	stderrBuf := bytes.Buffer{}
 	stdoutBuf := bytes.Buffer{}
 	cmd := exec.Cmd{
