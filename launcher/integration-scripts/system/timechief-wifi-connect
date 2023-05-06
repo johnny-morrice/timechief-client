@@ -24,10 +24,10 @@ if [ -z "$IFNAME" ]; then
 fi
 
 # Disable dnsmasq, if it is running.
-sudo systemctl stop dnsmasq || true
+sudo systemctl stop dnsmasq-timechief || true
 
 # Disable hostapd, if it is running.
-sudo systemctl stop hostapd || true
+sudo systemctl stop hostapd-timechief || true
 
 # Bring down the interface.
 sudo ip addr flush dev $IFNAME
