@@ -22,8 +22,8 @@ func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) error {
 	return logExecute(nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
 }
 
-func (nc NetCmd) Hotspot(ssid, password, ifname, accessPointIP string) error {
-	return logExecute(nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname)
+func (nc NetCmd) Hotspot(ssid, password, ifname, accessPointIP, dhcpRange string) error {
+	return logExecute(nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname, dhcpRange)
 }
 
 func (nc NetCmd) ReadWifiInterface(ifname string) (WiFiInterface, error) {
