@@ -71,9 +71,9 @@ sudo ip link set $IFNAME up
 sudo ip addr add $AP_IP dev $IFNAME
 
 # Start dnsmasq with systemd.
-sudo systemctl start dnsmasq
+sudo systemctl start dnsmasq-timechief
 
 # Start hostapd with systemd.
-sudo systemctl start hostapd
+sudo systemctl start hostapd-timechief
 
 
