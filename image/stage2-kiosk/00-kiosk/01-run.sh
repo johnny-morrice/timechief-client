@@ -42,7 +42,7 @@ EOF
 
 # timechief-launcher daemon.
 on_chroot << EOF
-cat > /etc/systemd/system/timechief-launcher.service << CATEND
+
 [Unit]
 Description=TimeChief Launcher Service
 After=network.target
@@ -59,6 +59,45 @@ WantedBy=multi-user.target
 CATEND
     systemctl enable timechief-launcher
 EOF
+
+# DNSMasq unit file.
+on_chroot << EOF
+cat > /etc/systemd/system/dnsmasq-timechief.service << CATEND
+[Unit]
+Description=DNSmasq DNS and DHCP server
+After=syslog.target network.target
+
+[Service]
+ExecStart=/usr/sbin/dnsmasq -k -C /tmp/dnsmasq.conf
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+CATEND
+    systemctl disable dnsmasq-timechief
+    systemctl disable dnsmasq
+EOF
+
+# Hostapd unit file.
+on_chroot << EOF
+cat > /etc/systemd/system/hostapd-timechief.service << CATEND
+[Unit]
+Description=HostAP Daemon
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/hostapd -B -P /run/hostapd.pid /tmp/hostapd.conf
+ExecReload=/bin/kill -HUP \$MAINPID
+PIDFile=/run/hostapd.pid
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+CATEND
+    systemctl disable hostapd-timechief
+    systemctl disable hostapd
 
 # SSH
 on_chroot << EOF

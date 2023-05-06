@@ -11,3 +11,5 @@ xdotool
 vim
 daemontools
 openssh-server
+dnsmasq
+hostapd
