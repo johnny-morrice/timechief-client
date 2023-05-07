@@ -98,6 +98,7 @@ WantedBy=multi-user.target
 CATEND
     systemctl disable hostapd-timechief
     systemctl disable hostapd
+EOF
 
 # SSH
 on_chroot << EOF
