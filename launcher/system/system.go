@@ -334,6 +334,12 @@ func (sys System) CheckInternet() error {
 	}()
 	for result := range resultChan {
 		if result {
+			go func() {
+				// Drain the channel.
+				// This ensures that all goroutines exit.
+				for range resultChan {
+				}
+			}()
 			return nil
 		}
 	}
