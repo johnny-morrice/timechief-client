@@ -6,7 +6,7 @@ import time
 
 # Check if all arguments are provided
 if len(sys.argv) != 4:
-    print(f"Usage: {sys.argv[0]} <internet_address> <ping_duration> <timeout>", file=sys.stderr)
+    print(f"Usage: {sys.argv[0]} <address> <ping_duration> <timeout>", file=sys.stderr)
     sys.exit(1)
 
 # Set the arguments
@@ -28,5 +28,5 @@ while True:
 
     # Check if the timeout has been reached
     if time.time() - start_time > timeout:
-        print("Error: Ping timed out.", file=sys.stderr)
+        print("error: ping timed out.", file=sys.stderr)
         sys.exit(1)
