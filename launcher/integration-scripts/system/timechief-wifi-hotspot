@@ -40,13 +40,13 @@ fi
 sudo systemctl stop dhcpcd
 
 # Create dnsmasq config file.
-sudo cat > /tmp/dnsmasq.conf <<EOF
+cat > /tmp/dnsmasq.conf <<EOF
 interface=$IFNAME
 dhcp-range=$DHCP_RANGE
 EOF
 
 # Create hostapd config file.
-sudo cat > /tmp/hostapd.conf <<EOF
+cat > /tmp/hostapd.conf <<EOF
 interface=$IFNAME
 driver=nl80211
 ssid=$SSID
@@ -63,7 +63,9 @@ rsn_pairwise=CCMP
 EOF
 
 # Disable wpa_supplicant on the interface.
-sudo killall wpa_supplicant
+sudo killall wpa_supplicant || true
+sudo systemctl stop dnsmasq-timechief 
+sudo systemctl stop hostapd-timechief
 
 # Configure the interface.
 sudo ip addr flush dev $IFNAME

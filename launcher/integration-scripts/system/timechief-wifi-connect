@@ -23,11 +23,10 @@ if [ -z "$IFNAME" ]; then
     exit 1
 fi
 
-# Disable dnsmasq, if it is running.
-sudo systemctl stop dnsmasq-timechief || true
-
-# Disable hostapd, if it is running.
-sudo systemctl stop hostapd-timechief || true
+# Bring network done first
+sudo killall wpa_supplicant || true
+sudo systemctl stop dnsmasq-timechief
+sudo systemctl stop hostapd-timechief
 
 # Bring down the interface.
 sudo ip addr flush dev $IFNAME
