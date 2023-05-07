@@ -1,0 +1,32 @@
+#!/usr/bin/python
+
+import sys
+import subprocess
+import time
+
+# Check if all arguments are provided
+if len(sys.argv) != 4:
+    print(f"Usage: {sys.argv[0]} <internet_address> <ping_duration> <timeout>", file=sys.stderr)
+    sys.exit(1)
+
+# Set the arguments
+address = sys.argv[1]
+duration = int(sys.argv[2])
+timeout = int(sys.argv[3])
+
+# Start the loop to ping the address
+start_time = time.time()
+while True:
+    try:
+        subprocess.check_output(["ping", "-c", "1", address], stderr=subprocess.DEVNULL)
+        sys.exit(0)
+    except subprocess.CalledProcessError:
+        pass
+
+    # Wait for the specified duration before pinging again
+    time.sleep(duration)
+
+    # Check if the timeout has been reached
+    if time.time() - start_time > timeout:
+        print("Error: Ping timed out.", file=sys.stderr)
+        sys.exit(1)
