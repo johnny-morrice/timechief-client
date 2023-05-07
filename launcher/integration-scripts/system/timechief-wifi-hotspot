@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 SSID=$1
 PASSWORD=$2
@@ -62,7 +63,7 @@ rsn_pairwise=CCMP
 EOF
 
 # Disable wpa_supplicant on the interface.
-sudo wpa_cli -i $IFNAME terminate
+sudo killall wpa_supplicant
 
 # Configure the interface.
 sudo ip addr flush dev $IFNAME
