@@ -3,7 +3,6 @@ package system
 import (
 	"fmt"
 	"log"
-	"path/filepath"
 
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system/netcmd"
@@ -15,14 +14,7 @@ type WifiInterface struct {
 }
 
 func (card WifiInterface) netCmd() netcmd.NetCmd {
-	return cfgNetCmd(card.Config)
-}
-
-func cfgNetCmd(cfg store.Config) netcmd.NetCmd {
-	root := filepath.Join(cfg.GetInstallRoot(), "bin")
-	return netcmd.NetCmd{
-		BasePath: root,
-	}
+	return netcmd.NewNetCmd(card.Config)
 }
 
 func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
@@ -88,7 +80,7 @@ type WifiNetwork struct {
 }
 
 func ReadWifiInterfaces(cfg store.Config) ([]WifiInterface, error) {
-	nmIfaces, err := cfgNetCmd(cfg).ReadWifiInterfaces()
+	nmIfaces, err := netcmd.NewNetCmd(cfg).ReadWifiInterfaces()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read wifi interfaces: %w", err)
 	}

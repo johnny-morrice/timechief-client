@@ -38,7 +38,7 @@ func Install(ctx *cli.Context) error {
 		"timechief-wifi-interface",
 		"timechief-wifi-interfaces",
 		"timechief-wifi-scan",
-		"timechief-internet-test",
+		"timechief-internet-check",
 	}
 
 	for _, script := range binScripts {

@@ -6,8 +6,11 @@ import (
 	"log"
 	"os/exec"
 	"path/filepath"
+	"sync"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/system/netcmd"
 	"gorm.io/gorm"
 )
 
@@ -251,4 +254,88 @@ func (sys System) LoadNetworkStatus() error {
 		return fmt.Errorf("failed to set network mode: %w", err)
 	}
 	return nil
+}
+
+type internetCheck struct {
+	address  string
+	timeout  time.Duration
+	interval time.Duration
+}
+
+func (check internetCheck) runCheck(nc netcmd.NetCmd) error {
+	// Start the loop to ping the address
+	log.Printf("checking internet with address: %s", check.address)
+	startTime := time.Now()
+	for {
+		err := nc.CheckInternet(check.address)
+
+		if err != nil {
+			log.Printf("retrying internet check after failure with address %s: %s", check.address, err)
+		}
+		if err == nil {
+			return nil
+		}
+
+		// Wait for the specified duration before pinging again
+		time.Sleep(check.interval)
+
+		// Check if the timeout has been reached
+		elapsedTime := time.Since(startTime)
+		if elapsedTime > check.timeout {
+			return fmt.Errorf("timed out checking internet with address: %s", check.address)
+		}
+	}
+}
+
+func (sys System) CheckInternet() error {
+	const timeout = 15 * time.Second
+	const interval = time.Second
+	addresses := []string{
+		"google.com",
+		"facebook.com",
+		"amazon.com",
+		"salesforce.com",
+		"gov.uk",
+	}
+	checks := make([]internetCheck, len(addresses))
+	for i := 0; i < len(addresses); i++ {
+		checks[i] = internetCheck{
+			address:  addresses[i],
+			timeout:  timeout,
+			interval: interval,
+		}
+	}
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	nc := netcmd.NewNetCmd(cfg)
+	// Run each check in a goroutine.
+	// If any of the checks return nil, then the internet is working.
+	// We can return early in this case.
+	// If all of the checks fail, then the internet is not working.
+	// We return an error in this case.
+	resultChan := make(chan bool)
+	closeChanWg := sync.WaitGroup{}
+	for i := 0; i < len(checks); i++ {
+		closeChanWg.Add(1)
+		go func(check internetCheck) {
+			defer closeChanWg.Done()
+			err := check.runCheck(nc)
+			resultChan <- err == nil
+			if err != nil {
+				log.Printf("internet check failed: %v", err)
+			}
+		}(checks[i])
+	}
+	go func() {
+		closeChanWg.Wait()
+		close(resultChan)
+	}()
+	for result := range resultChan {
+		if result {
+			return nil
+		}
+	}
+	return errors.New("all internet checks failed")
 }

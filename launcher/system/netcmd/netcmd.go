@@ -8,10 +8,19 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/johnny-morrice/timechief-client/launcher/store"
 )
 
 type NetCmd struct {
 	BasePath string
+}
+
+func NewNetCmd(cfg store.Config) NetCmd {
+	root := filepath.Join(cfg.GetInstallRoot(), "bin")
+	return NetCmd{
+		BasePath: root,
+	}
 }
 
 func (nc NetCmd) scriptPath(scriptName string) string {
@@ -54,6 +63,10 @@ func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
 		return nil, err
 	}
 	return result, nil
+}
+
+func (nc NetCmd) CheckInternet(address string) error {
+	return logExecute(nc.scriptPath("timechief-internet-test"), address)
 }
 
 func parseExecute(out interface{}, command string, args ...string) error {
