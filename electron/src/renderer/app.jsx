@@ -14,7 +14,6 @@ import { CalendarPage } from "./calendarPage";
 
 const App = () => {
   let ipcIntervals = initializeIPC();
-  sendClockDataRequest();
   onCleanup(() => {
     ipcIntervals.forEach(interval => clearInterval(interval));
   });
