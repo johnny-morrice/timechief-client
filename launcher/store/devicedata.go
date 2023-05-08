@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
@@ -20,7 +21,7 @@ type DeviceDataStore struct {
 func (store DeviceDataStore) GetDeviceData() (viewmodel.ClockData, error) {
 	var data DeviceData
 	result := store.DB.First(&data)
-	if result.Error != nil {
+	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return viewmodel.ClockData{}, fmt.Errorf("error getting cached device data: %w", result.Error)
 	}
 	var deviceData viewmodel.ClockData

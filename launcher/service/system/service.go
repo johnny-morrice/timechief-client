@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 )
@@ -24,7 +25,8 @@ func (svc Service) Shutdown() error {
 }
 
 func (svc Service) WifiConnect() error {
-	return svc.StateFlagStore.CreateIfNotExists("wifi-connect")
+	id := uuid.NewString()
+	return svc.KeyValueStore.Set("wifi-connect", id)
 }
 
 func (svc Service) WifiSetActiveNetwork(ssid string) error {

@@ -48,6 +48,14 @@ func (store WifiNetworkStore) SetActive(ssid string) error {
 	return nil
 }
 
+func (store WifiNetworkStore) UnsetActive() error {
+	result := store.DB.Model(&WifiNetwork{}).Where("active = ?", true).Update("active", false)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 // GetActive returns the active WIFI network.
 func (store WifiNetworkStore) GetActive() (WifiNetwork, error) {
 	var network WifiNetwork

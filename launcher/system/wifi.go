@@ -45,11 +45,15 @@ func (card WifiInterface) Connect(net WifiNetwork) error {
 }
 
 // TODO: Make these configurable
-const accessPointIPAddress = "172.16.0.1/24"
+const AccessPointIPAddress = "172.16.0.1/24"
 const dhcpRange = "172.16.0.100,172.16.0.200,12h"
 
+// TODO check if these modes are right.
+const AccessPointMode = "ap"
+const InfraMode = "infra"
+
 func (card WifiInterface) Hotspot(net WifiNetwork) error {
-	err := card.netCmd().Hotspot(net.SSID, net.Key, card.Interface, accessPointIPAddress, dhcpRange)
+	err := card.netCmd().Hotspot(net.SSID, net.Key, card.Interface, AccessPointIPAddress, dhcpRange)
 	if err != nil {
 		return fmt.Errorf("failed to create hotspot: %w", err)
 	}

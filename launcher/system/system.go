@@ -16,6 +16,7 @@ import (
 
 type System struct {
 	DB                 *gorm.DB
+	Cache              store.CacheStore
 	ConfigStore        store.ConfigStore
 	KeyValueStore      store.KeyValueStore
 	WifiInterfaceStore store.WifiInterfaceStore
@@ -188,7 +189,7 @@ func (sys System) WifiScan() error {
 	return nil
 }
 
-func (sys System) WifiConnect() error {
+func (sys System) WifiConnect(uuid string) error {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
@@ -204,7 +205,16 @@ func (sys System) WifiConnect() error {
 		SSID: storeNetwork.SSID,
 		Key:  storeNetwork.Key,
 	}
-	return card.Connect(network)
+	err = card.Connect(network)
+	if err != nil {
+		return fmt.Errorf("failed to connect to wifi network: %w", err)
+	}
+
+	err = sys.Cache.Create(uuid, time.Hour)
+	if err != nil {
+		return fmt.Errorf("failed to create cache entry for wifi connect status: %w", err)
+	}
+	return nil
 }
 
 func (sys System) WifiHotspot() error {
@@ -343,5 +353,13 @@ func (sys System) CheckInternet() error {
 			return nil
 		}
 	}
+
+	// Write internet check time to kv.
+	// TODO would be nice to use time.Time in the database.
+	err = sys.KeyValueStore.Set(store.LastInternetCheckKey, time.Now().Format(time.RFC3339))
+	if err != nil {
+		return fmt.Errorf("failed to record last internet check time: %w", err)
+	}
+
 	return errors.New("all internet checks failed")
 }

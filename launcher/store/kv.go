@@ -26,6 +26,7 @@ const HotspotSSID = "hotspot-ssid"
 const HotspotKey = "hotspot-key"
 const IPAddressKey = "ip-address"
 const InterfaceModeKey = "interface-mode"
+const LastInternetCheckKey = "last-internet-check"
 
 // Set a key-value pair in the store.
 func (store KeyValueStore) Set(key string, value string) error {

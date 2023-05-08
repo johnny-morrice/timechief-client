@@ -10,6 +10,7 @@ type Service struct {
 	StateFlagStore    store.StateFlagStore
 	CfgStore          store.ConfigStore
 }
+
 type TargetStatus struct {
 	Ready bool
 }

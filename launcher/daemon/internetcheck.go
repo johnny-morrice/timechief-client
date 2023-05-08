@@ -4,18 +4,16 @@ import (
 	"log"
 	"time"
 
-	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/urfave/cli/v2"
 )
 
-type WifiConnect struct {
-	KVStore         store.KeyValueStore
+type InternetCheck struct {
 	System          system.System
 	RefreshInterval time.Duration
 }
 
-func (daemon WifiConnect) Start(ctx *cli.Context) {
+func (daemon InternetCheck) Start(ctx *cli.Context) {
 	err := daemon.doTick(ctx)
 	if err != nil {
 		log.Printf("daemon tick error: %s", err)
@@ -35,14 +33,6 @@ func (daemon WifiConnect) Start(ctx *cli.Context) {
 // Every tick we check for a "scan-wifi" state flag.
 // If the state flag is set, we synchronise the wifi cards and wifi networks using the system package.
 // We then clear the state flag.
-func (daemon WifiConnect) doTick(ctx *cli.Context) error {
-	uuid, err := daemon.KVStore.Get("wifi-connect")
-	if err != nil {
-		return err
-	}
-	err = daemon.System.WifiConnect(uuid)
-	if err != nil {
-		return err
-	}
-	return daemon.KVStore.Delete("wifi-connect")
+func (daemon InternetCheck) doTick(ctx *cli.Context) error {
+	return daemon.System.CheckInternet()
 }
