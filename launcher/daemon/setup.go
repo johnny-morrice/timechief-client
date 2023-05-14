@@ -22,7 +22,12 @@ type Setup struct {
 }
 
 func (daemon Setup) Start(ctx *cli.Context) {
-	err := daemon.doTick(ctx)
+	err := daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
+	if err != nil {
+		log.Printf("initialisation error: %s", err)
+	}
+
+	err = daemon.doTick(ctx)
 	if err != nil {
 		log.Printf("daemon tick error: %s", err)
 	}
