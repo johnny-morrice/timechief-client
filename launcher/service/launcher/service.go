@@ -8,11 +8,16 @@ import (
 type Service struct {
 	LaunchTargetStore store.LaunchTargetStore
 	StateFlagStore    store.StateFlagStore
+	KeyValueStore     store.KeyValueStore
 	CfgStore          store.ConfigStore
 }
 
 type TargetStatus struct {
 	Ready bool
+}
+
+func (svc Service) SetSetupState(state string) error {
+	return svc.KeyValueStore.Set("setup", state)
 }
 
 func (svc Service) GetTarget() (service.LaunchTarget, error) {

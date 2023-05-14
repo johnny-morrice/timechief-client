@@ -16,7 +16,7 @@ type Setup struct {
 	System           system.System
 	WifiNetworkStore store.WifiNetworkStore
 	StateFlagStore   store.StateFlagStore
-	KVStore          store.KeyValueStore
+	KeyValueStore    store.KeyValueStore
 	Cache            store.CacheStore
 	RefreshInterval  time.Duration
 }
@@ -52,7 +52,7 @@ const (
 // If the state flag is set, we synchronise the wifi cards and wifi networks using the system package.
 // We then clear the state flag.
 func (daemon Setup) doTick(ctx *cli.Context) error {
-	state, err := daemon.KVStore.Get("setup")
+	state, err := daemon.KeyValueStore.Get("setup")
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (daemon Setup) handleBegin() error {
 	if err != nil {
 		return err
 	}
-	return daemon.KVStore.Set("setup", SetupFlagWaitHotspot)
+	return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
 }
 
 func (daemon Setup) handleHotspotWait() error {
@@ -107,11 +107,11 @@ func (daemon Setup) handleHotspotWait() error {
 	if !ok {
 		return nil
 	}
-	return daemon.KVStore.Set("setup", SetupFlagWaitUserSelectNetwork)
+	return daemon.KeyValueStore.Set("setup", SetupFlagWaitUserSelectNetwork)
 }
 
 func (daemon Setup) isInterfaceSetup(mode string, ipMatch func(ip string) bool) (bool, error) {
-	actualMode, err := daemon.KVStore.Get(store.InterfaceModeKey)
+	actualMode, err := daemon.KeyValueStore.Get(store.InterfaceModeKey)
 	if err != nil {
 		return false, err
 	}
@@ -120,7 +120,7 @@ func (daemon Setup) isInterfaceSetup(mode string, ipMatch func(ip string) bool) 
 		return false, nil
 	}
 
-	actualIP, err := daemon.KVStore.Get(store.IPAddressKey)
+	actualIP, err := daemon.KeyValueStore.Get(store.IPAddressKey)
 	if err != nil {
 		return false, err
 	}
@@ -137,16 +137,16 @@ func (daemon Setup) handleWaitUserSelectNetwork() error {
 		return err
 	}
 	log.Printf("launcher setup found active network: %s", active.SSID)
-	return daemon.KVStore.Set("setup", SetupFlagNetworkSelected)
+	return daemon.KeyValueStore.Set("setup", SetupFlagNetworkSelected)
 }
 
 func (daemon Setup) handleNetworkSelected() error {
 	connectID := uuid.NewString()
-	err := daemon.KVStore.Set("setup-wifi-uuid", connectID)
+	err := daemon.KeyValueStore.Set("setup-wifi-uuid", connectID)
 	if err != nil {
 		return err
 	}
-	return daemon.KVStore.Set("wifi-connect", connectID)
+	return daemon.KeyValueStore.Set("wifi-connect", connectID)
 }
 
 var privateIPBlocks []*net.IPNet
@@ -169,7 +169,7 @@ func init() {
 }
 
 func (daemon Setup) handleWaitNetworkConnect() error {
-	connectID, err := daemon.KVStore.Get("setup-wifi-uuid")
+	connectID, err := daemon.KeyValueStore.Get("setup-wifi-uuid")
 	if err != nil {
 		return err
 	}
@@ -202,16 +202,16 @@ func (daemon Setup) handleWaitNetworkConnect() error {
 		return nil
 	}
 	// Clear last internet check time.
-	err = daemon.KVStore.Delete(store.LastInternetCheckKey)
+	err = daemon.KeyValueStore.Delete(store.LastInternetCheckKey)
 	if err != nil {
 		return err
 	}
 
-	return daemon.KVStore.Set("setup", SetupFlagNetworkConnected)
+	return daemon.KeyValueStore.Set("setup", SetupFlagNetworkConnected)
 }
 
 func (daemon Setup) handleNetworkConnected() error {
-	val, err := daemon.KVStore.Get(store.LastInternetCheckKey)
+	val, err := daemon.KeyValueStore.Get(store.LastInternetCheckKey)
 	if err != nil {
 		return err
 	}
@@ -223,7 +223,7 @@ func (daemon Setup) handleNetworkConnected() error {
 		return err
 	}
 	if time.Since(checkTime) < validDuration {
-		return daemon.KVStore.Set("setup", SetupFlagInternetConnected)
+		return daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
 	}
 
 	return nil

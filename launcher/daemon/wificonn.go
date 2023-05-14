@@ -10,7 +10,7 @@ import (
 )
 
 type WifiConnect struct {
-	KVStore         store.KeyValueStore
+	KeyValueStore   store.KeyValueStore
 	System          system.System
 	RefreshInterval time.Duration
 }
@@ -36,7 +36,7 @@ func (daemon WifiConnect) Start(ctx *cli.Context) {
 // If the state flag is set, we synchronise the wifi cards and wifi networks using the system package.
 // We then clear the state flag.
 func (daemon WifiConnect) doTick(ctx *cli.Context) error {
-	uuid, err := daemon.KVStore.Get("wifi-connect")
+	uuid, err := daemon.KeyValueStore.Get("wifi-connect")
 	if err != nil {
 		return err
 	}
@@ -44,5 +44,5 @@ func (daemon WifiConnect) doTick(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	return daemon.KVStore.Delete("wifi-connect")
+	return daemon.KeyValueStore.Delete("wifi-connect")
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type DeleteExpired struct {
-	BoolCache       store.CacheStore
+	Cache           store.CacheStore
 	RefreshInterval time.Duration
 }
 
@@ -34,5 +34,5 @@ func (daemon DeleteExpired) Start(ctx *cli.Context) {
 // If the state flag is set, we synchronise the wifi cards and wifi networks using the system package.
 // We then clear the state flag.
 func (daemon DeleteExpired) doTick(ctx *cli.Context) error {
-	return daemon.BoolCache.DeleteExpired()
+	return daemon.Cache.DeleteExpired()
 }

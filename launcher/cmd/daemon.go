@@ -13,7 +13,6 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/johnny-morrice/timechief-client/launcher/update"
 	"github.com/urfave/cli/v2"
-	"gorm.io/gorm"
 )
 
 func Daemon(ctx *cli.Context) error {
@@ -50,9 +49,10 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	launchTargetStore := store.LaunchTargetStore{DB: db}
 	up := update.Updater{
 		VersionStore:      store.VersionStore{DB: db},
-		LaunchTargetStore: store.LaunchTargetStore{DB: db},
+		LaunchTargetStore: launchTargetStore,
 		CfgStore:          cfgStore,
 		Client:            clnt,
 		RequestTimeout:    ctx.Duration("service-request-timeout"),
@@ -81,12 +81,17 @@ func Daemon(ctx *cli.Context) error {
 		RequestTimeout:       ctx.Duration("service-request-timeout"),
 	}
 
+	wifiNetworkStore := store.WifiNetworkStore{DB: db}
+
+	wifiInterfaceStore := store.WifiInterfaceStore{DB: db}
+	cache := store.CacheStore{DB: db}
 	system := system.System{
 		ConfigStore:        cfgStore,
 		KeyValueStore:      keyValueStore,
-		WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
-		WifiNetworkStore:   store.WifiNetworkStore{DB: db},
+		WifiInterfaceStore: wifiInterfaceStore,
+		WifiNetworkStore:   wifiNetworkStore,
 		DB:                 db,
+		Cache:              cache,
 	}
 
 	wifiLoad := daemon.WifiLoadInterfaces{
@@ -94,8 +99,8 @@ func Daemon(ctx *cli.Context) error {
 		System:         system,
 	}
 	wifiConn := daemon.WifiConnect{
-		StateFlagStore: flagStore,
-		System:         system,
+		KeyValueStore: keyValueStore,
+		System:        system,
 	}
 	wifiScan := daemon.WifiScan{
 		StateFlagStore: flagStore,
@@ -109,6 +114,18 @@ func Daemon(ctx *cli.Context) error {
 		System: system,
 	}
 
+	deleteExpired := daemon.DeleteExpired{
+		Cache: cache,
+	}
+
+	setup := daemon.Setup{
+		KeyValueStore:    keyValueStore,
+		WifiNetworkStore: wifiNetworkStore,
+		Cache:            cache,
+		StateFlagStore:   flagStore,
+		System:           system,
+	}
+
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
 	go wifiScan.Start(ctx)
@@ -117,47 +134,36 @@ func Daemon(ctx *cli.Context) error {
 	go deviceDataDaemon.Start(ctx)
 	go pairingDaemon.Start(ctx)
 	go networkStatus.Start(ctx)
+	go deleteExpired.Start(ctx)
+	go setup.Start(ctx)
 
-	return serveAPI(ctx, db)
-}
-
-type apiPackage interface {
-	AddRoutes(mux *http.ServeMux)
-}
-
-func serveAPI(ctx *cli.Context, db *gorm.DB) error {
 	addr := ctx.String("listen-addr")
-	system := system.System{
-		ConfigStore:        store.ConfigStore{DB: db},
-		WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
-		WifiNetworkStore:   store.WifiNetworkStore{DB: db},
-		DB:                 db,
-	}
 	mux := http.NewServeMux()
 	packages := []apiPackage{
 		api.System{
 			Service: syssvc.Service{
 				System:           system,
-				StateFlagStore:   store.StateFlagStore{DB: db},
-				KeyValueStore:    store.KeyValueStore{DB: db},
-				WifiNetworkStore: store.WifiNetworkStore{DB: db},
+				StateFlagStore:   flagStore,
+				KeyValueStore:    keyValueStore,
+				WifiNetworkStore: wifiNetworkStore,
 			},
 		},
 		api.Data{
 			Service: data.Service{
 				DeviceDataStore:    store.DeviceDataStore{DB: db},
-				LaunchTargetStore:  store.LaunchTargetStore{DB: db},
-				StateFlagStore:     store.StateFlagStore{DB: db},
-				WifiInterfaceStore: store.WifiInterfaceStore{DB: db},
-				WifiNetworkStore:   store.WifiNetworkStore{DB: db},
-				KeyValueStore:      store.KeyValueStore{DB: db},
+				LaunchTargetStore:  launchTargetStore,
+				StateFlagStore:     flagStore,
+				WifiInterfaceStore: wifiInterfaceStore,
+				WifiNetworkStore:   wifiNetworkStore,
+				KeyValueStore:      keyValueStore,
 			},
 		},
 		api.Launcher{
 			Service: launcher.Service{
-				LaunchTargetStore: store.LaunchTargetStore{DB: db},
-				StateFlagStore:    store.StateFlagStore{DB: db},
-				CfgStore:          store.ConfigStore{DB: db},
+				LaunchTargetStore: launchTargetStore,
+				KeyValueStore:     keyValueStore,
+				StateFlagStore:    flagStore,
+				CfgStore:          cfgStore,
 			},
 		},
 	}
@@ -165,4 +171,8 @@ func serveAPI(ctx *cli.Context, db *gorm.DB) error {
 		pkg.AddRoutes(mux)
 	}
 	return http.ListenAndServe(addr, mux)
+}
+
+type apiPackage interface {
+	AddRoutes(mux *http.ServeMux)
 }
