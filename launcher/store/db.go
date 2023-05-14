@@ -9,7 +9,7 @@ func getGormConfig() *gorm.Config {
 }
 
 func AutoMigrate(db *gorm.DB) error {
-	return db.AutoMigrate(&LaunchTarget{}, &ConfigEntry{}, &Version{}, &StateFlag{}, &DeviceData{}, &KeyValue{}, &WifiInterface{}, &WifiNetwork{})
+	return db.AutoMigrate(&LaunchTarget{}, &ConfigEntry{}, &Version{}, &StateFlag{}, &DeviceData{}, &KeyValue{}, &WifiInterface{}, &WifiNetwork{}, &CacheEntry{})
 }
 
 func CloseDB(db *gorm.DB) error {
