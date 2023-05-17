@@ -26,7 +26,7 @@ type Setup struct {
 func (daemon Setup) Start(ctx *cli.Context) {
 	err := daemon.doTick(ctx)
 	if err != nil {
-		log.Printf("daemon tick error: %s", err)
+		log.Printf("setup daemon tick error: %s", err)
 	}
 	if daemon.RefreshInterval == 0 {
 		daemon.RefreshInterval = 1 * time.Second
@@ -34,7 +34,7 @@ func (daemon Setup) Start(ctx *cli.Context) {
 	runEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
-			log.Printf("daemon tick error: %s", err)
+			log.Printf("setup daemon tick error: %s", err)
 		}
 	})
 }

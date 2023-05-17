@@ -20,7 +20,7 @@ type WifiConnect struct {
 func (daemon WifiConnect) Start(ctx *cli.Context) {
 	err := daemon.doTick(ctx)
 	if err != nil {
-		log.Printf("daemon tick error: %s", err)
+		log.Printf("wifi-connect daemon tick error: %s", err)
 	}
 	if daemon.RefreshInterval == 0 {
 		daemon.RefreshInterval = 5 * time.Second
@@ -28,7 +28,7 @@ func (daemon WifiConnect) Start(ctx *cli.Context) {
 	runEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
-			log.Printf("daemon tick error: %s", err)
+			log.Printf("wifi-connect daemon tick error: %s", err)
 		}
 	})
 }
