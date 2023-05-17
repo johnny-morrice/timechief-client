@@ -1,6 +1,7 @@
 package daemon
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -55,7 +56,7 @@ const (
 func (daemon Setup) doTick(ctx *cli.Context) error {
 	state, err := daemon.KeyValueStore.Get("setup")
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return daemon.handleBegin()
 		}
 		return err

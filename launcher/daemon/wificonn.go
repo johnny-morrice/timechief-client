@@ -1,12 +1,14 @@
 package daemon
 
 import (
+	"errors"
 	"log"
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/urfave/cli/v2"
+	"gorm.io/gorm"
 )
 
 type WifiConnect struct {
@@ -38,6 +40,9 @@ func (daemon WifiConnect) Start(ctx *cli.Context) {
 func (daemon WifiConnect) doTick(ctx *cli.Context) error {
 	uuid, err := daemon.KeyValueStore.Get("wifi-connect")
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return err
 	}
 	err = daemon.System.WifiConnect(uuid)
