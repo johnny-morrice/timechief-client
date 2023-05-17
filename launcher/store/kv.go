@@ -57,6 +57,9 @@ func (store KeyValueStore) List() ([]KeyValue, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all key-value pairs: %w", err)
 	}
+	if entries == nil {
+		entries = []KeyValue{}
+	}
 	sort.SliceStable(entries, func(i, j int) bool {
 		return entries[i].Key < entries[j].Key
 	})
