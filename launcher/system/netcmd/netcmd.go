@@ -93,13 +93,9 @@ func logExecute(command string, args ...string) error {
 }
 
 func executeReturningCombinedOutput(command string, args ...string) ([]byte, error) {
-	stderrBuf := bytes.Buffer{}
-	stdoutBuf := bytes.Buffer{}
 	cmd := exec.Cmd{
-		Path:   command,
-		Args:   args,
-		Stderr: &stderrBuf,
-		Stdout: &stdoutBuf,
+		Path: command,
+		Args: args,
 	}
 	bs, err := cmd.CombinedOutput()
 	if err != nil {
