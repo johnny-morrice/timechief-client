@@ -44,7 +44,7 @@ func (store KeyValueStore) Get(key string) (string, error) {
 	var entry KeyValue
 	err := store.DB.Where("key = ?", key).First(&entry).Error
 	if err != nil {
-		return "", fmt.Errorf("failed to get key-value pair: %w", err)
+		return "", fmt.Errorf("failed to get key-value pair %s: %w", key, err)
 	}
 	return entry.Value, nil
 }
