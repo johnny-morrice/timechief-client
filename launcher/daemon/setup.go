@@ -10,6 +10,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/urfave/cli/v2"
+	"gorm.io/gorm"
 )
 
 type Setup struct {
@@ -22,12 +23,7 @@ type Setup struct {
 }
 
 func (daemon Setup) Start(ctx *cli.Context) {
-	err := daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
-	if err != nil {
-		log.Printf("initialisation error: %s", err)
-	}
-
-	err = daemon.doTick(ctx)
+	err := daemon.doTick(ctx)
 	if err != nil {
 		log.Printf("daemon tick error: %s", err)
 	}
@@ -59,6 +55,9 @@ const (
 func (daemon Setup) doTick(ctx *cli.Context) error {
 	state, err := daemon.KeyValueStore.Get("setup")
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return daemon.handleBegin()
+		}
 		return err
 	}
 	switch state {
