@@ -4,13 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"gorm.io/gorm"
 )
 
 type DeviceData struct {
-	gorm.Model
+	ID         uint `gorm:"primarykey"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 	DeviceJSON []byte
 }
 
