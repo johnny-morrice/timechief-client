@@ -140,6 +140,7 @@ func (api System) HandleShutdown(w http.ResponseWriter, r *http.Request) {
 }
 
 func writeJSON(w http.ResponseWriter, obj interface{}) {
+	w.Header().Set("Content-Type", "application/json")
 	enc := json.NewEncoder(w)
 	err := enc.Encode(obj)
 	if err != nil {
