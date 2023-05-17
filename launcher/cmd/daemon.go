@@ -125,6 +125,9 @@ func Daemon(ctx *cli.Context) error {
 		StateFlagStore:   flagStore,
 		System:           system,
 	}
+	internetCheck := daemon.InternetCheck{
+		System: system,
+	}
 
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
@@ -136,6 +139,7 @@ func Daemon(ctx *cli.Context) error {
 	go networkStatus.Start(ctx)
 	go deleteExpired.Start(ctx)
 	go setup.Start(ctx)
+	go internetCheck.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
