@@ -105,7 +105,7 @@ func (daemon Setup) handleBegin() error {
 }
 
 func (daemon Setup) handleHotspotWait() error {
-	ok, err := daemon.isInterfaceSetup(system.AccessPointIPAddress, func(ip string) bool { return ip == system.AccessPointIPAddress })
+	ok, err := daemon.isInterfaceSetup(system.AccessPointMode, func(ip string) bool { return ip == system.AccessPointIPAddress })
 	if err != nil {
 		return err
 	}
