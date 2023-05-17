@@ -66,7 +66,7 @@ func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
 }
 
 func (nc NetCmd) CheckInternet(address string) error {
-	return logExecute(nc.scriptPath("timechief-internet-test"), address)
+	return logExecute(nc.scriptPath("timechief-internet-check"), address)
 }
 
 func parseExecute(out interface{}, command string, args ...string) error {
