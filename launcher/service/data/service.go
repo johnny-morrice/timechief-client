@@ -23,7 +23,6 @@ type LauncherState struct {
 	SetupState          string
 	WifiState           WifiState
 	NetworkState        NetworkState
-	KeyValuePairs       []KeyValuePair
 	Flags               []string
 }
 
@@ -148,19 +147,6 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	setupState, err := svc.KeyValueStore.Get("setup")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, err
-	}
-
-	keyValues, err := svc.KeyValueStore.List()
-	if err != nil {
-		return DeviceData{}, err
-	}
-
-	resultKeyValues := make([]KeyValuePair, len(keyValues))
-	for i, kv := range keyValues {
-		resultKeyValues[i] = KeyValuePair{
-			Key:   kv.Key,
-			Value: kv.Value,
-		}
 	}
 
 	result := DeviceData{
