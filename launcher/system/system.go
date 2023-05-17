@@ -274,7 +274,7 @@ type internetCheck struct {
 
 func (check internetCheck) runCheck(nc netcmd.NetCmd) error {
 	// Start the loop to ping the address
-	log.Printf("checking internet with address: %s", check.address)
+	// log.Printf("checking internet with address: %s", check.address)
 	startTime := time.Now()
 	for {
 		err := nc.CheckInternet(check.address)
@@ -350,15 +350,14 @@ func (sys System) CheckInternet() error {
 				for range resultChan {
 				}
 			}()
+			// Write internet check time to kv.
+			// TODO would be nice to use time.Time in the database.
+			err = sys.KeyValueStore.Set(store.LastInternetCheckKey, time.Now().Format(time.RFC3339))
+			if err != nil {
+				return fmt.Errorf("failed to record last internet check time: %w", err)
+			}
 			return nil
 		}
-	}
-
-	// Write internet check time to kv.
-	// TODO would be nice to use time.Time in the database.
-	err = sys.KeyValueStore.Set(store.LastInternetCheckKey, time.Now().Format(time.RFC3339))
-	if err != nil {
-		return fmt.Errorf("failed to record last internet check time: %w", err)
 	}
 
 	return errors.New("all internet checks failed")
