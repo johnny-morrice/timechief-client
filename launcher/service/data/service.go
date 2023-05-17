@@ -23,6 +23,12 @@ type LauncherState struct {
 	ActiveTargetVersion string
 	WifiState           WifiState
 	NetworkState        NetworkState
+	KeyValuePairs       []KeyValuePair
+}
+
+type KeyValuePair struct {
+	Key   string
+	Value string
 }
 
 type NetworkState struct {
@@ -136,6 +142,19 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	interfaceMode, err := svc.KeyValueStore.Get(store.InterfaceModeKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, err
+	}
+
+	keyValues, err := svc.KeyValueStore.List()
+	if err != nil {
+		return DeviceData{}, err
+	}
+
+	resultKeyValues := make([]KeyValuePair, len(keyValues))
+	for i, kv := range keyValues {
+		resultKeyValues[i] = KeyValuePair{
+			Key:   kv.Key,
+			Value: kv.Value,
+		}
 	}
 
 	result := DeviceData{

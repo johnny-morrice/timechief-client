@@ -1,6 +1,7 @@
 package store
 
 import (
+	"sort"
 	"time"
 
 	"gorm.io/gorm"
@@ -27,6 +28,7 @@ func (store StateFlagStore) List() ([]string, error) {
 	for _, flag := range flags {
 		stateFlags = append(stateFlags, flag.State)
 	}
+	sort.Strings(stateFlags)
 	return stateFlags, nil
 }
 

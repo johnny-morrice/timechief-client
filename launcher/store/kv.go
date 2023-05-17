@@ -3,6 +3,7 @@ package store
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	"gorm.io/gorm"
@@ -47,6 +48,19 @@ func (store KeyValueStore) Get(key string) (string, error) {
 		return "", fmt.Errorf("failed to get key-value pair %s: %w", key, err)
 	}
 	return entry.Value, nil
+}
+
+// Get all key value entries.
+func (store KeyValueStore) List() ([]KeyValue, error) {
+	var entries []KeyValue
+	err := store.DB.Find(&entries).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all key-value pairs: %w", err)
+	}
+	sort.SliceStable(entries, func(i, j int) bool {
+		return entries[i].Key < entries[j].Key
+	})
+	return entries, nil
 }
 
 // Exists returns true if the key exists in the store.
