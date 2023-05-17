@@ -39,6 +39,8 @@ type WifiState struct {
 	ActiveWifiInterface string
 	InterfaceMode       string
 	ActiveSSID          string
+	HotspotSSID         string
+	HotspotKey          string
 	WifiNetworks        []WifiNetwork
 }
 
@@ -149,6 +151,16 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, err
 	}
 
+	hotspotSSID, err := svc.KeyValueStore.Get(store.HotspotSSID)
+	if err != nil {
+		return DeviceData{}, fmt.Errorf("failed to get hotspot ssid: %w", err)
+	}
+
+	hotspotKey, err := svc.KeyValueStore.Get(store.HotspotKey)
+	if err != nil {
+		return DeviceData{}, fmt.Errorf("failed to get hotspot key: %w", err)
+	}
+
 	result := DeviceData{
 		ServiceData: clockData,
 		LauncherState: LauncherState{
@@ -160,6 +172,8 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 				InterfaceMode:       interfaceMode,
 				ActiveSSID:          activeNet.SSID,
 				WifiNetworks:        networks,
+				HotspotSSID:         hotspotSSID,
+				HotspotKey:          hotspotKey,
 			},
 			NetworkState: NetworkState{
 				IPAddress: ipAddress,
