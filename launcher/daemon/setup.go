@@ -139,6 +139,9 @@ func (daemon Setup) isInterfaceSetup(mode string, ipMatch func(ip string) bool) 
 func (daemon Setup) handleWaitUserSelectNetwork() error {
 	active, err := daemon.WifiNetworkStore.GetActive()
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return err
 	}
 	log.Printf("launcher setup found active network: %s", active.SSID)
@@ -151,7 +154,11 @@ func (daemon Setup) handleNetworkSelected() error {
 	if err != nil {
 		return err
 	}
-	return daemon.KeyValueStore.Set("wifi-connect", connectID)
+	err = daemon.KeyValueStore.Set("wifi-connect", connectID)
+	if err != nil {
+		return err
+	}
+	return daemon.KeyValueStore.Set("setup", SetupFlagWaitNetworkConnect)
 }
 
 var privateIPBlocks []*net.IPNet
