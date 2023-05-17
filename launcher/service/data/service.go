@@ -19,11 +19,12 @@ type Service struct {
 }
 
 type LauncherState struct {
-	Flags               []string
 	ActiveTargetVersion string
+	SetupState          string
 	WifiState           WifiState
 	NetworkState        NetworkState
 	KeyValuePairs       []KeyValuePair
+	Flags               []string
 }
 
 type KeyValuePair struct {
@@ -48,8 +49,8 @@ type WifiNetwork struct {
 }
 
 type DeviceData struct {
-	ServiceData   viewmodel.ClockData
 	LauncherState LauncherState
+	ServiceData   viewmodel.ClockData
 }
 
 type PairingStatus struct {
@@ -144,6 +145,11 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, err
 	}
 
+	setupState, err := svc.KeyValueStore.Get("setup")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, err
+	}
+
 	keyValues, err := svc.KeyValueStore.List()
 	if err != nil {
 		return DeviceData{}, err
@@ -160,6 +166,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	result := DeviceData{
 		ServiceData: clockData,
 		LauncherState: LauncherState{
+			SetupState:          setupState,
 			Flags:               flags,
 			ActiveTargetVersion: target.Version.Details(),
 			WifiState: WifiState{
