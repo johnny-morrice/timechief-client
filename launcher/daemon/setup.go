@@ -225,6 +225,9 @@ func (daemon Setup) handleWaitNetworkConnect() error {
 func (daemon Setup) handleNetworkConnected() error {
 	val, err := daemon.KeyValueStore.Get(store.LastInternetCheckKey)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return err
 	}
 	// TODO fix race condition with internet check.
