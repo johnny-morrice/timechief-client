@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"time"
 
@@ -92,7 +93,10 @@ func (daemon Setup) handleBegin() error {
 	if err != nil {
 		return err
 	}
-
+	err = daemon.StateFlagStore.CreateIfNotExists("wifi-load-interfaces")
+	if err != nil {
+		return err
+	}
 	err = daemon.StateFlagStore.CreateIfNotExists("wifi-scan")
 	if err != nil {
 		return err
@@ -101,7 +105,31 @@ func (daemon Setup) handleBegin() error {
 	if err != nil {
 		return err
 	}
+	ssid := generateHotspotSSID()
+	key := generateHotspotKey()
+	err = daemon.KeyValueStore.Set(store.HotspotSSID, ssid)
+	if err != nil {
+		return err
+	}
+	err = daemon.KeyValueStore.Set(store.HotspotKey, key)
+	if err != nil {
+		return err
+	}
 	return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
+}
+
+// TODO refactor with service code
+func randomNum() string {
+	suffix := rand.Int31n(899999) + 100000
+	return fmt.Sprintf("%d", suffix)
+}
+
+func generateHotspotSSID() string {
+	return "timechief" + randomNum()
+}
+
+func generateHotspotKey() string {
+	return "tc" + randomNum()
 }
 
 func (daemon Setup) handleHotspotWait() error {

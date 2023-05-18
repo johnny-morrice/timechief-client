@@ -154,6 +154,7 @@ func (sys System) WifiLoadInterfaces() error {
 		}
 	}
 
+	log.Printf("loaded active wifi interface: %s", active.Interface)
 	return nil
 }
 
