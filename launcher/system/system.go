@@ -272,27 +272,31 @@ type internetCheck struct {
 	interval time.Duration
 }
 
-func (check internetCheck) runCheck(nc netcmd.NetCmd) error {
+func (check internetCheck) runCheck(nc netcmd.NetCmd, stopch <-chan struct{}) error {
 	// Start the loop to ping the address
 	// log.Printf("checking internet with address: %s", check.address)
 	startTime := time.Now()
+	ticker := time.NewTicker(check.interval)
+	defer ticker.Stop()
 	for {
-		err := nc.CheckInternet(check.address)
-
-		if err != nil {
-			log.Printf("retrying internet check after failure with address %s: %s", check.address, err)
-		}
-		if err == nil {
+		select {
+		case <-stopch:
 			return nil
-		}
+		case <-ticker.C:
+			err := nc.CheckInternet(check.address)
 
-		// Wait for the specified duration before pinging again
-		time.Sleep(check.interval)
+			if err != nil {
+				log.Printf("retrying internet check after failure with address %s: %s", check.address, err)
+			}
+			if err == nil {
+				return nil
+			}
 
-		// Check if the timeout has been reached
-		elapsedTime := time.Since(startTime)
-		if elapsedTime > check.timeout {
-			return fmt.Errorf("timed out checking internet with address: %s", check.address)
+			// Check if the timeout has been reached
+			elapsedTime := time.Since(startTime)
+			if elapsedTime > check.timeout {
+				return fmt.Errorf("timed out checking internet with address: %s", check.address)
+			}
 		}
 	}
 }
@@ -327,11 +331,12 @@ func (sys System) CheckInternet() error {
 	// We return an error in this case.
 	resultChan := make(chan bool)
 	closeChanWg := sync.WaitGroup{}
+	stopChan := make(chan struct{})
 	for i := 0; i < len(checks); i++ {
 		closeChanWg.Add(1)
 		go func(check internetCheck) {
 			defer closeChanWg.Done()
-			err := check.runCheck(nc)
+			err := check.runCheck(nc, stopChan)
 			resultChan <- err == nil
 			if err != nil {
 				log.Printf("internet check failed: %v", err)
@@ -342,6 +347,7 @@ func (sys System) CheckInternet() error {
 		closeChanWg.Wait()
 		close(resultChan)
 	}()
+	defer close(stopChan)
 	for result := range resultChan {
 		if result {
 			go func() {
