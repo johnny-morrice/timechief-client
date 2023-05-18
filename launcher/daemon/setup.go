@@ -118,6 +118,9 @@ func (daemon Setup) handleHotspotWait() error {
 func (daemon Setup) isInterfaceSetup(mode string, ipMatch func(ip string) bool) (bool, error) {
 	actualMode, err := daemon.KeyValueStore.Get(store.InterfaceModeKey)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
 		return false, err
 	}
 
@@ -127,6 +130,9 @@ func (daemon Setup) isInterfaceSetup(mode string, ipMatch func(ip string) bool) 
 
 	actualIP, err := daemon.KeyValueStore.Get(store.IPAddressKey)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
 		return false, err
 	}
 	if !ipMatch(actualIP) {
@@ -183,6 +189,9 @@ func init() {
 func (daemon Setup) handleWaitNetworkConnect() error {
 	connectID, err := daemon.KeyValueStore.Get("setup-wifi-uuid")
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return err
 	}
 	ok, err := daemon.Cache.Exists(connectID)
