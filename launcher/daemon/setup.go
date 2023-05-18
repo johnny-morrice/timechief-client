@@ -115,6 +115,7 @@ func (daemon Setup) handleBegin() error {
 	if err != nil {
 		return err
 	}
+
 	return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
 }
 
