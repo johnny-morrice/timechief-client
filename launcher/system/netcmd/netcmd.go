@@ -32,7 +32,7 @@ func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) error {
 }
 
 func (nc NetCmd) Hotspot(ssid, password, ifname, accessPointIP, dhcpRange string) error {
-	return logExecute(nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname, dhcpRange)
+	return logExecute(nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname, accessPointIP, dhcpRange)
 }
 
 func (nc NetCmd) ReadWifiInterface(ifname string) (WiFiInterface, error) {
@@ -105,7 +105,7 @@ func executeReturningCombinedOutput(command string, args ...string) ([]byte, err
 	}
 	bs, err := cmd.CombinedOutput()
 	if err != nil {
-		return bs, fmt.Errorf("failed to execute %s %s: %w", command, strings.Join(args, " "), err)
+		return bs, fmt.Errorf("failed to execute %s: %w", strings.Join(args, " "), err)
 	}
 
 	return bs, nil
@@ -124,7 +124,7 @@ func executeReturningStdout(command string, args ...string) ([]byte, error) {
 	}
 	err := cmd.Run()
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute %s %s: %w", command, strings.Join(args, " "), err)
+		return nil, fmt.Errorf("failed to execute %s: %w", strings.Join(args, " "), err)
 	}
 
 	errBytes := stderrBuf.Bytes()

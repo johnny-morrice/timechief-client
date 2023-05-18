@@ -31,7 +31,13 @@ func (store WifiNetworkStore) Create(network *WifiNetwork) error {
 }
 
 // SetActive sets the active flag of a WIFI network to true, and sets all other networks to false.
-func (store WifiNetworkStore) SetActive(ssid string) error {
+func (store WifiNetworkStore) SetActive(ssid, key string) error {
+	// Set the wifi key.
+	err := store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("key", key).Error
+	if err != nil {
+		return fmt.Errorf("failed to set WIFI key: %w", err)
+	}
+
 	// Deactivate all other WIFI networks
 	result := store.DB.Model(&WifiNetwork{}).Where("active = ?", true).Update("active", false)
 	if result.Error != nil {

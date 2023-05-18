@@ -29,11 +29,11 @@ func (svc Service) WifiConnect() error {
 	return svc.KeyValueStore.Set("wifi-connect", id)
 }
 
-func (svc Service) WifiSetActiveNetwork(ssid string) error {
+func (svc Service) WifiSetActiveNetwork(ssid, key string) error {
 	if ssid == "" {
 		return errors.New("expected non-empty SSID")
 	}
-	return svc.WifiNetworkStore.SetActive(ssid)
+	return svc.WifiNetworkStore.SetActive(ssid, key)
 }
 
 func (svc Service) WifiScan() error {

@@ -27,11 +27,12 @@ type SystemService interface {
 	WifiHotspot() error
 	WifiLoadInterfaces() error
 	WifiScan() error
-	WifiSetActiveNetwork(ssid string) error
+	WifiSetActiveNetwork(ssid, key string) error
 }
 
 type WifiActivationRequest struct {
 	SSID string
+	Key  string
 }
 
 func (api System) HandleWifiSetActiveNetwork(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +47,7 @@ func (api System) HandleWifiSetActiveNetwork(w http.ResponseWriter, r *http.Requ
 		log.Printf("failed to decode wifi activation request: %v", err)
 		return
 	}
-	err = api.Service.WifiSetActiveNetwork(req.SSID)
+	err = api.Service.WifiSetActiveNetwork(req.SSID, req.Key)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		log.Printf("failed to handle wifi set active network: %v", err)

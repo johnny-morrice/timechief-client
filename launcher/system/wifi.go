@@ -22,16 +22,16 @@ func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan wifi networks: %w", err)
 	}
-	result := make([]WifiNetwork, len(nmNets))
-	for i, nmNet := range nmNets {
+	result := make([]WifiNetwork, 0, len(nmNets))
+	for _, nmNet := range nmNets {
 		if nmNet.Security != "WPA2" {
 			log.Printf("Skipping network %s with security %s", nmNet.SSID, nmNet.Security)
 			continue
 		}
-		result[i] = WifiNetwork{
+		result = append(result, WifiNetwork{
 			SSID:   nmNet.SSID,
 			Signal: nmNet.Signal,
-		}
+		})
 	}
 	return result, nil
 }
@@ -49,9 +49,8 @@ const AccessPointIPAddress = "172.16.0.1"
 const AccessPointIPAddressWithNetmask = AccessPointIPAddress + "/24"
 const dhcpRange = "172.16.0.100,172.16.0.200,12h"
 
-// TODO check if these modes are right.
-const AccessPointMode = "ap"
-const InfraMode = "infra"
+const AccessPointMode = "Master"
+const InfraMode = "Managed"
 
 func (card WifiInterface) Hotspot(net WifiNetwork) error {
 	err := card.netCmd().Hotspot(net.SSID, net.Key, card.Interface, AccessPointIPAddressWithNetmask, dhcpRange)
