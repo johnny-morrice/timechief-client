@@ -152,12 +152,12 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	}
 
 	hotspotSSID, err := svc.KeyValueStore.Get(store.HotspotSSID)
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, fmt.Errorf("failed to get hotspot ssid: %w", err)
 	}
 
 	hotspotKey, err := svc.KeyValueStore.Get(store.HotspotKey)
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, fmt.Errorf("failed to get hotspot key: %w", err)
 	}
 
