@@ -93,24 +93,29 @@ func (daemon Setup) handleBegin() error {
 	if err != nil {
 		return err
 	}
+
 	err = daemon.StateFlagStore.CreateIfNotExists("wifi-load-interfaces")
 	if err != nil {
 		return err
 	}
+
 	err = daemon.StateFlagStore.CreateIfNotExists("wifi-scan")
 	if err != nil {
 		return err
 	}
+
 	err = daemon.StateFlagStore.CreateIfNotExists("wifi-hotspot")
 	if err != nil {
 		return err
 	}
+
 	ssid := generateHotspotSSID()
 	key := generateHotspotKey()
 	err = daemon.KeyValueStore.Set(store.HotspotSSID, ssid)
 	if err != nil {
 		return err
 	}
+
 	err = daemon.KeyValueStore.Set(store.HotspotKey, key)
 	if err != nil {
 		return err
