@@ -129,6 +129,11 @@ func Daemon(ctx *cli.Context) error {
 		System: system,
 	}
 
+	_, err = wifiNetworkStore.GetActive()
+	if err == nil {
+		flagStore.CreateIfNotExists("wifi-connect")
+	}
+
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
 	go wifiScan.Start(ctx)
