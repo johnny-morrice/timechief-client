@@ -28,17 +28,17 @@ func (nc NetCmd) scriptPath(scriptName string) string {
 }
 
 func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) error {
-	return logExecute(nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
+	return logExecute("sudo", nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
 }
 
 func (nc NetCmd) Hotspot(ssid, password, ifname, accessPointIP, dhcpRange string) error {
-	return logExecute(nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname, accessPointIP, dhcpRange)
+	return logExecute("sudo", nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname, accessPointIP, dhcpRange)
 }
 
 func (nc NetCmd) ReadWifiInterface(ifname string) (WiFiInterface, error) {
 	// nmcli device show <interface>
 	result := WiFiInterface{}
-	err := parseExecute(&result, nc.scriptPath("timechief-wifi-interface"), ifname)
+	err := parseExecute(&result, "sudo", nc.scriptPath("timechief-wifi-interface"), ifname)
 	if err != nil {
 		return WiFiInterface{}, err
 	}
@@ -58,7 +58,7 @@ func (nc NetCmd) ReadWifiInterfaces() ([]WiFiInterface, error) {
 func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
 	// nmcli device wifi rescan ifname <interface>
 	result := []WiFiNetwork{}
-	err := parseExecute(&result, nc.scriptPath("timechief-wifi-scan"), ifname)
+	err := parseExecute(&result, "sudo", nc.scriptPath("timechief-wifi-scan"), ifname)
 	if err != nil {
 		return nil, err
 	}

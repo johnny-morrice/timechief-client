@@ -31,19 +31,28 @@ func Install(ctx *cli.Context) error {
 
 	binScripts := []string{
 		"timechief-bootstrap",
-		"timechief-reboot",
-		"timechief-shutdown",
-		"timechief-wifi-connect",
-		"timechief-wifi-hotspot",
-		"timechief-wifi-interface",
 		"timechief-wifi-interfaces",
-		"timechief-wifi-scan",
 		"timechief-internet-check",
 	}
 
 	for _, script := range binScripts {
 		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", script)
 		systemScript := filepath.Join(installRoot, "bin", script)
+		links = append(links, link{oldPath: targetScript, newPath: systemScript})
+	}
+
+	secureScripts := []string{
+		"timechief-reboot",
+		"timechief-shutdown",
+		"timechief-wifi-connect",
+		"timechief-wifi-hotspot",
+		"timechief-wifi-interface",
+		"timechief-wifi-scan",
+	}
+
+	for _, script := range secureScripts {
+		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", script)
+		systemScript := filepath.Join(installRoot, "bin", "secure", script)
 		links = append(links, link{oldPath: targetScript, newPath: systemScript})
 	}
 
