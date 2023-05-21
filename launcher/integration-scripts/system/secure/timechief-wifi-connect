@@ -24,20 +24,20 @@ if [ -z "$IFNAME" ]; then
 fi
 
 # Bring network done first
-sudo killall wpa_supplicant || true
-sudo systemctl stop dnsmasq-timechief
-sudo systemctl stop hostapd-timechief
+killall wpa_supplicant || true
+systemctl stop dnsmasq-timechief
+systemctl stop hostapd-timechief
 
 # Bring down the interface.
-sudo ip addr flush dev $IFNAME
-sudo ip link set $IFNAME down
+ip addr flush dev $IFNAME
+ip link set $IFNAME down
 
 # Bring up the interface.
-sudo ip link set $IFNAME up
+ip link set $IFNAME up
 
 # Now connect.
-sudo wpa_passphrase $SSID $PASSWORD > /tmp/wpa_supplicant.conf
-sudo wpa_supplicant -B -i $IFNAME -c /tmp/wpa_supplicant.conf
+wpa_passphrase $SSID $PASSWORD > /tmp/wpa_supplicant.conf
+wpa_supplicant -B -i $IFNAME -c /tmp/wpa_supplicant.conf
 
 # Now start dhcpcd.
-sudo systemctl start dhcpcd
+systemctl start dhcpcd

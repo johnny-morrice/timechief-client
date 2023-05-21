@@ -37,7 +37,7 @@ fi
 # This script is to configure a wifi hotspot on raspberry pi.
 
 # Disable dhcpcd on the interface.
-sudo systemctl stop dhcpcd
+systemctl stop dhcpcd
 
 # Create dnsmasq config file.
 cat > /tmp/dnsmasq.conf <<EOF
@@ -63,20 +63,20 @@ rsn_pairwise=CCMP
 EOF
 
 # Disable wpa_supplicant on the interface.
-sudo killall wpa_supplicant || true
-sudo systemctl stop dnsmasq-timechief 
-sudo systemctl stop hostapd-timechief
+killall wpa_supplicant || true
+systemctl stop dnsmasq-timechief 
+systemctl stop hostapd-timechief
 
 # Configure the interface.
-sudo ip addr flush dev $IFNAME
-sudo ip link set $IFNAME down
-sudo ip link set $IFNAME up
-sudo ip addr add $AP_IP dev $IFNAME
+ip addr flush dev $IFNAME
+ip link set $IFNAME down
+ip link set $IFNAME up
+ip addr add $AP_IP dev $IFNAME
 
 # Start dnsmasq with systemd.
-sudo systemctl start dnsmasq-timechief
+systemctl start dnsmasq-timechief
 
 # Start hostapd with systemd.
-sudo systemctl start hostapd-timechief
+systemctl start hostapd-timechief
 
 

@@ -11,7 +11,7 @@ device_name = sys.argv[1]
 state = open(f'/sys/class/net/{device_name}/operstate').read().strip()
 
 # Get the device SSID and mode from iwconfig
-iwconfig_output = subprocess.check_output(['sudo', 'iwconfig', device_name]).decode()
+iwconfig_output = subprocess.check_output(['iwconfig', device_name]).decode()
 ssid = None
 mode = None
 for line in iwconfig_output.split('\n'):
