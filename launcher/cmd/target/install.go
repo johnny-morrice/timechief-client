@@ -29,30 +29,21 @@ func Install(ctx *cli.Context) error {
 		{oldPath: targetSplash, newPath: systemSplash},
 	}
 
-	binScripts := []string{
-		"timechief-bootstrap",
-		"timechief-wifi-interfaces",
-		"timechief-internet-check",
+	scripts := []string{
+		"bin/timechief-bootstrap",
+		"bin/timechief-wifi-interfaces",
+		"bin/timechief-internet-check",
+		"bin/secure/timechief-reboot",
+		"bin/secure/timechief-shutdown",
+		"bin/secure/timechief-wifi-connect",
+		"bin/secure/timechief-wifi-hotspot",
+		"bin/secure/timechief-wifi-interface",
+		"bin/secure/timechief-wifi-scan",
 	}
 
-	for _, script := range binScripts {
+	for _, script := range scripts {
 		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", script)
-		systemScript := filepath.Join(installRoot, "bin", script)
-		links = append(links, link{oldPath: targetScript, newPath: systemScript})
-	}
-
-	secureScripts := []string{
-		"timechief-reboot",
-		"timechief-shutdown",
-		"timechief-wifi-connect",
-		"timechief-wifi-hotspot",
-		"timechief-wifi-interface",
-		"timechief-wifi-scan",
-	}
-
-	for _, script := range secureScripts {
-		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", script)
-		systemScript := filepath.Join(installRoot, "bin", "secure", script)
+		systemScript := filepath.Join(installRoot, script)
 		links = append(links, link{oldPath: targetScript, newPath: systemScript})
 	}
 
