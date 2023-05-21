@@ -23,7 +23,7 @@ function getDeviceStatus(signals) {
         let activeTargetVersion = launcherState["ActiveTargetVersion"];
         let currentVersion = signals.clientVersion();
         if (currentVersion && activeTargetVersion && activeTargetVersion !== currentVersion) {
-            return "restart to update";
+            return "restart to update to version " + activeTargetVersion;
         }
     }
     return signals.deviceStatus();
@@ -86,6 +86,10 @@ export const DevicePage = () => {
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device status</div>
                 <div class='flex-element'>{getDeviceStatus(deviceSignals)}</div>
+            </div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Client version</div>
+                <div class='flex-element'>{deviceSignals.clientVersion()}</div>
             </div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device Serial Number</div>
