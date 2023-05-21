@@ -108,14 +108,26 @@ func toStoreCards(cards []WifiInterface) []*store.WifiInterface {
 }
 
 func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
-	storeNets := make([]*store.WifiNetwork, len(nets))
+	dedupe := make(map[string]int, len(nets))
+
 	for i := 0; i < len(nets); i++ {
 		net := nets[i]
-		storeNet := &store.WifiNetwork{
-			SSID:   net.SSID,
-			Signal: net.Signal,
+		signal, ok := dedupe[net.SSID]
+		if ok {
+			if net.Signal < signal {
+				continue
+			}
 		}
-		storeNets[i] = storeNet
+		dedupe[net.SSID] = net.Signal
+	}
+
+	storeNets := make([]*store.WifiNetwork, 0, len(dedupe))
+	for ssid, signal := range dedupe {
+		storeNet := &store.WifiNetwork{
+			SSID:   ssid,
+			Signal: signal,
+		}
+		storeNets = append(storeNets, storeNet)
 	}
 	return storeNets
 }
