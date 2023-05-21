@@ -162,7 +162,7 @@ class LauncherClient {
 
   createPairing() {
     let cfg = {
-      url: this.baseURL + '/api/pairing',
+      url: this.baseURL + '/api/data/pairing',
       method: 'post'
     };
     return this.axios(cfg).then(resp => {
@@ -174,7 +174,7 @@ class LauncherClient {
 
   getPairing() {
     let cfg = {
-      url: this.baseURL + '/api/pairing',
+      url: this.baseURL + '/api/data/pairing',
       method: 'get'
     };
     return this.axios(cfg).then(resp => {
@@ -185,7 +185,7 @@ class LauncherClient {
   }
   getDeviceData() {
     let cfg = {
-      url: this.baseURL + '/api/device',
+      url: this.baseURL + '/api/data/device',
       method: 'get'
     };
     return this.axios(cfg).then(resp => {
