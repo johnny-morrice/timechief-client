@@ -1,8 +1,0 @@
-#!/bin/bash
-# This script is used to mock the output of the timechief wifi connect command.
-cat << EOF
-{
-    "Success": true,
-    "Message": "connected"
-}
-EOF
