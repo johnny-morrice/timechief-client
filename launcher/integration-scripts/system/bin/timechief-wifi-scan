@@ -1,2 +1,2 @@
 #!/bin/bash
-./secure/timechief-wifi-scan "$@"
+sudo ./secure/timechief-wifi-scan "$@"
