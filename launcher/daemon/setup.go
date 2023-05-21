@@ -94,6 +94,11 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
+	err = daemon.System.KeyValueStore.Delete("wifi-connect")
+	if err != nil {
+		return err
+	}
+
 	err = daemon.StateFlagStore.CreateIfNotExists("wifi-load-interfaces")
 	if err != nil {
 		return err
