@@ -114,9 +114,9 @@ nohook wpa_supplicant
 ENDCAT
 EOF
 
-# Shutdown without password
+# Run secure scripts with sudo
 on_chroot << EOF
-echo "user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown" >> /etc/sudoers
+echo "$FIRST_USER_NAME ALL=(ALL) NOPASSWD: /opt/timechief-launcher/bin/secure/" > /etc/sudoers.d/timechief
 EOF
 
 # Change issue
