@@ -9,7 +9,8 @@ import (
 )
 
 type Initialiser struct {
-	DB *gorm.DB
+	DB            *gorm.DB
+	KeyValueStore store.KeyValueStore
 	Updater
 }
 
@@ -19,6 +20,10 @@ func (init Initialiser) Initialise(ctx *cli.Context, cfg store.Config) error {
 		return err
 	}
 	err = init.CfgStore.SetConfig(cfg)
+	if err != nil {
+		return err
+	}
+	err = init.KeyValueStore.Set("setup", "Begin")
 	if err != nil {
 		return err
 	}

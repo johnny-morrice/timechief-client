@@ -40,7 +40,8 @@ func Initialise(ctx *cli.Context) error {
 		return err
 	}
 	init := update.Initialiser{
-		DB: db,
+		DB:            db,
+		KeyValueStore: store.KeyValueStore{DB: db},
 		Updater: update.Updater{
 			CfgStore:          cfgStore,
 			Client:            clnt,
