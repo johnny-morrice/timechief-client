@@ -27,10 +27,15 @@ func (sys System) stopApp() error {
 	return store.CloseDB(sys.DB)
 }
 
-func (sys System) runSudoScript(cfg store.Config, path string) error {
+func (sys System) runScript(cfg store.Config, path string) error {
 	root := cfg.GetInstallRoot()
-	script := filepath.Join(root, path)
-	output, err := exec.Command("sudo", script).CombinedOutput()
+	binRoot := filepath.Join(root, "bin")
+	script := filepath.Join(binRoot, path)
+	cmd := exec.Cmd{
+		Path: script,
+		Dir:  binRoot,
+	}
+	output, err := cmd.CombinedOutput()
 	log.Printf("system script %s output: %s", script, output)
 	if err != nil {
 		return fmt.Errorf("failed to execute system script %s: %w", path, err)
@@ -48,7 +53,7 @@ func (sys System) doShutdown() error {
 	if err != nil {
 		return err
 	}
-	return sys.runSudoScript(cfg, "bin/timechief-shutdown")
+	return sys.runScript(cfg, "timechief-shutdown")
 }
 
 func (sys System) doReboot() error {
@@ -61,7 +66,7 @@ func (sys System) doReboot() error {
 	if err != nil {
 		return err
 	}
-	return sys.runSudoScript(cfg, "bin/timechief-reboot")
+	return sys.runScript(cfg, "timechief-reboot")
 }
 
 func (sys System) Shutdown() error {

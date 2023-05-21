@@ -1,0 +1,2 @@
+#!/bin/bash
+./secure/timechief-wifi-interface "$@"

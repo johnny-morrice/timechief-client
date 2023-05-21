@@ -28,17 +28,17 @@ func (nc NetCmd) scriptPath(scriptName string) string {
 }
 
 func (nc NetCmd) ConnectToWifi(ssid, password, ifname string) error {
-	return logExecute("sudo", nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
+	return nc.logExecute(nc.scriptPath("timechief-wifi-connect"), ssid, password, ifname)
 }
 
 func (nc NetCmd) Hotspot(ssid, password, ifname, accessPointIP, dhcpRange string) error {
-	return logExecute("sudo", nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname, accessPointIP, dhcpRange)
+	return nc.logExecute(nc.scriptPath("timechief-wifi-hotspot"), ssid, password, ifname, accessPointIP, dhcpRange)
 }
 
 func (nc NetCmd) ReadWifiInterface(ifname string) (WiFiInterface, error) {
 	// nmcli device show <interface>
 	result := WiFiInterface{}
-	err := parseExecute(&result, "sudo", nc.scriptPath("timechief-wifi-interface"), ifname)
+	err := nc.parseExecute(&result, nc.scriptPath("timechief-wifi-interface"), ifname)
 	if err != nil {
 		return WiFiInterface{}, err
 	}
@@ -48,7 +48,7 @@ func (nc NetCmd) ReadWifiInterface(ifname string) (WiFiInterface, error) {
 func (nc NetCmd) ReadWifiInterfaces() ([]WiFiInterface, error) {
 	// nmcli device wifi list
 	result := []WiFiInterface{}
-	err := parseExecute(&result, nc.scriptPath("timechief-wifi-interfaces"))
+	err := nc.parseExecute(&result, nc.scriptPath("timechief-wifi-interfaces"))
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (nc NetCmd) ReadWifiInterfaces() ([]WiFiInterface, error) {
 func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
 	// nmcli device wifi rescan ifname <interface>
 	result := []WiFiNetwork{}
-	err := parseExecute(&result, "sudo", nc.scriptPath("timechief-wifi-scan"), ifname)
+	err := nc.parseExecute(&result, nc.scriptPath("timechief-wifi-scan"), ifname)
 	if err != nil {
 		return nil, err
 	}
@@ -67,15 +67,15 @@ func (nc NetCmd) Scan(ifname string) ([]WiFiNetwork, error) {
 
 func (nc NetCmd) CheckInternet(address string) error {
 	const debug = false
-	msg, err := executeReturningCombinedOutput(nc.scriptPath("timechief-internet-check"), address)
+	msg, err := nc.executeReturningCombinedOutput(nc.scriptPath("timechief-internet-check"), address)
 	if debug {
 		log.Printf("timechief-internet-check %s: %s", address, msg)
 	}
 	return err
 }
 
-func parseExecute(out interface{}, command string, args ...string) error {
-	bs, err := executeReturningStdout(command, args...)
+func (nc NetCmd) parseExecute(out interface{}, command string, args ...string) error {
+	bs, err := nc.executeReturningStdout(command, args...)
 	if err != nil {
 		return err
 	}
@@ -86,8 +86,8 @@ func parseExecute(out interface{}, command string, args ...string) error {
 	return nil
 }
 
-func logExecute(command string, args ...string) error {
-	msg, err := executeReturningCombinedOutput(command, args...)
+func (nc NetCmd) logExecute(command string, args ...string) error {
+	msg, err := nc.executeReturningCombinedOutput(command, args...)
 	if err != nil {
 		return err
 	}
@@ -97,11 +97,12 @@ func logExecute(command string, args ...string) error {
 	return nil
 }
 
-func executeReturningCombinedOutput(command string, args ...string) ([]byte, error) {
+func (nc NetCmd) executeReturningCombinedOutput(command string, args ...string) ([]byte, error) {
 	args = append([]string{command}, args...)
 	cmd := exec.Cmd{
 		Path: command,
 		Args: args,
+		Dir:  nc.BasePath,
 	}
 	bs, err := cmd.CombinedOutput()
 	if err != nil {
@@ -112,13 +113,14 @@ func executeReturningCombinedOutput(command string, args ...string) ([]byte, err
 }
 
 // executeReturningStdout uses os.exec to executeReturningStdout a command.
-func executeReturningStdout(command string, args ...string) ([]byte, error) {
+func (nc NetCmd) executeReturningStdout(command string, args ...string) ([]byte, error) {
 	stderrBuf := bytes.Buffer{}
 	stdoutBuf := bytes.Buffer{}
 	args = append([]string{command}, args...)
 	cmd := exec.Cmd{
 		Path:   command,
 		Args:   args,
+		Dir:    nc.BasePath,
 		Stderr: &stderrBuf,
 		Stdout: &stdoutBuf,
 	}
