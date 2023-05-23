@@ -30,7 +30,7 @@ func Install(ctx *cli.Context) error {
 	}
 
 	scripts := []string{
-		"timechief-bootstrap",
+		"bin/timechief-bootstrap",
 		"bin/timechief-wifi-interfaces",
 		"bin/timechief-internet-check",
 		"bin/timechief-reboot",
