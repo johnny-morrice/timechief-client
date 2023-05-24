@@ -17,6 +17,14 @@ function updateWebSetupPageSignals(signals, data) {
             let setupState = launcherState["SetupState"];
             signals.setSetupState(setupState);
         }
+        if ("NetworkState" in launcherState) {
+            let networkState = launcherState["NetworkState"];
+            if ("IPAddress" in networkState) {
+                let deviceIP = networkState["IPAddress"];
+                signals.setDeviceIP(deviceIP);
+            }
+        }
+
         if ("WifiState" in launcherState) {
             let wifiState = launcherState["WifiState"];
             let hotspotSSID = wifiState["HotspotSSID"];
@@ -60,6 +68,10 @@ export const WebSetupPage = (props) => {
                 <div class='row-flex flex-element'>
                     <div class="flex-element data-name">Hotspot SSID</div>
                     <div class="flex-element data-value">{signals.hotspotKey}</div>
+                </div>
+                <div class='row-flex flex-element'>
+                    <div class="flex-element data-name">Device IP</div>
+                    <div class="flex-element data-value">{signals.deviceIP}</div>
                 </div>
             </div>
         </Show>
