@@ -183,6 +183,20 @@ class LauncherClient {
       }
     });
   }
+  postSetupBegin() {
+    let cfg = {
+      url: this.baseURL + '/api/launcher/setup',
+      method: 'post',
+      data: {
+        "State": "Begin"
+      }
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return {};
+      }
+    });
+  }
   getDeviceData() {
     let cfg = {
       url: this.baseURL + '/api/data/device',
@@ -235,6 +249,7 @@ handleIPCAPICall("pairingGet", "pairingGetResult", () => client.getPairing());
 handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());
 handleIPCAPICall("reboot", "rebootResult", () => client.reboot());
 handleIPCAPICall("shutdown", "shutdownResult", () => client.shutdown());
+handleIPCAPICall("setupBegin", "setupBeginResult", () => client.postSetupBegin());
 
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {

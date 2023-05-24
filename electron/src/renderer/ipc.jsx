@@ -34,6 +34,7 @@ export const pairingGetReceiver = new APIResultReceiver("pairingGetResult");
 export const clockDataReceiver = new APIResultReceiver("clockDataResult");
 export const rebootReceiver = new APIResultReceiver("rebootResult");
 export const shutdownReceiver = new APIResultReceiver("shutdownResult");
+export const setupBeginReceiver = new APIResultReceiver("setupBeginResult");
 
 const deviceCallbacks = [];
 function receiveDeviceStatus() {
@@ -88,8 +89,8 @@ export function sendReboot() {
     window.api.send("reboot");
 }
 
-export function sendBeginSetup() {
-    // TODO
+export function sendSetupBegin() {
+    window.api.send("setupBegin");
 }
 
 export function sendShutdown() {
@@ -115,5 +116,6 @@ export function initializeIPC() {
     pairingGetReceiver.receive();
     rebootReceiver.receive();
     shutdownReceiver.receive();
+    setupBeginReceiver.receive();
     return [deviceInterval, apiInterval];
 }

@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown } from './ipc';
+import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from './ipc';
 
 class DeviceSignals {
     constructor() {
@@ -58,12 +58,12 @@ function onClickShutdown() {
 
 function onClickReboot() {
     console.log("reboot clicked")
-    sendReboot()
+    sendReboot();
 }
 
 function onClickSetup() {
     console.log("setup clicked")
-    showSetup();
+    sendSetupBegin();
 }
 
 var initialised = false;
