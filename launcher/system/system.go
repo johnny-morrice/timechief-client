@@ -193,14 +193,14 @@ func (sys System) WifiScan() error {
 	if len(networks) == 0 {
 		return ErrNoWifiNetworks
 	}
-	err = sys.WifiNetworkStore.DeleteAll()
+	err = sys.WifiNetworkStore.MarkAllNotFound()
 	if err != nil {
 		return fmt.Errorf("failed to delete all wifi networks: %w", err)
 	}
 	storeNets := toStoreNetworks(networks)
 	for i := 0; i < len(storeNets); i++ {
 		net := storeNets[i]
-		err = sys.WifiNetworkStore.Create(net)
+		err = sys.WifiNetworkStore.Save(net)
 		if err != nil {
 			return fmt.Errorf("failed to create wifi network: %w", err)
 		}
