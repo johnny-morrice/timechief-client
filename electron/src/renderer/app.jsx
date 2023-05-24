@@ -13,6 +13,9 @@ import { LocalePage } from "./localePage";
 import { CalendarPage } from "./calendarPage";
 import { WebSetupPage } from "./webSetupPage";
 
+const AppScreen = (props) => 
+  <WebSetupPage element={<div><StatusBar/>{props.element}<TaskBar/></div>}/>
+
 const App = () => {
   let ipcIntervals = initializeIPC();
   onCleanup(() => {
@@ -20,20 +23,20 @@ const App = () => {
   });
 
   return <Routes>
-        <Route path="/home" element={<WebSetupPage element={<HomePage/>}/>}/>
-        <Route path="/forecast" element={<WebSetupPage element={<ForecastPage/>}/>}/>
-        <Route path="/device" element={<WebSetupPage element={<DevicePage/>}/>}/>
-        <Route path="/astro" element={<WebSetupPage element={<AstroPage/>}/>}/>
-        <Route path="/account" element={<WebSetupPage element={<AccountPage/>}/>}/>
-        <Route path="/locale" element={<WebSetupPage element={<LocalePage/>}/>}/>
-        <Route path="/calendar" element={<WebSetupPage element={<CalendarPage/>}/>}/>
-        <Route path="/" element={<WebSetupPage element={<HomePage/>}/>}/>
+        <Route path="/home" element={<AppScreen element={<HomePage/>}/>}/>
+        <Route path="/forecast" element={<AppScreen element={<ForecastPage/>}/>}/>
+        <Route path="/device" element={<AppScreen element={<DevicePage/>}/>}/>
+        <Route path="/astro" element={<AppScreen element={<AstroPage/>}/>}/>
+        <Route path="/account" element={<AppScreen element={<AccountPage/>}/>}/>
+        <Route path="/locale" element={<AppScreen element={<LocalePage/>}/>}/>
+        <Route path="/calendar" element={<AppScreen element={<CalendarPage/>}/>}/>
+        <Route path="/" element={<AppScreen element={<HomePage/>}/>}/>
       </Routes>
 };
 
 
 export function attachApp() {
-  render(() => <Router source={hashIntegration()}><StatusBar/><App /><TaskBar/></Router>, document.getElementById('app'));
+  render(() => <Router source={hashIntegration()}><App></App></Router>, document.getElementById('app'));
 }
 
 attachApp();

@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addDataCallback } from './ipc';
+import { addDataCallback, sendSetupAbandon } from './ipc';
 
 class WebSetupPageSignals {
   constructor() {
@@ -7,12 +7,19 @@ class WebSetupPageSignals {
       [this.deviceIP, this.setDeviceIP] = createSignal("");
       [this.hotspotSSID, this.setHotspotSSID] = createSignal("");
       [this.hotspotKey, this.setHotspotKey] = createSignal("");
+      [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
   }
 }
 
 function updateWebSetupPageSignals(signals, data) {
     if ("LauncherState" in data) {
         let launcherState = data["LauncherState"];
+        if ("FirstTimeSetupDone" in launcherState) {
+            let firstTimeSetupDone = launcherState["FirstTimeSetupDone"];
+            signals.setFirstTimeSetupDone(firstTimeSetupDone);
+        } else {
+            signals.setFirstTimeSetupDone(false);
+        }
         if ("SetupState" in launcherState) {
             let setupState = launcherState["SetupState"];
             signals.setSetupState(setupState);
@@ -49,6 +56,14 @@ function isLoading(signals) {
     return signals.setupState() !== "InternetConnected" && signals.setupState() !== "WaitUserSelectNetwork";
 }
 
+function isDisplayBackButton(signals) {
+    return !signals.isInternetConnectedState() && !signals.firstTimeSetupDone();
+}
+
+function onClickBack() {
+    sendSetupAbandon();
+}
+
 var initialised = false;
 let signals = new WebSetupPageSignals();
 export const WebSetupPage = (props) => {
@@ -60,7 +75,7 @@ export const WebSetupPage = (props) => {
   return <div id="web-setup">
         <Show when={isHotspotReady(signals)}>
             <div class="column-flex">
-                <div class="flex-element section-name underline">Setup your device</div>
+                <div class="flex-element section-name underline">Setup your timechief</div>
                 <div class='row-flex flex-element'>
                     <div class="flex-element data-name">Connect to Wifi Network</div>
                     <div class="flex-element data-value">{signals.hotspotSSID}</div>
@@ -73,10 +88,27 @@ export const WebSetupPage = (props) => {
                     <div class="flex-element data-name">Device IP</div>
                     <div class="flex-element data-value">{signals.deviceIP}</div>
                 </div>
+                <Show when={isDisplayBackButton(signals)}>
+                    <div class='row-flex flex-element'>
+                        <div class='flex-element data-name'>Cancel setup</div>
+                        <button class='flex-element' onClick={onClickBack}><i class="fa-solid fa-square-arrow-left"></i></button>
+                    </div>
+                </Show>
             </div>
         </Show>
         <Show when={isLoading(signals)}>
-            <div class="flex-element section-name underline">Loading...</div>
+            <div class="column-flex">
+                <div class="flex-element section-name underline">Setup your timechief</div>
+                <div class='row-flex flex-element'>
+                    <div class="flex-element data-name">Loading...</div>
+                </div>
+                <Show when={isDisplayBackButton(signals)}>
+                    <div class='row-flex flex-element'>
+                        <div class='flex-element data-name'>Cancel setup</div>
+                        <button class='flex-element' onClick={onClickBack}><i class="fa-solid fa-square-arrow-left"></i></button>
+                    </div>
+                </Show>
+            </div>
         </Show>
         <Show when={isInternetConnectedState(signals)}>
             {props.element}
