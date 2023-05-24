@@ -23,6 +23,7 @@ type LauncherState struct {
 	SetupState          string
 	WifiState           WifiState
 	NetworkState        NetworkState
+	FirstTimeSetupDone  bool
 	Flags               []string
 }
 
@@ -161,6 +162,12 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, fmt.Errorf("failed to get hotspot key: %w", err)
 	}
 
+	_, err = svc.KeyValueStore.Get("firstTimeSetupDone")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, fmt.Errorf("failed to get firstTimeSetupDone: %w", err)
+	}
+	firstTimeSetupDone := !errors.Is(err, gorm.ErrRecordNotFound)
+
 	result := DeviceData{
 		ServiceData: clockData,
 		LauncherState: LauncherState{
@@ -175,6 +182,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 				HotspotSSID:         hotspotSSID,
 				HotspotKey:          hotspotKey,
 			},
+			FirstTimeSetupDone: firstTimeSetupDone,
 			NetworkState: NetworkState{
 				IPAddress: ipAddress,
 			},

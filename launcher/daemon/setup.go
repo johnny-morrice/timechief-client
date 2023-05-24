@@ -289,6 +289,11 @@ func (daemon Setup) handleNetworkConnected() error {
 		return daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
 	}
 
+	err = daemon.KeyValueStore.Set("firstTimeSetupDone", "true")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
