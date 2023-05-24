@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { onCleanup } from 'solid-js';
 import { hashIntegration, Router, Routes, Route } from "@solidjs/router";
-import { initializeIPC, sendClockDataRequest } from './ipc';
+import { initializeIPC } from './ipc';
 import { HomePage } from "./homePage";
 import { DevicePage } from "./devicePage";
 import { TaskBar } from "./taskbar";
@@ -11,6 +11,7 @@ import { AccountPage } from "./accountPage";
 import { StatusBar } from './statusBar';
 import { LocalePage } from "./localePage";
 import { CalendarPage } from "./calendarPage";
+import { WebSetupPage } from "./webSetupPage";
 
 const App = () => {
   let ipcIntervals = initializeIPC();
@@ -26,7 +27,7 @@ const App = () => {
       <Route path="/account" element={<AccountPage/>} />
       <Route path="/locale" element={<LocalePage/>} />
       <Route path="/calendar" element={<CalendarPage/>} />
-      <Route path="/" element={<HomePage/>} />
+      <Route path="/" element={<WebSetupPage/>} />
     </Routes>
 };
 

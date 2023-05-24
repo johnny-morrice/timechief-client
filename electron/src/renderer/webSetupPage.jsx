@@ -5,9 +5,10 @@ import { showHome } from './routes';
 
 class WebSetupPageSignals {
   constructor() {
-      [this.setupState, this.setupState] = createSignal("");
+      [this.setupState, this.setSetupState] = createSignal("");
       [this.deviceIP, this.setDeviceIP] = createSignal("");
-      [this.hotspotSSID, this.setHotspotKey] = createSignal("");
+      [this.hotspotSSID, this.setHotspotSSID] = createSignal("");
+      [this.hotspotKey, this.setHotspotKey] = createSignal("");
   }
 }
 
@@ -15,6 +16,10 @@ function updateWebSetupPageSignals(signals, data) {
     if ("LauncherState" in data) {
         let launcherState = data["LauncherState"];
         if ("SetupState" in launcherState) {
+            if (isInternetConnectedState(signals)) {
+                showHome();
+                return;
+            }
             let setupState = launcherState["SetupState"];
             signals.setSetupState(setupState);
         }
