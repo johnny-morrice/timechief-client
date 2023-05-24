@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"os/exec"
 	"path/filepath"
 	"sync"
@@ -235,25 +236,69 @@ func (sys System) WifiConnect(uuid string) error {
 	return nil
 }
 
+func randomNum() string {
+	suffix := rand.Int31n(899999) + 100000
+	return fmt.Sprintf("%d", suffix)
+}
+
+func generateHotspotSSID() string {
+	return "timechief" + randomNum()
+}
+
+func generateHotspotKey() string {
+	return "tc" + randomNum()
+}
+
+type hotspotCredentials struct {
+	SSID string
+	Key  string
+}
+
+func (sys System) getHotspotCredentials() (hotspotCredentials, error) {
+	var ssid string
+	var key string
+	ssid, err := sys.KeyValueStore.Get(store.HotspotSSID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		ssid = generateHotspotSSID()
+		key = generateHotspotKey()
+		err = sys.KeyValueStore.Set(store.HotspotSSID, ssid)
+		if err != nil {
+			return hotspotCredentials{}, err
+		}
+
+		err = sys.KeyValueStore.Set(store.HotspotKey, key)
+		if err != nil {
+			return hotspotCredentials{}, err
+		}
+		return hotspotCredentials{SSID: ssid, Key: key}, nil
+	}
+
+	if err != nil {
+		return hotspotCredentials{}, fmt.Errorf("failed to get hotspot ssid: %w", err)
+	}
+	key, err = sys.KeyValueStore.Get(store.HotspotKey)
+	if err != nil {
+		return hotspotCredentials{}, fmt.Errorf("failed to get hotspot key: %w", err)
+	}
+
+	return hotspotCredentials{SSID: ssid, Key: key}, nil
+}
+
 func (sys System) WifiHotspot() error {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
 	}
-	ssid, err := sys.KeyValueStore.Get(store.HotspotSSID)
+	credentials, err := sys.getHotspotCredentials()
 	if err != nil {
-		return fmt.Errorf("failed to get hotspot ssid: %w", err)
-	}
-	key, err := sys.KeyValueStore.Get(store.HotspotKey)
-	if err != nil {
-		return fmt.Errorf("failed to get hotspot key: %w", err)
+		return fmt.Errorf("failed to get hotspot credentials: %w", err)
 	}
 	card := WifiInterface{
 		Interface: storeCard.Interface,
 	}
 	network := WifiNetwork{
-		SSID: ssid,
-		Key:  key,
+		SSID: credentials.SSID,
+		Key:  credentials.Key,
 	}
 	return card.Hotspot(network)
 }

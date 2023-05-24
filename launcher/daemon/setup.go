@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math/rand"
 	"net"
 	"time"
 
@@ -114,33 +113,7 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
-	ssid := generateHotspotSSID()
-	key := generateHotspotKey()
-	err = daemon.KeyValueStore.Set(store.HotspotSSID, ssid)
-	if err != nil {
-		return err
-	}
-
-	err = daemon.KeyValueStore.Set(store.HotspotKey, key)
-	if err != nil {
-		return err
-	}
-
 	return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
-}
-
-// TODO refactor with service code
-func randomNum() string {
-	suffix := rand.Int31n(899999) + 100000
-	return fmt.Sprintf("%d", suffix)
-}
-
-func generateHotspotSSID() string {
-	return "timechief" + randomNum()
-}
-
-func generateHotspotKey() string {
-	return "tc" + randomNum()
 }
 
 func (daemon Setup) handleHotspotWait() error {
@@ -286,12 +259,11 @@ func (daemon Setup) handleNetworkConnected() error {
 		return err
 	}
 	if time.Since(checkTime) < validDuration {
+		err = daemon.KeyValueStore.Set("firstTimeSetupDone", "true")
+		if err != nil {
+			return err
+		}
 		return daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
-	}
-
-	err = daemon.KeyValueStore.Set("firstTimeSetupDone", "true")
-	if err != nil {
-		return err
 	}
 
 	return nil

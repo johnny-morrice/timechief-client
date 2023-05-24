@@ -2,8 +2,6 @@ package system
 
 import (
 	"errors"
-	"fmt"
-	"math/rand"
 
 	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
@@ -40,30 +38,7 @@ func (svc Service) WifiScan() error {
 	return svc.StateFlagStore.CreateIfNotExists("wifi-scan")
 }
 
-func randomNum() string {
-	suffix := rand.Int31n(899999) + 100000
-	return fmt.Sprintf("%d", suffix)
-}
-
-func generateHotspotSSID() string {
-	return "timechief" + randomNum()
-}
-
-func generateHotspotKey() string {
-	return "tc" + randomNum()
-}
-
 func (svc Service) WifiHotspot() error {
-	ssid := generateHotspotSSID()
-	key := generateHotspotKey()
-	err := svc.KeyValueStore.Set(store.HotspotSSID, ssid)
-	if err != nil {
-		return err
-	}
-	err = svc.KeyValueStore.Set(store.HotspotKey, key)
-	if err != nil {
-		return err
-	}
 	return svc.StateFlagStore.CreateIfNotExists("wifi-hotspot")
 }
 
