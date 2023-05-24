@@ -1,7 +1,5 @@
 import { createSignal } from 'solid-js';
 import { addDataCallback } from './ipc';
-import { HomePage } from './homePage';
-import { showHome } from './routes';
 
 class WebSetupPageSignals {
   constructor() {
@@ -16,10 +14,6 @@ function updateWebSetupPageSignals(signals, data) {
     if ("LauncherState" in data) {
         let launcherState = data["LauncherState"];
         if ("SetupState" in launcherState) {
-            if (isInternetConnectedState(signals)) {
-                showHome();
-                return;
-            }
             let setupState = launcherState["SetupState"];
             signals.setSetupState(setupState);
         }
@@ -49,7 +43,7 @@ function isLoading(signals) {
 
 var initialised = false;
 let signals = new WebSetupPageSignals();
-export const WebSetupPage = () => {
+export const WebSetupPage = (props) => {
   if (!initialised) {
         addDataCallback((data) => updateWebSetupPageSignals(signals, data));
     initialised = true;
@@ -69,11 +63,11 @@ export const WebSetupPage = () => {
                 </div>
             </div>
         </Show>
-        <Show when={isInternetConnectedState(signals)}>
-            <HomePage/>
-        </Show>
         <Show when={isLoading(signals)}>
             <div class="flex-element section-name underline">Loading...</div>
+        </Show>
+        <Show when={isInternetConnectedState(signals)}>
+            {props.element}
         </Show>
   </div>;
 };

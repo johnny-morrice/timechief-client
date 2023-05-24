@@ -20,15 +20,15 @@ const App = () => {
   });
 
   return <Routes>
-      <Route path="/home" element={<HomePage/>} />
-      <Route path="/forecast" element={<ForecastPage/>} />
-      <Route path="/device" element={<DevicePage/>} />
-      <Route path="/astro" element={<AstroPage/>} />
-      <Route path="/account" element={<AccountPage/>} />
-      <Route path="/locale" element={<LocalePage/>} />
-      <Route path="/calendar" element={<CalendarPage/>} />
-      <Route path="/" element={<WebSetupPage/>} />
-    </Routes>
+        <Route path="/home" element={<WebSetupPage element={<HomePage/>}/>}/>
+        <Route path="/forecast" element={<WebSetupPage element={<ForecastPage/>}/>}/>
+        <Route path="/device" element={<WebSetupPage element={<DevicePage/>}/>}/>
+        <Route path="/astro" element={<WebSetupPage element={<AstroPage/>}/>}/>
+        <Route path="/account" element={<WebSetupPage element={<AccountPage/>}/>}/>
+        <Route path="/locale" element={<WebSetupPage element={<LocalePage/>}/>}/>
+        <Route path="/calendar" element={<WebSetupPage element={<CalendarPage/>}/>}/>
+        <Route path="/" element={<WebSetupPage element={<HomePage/>}/>}/>
+      </Routes>
 };
 
 

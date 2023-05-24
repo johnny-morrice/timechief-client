@@ -61,6 +61,11 @@ function onClickReboot() {
     sendReboot()
 }
 
+function onClickSetup() {
+    console.log("setup clicked")
+    showSetup();
+}
+
 var initialised = false;
 let deviceSignals = new DeviceSignals();
 
@@ -82,6 +87,10 @@ export const DevicePage = () => {
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Shutdown</div>
                 <button class='flex-element' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
+            </div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Setup device</div>
+                <button class='flex-element' onClick={onClickSetup}><i class="fa-solid fa-gear"></i></button>
             </div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device status</div>

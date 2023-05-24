@@ -88,6 +88,10 @@ export function sendReboot() {
     window.api.send("reboot");
 }
 
+export function sendBeginSetup() {
+    // TODO
+}
+
 export function sendShutdown() {
     window.api.send("shutdown");
 }
