@@ -62,11 +62,11 @@ export const WebSetupPage = (props) => {
             <div class="column-flex">
                 <div class="flex-element section-name underline">Setup your device</div>
                 <div class='row-flex flex-element'>
-                    <div class="flex-element data-name">Hotspot SSID</div>
+                    <div class="flex-element data-name">Connect to Wifi Network</div>
                     <div class="flex-element data-value">{signals.hotspotSSID}</div>
                 </div>
                 <div class='row-flex flex-element'>
-                    <div class="flex-element data-name">Hotspot SSID</div>
+                    <div class="flex-element data-name">Wifi Key</div>
                     <div class="flex-element data-value">{signals.hotspotKey}</div>
                 </div>
                 <div class='row-flex flex-element'>
