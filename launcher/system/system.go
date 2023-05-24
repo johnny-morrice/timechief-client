@@ -179,6 +179,7 @@ func (sys System) WifiLoadInterfaces() error {
 var ErrNoWifiNetworks error = errors.New("no wifi networks found")
 
 func (sys System) WifiScan() error {
+	log.Println("scanning wifi networks")
 	storeIFace, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)

@@ -12,7 +12,7 @@ type WifiNetwork struct {
 	ID            uint `gorm:"primarykey"`
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	SSID          string `gorm:"uniqueIndex,column:ssid"`
+	SSID          string `gorm:"column:ssid;uniqueIndex"`
 	Signal        int
 	Key           string
 	Selected      bool
@@ -26,6 +26,9 @@ type WifiNetworkStore struct {
 
 // Save creates a new WIFI network if not already in database, and updates signal strength otherwise.
 func (store WifiNetworkStore) Save(network *WifiNetwork) error {
+	if network.SSID == "" {
+		return errors.New("expected non-empty SSID")
+	}
 	network.FoundLastScan = true
 	// Check if network already exists
 	var existing WifiNetwork

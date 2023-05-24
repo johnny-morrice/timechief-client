@@ -3,6 +3,7 @@ package cmd
 import (
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/api"
 	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/daemon"
@@ -131,7 +132,10 @@ func Daemon(ctx *cli.Context) error {
 
 	_, err = wifiNetworkStore.GetActive()
 	if err == nil {
-		flagStore.CreateIfNotExists("wifi-connect")
+		err = keyValueStore.Set("wifi-connect", uuid.NewString())
+		if err != nil {
+			return err
+		}
 	}
 
 	go wifiLoad.Start(ctx)
