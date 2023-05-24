@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addDataCallback, sendSetupAbandon } from './ipc';
+import { addDataCallback, sendSetupCancel } from './ipc';
 
 class WebSetupPageSignals {
   constructor() {
@@ -57,11 +57,11 @@ function isLoading(signals) {
 }
 
 function isDisplayBackButton(signals) {
-    return !signals.isInternetConnectedState() && !signals.firstTimeSetupDone();
+    return !isInternetConnectedState(signals) && signals.firstTimeSetupDone();
 }
 
 function onClickBack() {
-    sendSetupAbandon();
+    sendSetupCancel();
 }
 
 var initialised = false;
@@ -91,7 +91,7 @@ export const WebSetupPage = (props) => {
                 <Show when={isDisplayBackButton(signals)}>
                     <div class='row-flex flex-element'>
                         <div class='flex-element data-name'>Cancel setup</div>
-                        <button class='flex-element' onClick={onClickBack}><i class="fa-solid fa-square-arrow-left"></i></button>
+                        <button class='flex-element' onClick={onClickBack}><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </Show>
             </div>
@@ -105,7 +105,7 @@ export const WebSetupPage = (props) => {
                 <Show when={isDisplayBackButton(signals)}>
                     <div class='row-flex flex-element'>
                         <div class='flex-element data-name'>Cancel setup</div>
-                        <button class='flex-element' onClick={onClickBack}><i class="fa-solid fa-square-arrow-left"></i></button>
+                        <button class='flex-element' onClick={onClickBack}><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </Show>
             </div>

@@ -183,7 +183,7 @@ class LauncherClient {
       }
     });
   }
-  postSetupBegin() {
+  postSetupBeginState() {
     let cfg = {
       url: this.baseURL + '/api/launcher/setup',
       method: 'post',
@@ -197,6 +197,34 @@ class LauncherClient {
       }
     });
   }
+
+  postSetupInternetConnectedState() {
+    let cfg = {
+      url: this.baseURL + '/api/launcher/setup',
+      method: 'post',
+      data: {
+        "State": "InternetConnected"
+      }
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return {};
+      }
+    });
+  }
+
+  postWifiConnect() {
+    let cfg = {
+      url: this.baseURL + '/api/system/wifi/connect',
+      method: 'post',
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return {};
+      }
+    });
+  }
+
   getDeviceData() {
     let cfg = {
       url: this.baseURL + '/api/data/device',
@@ -249,7 +277,8 @@ handleIPCAPICall("pairingGet", "pairingGetResult", () => client.getPairing());
 handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());
 handleIPCAPICall("reboot", "rebootResult", () => client.reboot());
 handleIPCAPICall("shutdown", "shutdownResult", () => client.shutdown());
-handleIPCAPICall("setupBegin", "setupBeginResult", () => client.postSetupBegin());
+handleIPCAPICall("setupBegin", "setupBeginResult", () => client.postSetupBeginState());
+handleIPCAPICall("setupCancel", "setupCancelResult", () => client.postSetupInternetConnectedState().then(() => client.postWifiConnect()));
 
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {
