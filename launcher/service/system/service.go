@@ -24,6 +24,10 @@ func (svc Service) Shutdown() error {
 
 func (svc Service) WifiConnect() error {
 	id := uuid.NewString()
+	err := svc.WifiNetworkStore.MarkSelectedReady()
+	if err != nil {
+		return err
+	}
 	return svc.KeyValueStore.Set("wifi-connect", id)
 }
 
@@ -31,7 +35,7 @@ func (svc Service) WifiSetActiveNetwork(ssid, key string) error {
 	if ssid == "" {
 		return errors.New("expected non-empty SSID")
 	}
-	return svc.WifiNetworkStore.SetActive(ssid, key)
+	return svc.WifiNetworkStore.SelectNetwork(ssid, key)
 }
 
 func (svc Service) WifiScan() error {

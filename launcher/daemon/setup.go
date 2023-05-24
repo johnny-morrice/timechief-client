@@ -83,7 +83,7 @@ func (daemon Setup) doTick(ctx *cli.Context) error {
 
 func (daemon Setup) handleBegin() error {
 	// Wipe all setup data.
-	err := daemon.WifiNetworkStore.UnsetActive()
+	err := daemon.WifiNetworkStore.MarkNotReady()
 	if err != nil {
 		return err
 	}

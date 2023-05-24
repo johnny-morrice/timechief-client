@@ -14,7 +14,8 @@ type WifiNetwork struct {
 	SSID      string `gorm:"column:ssid"`
 	Signal    int
 	Key       string
-	Active    bool
+	Selected  bool
+	Ready     bool
 }
 
 type WifiNetworkStore struct {
@@ -30,8 +31,8 @@ func (store WifiNetworkStore) Create(network *WifiNetwork) error {
 	return nil
 }
 
-// SetActive sets the active flag of a WIFI network to true, and sets all other networks to false.
-func (store WifiNetworkStore) SetActive(ssid, key string) error {
+// SelectNetwork sets the active flag of a WIFI network to true, and sets all other networks to false.
+func (store WifiNetworkStore) SelectNetwork(ssid, key string) error {
 	// Set the wifi key.
 	err := store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("key", key).Error
 	if err != nil {
@@ -39,12 +40,19 @@ func (store WifiNetworkStore) SetActive(ssid, key string) error {
 	}
 
 	// Deactivate all other WIFI networks
-	result := store.DB.Model(&WifiNetwork{}).Where("active = ?", true).Update("active", false)
+	result := store.DB.Model(&WifiNetwork{}).Where("selected = ?", true).Update("selected", false)
 	if result.Error != nil {
 		return result.Error
 	}
 	// Activate the network
-	result = store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("active", true)
+	result = store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("selected", true)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("failed to set active WIFI network %s: %w", ssid, gorm.ErrRecordNotFound)
+	}
+	result = store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("ready", true)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -54,8 +62,24 @@ func (store WifiNetworkStore) SetActive(ssid, key string) error {
 	return nil
 }
 
-func (store WifiNetworkStore) UnsetActive() error {
-	result := store.DB.Model(&WifiNetwork{}).Where("active = ?", true).Update("active", false)
+func (store WifiNetworkStore) MarkSelectedReady() error {
+	result := store.DB.Model(&WifiNetwork{}).Where("selected = ?", true).Update("ready", true)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (store WifiNetworkStore) MarkNotReady() error {
+	result := store.DB.Model(&WifiNetwork{}).Where("ready = ?", true).Update("ready", false)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (store WifiNetworkStore) DeselectNetwork() error {
+	result := store.DB.Model(&WifiNetwork{}).Where("selected = ?", true).Update("selected", false)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -65,7 +89,7 @@ func (store WifiNetworkStore) UnsetActive() error {
 // GetActive returns the active WIFI network.
 func (store WifiNetworkStore) GetActive() (WifiNetwork, error) {
 	var network WifiNetwork
-	result := store.DB.Where("active = ?", true).First(&network)
+	result := store.DB.Where("selected = ?", true).Where("ready = ?", true).First(&network)
 	if result.Error != nil {
 		return WifiNetwork{}, result.Error
 	}
