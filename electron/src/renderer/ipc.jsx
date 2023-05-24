@@ -93,6 +93,10 @@ export function sendSetupBegin() {
     window.api.send("setupBegin");
 }
 
+export function sendSetupCancel() {
+    window.api.send("setupCancel");
+}
+
 export function sendShutdown() {
     window.api.send("shutdown");
 }

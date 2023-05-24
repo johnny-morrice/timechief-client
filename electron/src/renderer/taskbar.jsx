@@ -23,9 +23,6 @@ export const TaskBar = () => {
         addServiceDataCallback((data) => updateTaskBarSignals(taskBarSignals, data));
         initialised = true;
     }
-    onCleanup(() => {
-        clearInterval(timeInterval);
-    });
 
     return <div id="taskbar">
         <div class="row-flex">
