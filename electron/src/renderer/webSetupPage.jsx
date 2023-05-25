@@ -4,7 +4,7 @@ import { addDataCallback, sendSetupCancel } from './ipc';
 class WebSetupPageSignals {
   constructor() {
       [this.setupState, this.setSetupState] = createSignal("");
-      [this.deviceIP, this.setDeviceIP] = createSignal("");
+      [this.deviceSetupURL, this.setDeviceSetupURL] = createSignal("");
       [this.hotspotSSID, this.setHotspotSSID] = createSignal("");
       [this.hotspotKey, this.setHotspotKey] = createSignal("");
       [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
@@ -24,12 +24,9 @@ function updateWebSetupPageSignals(signals, data) {
             let setupState = launcherState["SetupState"];
             signals.setSetupState(setupState);
         }
-        if ("NetworkState" in launcherState) {
-            let networkState = launcherState["NetworkState"];
-            if ("IPAddress" in networkState) {
-                let deviceIP = networkState["IPAddress"];
-                signals.setDeviceIP(deviceIP);
-            }
+        if ("WebURL" in launcherState) {
+            let setupURL = launcherState["WebURL"];
+            signals.setDeviceSetupURL(setupURL);
         }
 
         if ("WifiState" in launcherState) {
@@ -75,7 +72,7 @@ export const WebSetupPage = (props) => {
   return <div id="web-setup">
         <Show when={isHotspotReady(signals)}>
             <div class="column-flex">
-                <div class="flex-element section-name underline">Setup your timechief</div>
+                <div class="flex-element section-name underline">Welcome to Timechief</div>
                 <div class='row-flex flex-element'>
                     <div class="flex-element data-name">Connect to Wifi Network</div>
                     <div class="flex-element data-value">{signals.hotspotSSID}</div>
@@ -85,8 +82,8 @@ export const WebSetupPage = (props) => {
                     <div class="flex-element data-value">{signals.hotspotKey}</div>
                 </div>
                 <div class='row-flex flex-element'>
-                    <div class="flex-element data-name">Device IP</div>
-                    <div class="flex-element data-value">{signals.deviceIP}</div>
+                    <div class="flex-element data-name">Continue setup via your browser</div>
+                    <div class="flex-element data-value">{signals.deviceSetupURL}</div>
                 </div>
                 <Show when={isDisplayBackButton(signals)}>
                     <div class='row-flex flex-element'>
@@ -98,7 +95,7 @@ export const WebSetupPage = (props) => {
         </Show>
         <Show when={isLoading(signals)}>
             <div class="column-flex">
-                <div class="flex-element section-name underline">Setup your timechief</div>
+                <div class="flex-element section-name underline">Welcome to Timechief</div>
                 <div class='row-flex flex-element'>
                     <div class="flex-element data-name">Loading...</div>
                 </div>
