@@ -27,8 +27,8 @@ state = open(f'/sys/class/net/{device_name}/operstate').read().strip()
 
 # Get the device SSID and mode from iwconfig
 iwconfig_output = subprocess.check_output(['iwconfig', device_name]).decode()
-ssid = None
-mode = None
+ssid = ""
+mode = ""
 for line in iwconfig_output.split('\n'):
     ssid_re = r'ESSID:"(\S+)"'
     mode_re = r'Mode:(\S+)'
