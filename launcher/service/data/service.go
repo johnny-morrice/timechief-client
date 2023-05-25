@@ -21,6 +21,7 @@ type Service struct {
 type LauncherState struct {
 	ActiveTargetVersion string
 	SetupState          string
+	WebURL              string
 	WifiState           WifiState
 	NetworkState        NetworkState
 	FirstTimeSetupDone  bool
@@ -97,6 +98,14 @@ func (svc Service) GetPairingStatus() (PairingStatus, error) {
 	return result, nil
 }
 
+func webURL(ip string) string {
+	if ip == "" {
+		return ""
+	}
+	// TODO use listen port from command line.
+	return fmt.Sprintf("http://%s:8080/", ip)
+}
+
 func (svc Service) GetDeviceData() (DeviceData, error) {
 	clockData, err := svc.DeviceDataStore.GetDeviceData()
 	if err != nil {
@@ -171,6 +180,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	result := DeviceData{
 		ServiceData: clockData,
 		LauncherState: LauncherState{
+			WebURL:              webURL(ipAddress),
 			SetupState:          setupState,
 			Flags:               flags,
 			ActiveTargetVersion: target.Version.Details(),
