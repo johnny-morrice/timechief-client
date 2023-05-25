@@ -131,3 +131,29 @@ EOF
 on_chroot << EOF
 raspi-config nonint do_wifi_country GB
 EOF
+
+# Set up nginx proxy.
+on_chroot << EOF
+# Create a separate Nginx configuration file
+cat > /etc/nginx/sites-available/timechief.conf << CATEND
+server {
+    listen 80;
+    server_name _;
+
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+CATEND
+
+# Enable the Nginx configuration for your project
+ln -s /etc/nginx/sites-available/timechief.conf /etc/nginx/sites-enabled/
+
+# Disable the default Nginx configuration
+rm /etc/nginx/sites-enabled/default
+
+# Restart Nginx to apply the changes
+systemctl enable nginx
+EOF

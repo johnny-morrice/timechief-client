@@ -13,3 +13,4 @@ daemontools
 openssh-server
 dnsmasq
 hostapd
+nginx
