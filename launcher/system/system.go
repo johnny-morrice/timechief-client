@@ -307,9 +307,11 @@ func (sys System) WifiHotspot() error {
 func (sys System) LoadNetworkStatus() error {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Println("cannot load network status, no active wifi card")
 		return fmt.Errorf("failed to get active wifi card: %w", err)
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Println("cannot load network status, no active wifi card")
 		return nil
 	}
 	card := WifiInterface{
@@ -318,6 +320,15 @@ func (sys System) LoadNetworkStatus() error {
 	status, err := card.NetworkStatus()
 	if err != nil {
 		return fmt.Errorf("failed to get network status: %w", err)
+	}
+	if status.IPV4Address == "" {
+		return fmt.Errorf("cannot load network status, no ip address found for %s", card.Interface)
+	}
+	oldIpAddress, err := sys.KeyValueStore.Get(store.IPAddressKey)
+	if err != nil {
+		if oldIpAddress != status.IPV4Address {
+			log.Printf("ip address changed from %v to %v", oldIpAddress, status.IPV4Address)
+		}
 	}
 	err = sys.KeyValueStore.Set(store.IPAddressKey, status.IPV4Address)
 	if err != nil {
