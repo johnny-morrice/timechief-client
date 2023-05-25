@@ -102,8 +102,7 @@ func webURL(ip string) string {
 	if ip == "" {
 		return ""
 	}
-	// TODO use listen port from command line.
-	return fmt.Sprintf("http://%s:8080/", ip)
+	return fmt.Sprintf("http://%s/", ip)
 }
 
 func (svc Service) GetDeviceData() (DeviceData, error) {
