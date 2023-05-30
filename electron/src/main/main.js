@@ -225,6 +225,21 @@ class LauncherClient {
     });
   }
 
+  postWifiMarkNotReady() {
+    let cfg = {
+      url: this.baseURL + '/api/system/wifi/state',
+      method: 'post',
+      data: {
+        "Ready": false
+      }
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return {};
+      }
+    });
+  }
+
   getDeviceData() {
     let cfg = {
       url: this.baseURL + '/api/data/device',
@@ -279,6 +294,7 @@ handleIPCAPICall("reboot", "rebootResult", () => client.reboot());
 handleIPCAPICall("shutdown", "shutdownResult", () => client.shutdown());
 handleIPCAPICall("setupBegin", "setupBeginResult", () => client.postSetupBeginState());
 handleIPCAPICall("setupCancel", "setupCancelResult", () => client.postSetupInternetConnectedState().then(() => client.postWifiConnect()));
+handleIPCAPICall("setupRestart", "setupRestartResult", () => client.postSetupBeginState().then(() => client.postWifiMarkNotReady()));
 
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {

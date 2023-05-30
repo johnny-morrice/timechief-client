@@ -97,6 +97,10 @@ export function sendSetupCancel() {
     window.api.send("setupCancel");
 }
 
+export function sendSetupCancel() {
+    window.api.send("setupRestart");
+}
+
 export function sendShutdown() {
     window.api.send("shutdown");
 }
