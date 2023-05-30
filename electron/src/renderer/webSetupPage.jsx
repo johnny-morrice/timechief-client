@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addDataCallback, sendSetupCancel, sendReboot, sendShutdown } from './ipc';
+import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown } from './ipc';
 
 class WebSetupPageSignals {
   constructor() {
@@ -7,7 +7,7 @@ class WebSetupPageSignals {
       [this.deviceSetupURL, this.setDeviceSetupURL] = createSignal("");
       [this.hotspotSSID, this.setHotspotSSID] = createSignal("");
       [this.hotspotKey, this.setHotspotKey] = createSignal("");
-      [this.connectionError, this.setConnectionError] = createSignal(false);
+      [this.wifiError, this.setWifiError] = createSignal(false);
       [this.activeSSID, this.setActiveSSID] = createSignal("");
       [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
   }
@@ -36,9 +36,9 @@ function updateWebSetupPageSignals(signals, data) {
             let hotspotSSID = wifiState["HotspotSSID"];
             let hotspotKey = wifiState["HotspotKey"];
             let activeSSID = wifiState["ActiveSSID"];
-            let connectionState = wifiState["ActiveSSIDState"];
+            let wifiError = wifiState["IsWifiError"];
             signals.setActiveSSID(activeSSID);
-            signals.setConnectionError(connectionState === "error");
+            signals.setWifiError(wifiError);
         
             if (hotspotSSID.length > 0 && hotspotKey.length > 0) {
                 signals.setHotspotSSID(hotspotSSID);
@@ -46,6 +46,10 @@ function updateWebSetupPageSignals(signals, data) {
             }
         }
     }
+}
+
+function isConnectionError(signals) {
+    return signals.wifiError();
 }
 
 function isInternetConnectedState(signals) {
@@ -106,7 +110,7 @@ export const WebSetupPage = (props) => {
                     <div class="flex-element data-name">Continue setup via your browser</div>
                     <div class="flex-element data-value">{signals.deviceSetupURL}</div>
                 </div>
-                <Show when={signals.connectionError}>
+                <Show when={isConnectionError(signals)}>
                     <div class='row-flex flex-element'>
                         <div class="flex-element data-name">Error connecting to network, please run through setup again</div>
                     </div>
@@ -133,11 +137,6 @@ export const WebSetupPage = (props) => {
                 <div class='row-flex flex-element'>
                     <div class="flex-element data-name">Loading...</div>
                 </div>
-                <Show when={signals.connectionError}>
-                    <div class='row-flex flex-element'>
-                        <div class="flex-element data-name">Error connecting to network, restarting setup</div>
-                    </div>
-                </Show>
                 <div class='row-flex flex-element'>
                     <div class='flex-element data-name'>Reboot</div>
                     <button class='flex-element' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
