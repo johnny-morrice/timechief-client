@@ -19,6 +19,7 @@ type System struct {
 	DB                 *gorm.DB
 	ConfigStore        store.ConfigStore
 	KeyValueStore      store.KeyValueStore
+	StateFlagStore     store.StateFlagStore
 	WifiInterfaceStore store.WifiInterfaceStore
 	WifiNetworkStore   store.WifiNetworkStore
 }
@@ -324,18 +325,26 @@ func (sys System) LoadNetworkStatus() error {
 	if err != nil {
 		return fmt.Errorf("failed to get network status: %w", err)
 	}
-	if status.SSID != "" {
-		if status.State == "Up" {
+	if status.Mode == "Managed" && status.SSID != "" {
+		if status.State == "up" {
 			log.Printf("connected to %s", status.SSID)
 			err = sys.WifiNetworkStore.MarkConnectionSuccess(status.SSID)
 			if err != nil {
 				return fmt.Errorf("failed to mark wifi network as connected: %w", err)
+			}
+			err = sys.StateFlagStore.Delete("wifi-error")
+			if err != nil {
+				return fmt.Errorf("failed to delete wifi error flag: %w", err)
 			}
 		} else {
 			log.Printf("not connected to %s", status.SSID)
 			err = sys.WifiNetworkStore.MarkConnectionFailure(status.SSID)
 			if err != nil {
 				return fmt.Errorf("failed to mark wifi network as disconnected: %w", err)
+			}
+			err = sys.StateFlagStore.CreateIfNotExists("wifi-error")
+			if err != nil {
+				return fmt.Errorf("failed to create wifi error flag: %w", err)
 			}
 		}
 	}

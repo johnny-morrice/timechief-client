@@ -41,7 +41,7 @@ type WifiState struct {
 	ActiveWifiInterface string
 	InterfaceMode       string
 	ActiveSSID          string
-	ActiveSSIDState     string
+	IsWifiError         bool
 	HotspotSSID         string
 	HotspotKey          string
 	WifiNetworks        []WifiNetwork
@@ -138,6 +138,11 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, err
 	}
 
+	isWifiError, err := svc.StateFlagStore.Exists("wifi-error")
+	if err != nil {
+		return DeviceData{}, err
+	}
+
 	networks := make([]WifiNetwork, len(storeNets))
 	for i, storeNet := range storeNets {
 		networks[i] = WifiNetwork{
@@ -188,7 +193,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 				ActiveWifiInterface: wifiInterface.Interface,
 				InterfaceMode:       interfaceMode,
 				ActiveSSID:          activeNet.SSID,
-				ActiveSSIDState:     activeNet.ConnectionState,
+				IsWifiError:         isWifiError,
 				WifiNetworks:        networks,
 				HotspotSSID:         hotspotSSID,
 				HotspotKey:          hotspotKey,

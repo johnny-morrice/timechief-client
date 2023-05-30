@@ -169,6 +169,10 @@ func (daemon Setup) handleNetworkSelected() error {
 	if err != nil {
 		return err
 	}
+	err = daemon.KeyValueStore.Set("setupWifiConnectTime", time.Now().Format(time.RFC3339))
+	if err != nil {
+		return err
+	}
 	return daemon.KeyValueStore.Set("setup", SetupFlagWaitNetworkConnect)
 }
 
@@ -191,6 +195,8 @@ func init() {
 	}
 }
 
+const connectTimeout = time.Second * 180
+
 func (daemon Setup) handleWaitNetworkConnect() error {
 	// Get active network
 	active, err := daemon.WifiNetworkStore.GetActive()
@@ -198,10 +204,27 @@ func (daemon Setup) handleWaitNetworkConnect() error {
 		return err
 	}
 
-	if active.ConnectionState == "error" {
-		log.Printf("setup failed to connect to wifi network: %s", active.SSID)
-		return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
-	} else if active.ConnectionState != "connected" {
+	// Check for connection timeout.
+	timeText, err := daemon.KeyValueStore.Get("setupWifiConnectTime")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	if timeText != "" {
+		connectTime, err := time.Parse(time.RFC3339, timeText)
+		if err != nil {
+			return err
+		}
+		if time.Since(connectTime) > connectTimeout {
+			if active.ConnectionState == "error" {
+				log.Printf("setup failed to connect to wifi network: %s", active.SSID)
+				return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
+			}
+		}
+	}
+
+	if active.ConnectionState != "connected" {
+		log.Println("setup still waiting for wifi connection")
 		return nil
 	}
 

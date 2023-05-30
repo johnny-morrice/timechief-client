@@ -89,6 +89,7 @@ func Daemon(ctx *cli.Context) error {
 		KeyValueStore:      keyValueStore,
 		WifiInterfaceStore: wifiInterfaceStore,
 		WifiNetworkStore:   wifiNetworkStore,
+		StateFlagStore:     flagStore,
 		DB:                 db,
 	}
 
