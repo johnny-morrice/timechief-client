@@ -38,14 +38,13 @@ func (daemon Setup) Start(ctx *cli.Context) {
 }
 
 const (
-	SetupFlagBegin                      string = "Begin"
-	SetupFlagWaitHotspot                string = "WaitHotspot"
-	SetupFlagWaitUserSelectNetwork      string = "WaitUserSelectNetwork"
-	SetupFlagWaitUserSelectNetworkError string = "WaitUserSelectNetworkError"
-	SetupFlagNetworkSelected            string = "NetworkSelected"
-	SetupFlagWaitNetworkConnect         string = "WaitNetworkConnect"
-	SetupFlagNetworkConnected           string = "NetworkConnected"
-	SetupFlagInternetConnected          string = "InternetConnected"
+	SetupFlagBegin                 string = "Begin"
+	SetupFlagWaitHotspot           string = "WaitHotspot"
+	SetupFlagWaitUserSelectNetwork string = "WaitUserSelectNetwork"
+	SetupFlagNetworkSelected       string = "NetworkSelected"
+	SetupFlagWaitNetworkConnect    string = "WaitNetworkConnect"
+	SetupFlagNetworkConnected      string = "NetworkConnected"
+	SetupFlagInternetConnected     string = "InternetConnected"
 )
 
 // doTick is a single step in the main loop of the daemon.
@@ -204,10 +203,10 @@ func (daemon Setup) handleWaitNetworkConnect() error {
 		return err
 	}
 
-	if active.ConnectedStatus == "error" {
+	if active.ConnectionState == "error" {
 		log.Printf("setup failed to connect to wifi network: %s", active.SSID)
-		return daemon.KeyValueStore.Set("setup", SetupFlagWaitUserSelectNetworkError)
-	} else if active.ConnectedStatus != "connected" {
+		return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
+	} else if active.ConnectionState != "connected" {
 		return nil
 	}
 

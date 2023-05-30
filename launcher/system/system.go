@@ -231,13 +231,13 @@ func (sys System) WifiConnect() error {
 
 	if err == nil {
 		log.Printf("connected to wifi network: %s", network.SSID)
-		err = sys.WifiNetworkStore.MarkConnected(network.SSID, "connected")
+		err = sys.WifiNetworkStore.MarkConnectionSuccess(network.SSID)
 		if err != nil {
 			return fmt.Errorf("failed to mark wifi network as connected: %w", err)
 		}
 	} else {
 		log.Printf("failed to connect to wifi network: %s", network.SSID)
-		err = sys.WifiNetworkStore.MarkConnected(network.SSID, "error")
+		err = sys.WifiNetworkStore.MarkConnectionFailure(network.SSID)
 		if err != nil {
 			return fmt.Errorf("failed to mark wifi network as not found: %w", err)
 		}

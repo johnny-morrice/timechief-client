@@ -18,7 +18,7 @@ type WifiNetwork struct {
 	Selected        bool
 	Ready           bool
 	FoundLastScan   bool
-	ConnectedStatus string
+	ConnectionState string
 	ConnectTime     time.Time
 }
 
@@ -117,10 +117,24 @@ func (store WifiNetworkStore) MarkNotReady() error {
 	return nil
 }
 
-func (store WifiNetworkStore) MarkConnected(ssid string, status string) error {
+func (store WifiNetworkStore) MarkConnectionSuccess(ssid string) error {
 	// Set connected status and connect time for ssid
 	connectTime := time.Now()
-	result := store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("connected_status", status)
+	result := store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("connection_state", "connected")
+	if result.Error != nil {
+		return result.Error
+	}
+	result = store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("connect_time", connectTime)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (store WifiNetworkStore) MarkConnectionFailure(ssid string) error {
+	// Set connected status and connect time for ssid
+	connectTime := time.Now()
+	result := store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("connection_state", "error")
 	if result.Error != nil {
 		return result.Error
 	}
@@ -132,7 +146,8 @@ func (store WifiNetworkStore) MarkConnected(ssid string, status string) error {
 }
 
 func (store WifiNetworkStore) ResetConnectedStatus() error {
-	result := store.DB.Model(&WifiNetwork{}).Session(&gorm.Session{AllowGlobalUpdate: true}).Update("connected", "")
+	// If a network has connection_state "connected", clear the field.
+	result := store.DB.Model(&WifiNetwork{}).Where("connection_state = ?", "connected").Update("connection_state", "")
 	if result.Error != nil {
 		return result.Error
 	}

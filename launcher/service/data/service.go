@@ -41,6 +41,7 @@ type WifiState struct {
 	ActiveWifiInterface string
 	InterfaceMode       string
 	ActiveSSID          string
+	ActiveSSIDState     string
 	HotspotSSID         string
 	HotspotKey          string
 	WifiNetworks        []WifiNetwork
@@ -187,6 +188,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 				ActiveWifiInterface: wifiInterface.Interface,
 				InterfaceMode:       interfaceMode,
 				ActiveSSID:          activeNet.SSID,
+				ActiveSSIDState:     activeNet.ConnectionState,
 				WifiNetworks:        networks,
 				HotspotSSID:         hotspotSSID,
 				HotspotKey:          hotspotKey,
