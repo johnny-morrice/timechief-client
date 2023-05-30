@@ -66,6 +66,9 @@ func (card WifiInterface) NetworkStatus() (NetworkStatus, error) {
 		return NetworkStatus{}, fmt.Errorf("failed to read wifi interface: %w", err)
 	}
 	status := NetworkStatus{
+		Device:      net.Device,
+		State:       net.State,
+		SSID:        net.SSID,
 		IPV4Address: net.IPV4Address,
 		Mode:        net.Mode,
 	}
@@ -73,8 +76,11 @@ func (card WifiInterface) NetworkStatus() (NetworkStatus, error) {
 }
 
 type NetworkStatus struct {
-	IPV4Address string
+	Device      string
+	State       string
+	SSID        string
 	Mode        string
+	IPV4Address string
 }
 
 type WifiNetwork struct {

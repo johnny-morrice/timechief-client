@@ -86,11 +86,6 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
-	err = daemon.WifiNetworkStore.ResetConnectedStatus()
-	if err != nil {
-		return err
-	}
-
 	err = daemon.KeyValueStore.Delete("setup-wifi-uuid")
 	if err != nil {
 		return err

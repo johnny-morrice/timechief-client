@@ -229,13 +229,7 @@ func (sys System) WifiConnect() error {
 		return fmt.Errorf("failed to connect to wifi network: %w", err)
 	}
 
-	if err == nil {
-		log.Printf("connected to wifi network: %s", network.SSID)
-		err = sys.WifiNetworkStore.MarkConnectionSuccess(network.SSID)
-		if err != nil {
-			return fmt.Errorf("failed to mark wifi network as connected: %w", err)
-		}
-	} else {
+	if err != nil {
 		log.Printf("failed to connect to wifi network: %s", network.SSID)
 		err = sys.WifiNetworkStore.MarkConnectionFailure(network.SSID)
 		if err != nil {
@@ -329,6 +323,21 @@ func (sys System) LoadNetworkStatus() error {
 	status, err := card.NetworkStatus()
 	if err != nil {
 		return fmt.Errorf("failed to get network status: %w", err)
+	}
+	if status.SSID != "" {
+		if status.State == "Up" {
+			log.Printf("connected to %s", status.SSID)
+			err = sys.WifiNetworkStore.MarkConnectionSuccess(status.SSID)
+			if err != nil {
+				return fmt.Errorf("failed to mark wifi network as connected: %w", err)
+			}
+		} else {
+			log.Printf("not connected to %s", status.SSID)
+			err = sys.WifiNetworkStore.MarkConnectionFailure(status.SSID)
+			if err != nil {
+				return fmt.Errorf("failed to mark wifi network as disconnected: %w", err)
+			}
+		}
 	}
 	if status.IPV4Address == "" {
 		return fmt.Errorf("cannot load network status, no ip address found for %s", card.Interface)
