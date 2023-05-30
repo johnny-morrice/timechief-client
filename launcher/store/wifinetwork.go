@@ -9,15 +9,17 @@ import (
 )
 
 type WifiNetwork struct {
-	ID            uint `gorm:"primarykey"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	SSID          string `gorm:"column:ssid;uniqueIndex"`
-	Signal        int
-	Key           string
-	Selected      bool
-	Ready         bool
-	FoundLastScan bool
+	ID              uint `gorm:"primarykey"`
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	SSID            string `gorm:"column:ssid;uniqueIndex"`
+	Signal          int
+	Key             string
+	Selected        bool
+	Ready           bool
+	FoundLastScan   bool
+	ConnectedStatus string
+	ConnectTime     time.Time
 }
 
 type WifiNetworkStore struct {
@@ -109,6 +111,28 @@ func (store WifiNetworkStore) MarkSelectedReady() error {
 
 func (store WifiNetworkStore) MarkNotReady() error {
 	result := store.DB.Model(&WifiNetwork{}).Where("ready = ?", true).Update("ready", false)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (store WifiNetworkStore) MarkConnected(ssid string, status string) error {
+	// Set connected status and connect time for ssid
+	connectTime := time.Now()
+	result := store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("connected_status", status)
+	if result.Error != nil {
+		return result.Error
+	}
+	result = store.DB.Model(&WifiNetwork{}).Where("ssid = ?", ssid).Update("connect_time", connectTime)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (store WifiNetworkStore) ResetConnectedStatus() error {
+	result := store.DB.Model(&WifiNetwork{}).Session(&gorm.Session{AllowGlobalUpdate: true}).Update("connected", "")
 	if result.Error != nil {
 		return result.Error
 	}

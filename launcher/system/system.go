@@ -17,7 +17,6 @@ import (
 
 type System struct {
 	DB                 *gorm.DB
-	Cache              store.CacheStore
 	ConfigStore        store.ConfigStore
 	KeyValueStore      store.KeyValueStore
 	WifiInterfaceStore store.WifiInterfaceStore
@@ -209,7 +208,7 @@ func (sys System) WifiScan() error {
 	return nil
 }
 
-func (sys System) WifiConnect(uuid string) error {
+func (sys System) WifiConnect() error {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
 	if err != nil {
 		return fmt.Errorf("failed to get active wifi card: %w", err)
@@ -230,10 +229,20 @@ func (sys System) WifiConnect(uuid string) error {
 		return fmt.Errorf("failed to connect to wifi network: %w", err)
 	}
 
-	err = sys.Cache.Create(uuid, time.Hour)
-	if err != nil {
-		return fmt.Errorf("failed to create cache entry for wifi connect status: %w", err)
+	if err == nil {
+		log.Printf("connected to wifi network: %s", network.SSID)
+		err = sys.WifiNetworkStore.MarkConnected(network.SSID, "connected")
+		if err != nil {
+			return fmt.Errorf("failed to mark wifi network as connected: %w", err)
+		}
+	} else {
+		log.Printf("failed to connect to wifi network: %s", network.SSID)
+		err = sys.WifiNetworkStore.MarkConnected(network.SSID, "error")
+		if err != nil {
+			return fmt.Errorf("failed to mark wifi network as not found: %w", err)
+		}
 	}
+
 	return nil
 }
 

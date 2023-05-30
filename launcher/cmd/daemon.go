@@ -3,7 +3,6 @@ package cmd
 import (
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/api"
 	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/daemon"
@@ -85,14 +84,12 @@ func Daemon(ctx *cli.Context) error {
 	wifiNetworkStore := store.WifiNetworkStore{DB: db}
 
 	wifiInterfaceStore := store.WifiInterfaceStore{DB: db}
-	cache := store.CacheStore{DB: db}
 	system := system.System{
 		ConfigStore:        cfgStore,
 		KeyValueStore:      keyValueStore,
 		WifiInterfaceStore: wifiInterfaceStore,
 		WifiNetworkStore:   wifiNetworkStore,
 		DB:                 db,
-		Cache:              cache,
 	}
 
 	wifiLoad := daemon.WifiLoadInterfaces{
@@ -100,8 +97,8 @@ func Daemon(ctx *cli.Context) error {
 		System:         system,
 	}
 	wifiConn := daemon.WifiConnect{
-		KeyValueStore: keyValueStore,
-		System:        system,
+		StateFlagStore: flagStore,
+		System:         system,
 	}
 	wifiScan := daemon.WifiScan{
 		StateFlagStore: flagStore,
@@ -115,14 +112,9 @@ func Daemon(ctx *cli.Context) error {
 		System: system,
 	}
 
-	deleteExpired := daemon.DeleteExpired{
-		Cache: cache,
-	}
-
 	setup := daemon.Setup{
 		KeyValueStore:    keyValueStore,
 		WifiNetworkStore: wifiNetworkStore,
-		Cache:            cache,
 		StateFlagStore:   flagStore,
 		System:           system,
 	}
@@ -132,7 +124,7 @@ func Daemon(ctx *cli.Context) error {
 
 	_, err = wifiNetworkStore.GetActive()
 	if err == nil {
-		err = keyValueStore.Set("wifi-connect", uuid.NewString())
+		err = flagStore.CreateIfNotExists("wifi-connect")
 		if err != nil {
 			return err
 		}
@@ -146,7 +138,6 @@ func Daemon(ctx *cli.Context) error {
 	go deviceDataDaemon.Start(ctx)
 	go pairingDaemon.Start(ctx)
 	go networkStatus.Start(ctx)
-	go deleteExpired.Start(ctx)
 	go setup.Start(ctx)
 	go internetCheck.Start(ctx)
 

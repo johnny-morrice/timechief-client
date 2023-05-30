@@ -7,7 +7,6 @@ import (
 	"net"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 	"github.com/urfave/cli/v2"
@@ -19,7 +18,6 @@ type Setup struct {
 	WifiNetworkStore store.WifiNetworkStore
 	StateFlagStore   store.StateFlagStore
 	KeyValueStore    store.KeyValueStore
-	Cache            store.CacheStore
 	RefreshInterval  time.Duration
 }
 
@@ -40,13 +38,14 @@ func (daemon Setup) Start(ctx *cli.Context) {
 }
 
 const (
-	SetupFlagBegin                 string = "Begin"
-	SetupFlagWaitHotspot           string = "WaitHotspot"
-	SetupFlagWaitUserSelectNetwork string = "WaitUserSelectNetwork"
-	SetupFlagNetworkSelected       string = "NetworkSelected"
-	SetupFlagWaitNetworkConnect    string = "WaitNetworkConnect"
-	SetupFlagNetworkConnected      string = "NetworkConnected"
-	SetupFlagInternetConnected     string = "InternetConnected"
+	SetupFlagBegin                      string = "Begin"
+	SetupFlagWaitHotspot                string = "WaitHotspot"
+	SetupFlagWaitUserSelectNetwork      string = "WaitUserSelectNetwork"
+	SetupFlagWaitUserSelectNetworkError string = "WaitUserSelectNetworkError"
+	SetupFlagNetworkSelected            string = "NetworkSelected"
+	SetupFlagWaitNetworkConnect         string = "WaitNetworkConnect"
+	SetupFlagNetworkConnected           string = "NetworkConnected"
+	SetupFlagInternetConnected          string = "InternetConnected"
 )
 
 // doTick is a single step in the main loop of the daemon.
@@ -88,12 +87,17 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
-	err = daemon.System.KeyValueStore.Delete("setup-wifi-uuid")
+	err = daemon.WifiNetworkStore.ResetConnectedStatus()
 	if err != nil {
 		return err
 	}
 
-	err = daemon.System.KeyValueStore.Delete("wifi-connect")
+	err = daemon.KeyValueStore.Delete("setup-wifi-uuid")
+	if err != nil {
+		return err
+	}
+
+	err = daemon.StateFlagStore.Delete("wifi-connect")
 	if err != nil {
 		return err
 	}
@@ -167,12 +171,7 @@ func (daemon Setup) handleWaitUserSelectNetwork() error {
 }
 
 func (daemon Setup) handleNetworkSelected() error {
-	connectID := uuid.NewString()
-	err := daemon.KeyValueStore.Set("setup-wifi-uuid", connectID)
-	if err != nil {
-		return err
-	}
-	err = daemon.KeyValueStore.Set("wifi-connect", connectID)
+	err := daemon.StateFlagStore.CreateIfNotExists("wifi-connect")
 	if err != nil {
 		return err
 	}
@@ -199,22 +198,21 @@ func init() {
 }
 
 func (daemon Setup) handleWaitNetworkConnect() error {
-	connectID, err := daemon.KeyValueStore.Get("setup-wifi-uuid")
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
-		}
-		return err
-	}
-	ok, err := daemon.Cache.Exists(connectID)
+	// Get active network
+	active, err := daemon.WifiNetworkStore.GetActive()
 	if err != nil {
 		return err
 	}
-	if !ok {
+
+	if active.ConnectedStatus == "error" {
+		log.Printf("setup failed to connect to wifi network: %s", active.SSID)
+		return daemon.KeyValueStore.Set("setup", SetupFlagWaitUserSelectNetworkError)
+	} else if active.ConnectedStatus != "connected" {
 		return nil
 	}
+
 	// Check for IP address and infra mode.
-	ok, err = daemon.isInterfaceSetup(system.InfraMode, func(ipText string) bool {
+	ok, err := daemon.isInterfaceSetup(system.InfraMode, func(ipText string) bool {
 		ip := net.ParseIP(ipText)
 		if ip == nil {
 			return false

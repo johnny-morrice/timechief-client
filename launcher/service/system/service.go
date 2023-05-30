@@ -3,7 +3,6 @@ package system
 import (
 	"errors"
 
-	"github.com/google/uuid"
 	"github.com/johnny-morrice/timechief-client/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/system"
 )
@@ -23,12 +22,7 @@ func (svc Service) Shutdown() error {
 }
 
 func (svc Service) WifiConnect() error {
-	id := uuid.NewString()
-	err := svc.WifiNetworkStore.MarkSelectedReady()
-	if err != nil {
-		return err
-	}
-	return svc.KeyValueStore.Set("wifi-connect", id)
+	return svc.StateFlagStore.CreateIfNotExists("wifi-connect")
 }
 
 func (svc Service) WifiSetActiveNetwork(ssid, key string) error {
