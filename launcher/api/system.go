@@ -13,6 +13,7 @@ type System struct {
 func (api System) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/system/reboot", api.HandleReboot)
 	mux.HandleFunc("/api/system/shutdown", api.HandleShutdown)
+	mux.HandleFunc("/api/system/wifi/state", api.HandleWifiState)
 	mux.HandleFunc("/api/system/wifi/connect", api.HandleWifiConnect)
 	mux.HandleFunc("/api/system/wifi/hotspot", api.HandleWifiHotspot)
 	mux.HandleFunc("/api/system/wifi/load-interfaces", api.HandleWifiLoadInterfaces)
@@ -28,6 +29,7 @@ type SystemService interface {
 	WifiLoadInterfaces() error
 	WifiScan() error
 	WifiSetActiveNetwork(ssid, key string) error
+	WifiSetSelectedReadiness(ready bool) error
 }
 
 type WifiActivationRequest struct {
@@ -51,6 +53,31 @@ func (api System) HandleWifiSetActiveNetwork(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		log.Printf("failed to handle wifi set active network: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+type WifiStateRequest struct {
+	Ready bool
+}
+
+func (api System) HandleWifiState(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	req := WifiStateRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		log.Printf("failed to decode wifi state request: %v", err)
+		return
+	}
+	err = api.Service.WifiSetSelectedReadiness(req.Ready)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to handle wifi active network readiness: %v", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)

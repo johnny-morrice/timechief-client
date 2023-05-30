@@ -32,6 +32,14 @@ func (svc Service) WifiSetActiveNetwork(ssid, key string) error {
 	return svc.WifiNetworkStore.SelectNetwork(ssid, key)
 }
 
+func (svc Service) WifiSetSelectedReadiness(ready bool) error {
+	if ready {
+		return svc.WifiNetworkStore.MarkSelectedReady()
+	} else {
+		return svc.WifiNetworkStore.MarkNotReady()
+	}
+}
+
 func (svc Service) WifiScan() error {
 	return svc.StateFlagStore.CreateIfNotExists("wifi-scan")
 }
