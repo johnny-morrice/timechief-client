@@ -325,7 +325,7 @@ func (sys System) LoadNetworkStatus() error {
 	if err != nil {
 		return fmt.Errorf("failed to get network status: %w", err)
 	}
-	if status.Mode == "Managed" && status.SSID != "" {
+	if status.Mode == InfraMode && status.SSID != "" {
 		if status.State == "up" {
 			log.Printf("connected to %s", status.SSID)
 			err = sys.WifiNetworkStore.MarkConnectionSuccess(status.SSID)
