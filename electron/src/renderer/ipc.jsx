@@ -97,7 +97,7 @@ export function sendSetupCancel() {
     window.api.send("setupCancel");
 }
 
-export function sendSetupCancel() {
+export function sendSetupRestart() {
     window.api.send("setupRestart");
 }
 
