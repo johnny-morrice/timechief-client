@@ -40,7 +40,7 @@ function updateWebSetupPageSignals(signals, data) {
             signals.setActiveSSID(activeSSID);
             signals.setWifiError(wifiError);
         
-            if (hotspotID && hotspotSSID.length > 0 && hotspotKey.length > 0) {
+            if (hotspotSSID && hotspotKey && hotspotSSID.length > 0 && hotspotKey.length > 0) {
                 signals.setHotspotSSID(hotspotSSID);
                 signals.setHotspotKey(hotspotKey);
             }
