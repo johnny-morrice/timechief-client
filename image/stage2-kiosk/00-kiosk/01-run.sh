@@ -135,7 +135,7 @@ EOF
 # Set up nginx proxy.
 on_chroot << 'EOF'
 # Create a separate Nginx configuration file
-cat > /etc/nginx/sites-available/timechief.conf << CATEND
+cat > /etc/nginx/sites-available/timechief.conf << 'CATEND'
 server {
     listen 80;
     server_name _;
