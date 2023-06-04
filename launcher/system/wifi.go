@@ -83,6 +83,10 @@ type NetworkStatus struct {
 	IPV4Address string
 }
 
+func (status NetworkStatus) String() string {
+	return fmt.Sprintf("Device: %s, State: %s, SSID: %s, Mode: %s, IPV4Address: %s", status.Device, status.State, status.SSID, status.Mode, status.IPV4Address)
+}
+
 type WifiNetwork struct {
 	SSID   string
 	Key    string
