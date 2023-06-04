@@ -308,22 +308,22 @@ func (sys System) WifiHotspot() error {
 	return card.Hotspot(network)
 }
 
-func (sys System) LoadNetworkStatus() error {
+func (sys System) activeCardNetworkStatus() (NetworkStatus, error) {
 	storeCard, err := sys.WifiInterfaceStore.GetActive()
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil {
 		log.Println("cannot load network status, no active wifi card")
-		return fmt.Errorf("failed to get active wifi card: %w", err)
-	}
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		log.Println("cannot load network status, no active wifi card")
-		return nil
+		return NetworkStatus{}, fmt.Errorf("failed to get active wifi card: %w", err)
 	}
 	card := WifiInterface{
 		Interface: storeCard.Interface,
 	}
-	status, err := card.NetworkStatus()
+	return card.NetworkStatus()
+}
+
+func (sys System) LoadNetworkStatus() error {
+	status, err := sys.activeCardNetworkStatus()
 	if err != nil {
-		return fmt.Errorf("failed to get network status: %w", err)
+		return fmt.Errorf("failed to load network status: %w", err)
 	}
 	log.Printf("network status: %v", status)
 	if status.Mode == InfraMode && status.SSID != "" {
@@ -350,7 +350,7 @@ func (sys System) LoadNetworkStatus() error {
 		}
 	}
 	if status.IPV4Address == "" {
-		return fmt.Errorf("cannot load network status, no ip address found for %s", card.Interface)
+		return fmt.Errorf("cannot load network status, no ip address found for %s", status.Device)
 	}
 	oldIpAddress, err := sys.KeyValueStore.Get(store.IPAddressKey)
 	if err != nil {
@@ -405,6 +405,16 @@ func (check internetCheck) runCheck(nc netcmd.NetCmd, stopch <-chan struct{}) er
 }
 
 func (sys System) CheckInternet() error {
+	// Check network status
+	status, err := sys.activeCardNetworkStatus()
+	if err != nil {
+		return fmt.Errorf("failed to load network status: %w", err)
+	}
+
+	if status.Mode != InfraMode {
+		// log.Printf("not checking internet, network mode is %s", status.Mode)
+		return nil
+	}
 	const timeout = 15 * time.Second
 	const interval = time.Second
 	addresses := []string{
