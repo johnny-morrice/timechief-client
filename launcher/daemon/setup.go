@@ -216,10 +216,8 @@ func (daemon Setup) handleWaitNetworkConnect() error {
 			return err
 		}
 		if time.Since(connectTime) > connectTimeout {
-			if active.ConnectionState == "error" {
-				log.Printf("setup failed to connect to wifi network: %s", active.SSID)
-				return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
-			}
+			log.Printf("setup timed out connecting to wifi network: %s, connection state: %s", active.SSID, active.ConnectionState)
+			return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
 		}
 	}
 
