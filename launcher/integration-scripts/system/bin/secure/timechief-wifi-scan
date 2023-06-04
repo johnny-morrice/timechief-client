@@ -18,11 +18,11 @@ networks = []
 
 network = {}
 cell_re = 'Cell \d+ - '
-essid_re = 'ESSID:"(\S+)"'
+# Match regex for ESSID:"<essid>"
+essid_re = 'ESSID:"([^"]+)"'
 quality_re = 'Quality=(\d+)\/\d+'
 for line in output.split('\n'):
     line = line.strip()
-    
     if re.search(cell_re, line):
         network = {}
         networks.append(network)
