@@ -24,8 +24,9 @@ func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
 	}
 	result := make([]WifiNetwork, 0, len(nmNets))
 	for _, nmNet := range nmNets {
-		if nmNet.Security != "WPA2" {
-			log.Printf("Skipping network %s with security %s", nmNet.SSID, nmNet.Security)
+		validErr := nmNet.Validate()
+		if validErr != nil {
+			log.Printf("Invalid network: %s", validErr)
 			continue
 		}
 		result = append(result, WifiNetwork{

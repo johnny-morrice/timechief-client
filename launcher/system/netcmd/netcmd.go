@@ -151,6 +151,18 @@ type WiFiNetwork struct {
 	Security string
 }
 
+func (wn WiFiNetwork) Validate() error {
+	if wn.Security != "WPA2" {
+		return fmt.Errorf("unsupported security: %s", wn.Security)
+	}
+
+	if len(wn.SSID) < 2 || len(wn.SSID) > 32 {
+		return fmt.Errorf("invalid SSID: %s", wn.SSID)
+	}
+
+	return nil
+}
+
 type NetResult struct {
 	Success bool
 	Message string
