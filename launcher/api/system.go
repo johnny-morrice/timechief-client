@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 )
@@ -37,6 +38,18 @@ type WifiActivationRequest struct {
 	Key  string
 }
 
+func (req WifiActivationRequest) validate() error {
+	// SSID must be between 2 and 32 chars.
+	// Key must be at least 8 chars.
+	if len(req.SSID) < 2 || len(req.SSID) > 32 {
+		return errors.New("ssid must be between 2 and 32 chars")
+	}
+	if len(req.Key) < 8 {
+		return errors.New("key must be at least 8 chars")
+	}
+	return nil
+}
+
 func (api System) HandleWifiSetActiveNetwork(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -49,6 +62,14 @@ func (api System) HandleWifiSetActiveNetwork(w http.ResponseWriter, r *http.Requ
 		log.Printf("failed to decode wifi activation request: %v", err)
 		return
 	}
+
+	err = req.validate()
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		log.Printf("failed to validate wifi activation request: %v", err)
+		return
+	}
+
 	err = api.Service.WifiSetActiveNetwork(req.SSID, req.Key)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
