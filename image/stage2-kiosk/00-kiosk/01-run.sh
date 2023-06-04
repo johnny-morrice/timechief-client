@@ -133,7 +133,7 @@ raspi-config nonint do_wifi_country GB
 EOF
 
 # Set up nginx proxy.
-on_chroot << EOF
+on_chroot << 'EOF'
 # Create a separate Nginx configuration file
 cat > /etc/nginx/sites-available/timechief.conf << CATEND
 server {
@@ -142,8 +142,8 @@ server {
 
     location / {
         proxy_pass http://localhost:8080;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 }
 CATEND
