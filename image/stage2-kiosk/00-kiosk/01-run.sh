@@ -14,6 +14,7 @@ EOF
 
 install -m 644 files/config.txt "${ROOTFS_DIR}/boot/"
 install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/"
+install -m 644 files/nginx.conf "${ROOTFS_DIR}/etc/nginx/sites-available/timechief.conf"
 HOME="${ROOTFS_DIR}/home/${FIRST_USER_NAME}"
 install -m 644 -o 1000 -g 1000 files/.profile "${HOME}/"
 install -m 644 -o 1000 -g 1000 files/.xinitrc "${HOME}/"
@@ -134,20 +135,6 @@ EOF
 
 # Set up nginx proxy.
 on_chroot << 'EOF'
-# Create a separate Nginx configuration file
-cat > /etc/nginx/sites-available/timechief.conf << 'CATEND'
-server {
-    listen 80;
-    server_name _;
-
-    location / {
-        proxy_pass http://localhost:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-CATEND
-
 # Enable the Nginx configuration for your project
 ln -s /etc/nginx/sites-available/timechief.conf /etc/nginx/sites-enabled/
 
