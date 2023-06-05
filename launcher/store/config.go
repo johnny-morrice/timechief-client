@@ -22,14 +22,14 @@ type Config struct {
 }
 
 type ConfigStore struct {
-	Db *gorm.DB
+	DB *gorm.DB
 }
 
 func (store ConfigStore) SetConfig(cfg Config) error {
 	for key, value := range cfg.Config {
 		entry := ConfigEntry{Key: key, Value: value}
 		// Update existing entry or create new entry.
-		result := store.Db.Where("key = ?", key).Assign(entry).FirstOrCreate(&entry)
+		result := store.DB.Where("key = ?", key).Assign(entry).FirstOrCreate(&entry)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -39,13 +39,13 @@ func (store ConfigStore) SetConfig(cfg Config) error {
 	for key := range cfg.Config {
 		keys = append(keys, key)
 	}
-	result := store.Db.Where("key NOT IN ?", keys).Delete(&ConfigEntry{})
+	result := store.DB.Where("key NOT IN ?", keys).Delete(&ConfigEntry{})
 	return result.Error
 }
 
 func (store ConfigStore) GetConfig() (Config, error) {
 	var configEntries []ConfigEntry
-	result := store.Db.Find(&configEntries)
+	result := store.DB.Find(&configEntries)
 	if result.Error != nil {
 		return Config{}, result.Error
 	}
@@ -93,34 +93,6 @@ func (cfg Config) GetAPIBaseURL() string {
 }
 
 var ErrCfgNotFound = fmt.Errorf("config item not found")
-
-func (cfg Config) SetAccessToken(token string) {
-	cfg.Config["access-token"] = token
-}
-
-func (cfg Config) GetAccessToken() (string, error) {
-	token, ok := cfg.Config["access-token"]
-	if !ok {
-		return "", fmt.Errorf("access-token not found: %w", ErrCfgNotFound)
-	}
-	return token, nil
-}
-
-func (cfg Config) SetPairingCode(code string) {
-	cfg.Config["pairing-code"] = code
-}
-
-func (cfg Config) GetPairingCode() (string, error) {
-	code, ok := cfg.Config["pairing-code"]
-	if !ok {
-		return "", fmt.Errorf("pairing-code not found: %w", ErrCfgNotFound)
-	}
-	return code, nil
-}
-
-func (cfg Config) ClearPairingCode() {
-	delete(cfg.Config, "pairing-code")
-}
 
 // TODO this will potentially go away with the new API.
 func (cfg Config) GetDeviceCredentials() (string, error) {

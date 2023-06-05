@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown } from './ipc';
+import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from './ipc';
 
 class DeviceSignals {
     constructor() {
@@ -23,7 +23,7 @@ function getDeviceStatus(signals) {
         let activeTargetVersion = launcherState["ActiveTargetVersion"];
         let currentVersion = signals.clientVersion();
         if (currentVersion && activeTargetVersion && activeTargetVersion !== currentVersion) {
-            return "restart to update";
+            return "restart to update to version " + activeTargetVersion;
         }
     }
     return signals.deviceStatus();
@@ -58,7 +58,12 @@ function onClickShutdown() {
 
 function onClickReboot() {
     console.log("reboot clicked")
-    sendReboot()
+    sendReboot();
+}
+
+function onClickSetup() {
+    console.log("setup clicked")
+    sendSetupBegin();
 }
 
 var initialised = false;
@@ -84,8 +89,16 @@ export const DevicePage = () => {
                 <button class='flex-element' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
             </div>
             <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Setup device</div>
+                <button class='flex-element' onClick={onClickSetup}><i class="fa-solid fa-gear"></i></button>
+            </div>
+            <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device status</div>
                 <div class='flex-element'>{getDeviceStatus(deviceSignals)}</div>
+            </div>
+            <div class='row-flex flex-element'>
+                <div class='flex-element data-name'>Client version</div>
+                <div class='flex-element'>{deviceSignals.clientVersion()}</div>
             </div>
             <div class='row-flex flex-element'>
                 <div class='flex-element data-name'>Device Serial Number</div>

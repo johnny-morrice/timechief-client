@@ -50,6 +50,9 @@ func (daemon Update) doTick(ctx *cli.Context) error {
 }
 
 func runEvery(duration time.Duration, f func()) {
+	if duration == 0 {
+		panic("runEvery duration must be positive")
+	}
 	for range time.Tick(duration) {
 		f()
 	}

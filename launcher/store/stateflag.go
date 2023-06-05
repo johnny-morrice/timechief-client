@@ -1,6 +1,7 @@
 package store
 
 import (
+	"sort"
 	"time"
 
 	"gorm.io/gorm"
@@ -14,12 +15,12 @@ type StateFlag struct {
 }
 
 type StateFlagStore struct {
-	Db *gorm.DB
+	DB *gorm.DB
 }
 
 func (store StateFlagStore) List() ([]string, error) {
 	var flags []StateFlag
-	result := store.Db.Find(&flags)
+	result := store.DB.Find(&flags)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -27,12 +28,13 @@ func (store StateFlagStore) List() ([]string, error) {
 	for _, flag := range flags {
 		stateFlags = append(stateFlags, flag.State)
 	}
+	sort.Strings(stateFlags)
 	return stateFlags, nil
 }
 
 func (store StateFlagStore) Exists(flag string) (bool, error) {
 	var count int64
-	result := store.Db.Model(&StateFlag{}).Where("state = ?", flag).Count(&count)
+	result := store.DB.Model(&StateFlag{}).Where("state = ?", flag).Count(&count)
 	if result.Error != nil {
 		return false, result.Error
 	}
@@ -41,12 +43,12 @@ func (store StateFlagStore) Exists(flag string) (bool, error) {
 
 func (store StateFlagStore) CreateIfNotExists(flag string) error {
 	var count int64
-	result := store.Db.Model(&StateFlag{}).Where("state = ?", flag).Count(&count)
+	result := store.DB.Model(&StateFlag{}).Where("state = ?", flag).Count(&count)
 	if result.Error != nil {
 		return result.Error
 	}
 	if count == 0 {
-		result = store.Db.Create(&StateFlag{State: flag})
+		result = store.DB.Create(&StateFlag{State: flag})
 		if result.Error != nil {
 			return result.Error
 		}
@@ -55,7 +57,7 @@ func (store StateFlagStore) CreateIfNotExists(flag string) error {
 }
 
 func (store StateFlagStore) Delete(flag string) error {
-	result := store.Db.Where("state = ?", flag).Delete(&StateFlag{})
+	result := store.DB.Where("state = ?", flag).Delete(&StateFlag{})
 	if result.Error != nil {
 		return result.Error
 	}
@@ -63,7 +65,7 @@ func (store StateFlagStore) Delete(flag string) error {
 }
 
 func (store StateFlagStore) DeleteAll() error {
-	result := store.Db.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&StateFlag{})
+	result := store.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&StateFlag{})
 	if result.Error != nil {
 		return result.Error
 	}

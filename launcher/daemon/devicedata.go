@@ -3,6 +3,7 @@ package daemon
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -18,6 +19,7 @@ import (
 type DeviceData struct {
 	DeviceDataStore store.DeviceDataStore
 	CfgStore        store.ConfigStore
+	KeyValueStore   store.KeyValueStore
 	StateFlagStore  store.StateFlagStore
 	RequestTimeout  time.Duration
 	RefreshInterval time.Duration
@@ -117,7 +119,7 @@ func (dd DeviceData) doFetchLatest() (viewmodel.ClockData, error) {
 		return viewmodel.ClockData{}, err
 	}
 
-	token, err := dd.getToken(authnClient, cfg, credentials)
+	token, err := dd.getToken(authnClient, credentials)
 
 	if err != nil {
 		return viewmodel.ClockData{}, err
@@ -144,18 +146,10 @@ func (dd DeviceData) doFetchLatest() (viewmodel.ClockData, error) {
 }
 
 func (dd DeviceData) saveToken(token string) error {
-	cfg, err := dd.CfgStore.GetConfig()
+	err := dd.KeyValueStore.Set(store.AccessTokenKey, token)
 	if err != nil {
-		return err
+		return fmt.Errorf("error saving access token: %s", err)
 	}
-
-	cfg.SetAccessToken(token)
-
-	err = dd.CfgStore.SetConfig(cfg)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -171,7 +165,7 @@ func (dd DeviceData) getClockData(apiClient *apiclient.Client) (*viewmodel.Clock
 	return clockData, nil
 }
 
-func (dd DeviceData) getToken(authnClient *authnclient.Client, cfg store.Config, credentials string) (string, error) {
+func (dd DeviceData) getToken(authnClient *authnclient.Client, credentials string) (string, error) {
 	credentialParts := strings.Split(credentials, ":")
 	if len(credentialParts) != 2 {
 		return "", errors.New("expected device credentials to be in form serial:secret")

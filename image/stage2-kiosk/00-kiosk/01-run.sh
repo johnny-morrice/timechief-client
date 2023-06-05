@@ -14,6 +14,7 @@ EOF
 
 install -m 644 files/config.txt "${ROOTFS_DIR}/boot/"
 install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/"
+install -m 644 files/nginx.conf "${ROOTFS_DIR}/etc/nginx/sites-available/timechief.conf"
 HOME="${ROOTFS_DIR}/home/${FIRST_USER_NAME}"
 install -m 644 -o 1000 -g 1000 files/.profile "${HOME}/"
 install -m 644 -o 1000 -g 1000 files/.xinitrc "${HOME}/"
@@ -60,14 +61,63 @@ CATEND
     systemctl enable timechief-launcher
 EOF
 
+# DNSMasq unit file.
+on_chroot << EOF
+cat > /etc/systemd/system/dnsmasq-timechief.service << CATEND
+[Unit]
+Description=DNSmasq DNS and DHCP server
+After=syslog.target network.target
+
+[Service]
+ExecStart=/usr/sbin/dnsmasq -k -C /tmp/dnsmasq.conf
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+CATEND
+    systemctl disable dnsmasq-timechief
+    systemctl disable dnsmasq
+EOF
+
+# Hostapd unit file.
+on_chroot << EOF
+cat > /etc/systemd/system/hostapd-timechief.service << CATEND
+[Unit]
+Description=HostAP Daemon
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/hostapd -B -P /run/hostapd.pid /tmp/hostapd.conf
+ExecReload=/bin/kill -HUP \$MAINPID
+PIDFile=/run/hostapd.pid
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+CATEND
+    systemctl disable hostapd-timechief
+    systemctl disable hostapd
+EOF
+
 # SSH
 on_chroot << EOF
     systemctl enable ssh
 EOF
 
-# Shutdown without password
+# Disable wpa_supplicant.
 on_chroot << EOF
-echo "user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown" >> /etc/sudoers
+    systemctl disable wpa_supplicant
+    cat >> /etc/dhcpcd.conf << ENDCAT
+interface wlan0
+nohook wpa_supplicant
+ENDCAT
+EOF
+
+# Run secure scripts with sudo
+on_chroot << EOF
+echo "$FIRST_USER_NAME ALL=(ALL) NOPASSWD: /opt/timechief-launcher/bin/secure/" > /etc/sudoers.d/timechief
 EOF
 
 # Change issue
@@ -75,4 +125,22 @@ on_chroot << EOF
 echo "Timechief Linux \n \l" > /etc/issue
 echo >> /etc/issue
 echo "Timechief Linux" > /etc/issue.net
+EOF
+
+# Set wifi country.
+# TODO: we need to do this dynamically at runtime based on the user's location.
+on_chroot << EOF
+raspi-config nonint do_wifi_country GB
+EOF
+
+# Set up nginx proxy.
+on_chroot << 'EOF'
+# Enable the Nginx configuration for your project
+ln -s /etc/nginx/sites-available/timechief.conf /etc/nginx/sites-enabled/
+
+# Disable the default Nginx configuration
+rm /etc/nginx/sites-enabled/default
+
+# Restart Nginx to apply the changes
+systemctl enable nginx
 EOF

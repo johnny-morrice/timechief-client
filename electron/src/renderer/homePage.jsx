@@ -60,24 +60,28 @@ function updateHomePageSignals(signals, data) {
   let timeZone = clock["Timezone"];
   let locale = clock["Locale"];
   let location = clock["Location"];
-  let currentWeather = data["Weather"]["Current"];
-  let temp = currentWeather["Temp"];
-  let feelsLike = currentWeather["FeelsLike"];
-  let weatherConditions = currentWeather["WeatherConditions"];
-  let feelsLikeText = kelvinToCelsiusText(feelsLike);
-  let tempText = kelvinToCelsiusText(temp);
-  let daily = data["Weather"]["Daily"];
-  if (daily.length > 0) {
-    let today = daily[0];
-    let todayConditions = today["WeatherConditions"];
-    signals.setTodayWeatherConditions(todayConditions["ConditionCode"]);
+  let weather = data["Weather"];
+  if (weather) {
+    let currentWeather = weather["Current"];
+    let temp = currentWeather["Temp"];
+    let feelsLike = currentWeather["FeelsLike"];
+    let weatherConditions = currentWeather["WeatherConditions"];
+    let feelsLikeText = kelvinToCelsiusText(feelsLike);
+    let tempText = kelvinToCelsiusText(temp);
+    signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
+    signals.setFeelsLikeTemp(feelsLikeText);
+    signals.setTemp(tempText);
+    let daily = weather["Daily"];
+    if (daily && daily.length > 0) {
+      let today = daily[0];
+      let todayConditions = today["WeatherConditions"];
+      signals.setTodayWeatherConditions(todayConditions["ConditionCode"]);
+    }
   }
+ 
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
   signals.setTimezone(timeZone);
-  signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
-  signals.setFeelsLikeTemp(feelsLikeText);
-  signals.setTemp(tempText);
   signals.setLocation(location);
   signals.setLastUpdateTime(new Date());
   if (calendar.Calendar) {

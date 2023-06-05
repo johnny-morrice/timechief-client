@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script is used to mock the output of the timechief wifi interfaces command.
+cat << EOF
+[
+    {
+        "Device": "wlan0",     
+        "State": "100 (connected)",
+        "SSID": "TimeChiefSSID",
+        "Mode": "infrastructure",
+        "IPV4Address": "192.168.0.1"
+    }
+]
+EOF

@@ -1,0 +1,43 @@
+#!/bin/bash
+set -e
+set -x
+
+# This script is to configure raspberry pi to join a wifi network.
+
+SSID=$1
+PASSWORD=$2
+IFNAME=$3
+
+if [ -z "$SSID" ]; then
+    echo "SSID is required"
+    exit 1
+fi
+
+if [ -z "$PASSWORD" ]; then
+    echo "PASSWORD is required"
+    exit 1
+fi
+
+if [ -z "$IFNAME" ]; then
+    echo "IFNAME is required"
+    exit 1
+fi
+
+# Bring network done first
+killall wpa_supplicant || true
+systemctl stop dnsmasq-timechief
+systemctl stop hostapd-timechief
+
+# Bring down the interface.
+ip addr flush dev $IFNAME
+ip link set $IFNAME down
+
+# Bring up the interface.
+ip link set $IFNAME up
+
+# Now connect.
+wpa_passphrase $SSID $PASSWORD > /tmp/wpa_supplicant.conf
+wpa_supplicant -B -i $IFNAME -c /tmp/wpa_supplicant.conf
+
+# Now start dhcpcd.
+systemctl start dhcpcd

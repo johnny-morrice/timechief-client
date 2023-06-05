@@ -2,25 +2,32 @@ package store
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"gorm.io/gorm"
 )
 
 type DeviceData struct {
-	gorm.Model
+	ID         uint `gorm:"primarykey"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 	DeviceJSON []byte
 }
 
 type DeviceDataStore struct {
-	Db *gorm.DB
+	DB *gorm.DB
 }
 
 func (store DeviceDataStore) GetDeviceData() (viewmodel.ClockData, error) {
 	var data DeviceData
-	result := store.Db.First(&data)
+	result := store.DB.First(&data)
 	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return viewmodel.ClockData{}, nil
+		}
 		return viewmodel.ClockData{}, fmt.Errorf("error getting cached device data: %w", result.Error)
 	}
 	var deviceData viewmodel.ClockData
@@ -38,12 +45,12 @@ func (store DeviceDataStore) SetDeviceData(clockData viewmodel.ClockData) error 
 	}
 	var data DeviceData
 	data.DeviceJSON = deviceJSON
-	result := store.Db.Save(&data)
+	result := store.DB.Save(&data)
 	if result.Error != nil {
 		return fmt.Errorf("error saving device data: %w", result.Error)
 	}
 	// Delete all entries except the most recent
-	result = store.Db.Where("id != ?", data.ID).Delete(&DeviceData{})
+	result = store.DB.Where("id != ?", data.ID).Delete(&DeviceData{})
 	if result.Error != nil {
 		return fmt.Errorf("error deleting old device data: %w", result.Error)
 	}

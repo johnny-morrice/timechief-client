@@ -2,7 +2,6 @@ package daemon
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -14,6 +13,7 @@ import (
 )
 
 type Pairing struct {
+	KeyValueStore        store.KeyValueStore
 	ConfigStore          store.ConfigStore
 	StateFlagStore       store.StateFlagStore
 	PairingCheckInterval time.Duration
@@ -21,14 +21,9 @@ type Pairing struct {
 }
 
 func (p Pairing) Initialise() error {
-	cfg, err := p.ConfigStore.GetConfig()
+	err := p.KeyValueStore.Delete(store.PairingCodeKey)
 	if err != nil {
-		return fmt.Errorf("error getting config: %s", err)
-	}
-	cfg.ClearPairingCode()
-	err = p.ConfigStore.SetConfig(cfg)
-	if err != nil {
-		return fmt.Errorf("error setting config: %s", err)
+		return fmt.Errorf("error deleting pairing code: %s", err)
 	}
 	return nil
 }
@@ -54,14 +49,10 @@ func (p Pairing) doTick(ctx *cli.Context) error {
 
 	if isPairingRequested {
 		log.Println("handling pairing request")
-		cfg, err := p.ConfigStore.GetConfig()
+		exists, err := p.KeyValueStore.Exists(store.PairingCodeKey)
 		if err != nil {
-			return fmt.Errorf("error getting config: %s", err)
-		}
-		_, err = cfg.GetPairingCode()
-		if err != nil && !errors.Is(err, store.ErrCfgNotFound) {
 			return fmt.Errorf("error getting pairing code: %s", err)
-		} else if errors.Is(err, store.ErrCfgNotFound) {
+		} else if !exists {
 			return p.createPairing()
 		}
 
@@ -86,7 +77,7 @@ func (p Pairing) createPairing() error {
 	if err != nil {
 		return fmt.Errorf("error getting config: %s", err)
 	}
-	token, err := cfg.GetAccessToken()
+	token, err := p.KeyValueStore.Get(store.AccessTokenKey)
 	if err != nil {
 		return fmt.Errorf("error getting access token: %s", err)
 	}
@@ -100,10 +91,9 @@ func (p Pairing) createPairing() error {
 	if err != nil {
 		return fmt.Errorf("error creating pairing: %s", err)
 	}
-	cfg.SetPairingCode(code.Code)
-	err = p.ConfigStore.SetConfig(cfg)
+	err = p.KeyValueStore.Set(store.PairingCodeKey, code.Code)
 	if err != nil {
-		return fmt.Errorf("error setting config: %s", err)
+		return fmt.Errorf("error setting pairing code: %s", err)
 	}
 	return nil
 }
@@ -113,11 +103,11 @@ func (p Pairing) handlePairingLinked() error {
 	if err != nil {
 		return fmt.Errorf("error getting config: %s", err)
 	}
-	token, err := cfg.GetAccessToken()
+	token, err := p.KeyValueStore.Get(store.AccessTokenKey)
 	if err != nil {
 		return fmt.Errorf("error getting access token: %s", err)
 	}
-	code, err := cfg.GetPairingCode()
+	code, err := p.KeyValueStore.Get(store.PairingCodeKey)
 	if err != nil {
 		return fmt.Errorf("error getting pairing code: %s", err)
 	}
@@ -144,14 +134,9 @@ func (p Pairing) handlePairingComplete() error {
 	if err != nil {
 		return fmt.Errorf("error deleting pairing-requested flag: %s", err)
 	}
-	cfg, err := p.ConfigStore.GetConfig()
+	err = p.KeyValueStore.Delete(store.PairingCodeKey)
 	if err != nil {
-		return fmt.Errorf("error getting config: %s", err)
-	}
-	cfg.ClearPairingCode()
-	err = p.ConfigStore.SetConfig(cfg)
-	if err != nil {
-		return fmt.Errorf("error setting config: %s", err)
+		return fmt.Errorf("error clearing pairing code: %s", err)
 	}
 	return nil
 }
@@ -161,11 +146,11 @@ func (p Pairing) getPairingState() (viewmodel.PairingStatus, error) {
 	if err != nil {
 		return viewmodel.PairingStatus{}, fmt.Errorf("error getting config: %s", err)
 	}
-	token, err := cfg.GetAccessToken()
+	token, err := p.KeyValueStore.Get(store.AccessTokenKey)
 	if err != nil {
 		return viewmodel.PairingStatus{}, fmt.Errorf("error getting access token: %s", err)
 	}
-	code, err := cfg.GetPairingCode()
+	code, err := p.KeyValueStore.Get(store.PairingCodeKey)
 	if err != nil {
 		return viewmodel.PairingStatus{}, fmt.Errorf("error getting pairing code: %s", err)
 	}

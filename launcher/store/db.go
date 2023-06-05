@@ -1,15 +1,30 @@
 package store
 
 import (
+	"log"
+	"os"
+	"time"
+
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func getGormConfig() *gorm.Config {
-	return &gorm.Config{}
+	logger := logger.New(
+		log.New(os.Stderr, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second * 5, // Slow SQL threshold
+			LogLevel:                  logger.Warn,     // Log level
+			IgnoreRecordNotFoundError: true,            // Ignore ErrRecordNotFound error for logger
+			ParameterizedQueries:      false,           // Don't include params in the SQL log
+			Colorful:                  false,           // Disable color
+		},
+	)
+	return &gorm.Config{Logger: logger}
 }
 
 func AutoMigrate(db *gorm.DB) error {
-	return db.AutoMigrate(&LaunchTarget{}, &ConfigEntry{}, &Version{}, &StateFlag{}, &DeviceData{})
+	return db.AutoMigrate(&LaunchTarget{}, &ConfigEntry{}, &Version{}, &StateFlag{}, &DeviceData{}, &KeyValue{}, &WifiInterface{}, &WifiNetwork{})
 }
 
 func CloseDB(db *gorm.DB) error {

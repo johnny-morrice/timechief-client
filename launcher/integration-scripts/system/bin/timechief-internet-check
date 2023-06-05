@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+set -x
+ADDRESS=$1
+
+if [ -z "$ADDRESS" ]; then
+    echo "no address specified"
+    exit 1
+fi
+
+ping -c 1 $ADDRESS

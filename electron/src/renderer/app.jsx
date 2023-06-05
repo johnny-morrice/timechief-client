@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { onCleanup } from 'solid-js';
 import { hashIntegration, Router, Routes, Route } from "@solidjs/router";
-import { initializeIPC, sendClockDataRequest } from './ipc';
+import { initializeIPC } from './ipc';
 import { HomePage } from "./homePage";
 import { DevicePage } from "./devicePage";
 import { TaskBar } from "./taskbar";
@@ -11,29 +11,32 @@ import { AccountPage } from "./accountPage";
 import { StatusBar } from './statusBar';
 import { LocalePage } from "./localePage";
 import { CalendarPage } from "./calendarPage";
+import { WebSetupPage } from "./webSetupPage";
+
+const AppScreen = (props) => 
+  <WebSetupPage element={<div><StatusBar/>{props.element}<TaskBar/></div>}/>
 
 const App = () => {
   let ipcIntervals = initializeIPC();
-  sendClockDataRequest();
   onCleanup(() => {
     ipcIntervals.forEach(interval => clearInterval(interval));
   });
 
   return <Routes>
-      <Route path="/home" element={<HomePage/>} />
-      <Route path="/forecast" element={<ForecastPage/>} />
-      <Route path="/device" element={<DevicePage/>} />
-      <Route path="/astro" element={<AstroPage/>} />
-      <Route path="/account" element={<AccountPage/>} />
-      <Route path="/locale" element={<LocalePage/>} />
-      <Route path="/calendar" element={<CalendarPage/>} />
-      <Route path="/" element={<HomePage/>} />
-    </Routes>
+        <Route path="/home" element={<AppScreen element={<HomePage/>}/>}/>
+        <Route path="/forecast" element={<AppScreen element={<ForecastPage/>}/>}/>
+        <Route path="/device" element={<AppScreen element={<DevicePage/>}/>}/>
+        <Route path="/astro" element={<AppScreen element={<AstroPage/>}/>}/>
+        <Route path="/account" element={<AppScreen element={<AccountPage/>}/>}/>
+        <Route path="/locale" element={<AppScreen element={<LocalePage/>}/>}/>
+        <Route path="/calendar" element={<AppScreen element={<CalendarPage/>}/>}/>
+        <Route path="/" element={<AppScreen element={<HomePage/>}/>}/>
+      </Routes>
 };
 
 
 export function attachApp() {
-  render(() => <Router source={hashIntegration()}><StatusBar/><App /><TaskBar/></Router>, document.getElementById('app'));
+  render(() => <Router source={hashIntegration()}><App></App></Router>, document.getElementById('app'));
 }
 
 attachApp();

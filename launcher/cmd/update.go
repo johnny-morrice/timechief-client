@@ -16,7 +16,7 @@ func Update(ctx *cli.Context) error {
 	}
 
 	defer store.CloseDB(db)
-	cfgStore := store.ConfigStore{Db: db}
+	cfgStore := store.ConfigStore{DB: db}
 	flagCfg := cfgFlags(ctx)
 
 	cfg, err := cfgStore.GetConfig()
@@ -36,8 +36,8 @@ func Update(ctx *cli.Context) error {
 	updater := update.Updater{
 		CfgStore:          cfgStore,
 		Client:            clnt,
-		LaunchTargetStore: store.LaunchTargetStore{Db: db},
-		VersionStore:      store.VersionStore{Db: db},
+		LaunchTargetStore: store.LaunchTargetStore{DB: db},
+		VersionStore:      store.VersionStore{DB: db},
 		RequestTimeout:    ctx.Duration("service-request-timeout"),
 	}
 
