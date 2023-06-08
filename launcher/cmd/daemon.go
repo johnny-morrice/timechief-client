@@ -6,6 +6,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/api"
 	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/daemon"
+	"github.com/johnny-morrice/timechief-client/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/service/launcher"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/service/system"
@@ -171,6 +172,7 @@ func Daemon(ctx *cli.Context) error {
 				CfgStore:          cfgStore,
 			},
 		},
+		fileserver.StaticFileHandler{},
 	}
 	for _, pkg := range packages {
 		pkg.AddRoutes(mux)
