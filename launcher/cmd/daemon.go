@@ -172,7 +172,7 @@ func Daemon(ctx *cli.Context) error {
 				CfgStore:          cfgStore,
 			},
 		},
-		fileserver.StaticFileHandler{},
+		fileserver.NewStaticFileHandler(),
 	}
 	for _, pkg := range packages {
 		pkg.AddRoutes(mux)
