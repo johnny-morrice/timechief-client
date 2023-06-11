@@ -1,5 +1,5 @@
 export async function getDeviceData() {
-    options = {
+    const options = {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
