@@ -1,11 +1,12 @@
 import { createSignal, onCleanup } from "solid-js";
-import { getDeviceData } from "./api";
+import { getDeviceData, postNetworkSelect } from "./api";
 
 export const Home = () => {
-    var [setupState, setSetupState] = createSignal("");
-    var [networks, setNetworks] = createSignal([]);
-    var [selectedNetwork, setSelectedNetwork] = createSignal("");
-    var [lastUpdateTime, setLastUpdateTime] = createSignal(new Date());
+    const [setupState, setSetupState] = createSignal("");
+    const [networks, setNetworks] = createSignal([]);
+    const [selectedNetwork, setSelectedNetwork] = createSignal("");
+    const [lastUpdateTime, setLastUpdateTime] = createSignal(new Date());
+    const [lastTickTime, setLastTickTime] = createSignal(new Date());
 
     const isLoading = () => {
         return setupState() !== "WaitUserSelectNetwork";
@@ -23,9 +24,11 @@ export const Home = () => {
     }
 
     const isErrorTimeout = () => {
-        const timeout = new Date();
+        const timeout = new Date(lastTickTime());
         const timeoutDuration = 30;
         timeout.setSeconds(timeout.getSeconds() - timeoutDuration);
+        console.log("timeout: " + timeout);
+        console.log("lastUpdateTime: " + lastUpdateTime());
         return lastUpdateTime() < timeout;
     }
 
@@ -42,7 +45,7 @@ export const Home = () => {
     };
 
     const onNetworkConnectClick = () => {
-        const ssid = selectedNetwork();
+        const ssid = selectedNetwork().SSID;
         const key = document.getElementById("network-key-input").value;
         const messageElem = document.getElementById("network-key-input-message");
         // Use postNetworkSelect to send the network key to the device.
@@ -73,11 +76,11 @@ export const Home = () => {
     const NetworkList = () => {
         return <div>
             <ul class="network-list">
-            <Index each={networks()}>{(network, i) =>
+            <For each={networks()}>{(network, i) =>
                 <li>
-                    <button onClick={onNetworkSelect(network)}>{network()}</button>    
+                    <button onClick={onNetworkSelect(network)}>{network.SSID}</button>
                 </li>
-                }</Index>
+                }</For>
             </ul>
         </div>   
     }
@@ -104,7 +107,7 @@ export const Home = () => {
             <div class="network-key-input">
                 <div id="network-key-input-message"></div>
                 <div class="network-key-input-label">
-                    Enter network key for {selectedNetwork()}
+                    Enter network key for {selectedNetwork().SSID}
                 </div>
                 <div class="network-key-input-field">
                     <input type="password" id="network-key-input"/>
@@ -166,9 +169,15 @@ export const Home = () => {
         });
     }
 
+    pollDeviceData();
+    const tickInterval = setInterval(() => setLastTickTime(new Date()), 1000);
+
     // Poll every 5 seconds
     const pollInterval = setInterval(pollDeviceData, 5000);
-    onCleanup(() => clearInterval(pollInterval));
+    onCleanup(() => {
+        clearInterval(pollInterval);
+        clearInterval(tickInterval);
+    });
     return <div>
         <div id="app-root">
             <div class="site-nav-bar">
@@ -182,7 +191,12 @@ export const Home = () => {
                 </div>
                 <div class="bar-account-wrapper">
                     <div class="status-indicator">
-                        <i class="fa-solid fa-heart"></i>
+                        <Show when={!isErrorTimeout()}>
+                            <i class="fa-solid fa-heart"></i>
+                        </Show>
+                        <Show when={isErrorTimeout()}>
+                        <i class="fa-solid fa-heart-crack"></i>
+                        </Show>
                     </div>
                 </div>
             </div>

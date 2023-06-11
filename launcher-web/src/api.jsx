@@ -16,11 +16,11 @@ export async function postNetworkSelect(ssid, key) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: {
+        body: JSON.stringify({
             "SSID": ssid,
             "KEY": key,
-        },
+        }),
     };
-    const url = `/api/data/device`;
-    return await fetch(url, options).then(response => response.json());
+    const url = `/api/system/wifi/network`;
+    return await fetch(url, options);
 }

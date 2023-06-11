@@ -31,7 +31,7 @@ body {
     font-size: 14pt;
 }
 
-nav.site-nav-bar {
+div.site-nav-bar {
     font-size: 30pt;
     font-weight: bold;
     background-color: black;
