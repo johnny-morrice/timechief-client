@@ -12,12 +12,14 @@ export const Home = () => {
     }
     const isDisplayNetworks = () => {
         const loading = isLoading();
-        return !loading && selectedNetwork() === "";
+        const error = isErrorTimeout();
+        return !loading && !error && selectedNetwork() === "";
     }
 
     const isDisplayEnterNetworkKey = () => {
         const loading = isLoading();
-        return !loading && selectedNetwork() !== "";
+        const error = isErrorTimeout();
+        return !loading && !error && selectedNetwork() !== "";
     }
 
     const isErrorTimeout = () => {
@@ -79,6 +81,14 @@ export const Home = () => {
             </ul>
         </div>   
     }
+
+    const NoNetworkList = () => {
+        return <div>
+            <div class="no-networks">
+                <p>No networks found</p>
+            </div>
+        </div>
+    }
     
     const Loading = () => {
         return <div>
@@ -106,6 +116,12 @@ export const Home = () => {
                     <button onClick={onNetworkSelectBack}>Back</button>
                 </div>
             </div>
+        </div>
+    }
+
+    const ErrorIndicator = () => {
+        return <div class="error-indicator">
+            <p>Cannot connect to device.  Check your device for updates.</p>
         </div>
     }
 
@@ -172,9 +188,21 @@ export const Home = () => {
             </div>
             <div class="root-wrapper">
                 <div class="main-content">
-                    <h1>It works!</h1>
-                    <p>Font awesome loaded indicator below</p>
-                    <i class="fa-solid fa-thumbs-up"></i>
+                    <Show when={isErrorTimeout()}>
+                        <ErrorIndicator/>
+                    </Show>
+                    <Show when={isLoading() && !isErrorTimeout()}>
+                        <Loading/>
+                    </Show>
+                    <Show when={isDisplayNetworks() && hasNetworks()}>
+                        <NetworkList/>
+                    </Show>
+                    <Show when={isDisplayNetworks() && !hasNetworks()}>
+                        <NoNetworkList/>
+                    </Show>
+                    <Show when={isDisplayEnterNetworkKey()}>
+                        <EnterNetworkKey/>
+                    </Show>
                 </div>
             </div>
         </div>
