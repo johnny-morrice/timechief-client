@@ -75,6 +75,9 @@ export const Home = () => {
 
     const NetworkList = () => {
         return <div>
+            <div class="network-list-header">
+                Select a network to connect
+            </div>
             <ul class="network-list">
             <For each={networks()}>{(network, i) =>
                 <li>
