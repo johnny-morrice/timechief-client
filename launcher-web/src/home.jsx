@@ -3,9 +3,9 @@ export const Home = () => {
         <div id="app-root">
             <nav class="site-nav-bar">
                 <div class="main-links">
-                    <div class="site-name-home" onClick={displayHomePage}>Timechief</div>
+                    <div class="site-name-home">Timechief</div>
                     <div class="bar-devices-wrapper">
-                        <div class="bar-devices-button" onClick={onClickShowDevices}>
+                        <div class="bar-device-setup">
                             DEVICE SETUP
                         </div>
                     </div>
@@ -22,8 +22,8 @@ export const Home = () => {
                     <p>Font awesome loaded indicator below</p>
                     <i class="fa-solid fa-thumbs-up"></i>
                 </div>
-                <div class="footer">Footer content</div>
             </div>
+            <footer class="footer">Footer content</footer>
         </div>
     </div>;
 }

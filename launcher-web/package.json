@@ -6,7 +6,7 @@
     "build-local": "vite build",
     "build-dev": "vite build --mode dev",
     "build-prod": "vite build --mode prod",
-    "serve": "vite"
+    "serve": "vite --host"
   },
   "browser": "src/web/index.js",
   "author": "GitHub",
