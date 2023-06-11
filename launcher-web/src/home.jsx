@@ -1,4 +1,16 @@
+import { getDeviceData } from "./api";
+
 export const Home = () => {
+    // Start a poll for device data
+    // This is going to function as a heartbeat but all the crucial information we need is also there.
+    function pollDeviceData() {
+        getDeviceData().then(data => {
+            console.log(data);
+        });
+    }
+
+    // Poll every 5 seconds
+    setInterval(pollDeviceData, 5000);
     return <div>
         <div id="app-root">
             <nav class="site-nav-bar">
