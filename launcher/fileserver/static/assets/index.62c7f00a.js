@@ -45,6 +45,7 @@ true&&(function polyfill() {
 const sharedConfig = {};
 
 const equalFn = (a, b) => a === b;
+const $TRACK = Symbol("solid-track");
 const $DEVCOMP = Symbol("solid-dev-component");
 const signalOptions = {
   equals: equalFn
@@ -511,8 +512,127 @@ function hash(s) {
   for (var i = 0, h = 9; i < s.length;) h = Math.imul(h ^ s.charCodeAt(i++), 9 ** 9);
   return `${h ^ h >>> 9}`;
 }
+
+const FALLBACK = Symbol("fallback");
+function dispose(d) {
+  for (let i = 0; i < d.length; i++) d[i]();
+}
+function mapArray(list, mapFn, options = {}) {
+  let items = [],
+    mapped = [],
+    disposers = [],
+    len = 0,
+    indexes = mapFn.length > 1 ? [] : null;
+  onCleanup(() => dispose(disposers));
+  return () => {
+    let newItems = list() || [],
+      i,
+      j;
+    newItems[$TRACK];
+    return untrack(() => {
+      let newLen = newItems.length,
+        newIndices,
+        newIndicesNext,
+        temp,
+        tempdisposers,
+        tempIndexes,
+        start,
+        end,
+        newEnd,
+        item;
+      if (newLen === 0) {
+        if (len !== 0) {
+          dispose(disposers);
+          disposers = [];
+          items = [];
+          mapped = [];
+          len = 0;
+          indexes && (indexes = []);
+        }
+        if (options.fallback) {
+          items = [FALLBACK];
+          mapped[0] = createRoot(disposer => {
+            disposers[0] = disposer;
+            return options.fallback();
+          });
+          len = 1;
+        }
+      }
+      else if (len === 0) {
+        mapped = new Array(newLen);
+        for (j = 0; j < newLen; j++) {
+          items[j] = newItems[j];
+          mapped[j] = createRoot(mapper);
+        }
+        len = newLen;
+      } else {
+        temp = new Array(newLen);
+        tempdisposers = new Array(newLen);
+        indexes && (tempIndexes = new Array(newLen));
+        for (start = 0, end = Math.min(len, newLen); start < end && items[start] === newItems[start]; start++);
+        for (end = len - 1, newEnd = newLen - 1; end >= start && newEnd >= start && items[end] === newItems[newEnd]; end--, newEnd--) {
+          temp[newEnd] = mapped[end];
+          tempdisposers[newEnd] = disposers[end];
+          indexes && (tempIndexes[newEnd] = indexes[end]);
+        }
+        newIndices = new Map();
+        newIndicesNext = new Array(newEnd + 1);
+        for (j = newEnd; j >= start; j--) {
+          item = newItems[j];
+          i = newIndices.get(item);
+          newIndicesNext[j] = i === undefined ? -1 : i;
+          newIndices.set(item, j);
+        }
+        for (i = start; i <= end; i++) {
+          item = items[i];
+          j = newIndices.get(item);
+          if (j !== undefined && j !== -1) {
+            temp[j] = mapped[i];
+            tempdisposers[j] = disposers[i];
+            indexes && (tempIndexes[j] = indexes[i]);
+            j = newIndicesNext[j];
+            newIndices.set(item, j);
+          } else disposers[i]();
+        }
+        for (j = start; j < newLen; j++) {
+          if (j in temp) {
+            mapped[j] = temp[j];
+            disposers[j] = tempdisposers[j];
+            if (indexes) {
+              indexes[j] = tempIndexes[j];
+              indexes[j](j);
+            }
+          } else mapped[j] = createRoot(mapper);
+        }
+        mapped = mapped.slice(0, len = newLen);
+        items = newItems.slice(0);
+      }
+      return mapped;
+    });
+    function mapper(disposer) {
+      disposers[j] = disposer;
+      if (indexes) {
+        const [s, set] = createSignal(j, {
+          name: "index"
+        }) ;
+        indexes[j] = set;
+        return mapFn(newItems[j], s);
+      }
+      return mapFn(newItems[j]);
+    }
+  };
+}
 function createComponent(Comp, props) {
   return devComponent(Comp, props || {});
+}
+
+function For(props) {
+  const fallback = "fallback" in props && {
+    fallback: () => props.fallback
+  };
+  return createMemo(mapArray(() => props.each, props.children, fallback || undefined), undefined, {
+    name: "value"
+  }) ;
 }
 function Show(props) {
   let strictEqual = false;
@@ -596,6 +716,8 @@ function reconcileArrays(parentNode, a, b) {
     }
   }
 }
+
+const $$EVENTS = "_$DX_DELEGATE";
 function render(code, element, init, options = {}) {
   let disposer;
   createRoot(dispose => {
@@ -615,10 +737,67 @@ function template(html, check, isSVG) {
   if (isSVG) node = node.firstChild;
   return node;
 }
+function delegateEvents(eventNames, document = window.document) {
+  const e = document[$$EVENTS] || (document[$$EVENTS] = new Set());
+  for (let i = 0, l = eventNames.length; i < l; i++) {
+    const name = eventNames[i];
+    if (!e.has(name)) {
+      e.add(name);
+      document.addEventListener(name, eventHandler);
+    }
+  }
+}
+function addEventListener(node, name, handler, delegate) {
+  if (delegate) {
+    if (Array.isArray(handler)) {
+      node[`$$${name}`] = handler[0];
+      node[`$$${name}Data`] = handler[1];
+    } else node[`$$${name}`] = handler;
+  } else if (Array.isArray(handler)) {
+    const handlerFn = handler[0];
+    node.addEventListener(name, handler[0] = e => handlerFn.call(node, handler[1], e));
+  } else node.addEventListener(name, handler);
+}
 function insert(parent, accessor, marker, initial) {
   if (marker !== undefined && !initial) initial = [];
   if (typeof accessor !== "function") return insertExpression(parent, accessor, initial, marker);
   createRenderEffect(current => insertExpression(parent, accessor(), current, marker), initial);
+}
+function eventHandler(e) {
+  const key = `$$${e.type}`;
+  let node = e.composedPath && e.composedPath()[0] || e.target;
+  if (e.target !== node) {
+    Object.defineProperty(e, "target", {
+      configurable: true,
+      value: node
+    });
+  }
+  Object.defineProperty(e, "currentTarget", {
+    configurable: true,
+    get() {
+      return node || document;
+    }
+  });
+  if (sharedConfig.registry && !sharedConfig.done) {
+    sharedConfig.done = true;
+    document.querySelectorAll("[id^=pl-]").forEach(elem => {
+      while (elem && elem.nodeType !== 8 && elem.nodeValue !== "pl-" + e) {
+        let x = elem.nextSibling;
+        elem.remove();
+        elem = x;
+      }
+      elem && elem.remove();
+    });
+  }
+  while (node) {
+    const handler = node[key];
+    if (handler && !node.disabled) {
+      const data = node[`${key}Data`];
+      data !== undefined ? handler.call(node, data, e) : handler.call(node, e);
+      if (e.cancelBubble) return;
+    }
+    node = node._$host || node.parentNode || node.host;
+  }
 }
 function insertExpression(parent, value, current, marker, unwrapArray) {
   if (sharedConfig.context && !current) current = [...parent.childNodes];
@@ -745,21 +924,264 @@ async function getDeviceData() {
   const url = `/api/data/device`;
   return await fetch(url, options).then(response => response.json());
 }
+async function postNetworkSelect(ssid, key) {
+  const options = {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      "SSID": ssid,
+      "KEY": key
+    })
+  };
+  const url = `/api/system/wifi/network`;
+  return await fetch(url, options);
+}
 
-const _tmpl$ = /*#__PURE__*/template(`<div><div id="app-root"><nav class="site-nav-bar"><div class="main-links"><div class="site-name-home">Timechief</div><div class="bar-devices-wrapper"><div class="bar-device-setup">DEVICE SETUP</div></div></div><div class="bar-account-wrapper"><div class="status-indicator"><i class="fa-solid fa-heart"></i></div></div></nav><div class="root-wrapper"><div class="main-content"><h1>It works!</h1><p>Font awesome loaded indicator below</p><i class="fa-solid fa-thumbs-up"></i></div></div><footer class="footer">Footer content</footer></div></div>`, 32);
+const _tmpl$ = /*#__PURE__*/template(`<div><div class="network-list-wrapper"><h1 class="network-list-header"><i class="fa-solid fa-house-signal"></i> Connect to your wifi network</h1><ul class="network-list"></ul></div></div>`, 10),
+  _tmpl$2 = /*#__PURE__*/template(`<li class="network-list-entry"><button class="network-list-entry-button"><i class="fa-solid fa-wifi"></i> </button></li>`, 6),
+  _tmpl$3 = /*#__PURE__*/template(`<div><div class="no-networks"><p>No networks found</p></div></div>`, 6),
+  _tmpl$4 = /*#__PURE__*/template(`<div><div class="loading-message"><p>Loading <i class="fa-solid fa-spinner fa-spin"></i></p><p>Check your device for updates</p></div></div>`, 10),
+  _tmpl$5 = /*#__PURE__*/template(`<div><div class="network-key-input"><form><div class="network-key-form"><h1 class="network-key-input-label">Enter network key for </h1><div id="network-key-input-message"></div><div class="network-key-input-field"><input type="password" id="network-key-input"></div><div class="network-key-input-button"><input type="submit" value="Connect"></div><div class="network-key-input-back"><button>Back</button></div></div></form></div></div>`, 22),
+  _tmpl$6 = /*#__PURE__*/template(`<div class="error-indicator"><p>Cannot connect to device. Check your device for updates.</p></div>`, 4),
+  _tmpl$7 = /*#__PURE__*/template(`<i class="fa-solid fa-heart"></i>`, 2),
+  _tmpl$8 = /*#__PURE__*/template(`<i class="fa-solid fa-heart-crack"></i>`, 2),
+  _tmpl$9 = /*#__PURE__*/template(`<div><div id="app-root"><div class="site-nav-bar"><div class="main-links"><div class="site-name-home">Timechief</div><div class="bar-devices-wrapper"><div class="bar-device-setup">DEVICE SETUP</div></div></div><div class="bar-account-wrapper"><div class="status-indicator"></div></div></div><div class="root-wrapper"><div class="main-content"></div></div></div></div>`, 22);
 const Home = () => {
+  const [setupState, setSetupState] = createSignal("");
+  const [networks, setNetworks] = createSignal([]);
+  const [selectedNetwork, setSelectedNetwork] = createSignal("");
+  const [lastUpdateTime, setLastUpdateTime] = createSignal(new Date());
+  const [lastTickTime, setLastTickTime] = createSignal(new Date());
+  const isLoading = () => {
+    return setupState() !== "WaitUserSelectNetwork";
+  };
+  const isDisplayNetworks = () => {
+    const loading = isLoading();
+    const error = isErrorTimeout();
+    return !loading && !error && selectedNetwork() === "";
+  };
+  const isDisplayEnterNetworkKey = () => {
+    const loading = isLoading();
+    const error = isErrorTimeout();
+    return !loading && !error && selectedNetwork() !== "";
+  };
+  const isErrorTimeout = () => {
+    const timeout = new Date(lastTickTime());
+    const timeoutDuration = 30;
+    timeout.setSeconds(timeout.getSeconds() - timeoutDuration);
+    return lastUpdateTime() < timeout;
+  };
+  const hasNetworks = () => {
+    return networks().length > 0;
+  };
+  const onNetworkSelectBack = () => {
+    setSelectedNetwork("");
+  };
+  const onNetworkSelect = network => {
+    return () => setSelectedNetwork(network);
+  };
+  const onNetworkConnectClick = event => {
+    event.preventDefault();
+    const ssid = selectedNetwork().SSID;
+    const key = document.getElementById("network-key-input").value;
+    const messageElem = document.getElementById("network-key-input-message");
+    // Use postNetworkSelect to send the network key to the device.
+    // If this method is successful, we may never get a response because of a race condition when the device changes networks.
+    // If we get a response with a 400 or 500 error code, it means either the SSID is bad or the network key failed to validate.
+    // We cannot at this stage know if the network key is correct or not.
+    // If we get a response with a 200 error code, it means the network key was accepted and the device is attempting to connect to the network.
+    postNetworkSelect(ssid, key).then(data => {
+      // Check for in status code in 200 range
+      if (data.status >= 200 && data.status < 300) {
+        // Write a message to the user that the network key was accepted and the device is attempting to connect to the network.
+        messageElem.innerHTML = "Network key accepted.  Check your device for updates";
+      } else if (data.status >= 400 && data.status < 600) {
+        // Write a message to the user that the network key was not accepted and the device is attempting to connect to the network.
+        console.log("error response selecting network");
+        console.log(data);
+        messageElem.innerHTML = "Network key not accepted.";
+      }
+    }).catch(error => {
+      // It could be that the device has had a network change because is has successfully connected.  Or it could be some other kind of error.
+      // We cannot know this is an error case.  We will just write a message to the user to check their device.
+      console.log("error after selecting network");
+      console.log(error);
+      messageElem.innerHTML = "Check your device for updates";
+    });
+  };
+  const NetworkList = () => {
+    return (() => {
+      const _el$ = _tmpl$.cloneNode(true),
+        _el$2 = _el$.firstChild,
+        _el$3 = _el$2.firstChild,
+        _el$4 = _el$3.nextSibling;
+      insert(_el$4, createComponent(For, {
+        get each() {
+          return networks();
+        },
+        children: (network, i) => (() => {
+          const _el$5 = _tmpl$2.cloneNode(true),
+            _el$6 = _el$5.firstChild,
+            _el$7 = _el$6.firstChild;
+            _el$7.nextSibling;
+          addEventListener(_el$6, "click", onNetworkSelect(network), true);
+          insert(_el$6, () => network.SSID, null);
+          return _el$5;
+        })()
+      }));
+      return _el$;
+    })();
+  };
+  const NoNetworkList = () => {
+    return _tmpl$3.cloneNode(true);
+  };
+  const Loading = () => {
+    return _tmpl$4.cloneNode(true);
+  };
+  const EnterNetworkKey = () => {
+    return (() => {
+      const _el$11 = _tmpl$5.cloneNode(true),
+        _el$12 = _el$11.firstChild,
+        _el$13 = _el$12.firstChild,
+        _el$14 = _el$13.firstChild,
+        _el$15 = _el$14.firstChild;
+        _el$15.firstChild;
+        const _el$17 = _el$15.nextSibling,
+        _el$18 = _el$17.nextSibling,
+        _el$19 = _el$18.nextSibling,
+        _el$20 = _el$19.nextSibling,
+        _el$21 = _el$20.firstChild;
+      _el$13.addEventListener("submit", onNetworkConnectClick);
+      insert(_el$15, () => selectedNetwork().SSID, null);
+      _el$21.$$click = onNetworkSelectBack;
+      return _el$11;
+    })();
+  };
+  const ErrorIndicator = () => {
+    return _tmpl$6.cloneNode(true);
+  };
+
   // Start a poll for device data
   // This is going to function as a heartbeat but all the crucial information we need is also there.
   function pollDeviceData() {
+    // {
+    //     "LauncherState": {
+    //         "ActiveTargetVersion": "timechief-linux-arm64 dev-sys v0.0.169",
+    //         "SetupState": "WaitUserSelectNetwork",
+    //         "WebURL": "http://172.16.0.1/",
+    //         "WifiState": {
+    //             "ActiveWifiInterface": "wlan0",
+    //             "InterfaceMode": "Master",
+    //             "ActiveSSID": "",
+    //             "IsWifiError": false,
+    //             "HotspotSSID": "timechief414948",
+    //             "HotspotKey": "tc782297",
+    //             "WifiNetworks": [
+    //                 {
+    //                     "SSID": "jammyBeanTaters2.4",
+    //                     "SignalStrength": 57
+    //                 },
+    //                 {
+    //                     "SSID": "jammyBeanTaters",
+    //                     "SignalStrength": 70
+    //                 }
+    //             ]
+    //         }
+    //     }
     getDeviceData().then(data => {
-      console.log(data);
+      if (data) {
+        if ("LauncherState" in data) {
+          const launcherState = data.LauncherState;
+          setSetupState(launcherState.SetupState);
+          if ("WifiState" in launcherState && "WifiNetworks" in launcherState.WifiState) {
+            setNetworks(launcherState.WifiState.WifiNetworks);
+          }
+          setLastUpdateTime(new Date());
+        }
+      }
     });
   }
+  pollDeviceData();
+  const tickInterval = setInterval(() => setLastTickTime(new Date()), 1000);
 
   // Poll every 5 seconds
-  setInterval(pollDeviceData, 5000);
-  return _tmpl$.cloneNode(true);
+  const pollInterval = setInterval(pollDeviceData, 5000);
+  onCleanup(() => {
+    clearInterval(pollInterval);
+    clearInterval(tickInterval);
+  });
+  return (() => {
+    const _el$23 = _tmpl$9.cloneNode(true),
+      _el$24 = _el$23.firstChild,
+      _el$25 = _el$24.firstChild,
+      _el$26 = _el$25.firstChild,
+      _el$27 = _el$26.nextSibling,
+      _el$28 = _el$27.firstChild,
+      _el$31 = _el$25.nextSibling,
+      _el$32 = _el$31.firstChild;
+    insert(_el$28, createComponent(Show, {
+      get when() {
+        return !isErrorTimeout();
+      },
+      get children() {
+        return _tmpl$7.cloneNode(true);
+      }
+    }), null);
+    insert(_el$28, createComponent(Show, {
+      get when() {
+        return isErrorTimeout();
+      },
+      get children() {
+        return _tmpl$8.cloneNode(true);
+      }
+    }), null);
+    insert(_el$32, createComponent(Show, {
+      get when() {
+        return isErrorTimeout();
+      },
+      get children() {
+        return createComponent(ErrorIndicator, {});
+      }
+    }), null);
+    insert(_el$32, createComponent(Show, {
+      get when() {
+        return createMemo(() => !!isLoading())() && !isErrorTimeout();
+      },
+      get children() {
+        return createComponent(Loading, {});
+      }
+    }), null);
+    insert(_el$32, createComponent(Show, {
+      get when() {
+        return createMemo(() => !!isDisplayNetworks())() && hasNetworks();
+      },
+      get children() {
+        return createComponent(NetworkList, {});
+      }
+    }), null);
+    insert(_el$32, createComponent(Show, {
+      get when() {
+        return createMemo(() => !!isDisplayNetworks())() && !hasNetworks();
+      },
+      get children() {
+        return createComponent(NoNetworkList, {});
+      }
+    }), null);
+    insert(_el$32, createComponent(Show, {
+      get when() {
+        return isDisplayEnterNetworkKey();
+      },
+      get children() {
+        return createComponent(EnterNetworkKey, {});
+      }
+    }), null);
+    return _el$23;
+  })();
 };
+delegateEvents(["click"]);
 
 function bindEvent(target, type, handler) {
     target.addEventListener(type, handler);
