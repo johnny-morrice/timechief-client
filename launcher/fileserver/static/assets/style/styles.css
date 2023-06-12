@@ -1,0 +1,132 @@
+@font-face {
+    font-family: 'Share Tech Mono';
+    src: url('../webfonts/ShareTechMono-Regular.woff2') format('woff2'),
+        url('../webfonts/ShareTechMono-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    src: url('../webfonts/TitilliumWeb-Regular.woff2') format('woff2'),
+        url('../webfonts/TitilliumWeb-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Seven Segment';
+    src: url('../webfonts/7segment.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Titillium Web';
+    font-size: 14pt;
+}
+
+div.site-nav-bar {
+    font-size: 30pt;
+    font-weight: bold;
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+div.main-links {
+    gap: 10pt;
+    display: flex;
+    align-items: center;
+}
+
+div.bar-devices-wrapper {
+    color: white;
+    display: flex;
+    font-size: 20pt;
+}
+
+div.bar-devices-button:hover {
+    text-decoration: underline;
+}
+
+div.bar-account-wrapper {
+    color: white;
+    gap: 10pt;
+    display: flex;
+    padding-right: 10pt;
+    font-size: 20pt;
+}
+
+div.site-name-home {
+    margin-left: 10pt;
+    color: green;
+}
+
+div.root-wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+div.main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 10pt;
+    align-items: center;
+}
+
+ul.network-list {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10pt;
+    align-items: center;
+    padding: 0px;
+    margin: 0px;
+}
+
+li.network-list-entry {
+    width: 100%;
+}
+
+button.network-list-entry-button {
+    border-radius: 2pt;
+    width: 100%;
+    background-color: white;
+    color: black;
+    font-size: 20pt;
+}
+
+button.network-list-entry-button:hover {
+    background-color: green;
+    color: white;
+}
+
+div.network-key-form input {
+    font-size: 20pt;
+}
+
+div.network-key-form button {
+    font-size: 20pt;
+}
+
+div.network-key-form {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    gap: 10pt;
+}
+
+p.loading-spin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
