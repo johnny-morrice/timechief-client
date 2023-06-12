@@ -100,7 +100,7 @@ export const Home = () => {
     const Loading = () => {
         return <div>
             <div class="loading-message">
-                <p>Loading <i class="fa-solid fa-spinner fa-spin"></i></p>
+                <p class="loading-spin"><i class="fa-solid fa-spinner fa-spin"></i></p>
                 <p>Check your device for updates</p>
             </div>
         </div>
