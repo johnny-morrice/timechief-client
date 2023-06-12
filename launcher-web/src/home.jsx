@@ -27,8 +27,6 @@ export const Home = () => {
         const timeout = new Date(lastTickTime());
         const timeoutDuration = 30;
         timeout.setSeconds(timeout.getSeconds() - timeoutDuration);
-        console.log("timeout: " + timeout);
-        console.log("lastUpdateTime: " + lastUpdateTime());
         return lastUpdateTime() < timeout;
     }
 
@@ -44,7 +42,8 @@ export const Home = () => {
         return () => setSelectedNetwork(network);
     };
 
-    const onNetworkConnectClick = () => {
+    const onNetworkConnectClick = (event) => {
+        event.preventDefault();
         const ssid = selectedNetwork().SSID;
         const key = document.getElementById("network-key-input").value;
         const messageElem = document.getElementById("network-key-input-message");
@@ -75,16 +74,18 @@ export const Home = () => {
 
     const NetworkList = () => {
         return <div>
-            <div class="network-list-header">
-                Select a network to connect
+            <div class="network-list-wrapper">
+                <h1 class="network-list-header">
+                <i class="fa-solid fa-house-signal"></i> Connect to your wifi network
+                </h1>
+                <ul class="network-list">
+                <For each={networks()}>{(network, i) =>
+                    <li class="network-list-entry">
+                        <button class="network-list-entry-button" onClick={onNetworkSelect(network)}><i class="fa-solid fa-wifi"></i> {network.SSID}</button>
+                    </li>
+                    }</For>
+                </ul>
             </div>
-            <ul class="network-list">
-            <For each={networks()}>{(network, i) =>
-                <li>
-                    <button onClick={onNetworkSelect(network)}>{network.SSID}</button>
-                </li>
-                }</For>
-            </ul>
         </div>   
     }
 
@@ -108,19 +109,23 @@ export const Home = () => {
     const EnterNetworkKey = () => {
         return <div>
             <div class="network-key-input">
-                <div id="network-key-input-message"></div>
-                <div class="network-key-input-label">
-                    Enter network key for {selectedNetwork().SSID}
-                </div>
-                <div class="network-key-input-field">
-                    <input type="password" id="network-key-input"/>
-                </div>
-                <div class="network-key-input-button">
-                    <button onClick={onNetworkConnectClick}>Connect</button>
-                </div>
-                <div class="network-key-input-back">
-                    <button onClick={onNetworkSelectBack}>Back</button>
-                </div>
+                <form onSubmit={onNetworkConnectClick}>
+                    <div class="network-key-form">
+                        <h1 class="network-key-input-label">
+                            Enter network key for {selectedNetwork().SSID}
+                        </h1>
+                        <div id="network-key-input-message"></div>
+                        <div class="network-key-input-field">
+                            <input type="password" id="network-key-input"/>
+                        </div>
+                        <div class="network-key-input-button">
+                            <input type="submit" value="Connect"/>
+                        </div>
+                        <div class="network-key-input-back">
+                            <button onClick={onNetworkSelectBack}>Back</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     }
