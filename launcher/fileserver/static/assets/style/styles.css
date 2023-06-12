@@ -123,3 +123,10 @@ div.network-key-form {
     align-items: left;
     gap: 10pt;
 }
+
+p.loading-spin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}

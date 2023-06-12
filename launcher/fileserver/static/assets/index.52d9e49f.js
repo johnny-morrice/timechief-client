@@ -943,7 +943,7 @@ async function postNetworkSelect(ssid, key) {
 const _tmpl$ = /*#__PURE__*/template(`<div><div class="network-list-wrapper"><h1 class="network-list-header"><i class="fa-solid fa-house-signal"></i> Connect to your wifi network</h1><ul class="network-list"></ul></div></div>`, 10),
   _tmpl$2 = /*#__PURE__*/template(`<li class="network-list-entry"><button class="network-list-entry-button"><i class="fa-solid fa-wifi"></i> </button></li>`, 6),
   _tmpl$3 = /*#__PURE__*/template(`<div><div class="no-networks"><p>No networks found</p></div></div>`, 6),
-  _tmpl$4 = /*#__PURE__*/template(`<div><div class="loading-message"><p>Loading <i class="fa-solid fa-spinner fa-spin"></i></p><p>Check your device for updates</p></div></div>`, 10),
+  _tmpl$4 = /*#__PURE__*/template(`<div><div class="loading-message"><p class="loading-spin"><i class="fa-solid fa-spinner fa-spin"></i></p><p>Check your device for updates</p></div></div>`, 10),
   _tmpl$5 = /*#__PURE__*/template(`<div><div class="network-key-input"><form><div class="network-key-form"><h1 class="network-key-input-label">Enter network key for </h1><div id="network-key-input-message"></div><div class="network-key-input-field"><input type="password" id="network-key-input"></div><div class="network-key-input-button"><input type="submit" value="Connect"></div><div class="network-key-input-back"><button>Back</button></div></div></form></div></div>`, 22),
   _tmpl$6 = /*#__PURE__*/template(`<div class="error-indicator"><p>Cannot connect to device. Check your device for updates.</p></div>`, 4),
   _tmpl$7 = /*#__PURE__*/template(`<i class="fa-solid fa-heart"></i>`, 2),
