@@ -3,16 +3,16 @@ package cmd
 import (
 	"net/http"
 
-	"github.com/johnny-morrice/timechief-client/launcher/api"
-	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
-	"github.com/johnny-morrice/timechief-client/launcher/daemon"
-	"github.com/johnny-morrice/timechief-client/launcher/fileserver"
-	"github.com/johnny-morrice/timechief-client/launcher/service/data"
-	"github.com/johnny-morrice/timechief-client/launcher/service/launcher"
-	syssvc "github.com/johnny-morrice/timechief-client/launcher/service/system"
-	"github.com/johnny-morrice/timechief-client/launcher/store"
-	"github.com/johnny-morrice/timechief-client/launcher/system"
-	"github.com/johnny-morrice/timechief-client/launcher/update"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
+	client "github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
+	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
 )
 
