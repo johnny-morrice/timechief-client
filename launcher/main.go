@@ -54,6 +54,10 @@ func getCLIApp() *cli.App {
 					Name:  "listen-addr",
 					Value: "0.0.0.0:8081",
 				},
+				&cli.BoolFlag{
+					Name:  "startup-sound",
+					Value: true,
+				},
 			},
 		},
 		{

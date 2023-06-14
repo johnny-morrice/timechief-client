@@ -1,7 +1,14 @@
 package cmd
 
-import "github.com/urfave/cli/v2"
+import (
+	"github.com/johnny-morrice/timechief-client/launcher/sound"
+	"github.com/urfave/cli/v2"
+)
 
 func Sound(ctx *cli.Context) error {
-	panic("not implemented")
+	daemon := sound.Daemon{
+		ListenAddr:       ctx.String("listen-addr"),
+		PlayStartupSound: ctx.Bool("startup-sound"),
+	}
+	return daemon.Run(ctx.Context)
 }
