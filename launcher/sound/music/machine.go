@@ -13,7 +13,7 @@ type MachineState uint8
 const (
 	STATE_IDLE MachineState = iota
 	STATE_PLAYING_ONCE
-	STATE_FLAYING_LOOP
+	STATE_PLAYING_LOOP
 )
 
 type Machine struct {
@@ -48,10 +48,11 @@ func (m *Machine) StartSong(state MachineState, song Song) error {
 	return nil
 }
 
-func (m *Machine) StopSong() {
+func (m *Machine) StopSong() error {
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 	m.State = STATE_IDLE
+	return nil
 }
 
 func (m *Machine) tick() error {
@@ -68,7 +69,7 @@ func (m *Machine) tick() error {
 		switch m.State {
 		case STATE_PLAYING_ONCE:
 			m.State = STATE_IDLE
-		case STATE_FLAYING_LOOP:
+		case STATE_PLAYING_LOOP:
 			nextNoteIndex = 0
 		default:
 			return fmt.Errorf("invalid state: %v", m.State)

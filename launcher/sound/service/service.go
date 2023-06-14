@@ -1,0 +1,45 @@
+package service
+
+import (
+	"fmt"
+
+	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
+)
+
+type SoundService struct {
+	machine  MusicMachine
+	songDict map[string]music.Song
+}
+
+func NewSoundService(machine MusicMachine) SoundService {
+	return SoundService{
+		machine:  machine,
+		songDict: map[string]music.Song{},
+	}
+}
+
+func (svc SoundService) StartSong(songOpts SongOptions) error {
+	song, ok := svc.songDict[songOpts.SongName]
+	if !ok {
+		return fmt.Errorf("song not found: %v", songOpts.SongName)
+	}
+	state := music.STATE_PLAYING_ONCE
+	if songOpts.Loop {
+		state = music.STATE_PLAYING_LOOP
+	}
+	return svc.machine.StartSong(state, song)
+}
+
+func (svc SoundService) StopSong() error {
+	return svc.machine.StopSong()
+}
+
+type SongOptions struct {
+	SongName string
+	Loop     bool
+}
+
+type MusicMachine interface {
+	StartSong(state music.MachineState, song music.Song) error
+	StopSong() error
+}
