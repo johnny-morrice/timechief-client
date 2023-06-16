@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown } from './ipc';
 
 class WebSetupPageSignals {
@@ -94,7 +94,36 @@ export const WebSetupPage = (props) => {
     initialised = true;
   }
 
-  return <div class="crt">
+  const applyCRTJank = () => {
+    // Get the crt-root element
+    const crtRoot = document.getElementById("crt-root");
+    // There is a 1 in 30 chance of the CRT jank being applied.
+    if (Math.random() < 0.033) {
+        // The CRT jank is applied crt-jank class to the crt-root element.
+        crtRoot.classList.add("crt-jank");
+        console.log("CRT Jank applied");
+        // Set a timeout to remove the CRT jank after 1.6 + n second.
+        // Where n is between 1.6 second and 2.4 second.
+        const timeout = 2800 + Math.random() * 800;
+        setTimeout(removeCRTJank, timeout);
+    }
+  };
+
+  const removeCRTJank = () => {
+    // Get the crt-root element
+    const crtRoot = document.getElementById("crt-root");
+    // The CRT jank is removed by removing the crt-jank class from the crt-root element.
+    crtRoot.classList.remove("crt-jank");
+    console.log("CRT Jank removed");
+  };
+
+  const jankInterval = setInterval(applyCRTJank, 1000);
+
+  onCleanup(() => {
+    clearInterval(jankInterval);
+  });
+
+  return <div id="crt-root" class="crt">
         <Show when={isHotspotReady(signals)}>
             <div class="column-flex">
                 <div class="flex-element section-name underline">Welcome to Timechief</div>
