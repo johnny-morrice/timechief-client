@@ -94,7 +94,7 @@ export const WebSetupPage = (props) => {
     initialised = true;
   }
 
-  return <div id="web-setup">
+  return <div class="crt">
         <Show when={isHotspotReady(signals)}>
             <div class="column-flex">
                 <div class="flex-element section-name underline">Welcome to Timechief</div>
