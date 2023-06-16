@@ -101,10 +101,10 @@ export const WebSetupPage = (props) => {
     if (Math.random() < 0.033) {
         // The CRT jank is applied crt-jank class to the crt-root element.
         crtRoot.classList.add("crt-jank");
-        console.log("CRT Jank applied");
+        // console.log("CRT Jank applied");
         // Set a timeout to remove the CRT jank after 1.6 + n second.
         // Where n is between 1.6 second and 2.4 second.
-        const timeout = 2800 + Math.random() * 800;
+        const timeout = 2800 + (Math.random() * 800);
         setTimeout(removeCRTJank, timeout);
     }
   };
@@ -114,7 +114,7 @@ export const WebSetupPage = (props) => {
     const crtRoot = document.getElementById("crt-root");
     // The CRT jank is removed by removing the crt-jank class from the crt-root element.
     crtRoot.classList.remove("crt-jank");
-    console.log("CRT Jank removed");
+    // console.log("CRT Jank removed");
   };
 
   const jankInterval = setInterval(applyCRTJank, 1000);
