@@ -58,6 +58,10 @@ func getCLIApp() *cli.App {
 					Name:  "startup-sound",
 					Value: true,
 				},
+				&cli.IntFlag{
+					Name:  "pwm-pin",
+					Value: 12,
+				},
 			},
 		},
 		{

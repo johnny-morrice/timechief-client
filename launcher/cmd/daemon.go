@@ -23,6 +23,11 @@ func Daemon(ctx *cli.Context) error {
 	}
 	defer store.CloseDB(db)
 
+	err = fileserver.InitialiseFS()
+	if err != nil {
+		return err
+	}
+
 	isAutoMigrate := ctx.Bool("auto-migrate")
 	if isAutoMigrate {
 		err = store.AutoMigrate(db)

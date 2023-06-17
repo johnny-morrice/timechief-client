@@ -2,6 +2,7 @@ package fileserver
 
 import (
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
@@ -11,13 +12,14 @@ import (
 var embeddedFilesystem embed.FS
 var staticFiles fs.FS
 
-func init() {
+func InitialiseFS() error {
 	var err error
 	staticFiles, err = fs.Sub(embeddedFilesystem, "static")
 	if err != nil {
-		panic("failed to get 'static' filesystem")
+		return fmt.Errorf("failed to get 'static' filesystem: %w", err)
 	}
 	log.Println("set up static filesystem")
+	return nil
 }
 
 func embeddedFileHandler() http.Handler {

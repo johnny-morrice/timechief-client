@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/songs"
 )
 
 type SoundService struct {
@@ -13,8 +14,10 @@ type SoundService struct {
 
 func NewSoundService(machine MusicMachine) SoundService {
 	return SoundService{
-		machine:  machine,
-		songDict: map[string]music.Song{},
+		machine: machine,
+		songDict: map[string]music.Song{
+			"startup": songs.StartupTone(),
+		},
 	}
 }
 

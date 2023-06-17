@@ -18,11 +18,10 @@ type Daemon struct {
 	ListenAddr       string
 	PlayStartupSound bool
 	PWMPin           int
-	DutyCycle        uint32
 }
 
 func (daemon Daemon) Run(ctx context.Context) error {
-	tg := rpio.NewPWMToneGenerator(daemon.PWMPin, daemon.DutyCycle)
+	tg := rpio.NewPWMToneGenerator(daemon.PWMPin)
 
 	machine := music.NewMachine(tg)
 	go machine.Run()
