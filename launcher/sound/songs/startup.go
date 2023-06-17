@@ -48,7 +48,10 @@ func StartupTone() music.Song {
 		C5, D5, E5, F5, G5, A5, B5,
 		C6, D6, E6, F6, G6, A6, B6,
 	}
-	song := music.Song{}
+	song := music.Song{
+		Name:  "startup",
+		Notes: make([]music.Note, 0, len(notes)),
+	}
 	for _, note := range notes {
 		song.Notes = append(song.Notes, music.Note{
 			PWMFreq: note,

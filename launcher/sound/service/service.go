@@ -13,12 +13,18 @@ type SoundService struct {
 }
 
 func NewSoundService(machine MusicMachine) SoundService {
-	return SoundService{
-		machine: machine,
-		songDict: map[string]music.Song{
-			"startup": songs.StartupTone(),
-		},
+	songs := []music.Song{
+		songs.StartupTone(),
 	}
+	svc := SoundService{
+		machine:  machine,
+		songDict: map[string]music.Song{},
+	}
+
+	for _, song := range songs {
+		svc.songDict[song.Name] = song
+	}
+	return svc
 }
 
 func (svc SoundService) StartSong(songOpts SongOptions) error {

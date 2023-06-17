@@ -21,6 +21,16 @@ type Daemon struct {
 }
 
 func (daemon Daemon) Run(ctx context.Context) error {
+	err := rpio.InitialiseRPIO()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err := rpio.ShutdownRPIO()
+		if err != nil {
+			log.Printf("error shutting down RPIO: %v", err)
+		}
+	}()
 	tg := rpio.NewPWMToneGenerator(daemon.PWMPin)
 
 	machine := music.NewMachine(tg)

@@ -47,6 +47,7 @@ func (m *Machine) StartSong(state MachineState, song Song) error {
 	if state == STATE_IDLE {
 		return errors.New("cannot start song with state STATE_IDLE")
 	}
+	log.Printf("starting song: %s", song.Name)
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	m.song = song
@@ -56,6 +57,7 @@ func (m *Machine) StartSong(state MachineState, song Song) error {
 }
 
 func (m *Machine) StopSong() error {
+	log.Printf("stopping song: %s", m.song.Name)
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	m.state = STATE_IDLE
@@ -124,5 +126,6 @@ type Note struct {
 }
 
 type Song struct {
+	Name  string
 	Notes []Note
 }

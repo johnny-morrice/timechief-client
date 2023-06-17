@@ -7,6 +7,7 @@ import (
 )
 
 func InitialiseRPIO() error {
+	log.Println("initialising RPIO")
 	err := rpio.Open()
 	if err != nil {
 		return err
@@ -16,6 +17,7 @@ func InitialiseRPIO() error {
 }
 
 func ShutdownRPIO() error {
+	log.Println("shutting down RPIO")
 	rpio.StopPwm()
 	return rpio.Close()
 }
