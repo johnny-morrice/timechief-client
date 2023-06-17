@@ -54,6 +54,7 @@ func (daemon Daemon) Run(ctx context.Context) error {
 		}
 	}
 
+	log.Printf("listening on %v", daemon.ListenAddr)
 	return http.ListenAndServe(daemon.ListenAddr, mux)
 }
 

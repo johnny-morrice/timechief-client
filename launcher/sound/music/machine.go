@@ -35,7 +35,7 @@ func NewMachine(tg ToneGenerator) *Machine {
 	return &Machine{
 		state:        STATE_IDLE,
 		idleDuration: time.Millisecond * 100,
-		noteDuration: time.Millisecond * 400,
+		noteDuration: time.Millisecond * 20,
 		noteIndex:    0,
 		song:         Song{},
 		lock:         &sync.Mutex{},
@@ -71,7 +71,6 @@ func (m *Machine) tick() error {
 		m.tg.Silence(m.idleDuration)
 		return nil
 	}
-	log.Printf("playing note at index %d", m.noteIndex)
 	note := m.song.Notes[m.noteIndex]
 	m.playNote(note)
 	nextNoteIndex := m.noteIndex + 1
