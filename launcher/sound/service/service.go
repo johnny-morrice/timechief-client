@@ -49,6 +49,6 @@ type SongOptions struct {
 }
 
 type MusicMachine interface {
-	StartSong(state music.MachineState, song music.Song) error
+	StartSong(state music.StateFlag, song music.Song) error
 	StopSong() error
 }

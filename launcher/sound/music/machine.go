@@ -4,25 +4,29 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"sync"
+	"sync/atomic"
 	"time"
 )
 
-type MachineState uint8
+type StateFlag uint8
 
 const (
-	STATE_IDLE MachineState = iota
+	STATE_IDLE StateFlag = iota
 	STATE_PLAYING_ONCE
 	STATE_PLAYING_LOOP
 )
 
+type machineState struct {
+	flag      StateFlag
+	song      Song
+	noteIndex int
+}
+
 type Machine struct {
-	state        MachineState
 	idleDuration time.Duration
 	noteDuration time.Duration
-	noteIndex    int
-	song         Song
-	lock         *sync.Mutex
+	state        atomic.Value
+	forceStop    atomic.Bool
 	tg           ToneGenerator
 }
 
@@ -32,60 +36,63 @@ type ToneGenerator interface {
 }
 
 func NewMachine(tg ToneGenerator) *Machine {
-	return &Machine{
-		state:        STATE_IDLE,
+	m := &Machine{
 		idleDuration: time.Millisecond * 100,
-		noteDuration: time.Millisecond * 20,
-		noteIndex:    0,
-		song:         Song{},
-		lock:         &sync.Mutex{},
+		noteDuration: time.Millisecond * 40,
 		tg:           tg,
 	}
+	m.state.Store(machineState{
+		flag: STATE_IDLE,
+	})
+	return m
 }
 
-func (m *Machine) StartSong(state MachineState, song Song) error {
+func (m *Machine) StartSong(state StateFlag, song Song) error {
 	if state == STATE_IDLE {
 		return errors.New("cannot start song with state STATE_IDLE")
 	}
 	log.Printf("starting song: %s", song.Name)
-	m.lock.Lock()
-	defer m.lock.Unlock()
-	m.song = song
-	m.noteIndex = 0
-	m.state = state
+	m.state.Store(machineState{
+		flag:      state,
+		song:      song,
+		noteIndex: 0,
+	})
+	m.forceStop.Store(false)
 	return nil
 }
 
 func (m *Machine) StopSong() error {
-	log.Printf("stopping song: %s", m.song.Name)
-	m.lock.Lock()
-	defer m.lock.Unlock()
-	m.state = STATE_IDLE
+	log.Printf("stopping song")
+	m.forceStop.Store(true)
 	return nil
 }
 
 func (m *Machine) tick() error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
-	if m.state == STATE_IDLE {
+	state := m.state.Load().(machineState)
+	if state.flag == STATE_IDLE {
 		m.tg.Silence(m.idleDuration)
 		return nil
 	}
-	note := m.song.Notes[m.noteIndex]
+	note := state.song.Notes[state.noteIndex]
 	m.playNote(note)
-	nextNoteIndex := m.noteIndex + 1
-	if nextNoteIndex >= len(m.song.Notes) {
-		log.Printf("end of song at note index %d", m.noteIndex)
-		switch m.state {
+	nextNoteIndex := state.noteIndex + 1
+	if nextNoteIndex >= len(state.song.Notes) {
+		log.Printf("end of song at note index %d", state.noteIndex)
+		switch state.flag {
 		case STATE_PLAYING_ONCE:
-			m.state = STATE_IDLE
+			state.flag = STATE_IDLE
 		case STATE_PLAYING_LOOP:
 			nextNoteIndex = 0
 		default:
 			return fmt.Errorf("invalid state: %v", m.state)
 		}
 	}
-	m.noteIndex = nextNoteIndex
+	state.noteIndex = nextNoteIndex
+	isStopped := m.forceStop.Load()
+	if isStopped {
+		state.flag = STATE_IDLE
+	}
+	m.state.Store(state)
 	return nil
 }
 
@@ -95,17 +102,6 @@ func (m *Machine) Run() {
 		if err != nil {
 			log.Printf("error in music machine: %v", err)
 		}
-		m.Sleep()
-	}
-}
-
-func (m *Machine) Sleep() {
-	m.lock.Lock()
-	defer m.lock.Unlock()
-	if m.state == STATE_IDLE {
-		time.Sleep(m.idleDuration)
-	} else {
-		time.Sleep(m.noteDuration)
 	}
 }
 
