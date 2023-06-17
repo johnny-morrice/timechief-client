@@ -4,20 +4,30 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/johnny-morrice/timechief-client/launcher/sound/api"
 	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/rpio"
 	"github.com/johnny-morrice/timechief-client/launcher/sound/service"
 )
 
 type Daemon struct {
 	ListenAddr       string
 	PlayStartupSound bool
+	PWMPin           int
+	DutyCycle        uint32
 }
 
 func (daemon Daemon) Run(ctx context.Context) error {
-	machine := music.NewMachine()
+	tg := rpio.NewPWMToneGenerator(daemon.PWMPin, daemon.DutyCycle)
+
+	machine := music.NewMachine(tg)
 	go machine.Run()
+
+	handleSignals(machine)
 
 	svc := service.NewSoundService(machine)
 	api := api.NewSoundAPI(svc)
@@ -36,4 +46,27 @@ func (daemon Daemon) Run(ctx context.Context) error {
 	}
 
 	return http.ListenAndServe(daemon.ListenAddr, mux)
+}
+
+// When we receive signterm we need to stop the machine.
+// This is because the machine uses raspberry pi PWM hardware and we need to shutdown the channel.
+// Otherwise sound might still come out.
+func handleSignals(machine *music.Machine) {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGTERM)
+	go func() {
+		for {
+			sig := <-signals
+			if sig == syscall.SIGTERM {
+				err := machine.StopSong()
+				if err != nil {
+					log.Printf("error stopping machine: %v", err)
+				}
+				err = rpio.ShutdownRPIO()
+				if err != nil {
+					log.Printf("error shutting down rpio: %v", err)
+				}
+			}
+		}
+	}()
 }

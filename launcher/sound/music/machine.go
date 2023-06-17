@@ -17,22 +17,29 @@ const (
 )
 
 type Machine struct {
-	State        MachineState
-	IdleDuration time.Duration
-	NoteDuration time.Duration
-	NoteIndex    int
-	Song         Song
-	Lock         *sync.Mutex
+	state        MachineState
+	idleDuration time.Duration
+	noteDuration time.Duration
+	noteIndex    int
+	song         Song
+	lock         *sync.Mutex
+	tg           ToneGenerator
 }
 
-func NewMachine() *Machine {
+type ToneGenerator interface {
+	PlayFreq(freq float32)
+	Silence()
+}
+
+func NewMachine(tg ToneGenerator) *Machine {
 	return &Machine{
-		State:        STATE_IDLE,
-		IdleDuration: time.Millisecond * 100,
-		NoteDuration: time.Millisecond * 10,
-		NoteIndex:    0,
-		Song:         Song{},
-		Lock:         &sync.Mutex{},
+		state:        STATE_IDLE,
+		idleDuration: time.Millisecond * 100,
+		noteDuration: time.Millisecond * 20,
+		noteIndex:    0,
+		song:         Song{},
+		lock:         &sync.Mutex{},
+		tg:           tg,
 	}
 }
 
@@ -40,42 +47,42 @@ func (m *Machine) StartSong(state MachineState, song Song) error {
 	if state == STATE_IDLE {
 		return errors.New("cannot start song with state STATE_IDLE")
 	}
-	m.Lock.Lock()
-	defer m.Lock.Unlock()
-	m.Song = song
-	m.NoteIndex = 0
-	m.State = state
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.song = song
+	m.noteIndex = 0
+	m.state = state
 	return nil
 }
 
 func (m *Machine) StopSong() error {
-	m.Lock.Lock()
-	defer m.Lock.Unlock()
-	m.State = STATE_IDLE
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.state = STATE_IDLE
 	return nil
 }
 
 func (m *Machine) tick() error {
-	m.Lock.Lock()
-	defer m.Lock.Unlock()
-	if m.State == STATE_IDLE {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if m.state == STATE_IDLE {
 		m.silence()
 		return nil
 	}
-	note := m.Song.Notes[m.NoteIndex]
+	note := m.song.Notes[m.noteIndex]
 	m.playNote(note)
-	nextNoteIndex := m.NoteIndex + 1
-	if nextNoteIndex >= len(m.Song.Notes) {
-		switch m.State {
+	nextNoteIndex := m.noteIndex + 1
+	if nextNoteIndex >= len(m.song.Notes) {
+		switch m.state {
 		case STATE_PLAYING_ONCE:
-			m.State = STATE_IDLE
+			m.state = STATE_IDLE
 		case STATE_PLAYING_LOOP:
 			nextNoteIndex = 0
 		default:
-			return fmt.Errorf("invalid state: %v", m.State)
+			return fmt.Errorf("invalid state: %v", m.state)
 		}
 	}
-	m.NoteIndex = nextNoteIndex
+	m.noteIndex = nextNoteIndex
 	return nil
 }
 
@@ -90,25 +97,29 @@ func (m *Machine) Run() {
 }
 
 func (m *Machine) Sleep() {
-	m.Lock.Lock()
-	defer m.Lock.Unlock()
-	if m.State == STATE_IDLE {
-		time.Sleep(m.IdleDuration)
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if m.state == STATE_IDLE {
+		time.Sleep(m.idleDuration)
 	} else {
-		time.Sleep(m.NoteDuration)
+		time.Sleep(m.noteDuration)
 	}
 }
 
 func (m *Machine) playNote(n Note) {
-	// TODO implement
+	if n.Silence {
+		m.silence()
+	} else {
+		m.tg.PlayFreq(n.PWMFreq)
+	}
 }
 
 func (m *Machine) silence() {
-	// TODO implement
+	m.tg.Silence()
 }
 
 type Note struct {
-	PWMFreq int
+	PWMFreq float32
 	Silence bool
 }
 
