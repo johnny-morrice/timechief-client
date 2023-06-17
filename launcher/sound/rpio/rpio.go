@@ -2,6 +2,7 @@ package rpio
 
 import (
 	"log"
+	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
 )
@@ -12,7 +13,6 @@ func InitialiseRPIO() error {
 	if err != nil {
 		return err
 	}
-	rpio.StartPwm()
 	return nil
 }
 
@@ -29,17 +29,22 @@ type PWMToneGenerator struct {
 func NewPWMToneGenerator(pinNumber int) PWMToneGenerator {
 	log.Printf("setting up PWM on pin %v", pinNumber)
 	pin := rpio.Pin(pinNumber)
-	pin.Pwm()
 	return PWMToneGenerator{pin: pin}
 }
 
-func (tg PWMToneGenerator) PlayFreq(freq float32) {
+func (tg PWMToneGenerator) PlayFreq(freq float32, duration time.Duration) {
 	// Notes are not integers, so we need to round.
 	// I bet we can do something clever here to get the fractional notes to sound better.
+	log.Printf("playing frequency: %v", freq)
+	tg.pin.Pwm()
 	tg.pin.Freq(int(freq * 32))
 	tg.pin.DutyCycle(1, 32)
+	rpio.StartPwm()
+	time.Sleep(duration)
+	rpio.StopPwm()
 }
 
-func (tg PWMToneGenerator) Silence() {
+func (tg PWMToneGenerator) Silence(duration time.Duration) {
 	tg.pin.DutyCycle(0, 0)
+	time.Sleep(duration)
 }

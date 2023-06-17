@@ -75,6 +75,7 @@ func handleSignals(machine *music.Machine) {
 				if err != nil {
 					log.Printf("error shutting down rpio: %v", err)
 				}
+
 			}
 		}
 	}()

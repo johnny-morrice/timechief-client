@@ -27,15 +27,15 @@ type Machine struct {
 }
 
 type ToneGenerator interface {
-	PlayFreq(freq float32)
-	Silence()
+	PlayFreq(freq float32, duration time.Duration)
+	Silence(duration time.Duration)
 }
 
 func NewMachine(tg ToneGenerator) *Machine {
 	return &Machine{
 		state:        STATE_IDLE,
 		idleDuration: time.Millisecond * 100,
-		noteDuration: time.Millisecond * 20,
+		noteDuration: time.Millisecond * 400,
 		noteIndex:    0,
 		song:         Song{},
 		lock:         &sync.Mutex{},
@@ -68,13 +68,15 @@ func (m *Machine) tick() error {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	if m.state == STATE_IDLE {
-		m.silence()
+		m.tg.Silence(m.idleDuration)
 		return nil
 	}
+	log.Printf("playing note at index %d", m.noteIndex)
 	note := m.song.Notes[m.noteIndex]
 	m.playNote(note)
 	nextNoteIndex := m.noteIndex + 1
 	if nextNoteIndex >= len(m.song.Notes) {
+		log.Printf("end of song at note index %d", m.noteIndex)
 		switch m.state {
 		case STATE_PLAYING_ONCE:
 			m.state = STATE_IDLE
@@ -112,12 +114,12 @@ func (m *Machine) playNote(n Note) {
 	if n.Silence {
 		m.silence()
 	} else {
-		m.tg.PlayFreq(n.PWMFreq)
+		m.tg.PlayFreq(n.PWMFreq, m.noteDuration)
 	}
 }
 
 func (m *Machine) silence() {
-	m.tg.Silence()
+	m.tg.Silence(m.noteDuration)
 }
 
 type Note struct {

@@ -3,20 +3,6 @@ package songs
 import "github.com/johnny-morrice/timechief-client/launcher/sound/music"
 
 const (
-	C2 = 65.41
-	D2 = 73.42
-	E2 = 82.41
-	F2 = 87.31
-	G2 = 98.00
-	A2 = 110.00
-	B2 = 123.47
-	C3 = 130.81
-	D3 = 146.83
-	E3 = 164.81
-	F3 = 174.61
-	G3 = 196.00
-	A3 = 220.00
-	B3 = 246.94
 	C4 = 261.63
 	D4 = 293.66
 	E4 = 329.63
@@ -42,11 +28,8 @@ const (
 
 func StartupTone() music.Song {
 	notes := []float32{
-		C2, D2, E2, F2, G2, A2, B2,
-		C3, D3, E3, F3, G3, A3, B3,
 		C4, D4, E4, F4, G4, A4, B4,
-		C5, D5, E5, F5, G5, A5, B5,
-		C6, D6, E6, F6, G6, A6, B6,
+		C5,
 	}
 	song := music.Song{
 		Name:  "startup",
