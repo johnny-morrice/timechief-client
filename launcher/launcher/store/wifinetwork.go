@@ -153,7 +153,7 @@ func (store WifiNetworkStore) GetActive() (WifiNetwork, error) {
 // List returns all WIFI networks in the store, sorted by ESSID, BSSID, and UUID.
 func (store WifiNetworkStore) List() ([]WifiNetwork, error) {
 	var networks []WifiNetwork
-	result := store.DB.Where("found_last_scan = ?", true).Order("signal, ssid").Find(&networks)
+	result := store.DB.Where("found_last_scan = ?", true).Order("signal DESC, ssid ASC").Find(&networks)
 	if result.Error != nil {
 		return []WifiNetwork{}, result.Error
 	}
