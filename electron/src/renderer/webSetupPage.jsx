@@ -99,8 +99,8 @@ export const WebSetupPage = (props) => {
     // Get the crt-root element
     const crtRoot = document.getElementById("crt-root");
     const boxes = document.getElementsByClassName("crt-box");
-    // There is a 1 in 30 chance of the CRT jank being applied.
-    if (Math.random() < 0.033) {
+    // There is a 1 in 120 chance of the CRT jank being applied.
+    if (Math.random() < 0.008333) {
         // The CRT jank is applied crt-jank class to the crt-root element.
         crtRoot.classList.add("crt-jank");
         // Add jank to all the boxes;
