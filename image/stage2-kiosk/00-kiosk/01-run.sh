@@ -61,6 +61,24 @@ CATEND
     systemctl enable timechief-launcher
 EOF
 
+# timechief-launcher sound daemon
+on_chroot << EOF
+cat > /etc/systemd/system/timechief-launcher-sound.service << CATEND
+[Unit]
+Description=TimeChief Launcher Sound Service
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/timechief-launcher
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher sound
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+CATEND
+    systemctl enable timechief-launcher-sound
+EOF
+
 # DNSMasq unit file.
 on_chroot << EOF
 cat > /etc/systemd/system/dnsmasq-timechief.service << CATEND
