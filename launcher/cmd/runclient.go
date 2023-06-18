@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/johnny-morrice/timechief-client/launcher/client/daemonclient"
-	"github.com/johnny-morrice/timechief-client/launcher/service"
-	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
 

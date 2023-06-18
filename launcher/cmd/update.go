@@ -3,9 +3,9 @@ package cmd
 import (
 	"log"
 
-	client "github.com/johnny-morrice/timechief-client/launcher/client/serviceclient"
-	"github.com/johnny-morrice/timechief-client/launcher/store"
-	"github.com/johnny-morrice/timechief-client/launcher/update"
+	client "github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
 )
 

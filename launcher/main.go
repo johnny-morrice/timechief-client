@@ -7,7 +7,7 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/launcher/cmd"
 	"github.com/johnny-morrice/timechief-client/launcher/cmd/target"
-	"github.com/johnny-morrice/timechief-client/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
 
@@ -47,9 +47,27 @@ func getCLIApp() *cli.App {
 			},
 		},
 		{
+			Name:   "daemon-sound",
+			Action: cmd.Sound,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "listen-addr",
+					Value: "0.0.0.0:8081",
+				},
+				&cli.BoolFlag{
+					Name:  "startup-sound",
+					Value: true,
+				},
+				&cli.IntFlag{
+					Name:  "pwm-pin",
+					Value: 12,
+				},
+			},
+		},
+		{
 			Name:    "daemon",
 			Aliases: []string{"d"},
-			Usage:   "Run the update daemon",
+			Usage:   "Run the launcher daemon",
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
 				&cli.StringFlag{
