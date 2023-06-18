@@ -29,7 +29,6 @@ type PWMToneGenerator struct {
 func NewPWMToneGenerator(pinNumber int) PWMToneGenerator {
 	log.Printf("setting up PWM on pin %v", pinNumber)
 	pin := rpio.Pin(pinNumber)
-
 	return PWMToneGenerator{pin: pin}
 }
 

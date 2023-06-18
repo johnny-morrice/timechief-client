@@ -109,7 +109,7 @@ func (m *Machine) tick() error {
 
 	// Next let's work out how the state should be advanced.
 	nextNoteIndex := m.state.noteIndex + 1
-	if nextNoteIndex >= len(m.state.song.Notes) {
+	if nextNoteIndex >= int(m.state.song.Length) {
 		log.Printf("end of song at note index %d", m.state.noteIndex)
 		switch m.state.flag {
 		case STATE_PLAYING_ONCE:
@@ -122,8 +122,8 @@ func (m *Machine) tick() error {
 	}
 
 	// Advance the state and play the note.
-	m.state.noteIndex = nextNoteIndex
 	note := m.state.song.Notes[m.state.noteIndex]
+	m.state.noteIndex = nextNoteIndex
 	m.playNote(note)
 	return nil
 }
