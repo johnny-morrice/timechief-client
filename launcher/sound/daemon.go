@@ -38,7 +38,10 @@ func (daemon Daemon) Run(ctx context.Context) error {
 
 	handleSignals(machine)
 
-	svc := service.NewSoundService(machine)
+	svc, err := service.NewSoundService(machine)
+	if err != nil {
+		return err
+	}
 	api := api.NewSoundAPI(svc)
 
 	mux := http.NewServeMux()

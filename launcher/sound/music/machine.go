@@ -31,8 +31,19 @@ type Machine struct {
 }
 
 type machineChange struct {
-	isChange bool
 	state    machineState
+	isChange bool
+}
+
+func init() {
+	// Quick typecheck that we can compare songs.
+	// This is a bit of a hack, but it's to make sure we've not put in any non-comparable stuff into machineChange.
+	changeA := machineChange{}
+	changeB := machineChange{}
+	equal := changeA == changeB
+	if !equal {
+		panic("BUG: machine change comparison check failed")
+	}
 }
 
 type ToneGenerator interface {
@@ -144,6 +155,7 @@ type Note struct {
 }
 
 type Song struct {
-	Name  string
-	Notes []Note
+	Notes  [255]Note
+	Name   string
+	Length uint8
 }

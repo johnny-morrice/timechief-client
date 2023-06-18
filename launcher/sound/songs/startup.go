@@ -1,6 +1,10 @@
 package songs
 
-import "github.com/johnny-morrice/timechief-client/launcher/sound/music"
+import (
+	"errors"
+
+	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
+)
 
 var (
 	C4  = music.Note{PWMFreq: 261.63}
@@ -90,14 +94,11 @@ var (
 	B8  = music.Note{PWMFreq: 7902.13}
 )
 
-func StartupTone() music.Song {
-
-	return music.Song{
+func StartupTone() (music.Song, error) {
+	song := Song{
 		Name: "startup",
 		Notes: []music.Note{
-			// D4,
-			// Eb4,
-			// Ab4,
+			// Wiggling around D4,Eb4,Ab4
 			Db4,
 			D4,
 			Eb4,
@@ -138,4 +139,23 @@ func StartupTone() music.Song {
 			G4,
 		},
 	}
+	return CompileSong(song)
+}
+
+type Song struct {
+	Name  string
+	Notes []music.Note
+}
+
+func CompileSong(song Song) (music.Song, error) {
+	if len(song.Notes) > 255 {
+		return music.Song{}, errors.New("song too long")
+	}
+	out := music.Song{
+		Name:   song.Name,
+		Notes:  [255]music.Note{},
+		Length: uint8(len(song.Notes)),
+	}
+	copy(out.Notes[:], song.Notes)
+	return out, nil
 }

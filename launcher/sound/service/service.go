@@ -12,9 +12,26 @@ type SoundService struct {
 	songDict map[string]music.Song
 }
 
-func NewSoundService(machine MusicMachine) SoundService {
-	songs := []music.Song{
-		songs.StartupTone(),
+func loadSongs() ([]music.Song, error) {
+	songsFactories := []func() (music.Song, error){
+		songs.StartupTone,
+	}
+
+	songs := []music.Song{}
+	for _, factory := range songsFactories {
+		song, err := factory()
+		if err != nil {
+			return nil, err
+		}
+		songs = append(songs, song)
+	}
+	return songs, nil
+}
+
+func NewSoundService(machine MusicMachine) (SoundService, error) {
+	songs, err := loadSongs()
+	if err != nil {
+		return SoundService{}, err
 	}
 	svc := SoundService{
 		machine:  machine,
@@ -24,7 +41,7 @@ func NewSoundService(machine MusicMachine) SoundService {
 	for _, song := range songs {
 		svc.songDict[song.Name] = song
 	}
-	return svc
+	return svc, nil
 }
 
 func (svc SoundService) StartSong(songOpts SongOptions) error {
