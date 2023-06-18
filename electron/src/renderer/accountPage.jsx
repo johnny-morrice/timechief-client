@@ -97,7 +97,7 @@ export const AccountPage = () => {
             <Show when={!hasPairingCode(accountSignals.pairingCode())}>
                 <div class='row-flex flex-element'>
                     <div class="flex-element">
-                        <button onClick={onClickLinkAccountButton}>Link your account <i class="fa-solid fa-user-plus"></i></button>
+                        <button onClick={onClickLinkAccountButton} class="crt-box">Link your account <i class="fa-solid fa-user-plus"></i></button>
                     </div>
                 </div>
             </Show>
@@ -109,7 +109,7 @@ export const AccountPage = () => {
             <Show when={!hasPairingCode(accountSignals.pairingCode())}>
                 <div class='row-flex flex-element'>
                     <div class="flex-element">
-                        <button onClick={onClickLinkAccountButton}>Link your account <i class="fa-solid fa-user-plus"></i></button>
+                        <button onClick={onClickLinkAccountButton} class="crt-box">Link your account <i class="fa-solid fa-user-plus"></i></button>
                     </div>
                 </div>
             </Show>

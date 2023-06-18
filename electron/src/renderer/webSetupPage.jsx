@@ -94,13 +94,19 @@ export const WebSetupPage = (props) => {
     initialised = true;
   }
 
+
   const applyCRTJank = () => {
     // Get the crt-root element
     const crtRoot = document.getElementById("crt-root");
+    const boxes = document.getElementsByClassName("crt-box");
     // There is a 1 in 30 chance of the CRT jank being applied.
     if (Math.random() < 0.033) {
         // The CRT jank is applied crt-jank class to the crt-root element.
         crtRoot.classList.add("crt-jank");
+        // Add jank to all the boxes;
+        for (let i = 0; i < boxes.length; i++) {
+            boxes[i].classList.add("crt-box-jank");
+        }
         // console.log("CRT Jank applied");
         // Set a timeout to remove the CRT jank after 1.6 + n second.
         // Where n is between 1.6 second and 2.4 second.
@@ -112,8 +118,13 @@ export const WebSetupPage = (props) => {
   const removeCRTJank = () => {
     // Get the crt-root element
     const crtRoot = document.getElementById("crt-root");
+    const boxes = document.getElementsByClassName("crt-box");
     // The CRT jank is removed by removing the crt-jank class from the crt-root element.
     crtRoot.classList.remove("crt-jank");
+    // Remove jank from all the boxes;
+    for (let i = 0; i < boxes.length; i++) {
+        boxes[i].classList.remove("crt-box-jank");
+    }
     // console.log("CRT Jank removed");
   };
 
@@ -146,16 +157,16 @@ export const WebSetupPage = (props) => {
                 </Show>
                 <div class='row-flex flex-element'>
                     <div class='flex-element data-name'>Reboot</div>
-                    <button class='flex-element' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
+                    <button class='flex-element crt-box' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
                 </div>
                 <div class='row-flex flex-element'>
                     <div class='flex-element data-name'>Shutdown</div>
-                    <button class='flex-element' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
+                    <button class='flex-element crt-box' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
                 </div>
                 <Show when={isDisplayBackButton(signals)}>
                     <div class='row-flex flex-element'>
                         <div class='flex-element data-name'>Cancel setup</div>
-                        <button class='flex-element' onClick={onClickBack}><i class="fa-solid fa-xmark"></i></button>
+                        <button class='flex-element crt-box' onClick={onClickBack}><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </Show>
             </div>
@@ -168,20 +179,20 @@ export const WebSetupPage = (props) => {
                 </div>
                 <div class='row-flex flex-element'>
                     <div class='flex-element data-name'>Reboot</div>
-                    <button class='flex-element' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
+                    <button class='flex-element crt-box' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
                 </div>
                 <div class='row-flex flex-element'>
                     <div class='flex-element data-name'>Shutdown</div>
-                    <button class='flex-element' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
+                    <button class='flex-element crt-box' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
                 </div>
                 <div class='row-flex flex-element'>
                     <div class='flex-element data-name'>Restart setup</div>
-                    <button class='flex-element' onClick={onClickRestartSetup}><i class="fa-solid fa-arrows-spin"></i></button>
+                    <button class='flex-element crt-box' onClick={onClickRestartSetup}><i class="fa-solid fa-arrows-spin"></i></button>
                 </div>
                 <Show when={isDisplayBackButton(signals)}>
                     <div class='row-flex flex-element'>
                         <div class='flex-element data-name'>Cancel setup</div>
-                        <button class='flex-element' onClick={onClickBack}><i class="fa-solid fa-xmark"></i></button>
+                        <button class='flex-element crt-box' onClick={onClickBack}><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </Show>
             </div>

@@ -27,27 +27,27 @@ export const TaskBar = () => {
     return <div id="taskbar">
         <div class="row-flex">
             <div class='flex-element'>
-                <button class='nav-button' onClick={showHome}><i class="fa-solid fa-home"></i></button>
+                <button class='nav-button crt-box' onClick={showHome}><i class="fa-solid fa-home"></i></button>
             </div>
             <div class='flex-element'>
-                <button class='nav-button' onClick={showForecast}><i class="fa-solid fa-cloud-sun"></i></button>
+                <button class='nav-button crt-box' onClick={showForecast}><i class="fa-solid fa-cloud-sun"></i></button>
             </div>
             <Show when={taskBarSignals.isCalendarExists()}>
                 <div class='flex-element'>
-                    <button class='nav-button' onClick={showCalendar}><i class="fa-solid fa-calendar-days"></i></button>
+                    <button class='nav-button crt-box' onClick={showCalendar}><i class="fa-solid fa-calendar-days"></i></button>
                 </div>
             </Show>
             <div class='flex-element'>
-                <button class='nav-button' onClick={showAstro}><i class="fa-solid fa-moon"></i></button>
+                <button class='nav-button crt-box' onClick={showAstro}><i class="fa-solid fa-moon"></i></button>
             </div>
             <div class='flex-element'>
-                <button class='nav-button' onClick={showAccount}><i class="fa-solid fa-user"></i></button>
+                <button class='nav-button crt-box' onClick={showAccount}><i class="fa-solid fa-user"></i></button>
             </div>
             <div class='flex-element'>
-                <button class='nav-button' onClick={showDevice}><i class="fa-solid fa-microchip"></i></button>
+                <button class='nav-button crt-box' onClick={showDevice}><i class="fa-solid fa-microchip"></i></button>
             </div>
             <div class='flex-element'>
-                <button class='nav-button' onClick={showLocale}><i class="fa-solid fa-earth-americas"></i></button>
+                <button class='nav-button crt-box' onClick={showLocale}><i class="fa-solid fa-earth-americas"></i></button>
             </div>
         </div>
     </div>;
