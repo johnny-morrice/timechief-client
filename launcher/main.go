@@ -47,7 +47,7 @@ func getCLIApp() *cli.App {
 			},
 		},
 		{
-			Name:   "sound",
+			Name:   "daemon-sound",
 			Action: cmd.Sound,
 			Flags: []cli.Flag{
 				&cli.StringFlag{

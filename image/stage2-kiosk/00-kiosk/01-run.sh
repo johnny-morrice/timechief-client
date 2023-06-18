@@ -70,7 +70,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=/opt/timechief-launcher
-ExecStart=/opt/timechief-launcher/bin/timechief-launcher sound
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound
 Restart=always
 
 [Install]
