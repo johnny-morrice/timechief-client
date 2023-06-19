@@ -8,7 +8,7 @@ setup(name='pyrtc',
       author_email='john.morrice.developer@gmail.com',
       license='All Rights Reserved',
       packages=['pyrtc'],
-    #   install_requires=[
-        #   'markdown',
-    #   ],
+      install_requires=[
+          'rv3028',
+      ],
       zip_safe=False)
