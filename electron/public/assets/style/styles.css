@@ -30,6 +30,10 @@ button {
     border: none;
 }
 
+button:focus {
+    outline: none;
+}
+
 button.nav-button {
     padding: 10pt;
     font-size: 22pt;

@@ -33,6 +33,8 @@ function updateSignals(signals, data) {
     signals.setCalendarError(hasStateFlag(data, "calendar-error"))
     signals.setAccountLinked(hasStateFlag(data, "principal-linked"));
     signals.setDeviceDataError(hasStateFlag(data, "device-data-error"));
+    console.log("calendar error: " + signals.isCalendarError())
+    console.log("account linked: " + signals.isAccountLinked())
 }
 
 function isTimeout(lastTime, timeout) {
@@ -46,8 +48,8 @@ function isDeviceDataError(signals) {
 }
 
 var initialised = false;
+const signals = new StatusBarSignals();
 export const StatusBar = () => {
-    let signals = new StatusBarSignals();
     if (!initialised) {
         addDataCallback((data) => updateSignals(signals, data));
         initialised = true;
