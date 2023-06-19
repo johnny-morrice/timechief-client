@@ -10,5 +10,6 @@ setup(name='pyrtc',
       packages=['pyrtc'],
       install_requires=[
           'rv3028',
+          'smbus'
       ],
       zip_safe=False)

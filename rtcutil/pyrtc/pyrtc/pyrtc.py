@@ -1,5 +1,4 @@
 import rv3028
-import time
 import datetime
 import argparse
 
@@ -7,15 +6,23 @@ def main():
     parser = argparse.ArgumentParser(description='Interact with RTC')
     # Add the positional arguments
     parser.add_argument('action', choices=['timeset', 'timeget'], help='Action to perform (timeset or timeget)')
+    parser.add_argument('--type', choices=['rv3028'], help='RTC type (rv3028)')
 
     # Parse the command-line arguments
     args = parser.parse_args()
+
+    if args.type == 'rv3028':
+        pass
+    else:
+        print('Unknown RTC type: {}'.format(args.type))
 
     # Perform the action based on the provided argument
     if args.action == 'timeset':
         timeset()
     elif args.action == 'timeget':
         timeget()
+    else:
+        print('Unknown action: {}'.format(args.action))
 
 
 def timeset():
