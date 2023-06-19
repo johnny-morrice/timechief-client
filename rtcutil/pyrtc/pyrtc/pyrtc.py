@@ -2,6 +2,7 @@ import rv3028
 import datetime
 import argparse
 import subprocess
+import sys
 
 def main():
     parser = argparse.ArgumentParser(description='Interact with RTC')
@@ -17,7 +18,7 @@ def main():
         pass
     else:
         print('Unknown RTC type: {}'.format(args.type))
-        exit(1)
+        sys.exit(1)
 
     # Perform the action based on the provided argument
     if args.action == 'timeset':
@@ -28,6 +29,7 @@ def main():
         timesync(args)
     else:
         print('Unknown action: {}'.format(args.action))
+        sys.exit(1)
 
 
 def timeset(args):
@@ -40,7 +42,7 @@ def timeset(args):
 def timeget(args):
     rtc = get_rtc()
     rtc_time = rtc.get_time_and_date()
-    print("The time is: {:02d}:{:02d}:{:02d} on :{:02d}/{:02d}/{:02d}".format(rtc_time.hour, rtc_time.minute, rtc_time.second, rtc_time.day, rtc_time.month, rtc_time.year))
+    print("The time is: {:02d}:{:02d}:{:02d} on: {:02d}/{:02d}/{:02d}".format(rtc_time.hour, rtc_time.minute, rtc_time.second, rtc_time.day, rtc_time.month, rtc_time.year))
 
 def timesync(args):
     rtc = get_rtc()
