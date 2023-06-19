@@ -6,7 +6,7 @@ import subprocess
 def main():
     parser = argparse.ArgumentParser(description='Interact with RTC')
     # Add the positional arguments
-    parser.add_argument('action', choices=['timeset', 'timeget'], help='Action to perform (timeset or timeget)')
+    parser.add_argument('action', choices=['timeset', 'timeget', 'timesync'], help='Action to perform (timeset or timeget)')
     parser.add_argument('--type', choices=['rv3028'], help='RTC type (rv3028)')
     parser.add_argument('--sync-script', default='/opt/timechief-launcher/bin/secure/set-system-time.sh', help='Path to time sync script')
 
@@ -17,6 +17,7 @@ def main():
         pass
     else:
         print('Unknown RTC type: {}'.format(args.type))
+        exit(1)
 
     # Perform the action based on the provided argument
     if args.action == 'timeset':
