@@ -12,8 +12,4 @@ setup(name='pyrtc',
         'rv3028',
         'smbus'
       ],
-      setup_requires = [
-        'rv3028',
-        'smbus'
-      ],
       zip_safe=False)
