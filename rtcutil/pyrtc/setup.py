@@ -9,7 +9,11 @@ setup(name='pyrtc',
       license='All Rights Reserved',
       packages=['pyrtc'],
       install_requires=[
-          'rv3028',
-          'smbus'
+        'rv3028',
+        'smbus'
       ],
+      setup_requires = [
+        'rv3028',
+        'smbus'
+      ]
       zip_safe=False)
