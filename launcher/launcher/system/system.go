@@ -492,5 +492,5 @@ func (sys System) SyncRTC() error {
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)
 	}
-	return sys.runScript(cfg, "secure/pyrtc", "timesync", "--type", "rv3028")
+	return sys.runScript(cfg, "sudo", "secure/pyrtc", "timesync", "--type", "rv3028")
 }
