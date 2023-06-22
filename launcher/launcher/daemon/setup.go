@@ -29,12 +29,34 @@ func (daemon Setup) Start(ctx *cli.Context) {
 	if daemon.RefreshInterval == 0 {
 		daemon.RefreshInterval = 1 * time.Second
 	}
+
 	runEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
 			log.Printf("setup daemon tick error: %s", err)
 		}
 	})
+}
+
+func (daemon Setup) init() error {
+	state, err := daemon.KeyValueStore.Get("setup")
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
+		}
+		return err
+	}
+
+	switch state {
+	// These are cases that we are OK starting in.
+	case SetupFlagBegin:
+	case SetupFlagInternetConnected:
+	default:
+		log.Printf("setup daemon init: resetting after starting with state %s", state)
+		// Any other state, start over.
+		return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
+	}
+	return nil
 }
 
 const (
