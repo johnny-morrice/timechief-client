@@ -129,14 +129,6 @@ func Daemon(ctx *cli.Context) error {
 		System: system,
 	}
 
-	_, err = wifiNetworkStore.GetActive()
-	if err == nil {
-		err = flagStore.CreateIfNotExists("wifi-connect")
-		if err != nil {
-			return err
-		}
-	}
-
 	timeSync := daemon.TimeSync{
 		Syncer: system,
 	}

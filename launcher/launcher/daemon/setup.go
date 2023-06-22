@@ -51,6 +51,19 @@ func (daemon Setup) init() error {
 	// These are cases that we are OK starting in.
 	case SetupFlagBegin:
 	case SetupFlagInternetConnected:
+		// Connect to internet if we are not already.
+		err = daemon.WifiNetworkStore.MarkSelectedReady()
+		if err != nil {
+			return err
+		}
+		_, err = daemon.WifiNetworkStore.GetActive()
+		if err == nil {
+			err = daemon.StateFlagStore.CreateIfNotExists("wifi-connect")
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	default:
 		log.Printf("setup daemon init: resetting after starting with state %s", state)
 		// Any other state, start over.
