@@ -30,6 +30,11 @@ func (daemon Setup) Start(ctx *cli.Context) {
 		daemon.RefreshInterval = 1 * time.Second
 	}
 
+	err = daemon.init()
+	if err != nil {
+		log.Printf("setup daemon init error: %s", err)
+	}
+
 	runEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
