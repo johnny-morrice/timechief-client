@@ -29,6 +29,7 @@ func (daemon TimeSync) Start(ctx *cli.Context) {
 func (daemon TimeSync) doTick() {
 	now := time.Now()
 	if now.Year() < 2023 {
+		log.Println("syncing time from rtc")
 		err := daemon.Syncer.SyncRTC()
 		if err != nil {
 			log.Printf("time sync error: %s", err)

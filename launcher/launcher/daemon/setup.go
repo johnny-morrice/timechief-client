@@ -235,7 +235,7 @@ func init() {
 	}
 }
 
-const connectTimeout = time.Second * 180
+const connectTimeout = time.Minute * 5
 
 func (daemon Setup) handleWaitNetworkConnect() error {
 	// Get active network
