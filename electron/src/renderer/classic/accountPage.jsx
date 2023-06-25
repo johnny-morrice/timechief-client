@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addServiceDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, addPairingGetCallback, addPairingCreateCallback } from './ipc';
+import { addServiceDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, addPairingGetCallback, addPairingCreateCallback } from '../ipc';
 import { toCanvas } from 'qrcode';
 
 class AccountPageSignals {
