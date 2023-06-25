@@ -28,14 +28,17 @@ func (sys System) stopApp() error {
 	return store.CloseDB(sys.DB)
 }
 
-func (sys System) runScript(cfg store.Config, path string) error {
+func (sys System) runScript(cfg store.Config, path string, args ...string) error {
 	root := cfg.GetInstallRoot()
 	binRoot := filepath.Join(root, "bin")
 	script := filepath.Join(binRoot, path)
+	args = append([]string{script}, args...)
 	cmd := exec.Cmd{
 		Path: script,
 		Dir:  binRoot,
+		Args: args,
 	}
+
 	output, err := cmd.CombinedOutput()
 	log.Printf("system script %s output: %s", script, output)
 	if err != nil {
@@ -480,4 +483,14 @@ func (sys System) CheckInternet() error {
 	}
 
 	return errors.New("all internet checks failed")
+}
+
+// SyncRTC syncs the system clock with the RTC.  By running the following command:
+// bin/secure/pyrtc timesync --type rv3028
+func (sys System) SyncRTC() error {
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	return sys.runScript(cfg, "sudo", "secure/pyrtc", "timesync", "--type", "rv3028")
 }

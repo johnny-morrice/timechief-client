@@ -162,3 +162,8 @@ rm /etc/nginx/sites-enabled/default
 # Restart Nginx to apply the changes
 systemctl enable nginx
 EOF
+
+# Enable i2c
+on_chroot << EOF
+raspi-config nonint do_i2c 0
+EOF

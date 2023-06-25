@@ -29,12 +29,52 @@ func (daemon Setup) Start(ctx *cli.Context) {
 	if daemon.RefreshInterval == 0 {
 		daemon.RefreshInterval = 1 * time.Second
 	}
+
+	err = daemon.init()
+	if err != nil {
+		log.Printf("setup daemon init error: %s", err)
+	}
+
 	runEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
 			log.Printf("setup daemon tick error: %s", err)
 		}
 	})
+}
+
+func (daemon Setup) init() error {
+	state, err := daemon.KeyValueStore.Get("setup")
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
+		}
+		return err
+	}
+
+	switch state {
+	// These are cases that we are OK starting in.
+	case SetupFlagBegin:
+	case SetupFlagInternetConnected:
+		// Connect to internet if we are not already.
+		err = daemon.WifiNetworkStore.MarkSelectedReady()
+		if err != nil {
+			return err
+		}
+		_, err = daemon.WifiNetworkStore.GetActive()
+		if err == nil {
+			err = daemon.StateFlagStore.CreateIfNotExists("wifi-connect")
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	default:
+		log.Printf("setup daemon init: resetting after starting with state %s", state)
+		// Any other state, start over.
+		return daemon.KeyValueStore.Set("setup", SetupFlagBegin)
+	}
+	return nil
 }
 
 const (
@@ -195,7 +235,7 @@ func init() {
 	}
 }
 
-const connectTimeout = time.Second * 180
+const connectTimeout = time.Minute * 5
 
 func (daemon Setup) handleWaitNetworkConnect() error {
 	// Get active network
