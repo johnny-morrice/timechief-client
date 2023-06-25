@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js';
 import { CalendarEvent, makeCanonicalDateText, sortCalendarEvents } from '../calendarEvent';
 import { addServiceDataCallback } from '../ipc';
-import { day } from './timing';
+import { day } from '../timing';
 
 class CalendarPageSignals {
   constructor() {

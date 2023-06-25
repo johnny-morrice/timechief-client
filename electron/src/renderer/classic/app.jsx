@@ -1,17 +1,17 @@
+import { render } from 'solid-js/web';
 import { onCleanup } from 'solid-js';
 import { hashIntegration, Router, Routes, Route } from "@solidjs/router";
-import { initializeIPC } from './ipc';
-import { HomePage } from "./classic/homePage";
-import { DevicePage } from "./classic/devicePage";
-import { TaskBar } from "./classic/taskbar";
-import { ForecastPage } from "./classic/forecastPage";
-import { AstroPage } from "./classic/astroPage";
-import { AccountPage } from "./classic/accountPage";
-import { StatusBar } from './classic/statusBar';
-import { LocalePage } from "./classic/localePage";
-import { CalendarPage } from "./classic/calendarPage";
+import { initializeIPC } from '../ipc';
 import { WebSetupPage } from "./webSetupPage";
-
+import { HomePage } from "./homePage";
+import { DevicePage } from "./devicePage";
+import { TaskBar } from "./taskbar";
+import { ForecastPage } from "./forecastPage";
+import { AstroPage } from "./astroPage";
+import { AccountPage } from "./accountPage";
+import { StatusBar } from './statusBar';
+import { LocalePage } from "./localePage";
+import { CalendarPage } from "./calendarPage";
 
 const AppScreen = (props) => 
   <WebSetupPage element={<div><StatusBar/>{props.element}<TaskBar/></div>}/>
