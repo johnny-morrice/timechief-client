@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown } from './ipc';
+import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown } from '../ipc';
 
 class WebSetupPageSignals {
   constructor() {

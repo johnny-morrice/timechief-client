@@ -1,3 +1,3 @@
-import { attachApp } from "./classic/classicapp";
+import { attachApp } from "./nostro/app";
 
 attachApp();
