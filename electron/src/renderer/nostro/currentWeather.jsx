@@ -1,4 +1,5 @@
 import { onCleanup, createSignal } from "solid-js";
+import { callbackName } from "./callback"
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { weatherIconStyleClass } from '../weatherIcon';
 import { kelvinToCelsiusText } from '../temperature';
@@ -44,12 +45,13 @@ function hasWeather(signals) {
 
 export const CurrentWeather = () => {
     const signals = new Signals();
-    addServiceDataCallback("CurrentWeather", (data) => {
+    const cbName = callbackName("CurrentWeather");
+    addServiceDataCallback(cbName, (data) => {
         updateSignals(signals, data);
     });
 
     onCleanup(() => {
-        removeDataCallback("CurrentWeather");
+        removeDataCallback(cbName);
     });
 
     return <div class="current-weather flex-column flex-grow">

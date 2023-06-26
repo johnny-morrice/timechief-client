@@ -1,5 +1,6 @@
 import { Show, createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
+import { callbackName } from "./callback";
 
 class Signals {
     constructor() {
@@ -74,10 +75,11 @@ function moonPhaseDescription(moonPhase) {
 
 export const Astro = () => {
     const signals = new Signals();
-    addServiceDataCallback("Astro", (data) => updateAstroPageSignals(signals, data));
+    const cbName = callbackName("Astro");
+    addServiceDataCallback(cbName, (data) => updateAstroPageSignals(signals, data));
 
     onCleanup(() => {
-        removeDataCallback("Astro");
+        removeDataCallback(cbName);
     });
 
     return <div class="astro">

@@ -2,6 +2,7 @@ import { createSignal, onCleanup } from 'solid-js';
 import { isCalendarExists } from '../calendarHelper';
 import { addDataCallback, removeDataCallback } from './ipc';
 import { apiErrorTimeout } from '../timing'
+import { callbackName } from "./callback";
 
 class Signals {
     constructor() {
@@ -49,9 +50,10 @@ function isDeviceDataError(signals) {
 
 export const StatusNote = () => {
     const signals = new Signals();
-    addDataCallback("StatusNote", (data) => updateSignals(signals, data));
+    const cbName = callbackName("StatusNote");
+    addDataCallback(cbName, (data) => updateSignals(signals, data));
     onCleanup(() => {
-        removeDataCallback("StatusNote");
+        removeDataCallback(cbName);
     });
     return <div class="status-note-root">
         <div class="status-note flex-column">

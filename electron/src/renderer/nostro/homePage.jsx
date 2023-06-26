@@ -11,6 +11,8 @@ import { Astro } from './astro';
 import { Fortune } from './fortune';
 import { DeviceInfo } from './deviceInfo';
 import { Pairing } from './pairing';
+import { Locale } from './locale';
+import { callbackName } from "./callback";
 
 class Signals {
   constructor() {
@@ -133,7 +135,8 @@ function hasNextEvent(signals) {
 
 export const HomePage = () => {
   const signals = new Signals();
-  addServiceDataCallback("HomePage", (data) => updateSignals(signals, data));
+  const cbName = callbackName("HomePage");
+  addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
 
   let timeInterval = setInterval(
     () => {
@@ -145,7 +148,7 @@ export const HomePage = () => {
 
   onCleanup(() => {
     clearInterval(timeInterval);
-    removeDataCallback("HomePage");
+    removeDataCallback(cbName);
   });
 
   return <div class="home-screen flex-row">
@@ -157,6 +160,7 @@ export const HomePage = () => {
           { icon: () => <i class="fa-solid fa-user"></i>, element: () => <Pairing /> },
           { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo />},
           { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
+          { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
         ]
       } />
     </div>

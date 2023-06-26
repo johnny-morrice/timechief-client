@@ -1,5 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
+import { callbackName } from "./callback";
 
 class Signals {
     constructor() {
@@ -93,9 +94,10 @@ function onClickReboot() {
 
 export const WebSetupPage = (props) => {
     const signals = new Signals();
-    addDataCallback("WebSetupPage", (data) => updateSignals(signals, data));
+    const cbName = callbackName("WebSetupPage");
+    addDataCallback(cbName, (data) => updateSignals(signals, data));
     onCleanup(() => {
-        removeDataCallback("WebSetupPage");
+        removeDataCallback(cbName);
     });
 
     const applyCRTJank = () => {
