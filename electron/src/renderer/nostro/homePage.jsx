@@ -7,6 +7,7 @@ import { CurrentWeather } from './currentWeather';
 import { StatusNote } from './statusNote';
 import { SwitcherWidget } from './switcherWidget';
 import { DeviceControl } from './deviceControl';
+import { Astro } from './astro';
 
 class Signals {
   constructor() {
@@ -149,7 +150,8 @@ export const HomePage = () => {
       <SwitcherWidget widgets={
         [
           { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
-          { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl />}
+          { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl />},
+          { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> }
         ]
       } />
     </div>

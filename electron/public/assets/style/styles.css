@@ -58,6 +58,13 @@ div.home-time {
     font-size: 60pt;
 }
 
+div.home-lhs-column {
+    flex-basis: 45%;
+}
+
+div.home-rhs-column {
+    flex-basis: 55%;
+}
 
 div.flex-column {
     display: flex;
@@ -99,6 +106,7 @@ button.action-button {
     border: 1px solid green;
     background-color: black;
     color: green;
+    font-size: 18pt
 }
 
 div.setup-wrapper {
@@ -111,7 +119,7 @@ div.setup-title {
     font-size: 22pt;
 }
 
-div.data-row-label {
+div.data-label {
     font-weight: 500;
 }
 
