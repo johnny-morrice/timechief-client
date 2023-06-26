@@ -197,6 +197,12 @@ div.forecast-day-controls {
     body {
         font-size: 18pt;
     }
+    button.forecast-control-button {
+        font-size: 18pt
+    }
+    button.action-button {
+        font-size: 20pt
+    }
     div.setup-title {
         font-size: 24pt;
     }
@@ -229,6 +235,12 @@ div.forecast-day-controls {
     }
     body {
         font-size: 22pt;
+    }
+    button.forecast-control-button {
+        font-size: 20pt
+    }
+    button.action-button {
+        font-size: 22pt
     }
     div.setup-title {
         font-size: 28pt;
