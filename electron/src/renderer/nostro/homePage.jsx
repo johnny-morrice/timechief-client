@@ -14,6 +14,7 @@ import { Pairing } from './pairing';
 import { Locale } from './locale';
 import { callbackName } from "./callback";
 import { Forecast } from './forecast';
+import { EventCalendar } from './eventCalendar';
 
 class Signals {
   constructor() {
@@ -163,6 +164,7 @@ export const HomePage = () => {
           { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
           { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
           { icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },
+          { icon: () => <i class="fa-solid fa-calendar-days"></i>, element: () => <EventCalendar /> },
         ]
       } />
     </div>
