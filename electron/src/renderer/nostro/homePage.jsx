@@ -4,6 +4,7 @@ import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
 import { removeDataCallback } from './ipc';
 import { CurrentWeather } from './currentWeather';
+import { StatusNote } from './statusNote';
 
 class Signals {
   constructor() {
@@ -152,7 +153,7 @@ export const HomePage = () => {
         <div class='home-location'>{signals.location}</div>
       </div>
 
-      <div class="home-action-center flex-grow border">
+      <div class="home-action-center flex-row flex-grow border">
         <Show when={hasNextEvent(signals)}>
           <div class='next-event-summary flex-column flex-grow'>
             <div class='next-event-time flex-row'>
@@ -164,6 +165,7 @@ export const HomePage = () => {
             </div>
           </div>
         </Show>
+        <StatusNote />
       </div>
     </div>
   </div>

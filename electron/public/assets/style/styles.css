@@ -121,3 +121,7 @@ div.flex-grow {
 div.flex-shrink {
     flex-shrink: 1;
 }
+
+.is-error {
+    color: red;
+}
