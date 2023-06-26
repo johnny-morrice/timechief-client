@@ -48,26 +48,26 @@ export const DeviceInfo = () => {
     });
 
     return <div class="device-control flex-grow">
-        <div class="flex-column flex-grow">
+        <Show when={!hasDeviceInfo(signals)}>
+            <div class="device-info-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+        </Show>
         <Show when={hasDeviceInfo(signals)}>
-                <div class="flex-row flex-grow">
-                    <div class="data-label">IP</div>
-                    <div class="data-value">{signals.ipAddress}</div>
+            <div class="flex-row flex-grow">
+                <div class="device-info-labels flex-column flex-grow">
+                    <div class="data-label flex-grow">IP</div>
+                    <div class="data-label flex-grow">Software version</div>
+                    <Show when={hasUpdateVersion(signals)}>
+                        <div class="data-label flex-grow">Update version</div>
+                    </Show>
                 </div>
-                <div class="flex-row flex-grow">
-                    <div class="data-label">Software version</div>
-                    <div class="data-value">{signals.clientVersion}</div>
+                <div class="device-info-values flex-column flex-grow">
+                    <div class="data-value flex-grow">{signals.ipAddress}</div>
+                    <div class="data-value flex-grow">{signals.clientVersion}</div>
+                    <Show when={hasUpdateVersion(signals)}>
+                        <div class="data-value flex-grow">{signals.activeTargetVersion}</div>
+                    </Show>
                 </div>
-                <Show when={hasUpdateVersion(signals)}>
-                    <div class="flex-row flex-grow">
-                        <div class="data-label">Update version</div>
-                        <div class="data-value">{signals.activeTargetVersion}</div>
-                    </div>
-                </Show>
-            </Show>
-            <Show when={!hasDeviceInfo(signals)}>
-                <div class="device-info-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
-            </Show>
-        </div>
+            </div>
+        </Show>
     </div>;
 };

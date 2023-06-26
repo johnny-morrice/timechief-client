@@ -133,14 +133,22 @@ div.setup-title {
 }
 
 div.data-label {
-    font-weight: 500;
+    font-weight: 600;
 }
 
 div.astro {
     font-size: 16pt;
 }
 
-@media (min-width: 480px) {
+div.weather-data {
+    font-size: 26pt;
+}
+
+div.current-weather-icon {
+    font-size: 32pt;
+}
+
+@media (min-width: 800px) {
     div.home-time {
         font-size: 80pt;
     }
@@ -162,29 +170,11 @@ div.astro {
     div.astro {
         font-size: 18pt;
     }
-}
-
-@media (min-width: 600px) {
-    div.home-time {
-        font-size: 100pt;
-    }
-    div.home-date {
+    div.weather-data {
         font-size: 28pt;
     }
-    div.home-location {
-        font-size: 22pt;
-    }
-    div.current-weather {
-        font-size: 26pt
-    }
-    body {
-        font-size: 20pt;
-    }
-    div.setup-title {
-        font-size: 26pt;
-    }
-    div.astro {
-        font-size: 20pt;
+    div.current-weather-icon {
+        font-size: 34pt;
     }
 }
 
@@ -209,5 +199,11 @@ div.astro {
     }
     div.astro {
         font-size: 20pt;
+    }
+    div.weather-data {
+        font-size: 32pt;
+    }
+    div.current-weather-icon {
+        font-size: 36pt;
     }
 }
