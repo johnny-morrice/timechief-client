@@ -8,6 +8,7 @@ import { StatusNote } from './statusNote';
 import { SwitcherWidget } from './switcherWidget';
 import { DeviceControl } from './deviceControl';
 import { Astro } from './astro';
+import { Fortune } from './fortune';
 
 class Signals {
   constructor() {
@@ -173,6 +174,9 @@ export const HomePage = () => {
               {getNextEventShortText(signals)}
             </div>
           </div>
+        </Show>
+        <Show when={!hasNextEvent(signals)}>
+          <Fortune />
         </Show>
         <StatusNote />
       </div>

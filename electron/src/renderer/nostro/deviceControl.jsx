@@ -6,6 +6,7 @@ class Signals {
         [this.deviceStatus, this.setDeviceStatus] = createSignal("");
         [this.launcherState, this.setLauncherState] = createSignal({});
         [this.clientVersion, this.setClientVersion] = createSignal("");
+        [this.disableShutdown, this.setDisableShutdown] = createSignal(false);
     }
 }
 
@@ -33,10 +34,18 @@ function getDeviceStatus(signals) {
 }
 
 function updateSignalsForAPIData(signals, data) {
+    var disableShutdown = false;
     if ("LauncherState" in data) {
         let launcherState = data["LauncherState"];
         signals.setLauncherState(launcherState);
+        if ("Flags" in launcherState) {
+            let isUpdating = launcherState["Flags"].includes("updating");
+            if (isUpdating) {
+                disableShutdown = true;
+            }
+        }
     }
+    signals.setDisableShutdown(disableShutdown);
 }
 
 function updateSignalsForElectronStatus(signals, statusResponse) {
@@ -73,10 +82,20 @@ export const DeviceControl = () => {
     return <div class="device-control">
         <div class="flex-column flex-grow">
             <div class="flex-grow flex-row">
-                <button class='action-button crt-box flex-grow' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                <Show when={!signals.disableShutdown()}>
+                    <button class='action-button crt-box flex-grow' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                </Show>
+                <Show when={signals.disableShutdown()}>
+                    <button class='action-button crt-box flex-grow' disabled onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                </Show>
             </div>
             <div class="flex-grow flex-row">
-                <button class='action-button crt-box flex-grow' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                <Show when={!signals.disableShutdown()}>
+                    <button class='action-button crt-box flex-grow' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                </Show>
+                <Show when={signals.disableShutdown()}>
+                    <button class='action-button crt-box flex-grow' disabled onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                </Show>
             </div>
             <div class="flex-grow flex-row">
                 <button class='action-button crt-box flex-grow' onClick={onClickSetup}>Setup device &nbsp;&nbsp; <i class="fa-solid fa-gear"></i></button>
