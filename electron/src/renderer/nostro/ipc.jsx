@@ -40,17 +40,21 @@ export const rebootReceiver = new APIResultReceiver("rebootResult");
 export const shutdownReceiver = new APIResultReceiver("shutdownResult");
 export const setupBeginReceiver = new APIResultReceiver("setupBeginResult");
 
-const deviceCallbacks = [];
+const deviceCallbacks = {};
 function receiveDeviceStatus() {
     window.device.receive("deviceStatus", (status) => {
-        deviceCallbacks.forEach(cb => {
-            cb(status)
-        });
+        for (const [_, cb] of Object.entries(deviceCallbacks)) {
+            cb(status);
+        }
     });
 }
 
-export function addDeviceStatusCallback(cb) {
-    deviceCallbacks.push(cb);
+export function addDeviceStatusCallback(name, cb) {
+    deviceCallbacks[name] = cb;
+}
+
+export function removeDeviceStatusCallback(name) {
+    delete deviceCallbacks[name];
 }
 
 export function addServiceDataCallback(name, cb) {
