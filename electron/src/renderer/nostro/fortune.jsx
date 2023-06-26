@@ -1,3 +1,4 @@
+import { createSignal, onCleanup } from "solid-js";
 import { second } from "../timing";
 
 export const Fortune = () => {
