@@ -164,6 +164,23 @@ table.forecast-weather-table td.weather-icon {
     font-size: 24pt;
 }
 
+button.forecast-control-button {
+    border: 1px solid green;
+    background-color: black;
+    color: green;
+    font-size: 16pt
+}
+
+div.forecast-control-label {
+    font-size: 16pt;
+}
+
+div.forecast-day-controls {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+}
+
 @media (min-width: 800px) {
     div.home-time {
         font-size: 80pt;

@@ -117,13 +117,79 @@ export const Forecast = () => {
         return dayCount > 0;
     }
 
+    function hasDayLoaded() {
+        const dayIndex = signals.dayIndex();
+        return signals.days[dayIndex].shortDate() !== "";
+    }
+
+    function hasPrevDay() {
+        const dayIndex = signals.dayIndex();
+        return dayIndex > 0;
+    }
+
+    function hasNextDay() {
+        const dayIndex = signals.dayIndex();
+        const dayCount = signals.dayCount();
+        return dayIndex < dayCount - 1;
+    }
+
+    function onClickPrev() {
+        if (hasPrevDay()) {
+            const dayIndex = signals.dayIndex();
+            signals.setDayIndex(dayIndex - 1);
+        }
+    }
+
+    function onClickNext() {
+        if (hasNextDay()) {
+            const dayIndex = signals.dayIndex();
+            signals.setDayIndex(dayIndex + 1);
+        }
+    }
+
+    function getPrevDay() {
+        if (hasPrevDay()) {
+            const dayIndex = signals.dayIndex();
+            return signals.days[dayIndex - 1];
+        }
+        return {
+            'shortDate': '',
+        };
+    }
+
+    function getNextDay() {
+        if (hasNextDay()) {
+            const dayIndex = signals.dayIndex();
+            return signals.days[dayIndex + 1];
+        }
+        return {
+            'shortDate': '',
+        };
+    }
+
     return <div class="forecast flex-column">
-        <Show when={!hasDay()}>
+        <Show when={!hasDay() || !hasDayLoaded()}>
             <div class="forecast-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
         </Show>
-        <Show when={hasDay()}>
+        <Show when={hasDay() && hasDayLoaded}>
             <div class="forecast-day flex-column flex-grow">
-                <div class="forecast-date flex-grow">{getCurrentDay().date}</div>
+                <div class="forecast-day-controls">
+                    <Show when={hasPrevDay()}>
+                        <div class="forecast-day-prev-button-wrapper">
+                            <button class="forecast-control-button forecast-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {getPrevDay().shortDate}</button>
+                        </div>
+                    </Show>
+                    <Show when={!hasPrevDay()}>
+                        <div class="forecast-day-prev-button-wrapper forecast-day-prev-button-disabled">
+                        </div>
+                    </Show>
+                    <div class="forecast-control-label forecast-date">{getCurrentDay().shortDate}</div>
+                    <Show when={hasNextDay()}>
+                        <div class="forecast-day-next-button-wrapper">
+                            <button class="forecast-control-button forecast-day-next-button" onClick={onClickNext}>{getNextDay().shortDate} <i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </Show>
+                </div>
                 <table class="forecast-weather-table flex-grow">
                     <tbody>
                         <tr>
