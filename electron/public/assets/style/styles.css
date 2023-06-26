@@ -86,6 +86,11 @@ div.flex-shrink {
     flex-shrink: 1;
 }
 
+div.switcher-widget-button-wrapper {
+    justify-self: flex-end;
+    align-items: flex-end;
+}
+
 .is-error {
     color: red;
 }
@@ -131,6 +136,10 @@ div.data-label {
     font-weight: 500;
 }
 
+div.astro {
+    font-size: 16pt;
+}
+
 @media (min-width: 480px) {
     div.home-time {
         font-size: 80pt;
@@ -149,6 +158,9 @@ div.data-label {
     }
     div.setup-title {
         font-size: 24pt;
+    }
+    div.astro {
+        font-size: 18pt;
     }
 }
 
@@ -171,6 +183,9 @@ div.data-label {
     div.setup-title {
         font-size: 26pt;
     }
+    div.astro {
+        font-size: 20pt;
+    }
 }
 
 @media (min-width: 1000px) {
@@ -191,5 +206,8 @@ div.data-label {
     }
     div.setup-title {
         font-size: 28pt;
+    }
+    div.astro {
+        font-size: 20pt;
     }
 }

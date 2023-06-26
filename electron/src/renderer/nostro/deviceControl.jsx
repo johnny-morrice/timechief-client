@@ -79,7 +79,7 @@ export const DeviceControl = () => {
         removeDataCallback("DeviceControl");
         removeDeviceStatusCallback("DeviceControl");
     });
-    return <div class="device-control">
+    return <div class="device-control flex-grow">
         <div class="flex-column flex-grow">
             <div class="flex-grow flex-row">
                 <Show when={!signals.disableShutdown()}>
