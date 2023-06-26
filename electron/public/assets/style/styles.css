@@ -30,24 +30,94 @@ body {
     margin: 0;
     border: 0;
     font-family: 'Titillium Web', sans-serif;
+    font-size: 16pt;
 }
 
 div.home-screen {
-    display: flex;
-    flex-direction: row;
     height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+div.border {
+    padding: 1em;
+    border: 1px solid green;
+}
+
+div.home-date {
+    font-size: 20pt;
+}
+
+div.home-location {
+    font-size: 18pt;
 }
 
 div.home-time {
     font-family: 'Seven Segment', monospace;
+    font-size: 60pt;
+}
+
+@media (min-width: 480px) {
+    div.home-time {
+        font-size: 80pt;
+    }
+    div.home-date {
+        font-size: 24pt;
+    }
+    div.home-location {
+        font-size: 20pt;
+    }
+    body {
+        font-size: 18pt;
+    }
+}
+
+@media (min-width: 600px) {
+    div.home-time {
+        font-size: 100pt;
+    }
+    div.home-date {
+        font-size: 28pt;
+    }
+    div.home-location {
+        font-size: 22pt;
+    }
+    body {
+        font-size: 20pt;
+    }
+}
+
+@media (min-width: 1000px) {
+    div.home-time {
+        font-size: 120pt;
+    }
+    div.home-date {
+        font-size: 30pt;
+    }
+    div.home-location {
+        font-size: 24pt;
+    }
+    body {
+        font-size: 22pt;
+    }
 }
 
 div.flex-column {
     display: flex;
     flex-direction: column;
+    gap: 1em;
 }
 
 div.flex-row {
     display: flex;
     flex-direction: row;
+    gap: 1em;
+}
+
+div.flex-grow {
+    flex-grow: 1;
+}
+
+div.flex-shrink {
+    flex-shrink: 1;
 }

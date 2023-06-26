@@ -1,5 +1,5 @@
-import { onCleanup } from "solid-js";
-import { addServiceDataCallback } from "../classic/ipc";
+import { onCleanup, createSignal } from "solid-js";
+import { addServiceDataCallback } from "./ipc";
 import { weatherIconStyleClass } from '../weatherIcon';
 import { kelvinToCelsiusText } from '../temperature';
 
@@ -44,23 +44,23 @@ export const CurrentWeather = () => {
         removeDataCallback("CurrentWeather");
     });
 
-    return <div class="current-weather">
-        <div class="weather-temp-wrapper flex-row">
-            <div class="weather-temp-label-wrapper flex-column">
+    return <div class="current-weather flex-column flex-grow">
+        <div class="weather-temp-wrapper flex-row flex-grow">
+            <div class="weather-temp-label-wrapper flex-column flex-grow">
                 <div class="weather-temp-label weather-label data-label">temp</div>
                 <div class="weather-temp-feels-label weather-label data-label">feels</div>
             </div>
-            <div class="weather-temp-data-wrapper flex-column">
-                <div class='weather-temp weather-data'>{props.signals.temp}</div>
+            <div class="weather-temp-data-wrapper flex-column flex-grow">
+                <div class='weather-temp weather-data'>{signals.temp}</div>
                 <div class='weather-temp-feels weather-data'>{signals.feelsLikeTemp}</div>
             </div>
         </div>
-        <div class="weather-condition-bar flex-row">
-            <div class="weather-condition-current-wrapper flex-column">
+        <div class="weather-condition-bar flex-row flex-grow">
+            <div class="weather-condition-current-wrapper flex-column flex-grow">
                 <div class='weather-condition-current-icon weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></div>
                 <div class="weather-condition-current-label weather-label data-label">current</div>
             </div>
-            <div class="weather-condition-today-wrapper flex-column">
+            <div class="weather-condition-today-wrapper flex-column flex-grow">
                 <div class='weather-condition-today-icon weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i></div>
                 <div class="weather-condition-today-label weather-label data-label">today</div>
             </div>
