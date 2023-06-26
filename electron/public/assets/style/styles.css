@@ -57,50 +57,6 @@ div.home-time {
     font-size: 60pt;
 }
 
-@media (min-width: 480px) {
-    div.home-time {
-        font-size: 80pt;
-    }
-    div.home-date {
-        font-size: 24pt;
-    }
-    div.home-location {
-        font-size: 20pt;
-    }
-    body {
-        font-size: 18pt;
-    }
-}
-
-@media (min-width: 600px) {
-    div.home-time {
-        font-size: 100pt;
-    }
-    div.home-date {
-        font-size: 28pt;
-    }
-    div.home-location {
-        font-size: 22pt;
-    }
-    body {
-        font-size: 20pt;
-    }
-}
-
-@media (min-width: 1000px) {
-    div.home-time {
-        font-size: 120pt;
-    }
-    div.home-date {
-        font-size: 30pt;
-    }
-    div.home-location {
-        font-size: 24pt;
-    }
-    body {
-        font-size: 22pt;
-    }
-}
 
 div.flex-column {
     display: flex;
@@ -124,4 +80,62 @@ div.flex-shrink {
 
 .is-error {
     color: red;
+}
+
+div.current-weather {
+    font-size: 22pt
+}
+
+@media (min-width: 480px) {
+    div.home-time {
+        font-size: 80pt;
+    }
+    div.home-date {
+        font-size: 24pt;
+    }
+    div.home-location {
+        font-size: 20pt;
+    }
+    div.current-weather {
+        font-size: 24pt
+    }
+    body {
+        font-size: 18pt;
+    }
+}
+
+@media (min-width: 600px) {
+    div.home-time {
+        font-size: 100pt;
+    }
+    div.home-date {
+        font-size: 28pt;
+    }
+    div.home-location {
+        font-size: 22pt;
+    }
+    div.current-weather {
+        font-size: 26pt
+    }
+    body {
+        font-size: 20pt;
+    }
+}
+
+@media (min-width: 1000px) {
+    div.home-time {
+        font-size: 120pt;
+    }
+    div.home-date {
+        font-size: 30pt;
+    }
+    div.home-location {
+        font-size: 24pt;
+    }
+    div.current-weather {
+        font-size: 28pt
+    }
+    body {
+        font-size: 22pt;
+    }
 }
