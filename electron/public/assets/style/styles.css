@@ -86,6 +86,35 @@ div.current-weather {
     font-size: 22pt
 }
 
+button:active {
+    outline: 0;
+}
+
+button:focus {
+    outline: 0;
+}
+
+button.action-button {
+    border: 1px solid green;
+    background-color: black;
+    color: green;
+}
+
+div.setup-wrapper {
+    height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+div.setup-title {
+    font-size: 22pt;
+}
+
+div.setup-button-box {
+    padding: 1em;
+    border: 1px solid green;
+}
+
 @media (min-width: 480px) {
     div.home-time {
         font-size: 80pt;
@@ -101,6 +130,9 @@ div.current-weather {
     }
     body {
         font-size: 18pt;
+    }
+    div.setup-title {
+        font-size: 24pt;
     }
 }
 
@@ -120,6 +152,9 @@ div.current-weather {
     body {
         font-size: 20pt;
     }
+    div.setup-title {
+        font-size: 26pt;
+    }
 }
 
 @media (min-width: 1000px) {
@@ -137,5 +172,8 @@ div.current-weather {
     }
     body {
         font-size: 22pt;
+    }
+    div.setup-title {
+        font-size: 28pt;
     }
 }

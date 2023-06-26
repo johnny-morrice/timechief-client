@@ -1,5 +1,5 @@
 import { onCleanup, createSignal } from "solid-js";
-import { addServiceDataCallback } from "./ipc";
+import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { weatherIconStyleClass } from '../weatherIcon';
 import { kelvinToCelsiusText } from '../temperature';
 

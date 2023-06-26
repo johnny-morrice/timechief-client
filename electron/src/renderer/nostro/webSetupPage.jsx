@@ -135,65 +135,54 @@ export const WebSetupPage = (props) => {
 
     return <div id="crt-root" class="crt">
         <Show when={isHotspotReady(signals)}>
-            <div class="column-flex">
-                <div class="flex-element section-name underline">Welcome to Timechief</div>
-                <div class='row-flex flex-element'>
-                    <div class="flex-element data-name">Connect to Wifi Network</div>
-                    <div class="flex-element data-value">{signals.hotspotSSID}</div>
-                </div>
-                <div class='row-flex flex-element'>
-                    <div class="flex-element data-name">Wifi Key</div>
-                    <div class="flex-element data-value">{signals.hotspotKey}</div>
-                </div>
-                <div class='row-flex flex-element'>
-                    <div class="flex-element data-name">Continue setup via your browser</div>
-                    <div class="flex-element data-value">{signals.deviceSetupURL}</div>
-                </div>
-                <Show when={isConnectionError(signals)}>
-                    <div class='row-flex flex-element'>
-                        <div class="flex-element data-name">Error connecting to network, please run through setup again</div>
+            <div class="setup-wrapper flex-column flex-grow">
+                <div class="setup-title">Welcome to Timechief</div>
+                <div class="setup-content-wrapper flex-row">
+                    <div class="setup-button-box flex-column">
+                        <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                        <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                        <Show when={isDisplayBackButton(signals)}>
+                            <button class='action-button crt-box' onClick={onClickBack}>Cancel setup &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                        </Show>
                     </div>
-                </Show>
-                <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Reboot</div>
-                    <button class='flex-element crt-box' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
-                </div>
-                <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Shutdown</div>
-                    <button class='flex-element crt-box' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
-                </div>
-                <Show when={isDisplayBackButton(signals)}>
-                    <div class='row-flex flex-element'>
-                        <div class='flex-element data-name'>Cancel setup</div>
-                        <button class='flex-element crt-box' onClick={onClickBack}><i class="fa-solid fa-xmark"></i></button>
+                    <div class="setup-instructions flex-column">
+                        <div class='flex-row'>
+                            <div class="data-row-label">Connect to Wifi Network</div>
+                            <div class="data-row-value">{signals.hotspotSSID}</div>
+                        </div>
+                        <div class='flex-row'>
+                            <div class="data-row-label">Wifi Key</div>
+                            <div class="data-row-value">{signals.hotspotKey}</div>
+                        </div>
+                        <div class='flex-row'>
+                            <div class="data-row-label">Continue setup via your browser</div>
+                            <div class="data-row-value">{signals.deviceSetupURL}</div>
+                        </div>
+                        <Show when={isConnectionError(signals)}>
+                            <div class='flex-row'>
+                                <div class="hotspot-error">Error connecting to network, please run through setup again</div>
+                            </div>
+                        </Show>
                     </div>
-                </Show>
+                </div>
             </div>
         </Show>
         <Show when={isLoading(signals)}>
-            <div class="column-flex">
-                <div class="flex-element section-name underline">Welcome to Timechief</div>
-                <div class='row-flex flex-element'>
-                    <div class="flex-element data-name">Loading...</div>
-                </div>
-                <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Reboot</div>
-                    <button class='flex-element crt-box' onClick={onClickReboot}><i class='fa-solid fa-refresh'></i></button>
-                </div>
-                <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Shutdown</div>
-                    <button class='flex-element crt-box' onClick={onClickShutdown}><i class='fa-solid fa-power-off'></i></button>
-                </div>
-                <div class='row-flex flex-element'>
-                    <div class='flex-element data-name'>Restart setup</div>
-                    <button class='flex-element crt-box' onClick={onClickRestartSetup}><i class="fa-solid fa-arrows-spin"></i></button>
-                </div>
-                <Show when={isDisplayBackButton(signals)}>
-                    <div class='row-flex flex-element'>
-                        <div class='flex-element data-name'>Cancel setup</div>
-                        <button class='flex-element crt-box' onClick={onClickBack}><i class="fa-solid fa-xmark"></i></button>
+            <div class="setup-wrapper column-flex flex-grow">
+                <div class="setup-title">Welcome to Timechief</div>
+                <div class="setup-action-wrapper flex-row">
+                    <div class="setup-button-box flex-column">
+                        <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                        <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                        <button class='action-button crt-box' onClick={onClickRestartSetup}>Restart setup &nbsp;&nbsp; <i class='fa-solid <i class="fa-solid fa-backward"></i>'></i></button>
+                        <Show when={isDisplayBackButton(signals)}>
+                            <button class='action-button crt-box' onClick={onClickBack}>Cancel setup &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                        </Show>
                     </div>
-                </Show>
+                    <div class="setup-loading">
+                        <div><i class="fa-solid fa-spinner fa-spin"></i></div>
+                    </div>
+                </div>
             </div>
         </Show>
         <Show when={isInternetConnectedState(signals)}>
