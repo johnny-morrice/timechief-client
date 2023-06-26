@@ -69,6 +69,7 @@ func Daemon(ctx *cli.Context) error {
 	updateDaemon := daemon.Update{
 		Updater:               up,
 		StateFlagStore:        flagStore,
+		KeyValueStore:         keyValueStore,
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
 	deviceDataDaemon := daemon.DeviceData{
