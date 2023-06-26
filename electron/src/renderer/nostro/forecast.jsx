@@ -5,18 +5,18 @@ import { weatherIconStyleClass } from '../weatherIcon';
 import { callbackName } from './callback';
 
 let dayForecastCount = 5;
-class ForecastPageSignals {
+class Signals {
     constructor() {
         this.days = [];
         for (var i = 0; i < dayForecastCount; i++) {
-            this.days.push(new DayForecastSignals())
+            this.days.push(new DaySignals())
         }
         [this.dayCount, this.setDayCount] = createSignal(0);
         [this.dayIndex, this.setDayIndex] = createSignal(0);
     }
 }
 
-class DayForecastSignals {
+class DaySignals {
     constructor() {
         [this.date, this.setDate] = createSignal("");
         [this.shortDate, this.setShortDate] = createSignal("");
@@ -32,7 +32,7 @@ class DayForecastSignals {
     }
 }
 
-function updateForecastPageSignals(signals, data) {
+function updateSignals(signals, data) {
     var locale = "en-GB";
     if ("Clock" in data) {
         if ("Locale" in data["Clock"] && data["Clock"]["Locale"] !== "") {
@@ -100,9 +100,9 @@ function renderLongDateText(locale, date) {
 }
 
 export const Forecast = () => {
-    let signals = new ForecastPageSignals();
+    let signals = new Signals();
     const cbName = callbackName("Forecast");
-    addServiceDataCallback(cbName, (data) => updateForecastPageSignals(signals, data));
+    addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
     onCleanup(() => {
         removeDataCallback(cbName);
     });

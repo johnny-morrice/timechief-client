@@ -1,0 +1,241 @@
+import { createSignal, onCleanup } from 'solid-js';
+import { CalendarEvent, makeCanonicalDateText, sortCalendarEvents } from '../calendarEvent';
+import { addServiceDataCallback, removeDataCallback } from './ipc';
+import { day } from '../timing';
+import { callbackName } from './callback';
+
+class Signals {
+  constructor() {
+    [this.calendarDays, this.setCalendarDays] = createSignal([]);
+    [this.loaded, this.setLoaded] = createSignal(false);
+    [this.locale, this.setLocale] = createSignal("en-GB");
+    [this.timeZone, this.setTimeZone] = createSignal("Europe/London");
+    [this.dayIndex, this.setDayIndex] = createSignal(0);
+  }
+}
+
+function updateSignals(signals, data) {
+  let calendarResp = data["Calendar"];
+  if ("Calendar" in calendarResp && calendarResp["Calendar"] != null) {
+    let calendar = calendarResp["Calendar"];
+    if ("Events" in calendar) {
+      let dataEvents = calendar["Events"];
+      if (dataEvents) {
+        let events = dataEvents.map(cev => new CalendarEvent(cev));
+        let calendarDays = new CalendarDays();
+        events.forEach(cev => calendarDays.addNewEvent(cev));
+        let ourCalendar = calendarDays.nextEvents(30, 3);
+        // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
+        signals.setCalendarDays(ourCalendar);
+      }
+    }
+  }
+  let clock = data["Clock"];
+  signals.setLocale(clock["Locale"]);
+  signals.setTimeZone(clock["Timezone"]);
+  signals.setLoaded(true);
+}
+
+
+function formatCalendarDayDate(signals, day) {
+  return day.formatDate(signals.locale(), signals.timeZone());
+}
+
+class CalendarDay {
+  constructor(calendarEvents) {
+    if (calendarEvents.length == 0) {
+      throw new Error("expected non empty calendarEvents");
+    }
+    this._calendarEvents = calendarEvents
+  }
+
+  date() {
+    return this._calendarEvents[0].startTime();
+  }
+
+  formatDate(locale, timeZone) {
+    return this.date().toLocaleDateString(locale, { dateStyle: 'short', timeZone: timeZone });
+  }
+
+  events() {
+    return this._calendarEvents;
+  }
+}
+
+class NullCalendarDay {
+  date() {
+    return new Date();
+  }
+  formatDate(locale, timeZone) {
+    return "";
+  }
+  events() {
+    return [];
+  }
+}
+
+
+class CalendarDays {
+
+  constructor() {
+    this._days = {};
+  }
+
+  nextEvents(dayLimit, eventLimit) {
+    let now = new Date();
+    let dates = [now];
+    for (var i = 1; i < dayLimit; i++) {
+      let nextDate = new Date();
+      nextDate.setTime(nextDate.getTime() + (day * i));
+      dates.push(nextDate);
+    }
+    let allDays = this._allDays();
+    let canonicalDates = dates.map(d => makeCanonicalDateText(d));
+    let out = [];
+    var eventCount = 0;
+    canonicalDates.forEach(text => {
+      if (eventCount < eventLimit) {
+        var events = allDays[text];
+        if (events) {
+          var exceeds = (eventCount + events.length) - eventLimit;
+          if (exceeds > 0) {
+            events = events.slice(0, exceeds);
+          }
+          out.push(new CalendarDay(events));
+          eventCount += events.length;
+        }
+      }
+    });
+    return out;
+  }
+
+  _allDays() {
+    for (let [_, day] of Object.entries(this._days)) {
+      sortCalendarEvents(day);
+    }
+    return this._days;
+  }
+
+  addNewEvent(event) {
+    let canonicalDate = event.canonicalStartDateText();
+    if (canonicalDate in this._days) {
+      this._days[canonicalDate].push(event);
+    } else {
+      this._days[canonicalDate] = [event];
+    }
+  }
+}
+
+function formatCalendarEventStartTime(signals, calendarEvent) {
+  return calendarEvent.formatStartTime(signals.locale(), signals.timeZone());
+}
+
+function formatCalendarEventEndTime(signals, calendarEvent) {
+  return calendarEvent.formatEndTime(signals.locale(), signals.timeZone());
+}
+
+
+export const EventCalendar = () => {
+  let signals = new Signals();
+  const cbName = callbackName("EventCalendar");
+  addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
+  onCleanup(() => removeDataCallback(cbName));
+
+  function getCurrentDay() {
+    const dayIndex = signals.dayIndex();
+    const days = signals.calendarDays();
+    if (dayIndex < days.length) {
+      return days[dayIndex];
+    }
+    return new NullCalendarDay();
+  }
+
+  function hasDay() {
+    const dayCount = signals.calendarDays().length;
+    return dayCount > 0;
+  }
+
+  function hasDayLoaded() {
+    const dayIndex = signals.dayIndex();
+    const days = signals.calendarDays();
+    if (dayIndex < days.length) {
+      const day = days[dayIndex];
+      return "date" in day;
+    }
+    return false;
+  }
+
+  function hasPrevDay() {
+    const dayIndex = signals.dayIndex();
+    return dayIndex > 0;
+  }
+
+  function hasNextDay() {
+    const dayIndex = signals.dayIndex();
+    const dayCount = signals.calendarDays().length;
+    return dayIndex < dayCount - 1;
+  }
+
+  function onClickPrev() {
+    if (hasPrevDay()) {
+      const dayIndex = signals.dayIndex();
+      signals.setDayIndex(dayIndex - 1);
+    }
+  }
+
+  function onClickNext() {
+    if (hasNextDay()) {
+      const dayIndex = signals.dayIndex();
+      signals.setDayIndex(dayIndex + 1);
+    }
+  }
+
+  function getPrevDay() {
+    if (hasPrevDay()) {
+      const dayIndex = signals.dayIndex();
+      return signals.days[dayIndex - 1];
+    }
+    return new NullCalendarDay();
+  }
+
+  function getNextDay() {
+    if (hasNextDay()) {
+      const dayIndex = signals.dayIndex();
+      return signals.days[dayIndex + 1];
+    }
+    return new NullCalendarDay();
+  }
+
+  return <div id="calendar-screen">
+    <Show when={!signals.loaded()}>
+      <div class="event-calendar-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    </Show>
+    <Show when={signals.loaded()}>
+      <div class="flex-column flex-grow">
+        <Show when={!hasDay(signals)}>
+          <div class="data-label">No calendar events</div>
+        </Show>
+        <Show when={hasDay(signals)}>
+            <div class="calendar-day flex-column flex-grow">
+              <div class="calendar-day-date flex-grow">Events on {formatCalendarDayDate(signals, getCurrentDay())}</div>
+              <div class="calendar-events flex-column flex-grow">
+                <For each={getCurrentDay().events()}>{(cev, j) =>
+                  <div class="calendar-event-wrapper flex-column flex-grow">
+                    <div class="calendar-event-when flex-grow">
+                      <Show when={cev.isAllDay()}>
+                        <div class="calendar-event-allday-date flex-grow"><i class="fa-solid fa-calendar-day"></i> {formatCalendarEventStartTime(signals, cev)}</div>
+                      </Show>
+                      <Show when={!cev.isAllDay()}>
+                        <div class="calendar-event-datetimes flex-grow"><i class="fa-solid fa-calendar-day"></i> {formatCalendarEventStartTime(signals, cev)} - {formatCalendarEventEndTime(signals, cev)}</div>
+                      </Show>
+                    </div>
+                    <div class="calendar-event-shorttext flex-grow">{cev.eventShortText()}</div>
+                  </div>
+                }</For>
+              </div>
+            </div>
+        </Show>
+      </div>
+    </Show>
+  </div>;
+};

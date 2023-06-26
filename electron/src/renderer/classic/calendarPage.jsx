@@ -59,7 +59,7 @@ class CalendarDay {
   }
 
   formatDate(locale, timeZone) {
-    return this.date().toLocaleDateString(locale, {dateStyle: 'short', timeZone: timeZone});
+    return this.date().toLocaleDateString(locale, { dateStyle: 'short', timeZone: timeZone });
   }
 
   events() {
@@ -111,7 +111,7 @@ class CalendarDays {
   addNewEvent(event) {
     let canonicalDate = event.canonicalStartDateText();
     if (canonicalDate in this._days) {
-      this._days[canonicalDate].push(event); 
+      this._days[canonicalDate].push(event);
     } else {
       this._days[canonicalDate] = [event];
     }
@@ -130,39 +130,39 @@ function formatCalendarEventEndTime(signals, calendarEvent) {
 var initialised = false;
 let calendarSignals = new CalendarPageSignals();
 export const CalendarPage = () => {
-  
+
   if (!initialised) {
     addServiceDataCallback((data) => updateCalendarPageSignals(calendarSignals, data));
     initialised = true;
   }
 
   return <div id="calendar-screen">
-        <div class="column-flex">
-          <Show when={!isCalendarDaysExists(calendarSignals)}>
-            <div class="no-calendar-events-message">No calendar events</div>
-          </Show>
-          <Show when={isCalendarDaysExists(calendarSignals)}>
-            <For each={getCalendarDays(calendarSignals)}>{(day, i) => 
-              <div class="calendar-day">
-                <div class="calendar-day-date">{formatCalendarDayDate(calendarSignals, day)}</div>
-                <div class="calendar-events">
-                  <For each={day.events()}>{(cev, j) =>
-                  <div class="calendar-event-wrapper">
-                    <div class="calendar-event-when">
-                      <Show when={cev.isAllDay()}>
-                        <div class="calendar-event-allday-date">{formatCalendarEventStartTime(calendarSignals, cev)}</div>
-                      </Show>
-                      <Show when={!cev.isAllDay()}>
-                        <div class="calendar-event-datetimes">{formatCalendarEventStartTime(calendarSignals, cev)} - {formatCalendarEventEndTime(calendarSignals, cev)}</div>
-                      </Show>
-                    </div>
-                    <div class="calendar-event-shorttext">{cev.eventShortText()}</div>
+    <div class="column-flex">
+      <Show when={!isCalendarDaysExists(calendarSignals)}>
+        <div class="no-calendar-events-message">No calendar events</div>
+      </Show>
+      <Show when={isCalendarDaysExists(calendarSignals)}>
+        <For each={getCalendarDays(calendarSignals)}>{(day, i) =>
+          <div class="calendar-day">
+            <div class="calendar-day-date">{formatCalendarDayDate(calendarSignals, day)}</div>
+            <div class="calendar-events">
+              <For each={day.events()}>{(cev, j) =>
+                <div class="calendar-event-wrapper">
+                  <div class="calendar-event-when">
+                    <Show when={cev.isAllDay()}>
+                      <div class="calendar-event-allday-date">{formatCalendarEventStartTime(calendarSignals, cev)}</div>
+                    </Show>
+                    <Show when={!cev.isAllDay()}>
+                      <div class="calendar-event-datetimes">{formatCalendarEventStartTime(calendarSignals, cev)} - {formatCalendarEventEndTime(calendarSignals, cev)}</div>
+                    </Show>
                   </div>
-                }</For>
-                </div>      
-              </div>
-            }</For>
-          </Show>
-        </div>
+                  <div class="calendar-event-shorttext">{cev.eventShortText()}</div>
+                </div>
+              }</For>
+            </div>
+          </div>
+        }</For>
+      </Show>
+    </div>
   </div>;
 };
