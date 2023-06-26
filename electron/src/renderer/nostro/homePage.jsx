@@ -13,6 +13,7 @@ import { DeviceInfo } from './deviceInfo';
 import { Pairing } from './pairing';
 import { Locale } from './locale';
 import { callbackName } from "./callback";
+import { Forecast } from './forecast';
 
 class Signals {
   constructor() {
@@ -161,6 +162,7 @@ export const HomePage = () => {
           { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo />},
           { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
           { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
+          { icon: () => <i class="fa-sharp fa-solid fa-eclipse"></i>, element: () => <Forecast /> },
         ]
       } />
     </div>
