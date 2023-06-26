@@ -143,7 +143,7 @@ export const HomePage = () => {
   });
 
   return <div class="home-screen flex-row">
-    <div class="home-lhs-column flex-column flex-grow border">
+    <div class="home-lhs-column flex-column flex-grow border crt-box">
       <CurrentWeather />
     </div>
     <div class='home-rhs-column flex-column flex-grow'>
@@ -153,7 +153,7 @@ export const HomePage = () => {
         <div class='home-location'>{signals.location}</div>
       </div>
 
-      <div class="home-action-center flex-row flex-grow border">
+      <div class="home-action-center flex-row flex-grow border crt-box">
         <Show when={hasNextEvent(signals)}>
           <div class='next-event-summary flex-column flex-grow'>
             <div class='next-event-time flex-row'>

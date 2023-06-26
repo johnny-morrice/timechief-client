@@ -138,7 +138,7 @@ export const WebSetupPage = (props) => {
             <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-content-wrapper flex-row">
-                    <div class="setup-button-box flex-column">
+                    <div class="setup-button-box border flex-column crt-box">
                         <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                         <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         <Show when={isDisplayBackButton(signals)}>
@@ -171,7 +171,7 @@ export const WebSetupPage = (props) => {
             <div class="setup-wrapper column-flex flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-action-wrapper flex-row">
-                    <div class="setup-button-box flex-column">
+                    <div class="setup-button-box border flex-column crt-box">
                         <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                         <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         <button class='action-button crt-box' onClick={onClickRestartSetup}>Restart setup &nbsp;&nbsp; <i class='fa-solid <i class="fa-solid fa-backward"></i>'></i></button>
