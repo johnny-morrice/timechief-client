@@ -10,6 +10,7 @@ class Signals {
         [this.wifiError, this.setWifiError] = createSignal(false);
         [this.activeSSID, this.setActiveSSID] = createSignal("");
         [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
+        [this.isUpdating, this.setUpdating] = createSignal(false);
     }
 }
 
@@ -30,6 +31,9 @@ function updateSignals(signals, data) {
             let setupURL = launcherState["WebURL"];
             signals.setDeviceSetupURL(setupURL);
         }
+
+        let isUpdating = launcherState["Flags"].includes("isUpdating");
+        signals.setUpdating(isUpdating);
 
         if ("WifiState" in launcherState) {
             let wifiState = launcherState["WifiState"];
@@ -139,10 +143,21 @@ export const WebSetupPage = (props) => {
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-content-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
-                        <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                        <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                        <Show when={signals.isUpdating()}>
+                            <button class='action-button crt-box' disabled onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button class='action-button crt-box' disabled onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                        </Show>
+                        <Show when={!signals.isUpdating()}>
+                            <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                        </Show>
                         <Show when={isDisplayBackButton(signals)}>
                             <button class='action-button crt-box' onClick={onClickBack}>Cancel setup &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                        </Show>
+                        <Show when={signals.isUpdating()}>
+                            <div class="setup-button-box-isUpdating">
+                                <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
+                            </div>
                         </Show>
                     </div>
                     <div class="setup-instructions flex-column">
@@ -172,11 +187,22 @@ export const WebSetupPage = (props) => {
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-action-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
-                        <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                        <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                        <Show when={signals.isUpdating()}>
+                            <button disabled class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button disabled class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                        </Show>
+                        <Show when={!signals.isUpdating()}>
+                            <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                        </Show>
                         <button class='action-button crt-box' onClick={onClickRestartSetup}>Restart setup &nbsp;&nbsp; <i class='fa-solid <i class="fa-solid fa-backward"></i>'></i></button>
                         <Show when={isDisplayBackButton(signals)}>
                             <button class='action-button crt-box' onClick={onClickBack}>Cancel setup &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                        </Show>
+                        <Show when={signals.isUpdating()}>
+                            <div class="setup-button-box-isUpdating">
+                                <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
+                            </div>
                         </Show>
                     </div>
                     <div class="setup-loading">
