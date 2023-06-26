@@ -1,19 +1,19 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown } from '../classic/ipc';
+import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 
-class WebSetupPageSignals {
-  constructor() {
-      [this.setupState, this.setSetupState] = createSignal("");
-      [this.deviceSetupURL, this.setDeviceSetupURL] = createSignal("");
-      [this.hotspotSSID, this.setHotspotSSID] = createSignal("");
-      [this.hotspotKey, this.setHotspotKey] = createSignal("");
-      [this.wifiError, this.setWifiError] = createSignal(false);
-      [this.activeSSID, this.setActiveSSID] = createSignal("");
-      [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
-  }
+class Signals {
+    constructor() {
+        [this.setupState, this.setSetupState] = createSignal("");
+        [this.deviceSetupURL, this.setDeviceSetupURL] = createSignal("");
+        [this.hotspotSSID, this.setHotspotSSID] = createSignal("");
+        [this.hotspotKey, this.setHotspotKey] = createSignal("");
+        [this.wifiError, this.setWifiError] = createSignal(false);
+        [this.activeSSID, this.setActiveSSID] = createSignal("");
+        [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
+    }
 }
 
-function updateWebSetupPageSignals(signals, data) {
+function updateSignals(signals, data) {
     if ("LauncherState" in data) {
         let launcherState = data["LauncherState"];
         if ("FirstTimeSetupDone" in launcherState) {
@@ -39,7 +39,7 @@ function updateWebSetupPageSignals(signals, data) {
             let wifiError = wifiState["IsWifiError"];
             signals.setActiveSSID(activeSSID);
             signals.setWifiError(wifiError);
-        
+
             if (hotspotSSID && hotspotKey && hotspotSSID.length > 0 && hotspotKey.length > 0) {
                 signals.setHotspotSSID(hotspotSSID);
                 signals.setHotspotKey(hotspotKey);
@@ -86,55 +86,54 @@ function onClickReboot() {
     sendReboot();
 }
 
-var initialised = false;
-let signals = new WebSetupPageSignals();
+
 export const WebSetupPage = (props) => {
-  if (!initialised) {
-        addDataCallback((data) => updateWebSetupPageSignals(signals, data));
-    initialised = true;
-  }
+    const signals = new Signals();
+    addDataCallback("WebSetupPage", (data) => updateSignals(signals, data));
+    onCleanup(() => {
+        removeDataCallback("WebSetupPage");
+    });
 
-
-  const applyCRTJank = () => {
-    // Get the crt-root element
-    const crtRoot = document.getElementById("crt-root");
-    const boxes = document.getElementsByClassName("crt-box");
-    // There is a 1 in 120 chance of the CRT jank being applied.
-    if (Math.random() < 0.008333) {
-        // The CRT jank is applied crt-jank class to the crt-root element.
-        crtRoot.classList.add("crt-jank");
-        // Add jank to all the boxes;
-        for (let i = 0; i < boxes.length; i++) {
-            boxes[i].classList.add("crt-box-jank");
+    const applyCRTJank = () => {
+        // Get the crt-root element
+        const crtRoot = document.getElementById("crt-root");
+        const boxes = document.getElementsByClassName("crt-box");
+        // There is a 1 in 120 chance of the CRT jank being applied.
+        if (Math.random() < 0.008333) {
+            // The CRT jank is applied crt-jank class to the crt-root element.
+            crtRoot.classList.add("crt-jank");
+            // Add jank to all the boxes;
+            for (let i = 0; i < boxes.length; i++) {
+                boxes[i].classList.add("crt-box-jank");
+            }
+            // console.log("CRT Jank applied");
+            // Set a timeout to remove the CRT jank after 1.6 + n second.
+            // Where n is between 1.6 second and 2.4 second.
+            const timeout = 2800 + (Math.random() * 800);
+            setTimeout(removeCRTJank, timeout);
         }
-        // console.log("CRT Jank applied");
-        // Set a timeout to remove the CRT jank after 1.6 + n second.
-        // Where n is between 1.6 second and 2.4 second.
-        const timeout = 2800 + (Math.random() * 800);
-        setTimeout(removeCRTJank, timeout);
-    }
-  };
+    };
 
-  const removeCRTJank = () => {
-    // Get the crt-root element
-    const crtRoot = document.getElementById("crt-root");
-    const boxes = document.getElementsByClassName("crt-box");
-    // The CRT jank is removed by removing the crt-jank class from the crt-root element.
-    crtRoot.classList.remove("crt-jank");
-    // Remove jank from all the boxes;
-    for (let i = 0; i < boxes.length; i++) {
-        boxes[i].classList.remove("crt-box-jank");
-    }
-    // console.log("CRT Jank removed");
-  };
+    const removeCRTJank = () => {
+        // Get the crt-root element
+        const crtRoot = document.getElementById("crt-root");
+        const boxes = document.getElementsByClassName("crt-box");
+        // The CRT jank is removed by removing the crt-jank class from the crt-root element.
+        crtRoot.classList.remove("crt-jank");
+        // Remove jank from all the boxes;
+        for (let i = 0; i < boxes.length; i++) {
+            boxes[i].classList.remove("crt-box-jank");
+        }
+        // console.log("CRT Jank removed");
+    };
 
-  const jankInterval = setInterval(applyCRTJank, 1000);
+    const jankInterval = setInterval(applyCRTJank, 1000);
 
-  onCleanup(() => {
-    clearInterval(jankInterval);
-  });
+    onCleanup(() => {
+        clearInterval(jankInterval);
+    });
 
-  return <div id="crt-root" class="crt">
+    return <div id="crt-root" class="crt">
         <Show when={isHotspotReady(signals)}>
             <div class="column-flex">
                 <div class="flex-element section-name underline">Welcome to Timechief</div>
@@ -200,5 +199,5 @@ export const WebSetupPage = (props) => {
         <Show when={isInternetConnectedState(signals)}>
             {props.element}
         </Show>
-  </div>;
+    </div>;
 };
