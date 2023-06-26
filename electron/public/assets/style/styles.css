@@ -110,11 +110,6 @@ div.setup-title {
     font-size: 22pt;
 }
 
-div.setup-button-box {
-    padding: 1em;
-    border: 1px solid green;
-}
-
 @media (min-width: 480px) {
     div.home-time {
         font-size: 80pt;
