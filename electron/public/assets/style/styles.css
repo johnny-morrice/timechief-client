@@ -194,6 +194,20 @@ div.calendar-day {
     font-size: 14pt;
 }
 
+div.event-calendar-day-controls {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+}
+
+button.event-calendar-control-button {
+    border: 1px solid green;
+    background-color: black;
+    color: green;
+    font-size: 16pt
+}
+
+
 @media (min-width: 800px) {
     div.home-time {
         font-size: 80pt;

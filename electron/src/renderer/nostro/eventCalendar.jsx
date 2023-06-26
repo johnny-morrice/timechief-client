@@ -41,6 +41,10 @@ function formatCalendarDayDate(signals, day) {
   return day.formatDate(signals.locale(), signals.timeZone());
 }
 
+function formatShortDate(signals, day) {
+  return day.shortDate(signals.locale(), signals.timeZone());
+}
+
 class CalendarDay {
   constructor(calendarEvents) {
     if (calendarEvents.length == 0) {
@@ -51,6 +55,11 @@ class CalendarDay {
 
   date() {
     return this._calendarEvents[0].startTime();
+  }
+
+  shortDate(locale, timeZone) {
+    // format using day of week and day of month
+    return this.date().toLocaleDateString(locale, { weekday: 'short', day: 'numeric', timeZone: timeZone });
   }
 
   formatDate(locale, timeZone) {
@@ -155,14 +164,9 @@ export const EventCalendar = () => {
     return dayCount > 0;
   }
 
-  function hasDayLoaded() {
-    const dayIndex = signals.dayIndex();
-    const days = signals.calendarDays();
-    if (dayIndex < days.length) {
-      const day = days[dayIndex];
-      return "date" in day;
-    }
-    return false;
+  function hasMultipleDays() {
+    const dayCount = signals.calendarDays().length;
+    return dayCount > 1;
   }
 
   function hasPrevDay() {
@@ -193,7 +197,10 @@ export const EventCalendar = () => {
   function getPrevDay() {
     if (hasPrevDay()) {
       const dayIndex = signals.dayIndex();
-      return signals.days[dayIndex - 1];
+      const days = signals.calendarDays();
+      if (dayIndex < days.length) {
+        return days[dayIndex - 1];
+      }
     }
     return new NullCalendarDay();
   }
@@ -201,7 +208,10 @@ export const EventCalendar = () => {
   function getNextDay() {
     if (hasNextDay()) {
       const dayIndex = signals.dayIndex();
-      return signals.days[dayIndex + 1];
+      const days = signals.calendarDays();
+      if (dayIndex < days.length) {
+        return days[dayIndex + 1];
+      }
     }
     return new NullCalendarDay();
   }
@@ -215,25 +225,44 @@ export const EventCalendar = () => {
         <Show when={!hasDay(signals)}>
           <div class="data-label">No calendar events</div>
         </Show>
-        <Show when={hasDay(signals)}>
-            <div class="calendar-day flex-column flex-grow">
-              <div class="calendar-day-date flex-grow">Events on {formatCalendarDayDate(signals, getCurrentDay())}</div>
-              <div class="calendar-events flex-column flex-grow">
-                <For each={getCurrentDay().events()}>{(cev, j) =>
-                  <div class="calendar-event-wrapper flex-column flex-grow">
-                    <div class="calendar-event-when flex-grow">
-                      <Show when={cev.isAllDay()}>
-                        <div class="calendar-event-allday-date flex-grow"><i class="fa-solid fa-calendar-day"></i> {formatCalendarEventStartTime(signals, cev)}</div>
-                      </Show>
-                      <Show when={!cev.isAllDay()}>
-                        <div class="calendar-event-datetimes flex-grow"><i class="fa-solid fa-calendar-day"></i> {formatCalendarEventStartTime(signals, cev)} - {formatCalendarEventEndTime(signals, cev)}</div>
-                      </Show>
-                    </div>
-                    <div class="calendar-event-shorttext flex-grow">{cev.eventShortText()}</div>
-                  </div>
-                }</For>
+        <Show when={hasMultipleDays(signals)}>
+          <div class="event-calendar-day-controls">
+            <Show when={hasPrevDay()}>
+              <div class="event-calendar-day-prev-button-wrapper">
+                <button class="event-calendar-control-button event-calendar-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {formatShortDate(signals, getPrevDay())}</button>
               </div>
+            </Show>
+            <Show when={!hasPrevDay()}>
+              <div class="event-calendar-day-prev-button-wrapper event-calendar-day-prev-button-disabled">
+              </div>
+            </Show>
+            <div class="event-calendar-control-label event-calendar-date">{formatShortDate(signals, getCurrentDay())}</div>
+            <Show when={hasNextDay()}>
+              <div class="event-calendar-day-next-button-wrapper">
+                <button class="event-calendar-control-button event-calendar-day-next-button" onClick={onClickNext}>{formatShortDate(signals, getNextDay())} <i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </Show>
+          </div>
+        </Show>
+        <Show when={hasDay(signals)}>
+          <div class="calendar-day flex-column flex-grow">
+            <div class="calendar-day-date flex-grow">Events on {formatCalendarDayDate(signals, getCurrentDay())}</div>
+            <div class="calendar-events flex-column flex-grow">
+              <For each={getCurrentDay().events()}>{(cev, j) =>
+                <div class="calendar-event-wrapper flex-column flex-grow">
+                  <div class="calendar-event-when flex-grow">
+                    <Show when={cev.isAllDay()}>
+                      <div class="calendar-event-allday-date flex-grow"><i class="fa-solid fa-calendar-day"></i> {formatCalendarEventStartTime(signals, cev)}</div>
+                    </Show>
+                    <Show when={!cev.isAllDay()}>
+                      <div class="calendar-event-datetimes flex-grow"><i class="fa-solid fa-calendar-day"></i> {formatCalendarEventStartTime(signals, cev)} - {formatCalendarEventEndTime(signals, cev)}</div>
+                    </Show>
+                  </div>
+                  <div class="calendar-event-shorttext flex-grow">{cev.eventShortText()}</div>
+                </div>
+              }</For>
             </div>
+          </div>
         </Show>
       </div>
     </Show>
