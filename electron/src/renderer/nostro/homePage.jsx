@@ -5,6 +5,8 @@ import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
 import { removeDataCallback } from './ipc';
 import { CurrentWeather } from './currentWeather';
 import { StatusNote } from './statusNote';
+import { SwitcherWidget } from './switcherWidget';
+import { DeviceControl } from './deviceControl';
 
 class Signals {
   constructor() {
@@ -144,7 +146,12 @@ export const HomePage = () => {
 
   return <div class="home-screen flex-row">
     <div class="home-lhs-column flex-column flex-grow border crt-box">
-      <CurrentWeather />
+      <SwitcherWidget widgets={
+        [
+          { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
+          { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl />}
+        ]
+      } />
     </div>
     <div class='home-rhs-column flex-column flex-grow'>
       <div class="home-time-wrapper flex-grow">
