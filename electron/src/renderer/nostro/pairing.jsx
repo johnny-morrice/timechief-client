@@ -50,9 +50,11 @@ export const Pairing = () => {
 
         if (pairingQrCodeCanvas == null) {
             let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
-            pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
-            canvasWrapper.appendChild(pairingQrCodeCanvas);
-            toCanvas(pairingQrCodeCanvas, `${signals.wwwBaseURL()}/pairing?pairingCode=${encodeURIComponent(pairingCode)}`);
+            if (canvasWrapper) {
+                pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
+                canvasWrapper.appendChild(pairingQrCodeCanvas);
+                toCanvas(pairingQrCodeCanvas, `${signals.wwwBaseURL()}/pairing?pairingCode=${encodeURIComponent(pairingCode)}`);
+            }
         }
         // Pairing is complete if we've got a code and the state is now none.
         if (data["Status"] == "none" && hasPairingCode(signals.pairingCode())) {
@@ -86,20 +88,20 @@ export const Pairing = () => {
         sendPairingCreateRequest();
     }
 
-    return <div class="pairing">
-        <div class="pairing-title">Account Pairing</div>
+    return <div class="pairing flex-column flex-grow">
+        <div class="pairing-title flex-grow">Account Pairing</div>
         <Show when={hasPrincipalSerial(signals.principalSerial()) && !hasPairingCode(signals.pairingCode())}>
-            <div class='pairing-button-wrapper'>
+            <div class='pairing-button-wrapper flex-grow'>
                 <button onClick={onClickLinkAccountButton} class="action-button crt-box">Relink your account &nbsp;&nbsp; <i class="fa-solid fa-user-plus"></i></button>
             </div>
         </Show>
         <Show when={!hasPrincipalSerial(signals.principalSerial()) && !hasPairingCode(signals.pairingCode())}>
-            <div class="pairing-button-wrapper">
+            <div class="pairing-button-wrapper flex-grow">
                 <button onClick={onClickLinkAccountButton} class="action-button crt-box">Link your account &nbsp;&nbsp; <i class="fa-solid fa-user-plus"></i></button>
             </div>
         </Show>
         <Show when={hasPairingCode(signals.pairingCode())}>
-            <div class="flex-column">
+            <div class="flex-column flex-grow">
                 <div class='flex-row'>
                     <div class="data-label">In your browser</div>
                     <div class="data-value">{signals.wwwBaseURL() + "/pairing"}</div>
