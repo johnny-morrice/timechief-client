@@ -3,10 +3,8 @@ import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDev
 
 class Signals {
     constructor() {
-        [this.deviceSerial, this.setDeviceSerial] = createSignal("");
         [this.deviceStatus, this.setDeviceStatus] = createSignal("");
         [this.launcherState, this.setLauncherState] = createSignal({});
-        [this.ipAddress, this.setIpAddress] = createSignal("unknown");
         [this.clientVersion, this.setClientVersion] = createSignal("");
     }
 }
@@ -35,12 +33,6 @@ function getDeviceStatus(signals) {
 }
 
 function updateSignalsForAPIData(signals, data) {
-    if ("ServiceData" in data) {
-        let serviceData = data["ServiceData"];
-        let clock = serviceData["Clock"];
-        let deviceSerial = clock["DeviceSerial"];
-        signals.setDeviceSerial(deviceSerial);
-    }
     if ("LauncherState" in data) {
         let launcherState = data["LauncherState"];
         signals.setLauncherState(launcherState);
@@ -49,11 +41,9 @@ function updateSignalsForAPIData(signals, data) {
 
 function updateSignalsForElectronStatus(signals, statusResponse) {
     const status = statusResponse["status"];
-    const ipAddress = statusResponse["ip_address"];
     const clientVersion = statusResponse["client_version"];
     signals.setClientVersion(clientVersion);
     signals.setDeviceStatus(status);
-    signals.setIpAddress(ipAddress);
 }
 
 function onClickShutdown() {
