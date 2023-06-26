@@ -204,39 +204,39 @@ export const HomePage = () => {
     clearInterval(timeInterval);
   });
 
-  return <div id="home-screen">
-    <div class="row-flex">
-      <div class="flex-element column-flex" id="home-data">
-        <div class='home-weather-title flex-element'>Weather</div>
-        <div class="flex-element row-flex">
-          <div class="flex-element column-flex home-major-data-fields-column">
-            <div class="flex-element">temp</div>
-            <div class="flex-element">feels</div>
+  return <div class="home-screen flex-row">
+      <div class="home-lhs-column flex-column">
+        <div class='home-weather-title'>Weather</div>
+        <div class="weather-temp-wrapper flex-row">
+          <div class="weather-temp-label-wrapper flex-column">
+            <div class="weather-temp-label weather-label data-label">temp</div>
+            <div class="weather-temp-feels-label weather-label data-label">feels</div>
           </div>
-          <div class="flex-element column-flex home-major-data-column">
-            <div class='flex-element home-major-data'>{homePageSignals.temp}</div>
-            <div class='flex-element home-major-data'>{homePageSignals.feelsLikeTemp}</div>
+          <div class="weather-temp-data-wrapper flex-column">
+            <div class='weather-temp weather-data'>{homePageSignals.temp}</div>
+            <div class='weather-temp-feels weather-data'>{homePageSignals.feelsLikeTemp}</div>
           </div>
         </div>
-        <div class="row-flex flex-element weather-icon-bar">
-          <div class="column-flex flex-element">
-            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.currentWeatherConditions())}></i></div>
-            <div class="flex-element">current</div>
+        <div class="weather-condition-bar flex-row">
+          <div class="weather-condition-current-wrapper flex-column">
+            <div class='weather-condition-current-icon weather-icon'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.currentWeatherConditions())}></i></div>
+            <div class="weather-condition-current-label weather-label data-label">current</div>
           </div>
-          <div class="column-flex flex-element">
-            <div class='weather-icon flex-element'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.todayWeatherConditions())}></i></div>
-            <div class="flex-element">today</div>
+          <div class="weather-condition-today-wrapper flex-column">
+            <div class='weather-condition-today-icon weather-icon'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.todayWeatherConditions())}></i></div>
+            <div class="weather-condition-today-label weather-label data-label">today</div>
           </div>
         </div>
       </div>
-      <div class='flex-element column-flex time-border'>
-        <div id='time'>{homePageSignals.myTime}</div>
-        <div id='date'>{homePageSignals.myDate}</div>
-        <div id='home-location'>{homePageSignals.location}</div>
+      <div class='home-rhs-column flex-column'>
+        <div class="home-time-large">{homePageSignals.myTime}</div>
+        <div class="home-date-large">{homePageSignals.myDate}</div>
+        <div class='home-location'>{homePageSignals.location}</div>
+        <div class="home-action-center">
         <Show when={hasNextEvent(homePageSignals)}>
-          <div class='next-event-summary'>
-            <div class='next-event-time'>
-              <div class='next-event-symbol'><i class="fa-solid fa-calendar-day"></i></div>
+          <div class='next-event-summary flex-column'>
+            <div class='next-event-time flex-row'>
+              <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
               <div class='next-event-time'>{getNextEventStartTime(homePageSignals)}</div>
             </div>
             <div class='next-event-shorttext'>
@@ -244,7 +244,7 @@ export const HomePage = () => {
             </div>
           </div>
         </Show>
+        </div>
       </div>
     </div>
-  </div>;
 };

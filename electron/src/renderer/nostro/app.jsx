@@ -22,4 +22,4 @@ const App = () => {
 
 export function attachApp() {
     render(() => <Router source={hashIntegration()}><App></App></Router>, document.getElementById('app'));
-  }
+}
