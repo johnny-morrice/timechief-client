@@ -147,16 +147,16 @@ export const WebSetupPage = (props) => {
                     </div>
                     <div class="setup-instructions flex-column">
                         <div class='flex-row'>
-                            <div class="data-row-label">Connect to Wifi Network</div>
-                            <div class="data-row-value">{signals.hotspotSSID}</div>
+                            <div class="data-label">Connect to Wifi Network</div>
+                            <div class="data-value">{signals.hotspotSSID}</div>
                         </div>
                         <div class='flex-row'>
-                            <div class="data-row-label">Wifi Key</div>
-                            <div class="data-row-value">{signals.hotspotKey}</div>
+                            <div class="data-label">Wifi Key</div>
+                            <div class="data-value">{signals.hotspotKey}</div>
                         </div>
                         <div class='flex-row'>
-                            <div class="data-row-label">Continue setup via your browser</div>
-                            <div class="data-row-value">{signals.deviceSetupURL}</div>
+                            <div class="data-label">Continue setup via your browser</div>
+                            <div class="data-value">{signals.deviceSetupURL}</div>
                         </div>
                         <Show when={isConnectionError(signals)}>
                             <div class='flex-row'>

@@ -84,20 +84,17 @@ export const DeviceControl = () => {
         <div class="flex-column flex-grow">
             <div class="flex-grow flex-row">
                 <button class='action-button crt-box flex-grow' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                <div class="flex-grow"></div>
             </div>
             <div class="flex-grow flex-row">
                 <button class='action-button crt-box flex-grow' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
-                <div class="flex-grow"></div>
             </div>
             <div class="flex-grow flex-row">
                 <button class='action-button crt-box flex-grow' onClick={onClickSetup}>Setup device &nbsp;&nbsp; <i class="fa-solid fa-gear"></i></button>
-                <div class="flex-grow"></div>
             </div>
             <Show when={hasDeviceStatus(signals)}>
                 <div class="flex-row flex-grow">
-                    <div class="data-row-label">Status</div>
-                    <div class="data-row-value">{getDeviceStatus(signals)}</div>
+                    <div class="data-label">Status</div>
+                    <div class="data-value">{getDeviceStatus(signals)}</div>
                 </div>
             </Show>
             <Show when={!hasDeviceStatus(signals)}>
