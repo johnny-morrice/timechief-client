@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addServiceDataCallback } from '../ipc';
+import { addServiceDataCallback } from './ipc';
 
 class AstroPageSignals {
   constructor() {

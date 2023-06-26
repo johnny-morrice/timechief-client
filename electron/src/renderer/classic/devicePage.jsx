@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from '../ipc';
+import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from './ipc';
 
 class DeviceSignals {
     constructor() {

@@ -38,6 +38,10 @@ div.home-screen {
     height: 100vh;
 }
 
+div.home-time {
+    font-family: 'Seven Segment', monospace;
+}
+
 div.flex-column {
     display: flex;
     flex-direction: column;
