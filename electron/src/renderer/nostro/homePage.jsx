@@ -162,7 +162,7 @@ export const HomePage = () => {
           { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo />},
           { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
           { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
-          { icon: () => <i class="fa-sharp fa-solid fa-eclipse"></i>, element: () => <Forecast /> },
+          { icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },
         ]
       } />
     </div>

@@ -41,7 +41,7 @@ function updateForecastPageSignals(signals, data) {
     }
     if ("Weather" in data) {
         if ("Daily" in data["Weather"]) {
-            let daily = weather["Weather"]["Daily"];
+            let daily = data["Weather"]["Daily"];
             var dayCount = daily.length;
             if (dayCount > dayForecastCount) {
                 dayCount = dayForecastCount;
@@ -102,7 +102,7 @@ function renderLongDateText(locale, date) {
 export const Forecast = () => {
     let signals = new ForecastPageSignals();
     const cbName = callbackName("Forecast");
-    addServiceDataCallback((data) => updateForecastPageSignals(signals, data));
+    addServiceDataCallback(cbName, (data) => updateForecastPageSignals(signals, data));
     onCleanup(() => {
         removeDataCallback(cbName);
     });
@@ -124,38 +124,41 @@ export const Forecast = () => {
         <Show when={hasDay()}>
             <div class="forecast-day flex-column flex-grow">
                 <div class="forecast-date flex-grow">{getCurrentDay().date}</div>
-                <div class='flex-row flex-grow'>
-                    <div class="flex-column flex-grow">
-                        <div class='data-label flex-grow'>Temp</div>
-                        <div class='flex-row flex-grow'>
-                            <div class='data-label flex-grow'>Morn</div>
-                            <div class='data-value flex-grow'>{getCurrentDay().mornTemp}</div>
-                        </div>
-                        <div class='flex-row flex-grow'>
-                            <div class='data-label flex-grow'>Day</div>
-
-                            <div class='data-value flex-grow'>{getCurrentDay().dayTemp}</div>
-                        </div>
-                        <div class='flex-row flex-grow'>
-                            <div class='data-label flex-grow'>Eve</div>
-                            <div class='data-value flex-grow'>{getCurrentDay().eveTemp}</div>
-                        </div>
-                        <div class='flex-row flex-grow'>
-                            <div class='data-label flex-grow'>Night</div>
-                            <div class='data-value flex-grow'>{getCurrentDay().nightTemp}</div>
-                        </div>
-                    </div>
-                    <div class="column-flex">
-                        <div class='data-label flex-grow'>Feels like</div>
-                        <div class='data-value flex-grow'>{getCurrentDay().mornFeelsLike}</div>
-                        <div class='data-value flex-grow'>{getCurrentDay().dayFeelsLike}</div>
-                        <div class='data-value flex-grow'>{getCurrentDay().eveFeelsLike}</div>
-                        <div class='data-value flex-grow'>{getCurrentDay().nightFeelsLike}</div>
-                    </div>
-                </div>
-                <div class='weather-icon'><i class={"fa-solid " + weatherIconStyleClass(day.weatherConditions())}></i></div>
+                <table class="forecast-weather-table flex-grow">
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th>temp</th>
+                            <th>feels like</th>
+                        </tr>
+                        <tr>
+                            <th>morn</th>
+                            <td>{getCurrentDay().mornTemp}</td>
+                            <td>{getCurrentDay().mornFeelsLike}</td>
+                        </tr>
+                        <tr>
+                            <th>day</th>
+                            <td>{getCurrentDay().dayTemp}</td>
+                            <td>{getCurrentDay().dayFeelsLike}</td>
+                        </tr>
+                        <tr>
+                            <th>eve</th>
+                            <td>{getCurrentDay().eveTemp}</td>
+                            <td>{getCurrentDay().eveFeelsLike}</td>
+                        </tr>
+                        <tr>
+                            <th>night</th>
+                            <td>{getCurrentDay().nightTemp}</td>
+                            <td>{getCurrentDay().nightFeelsLike}</td>
+                        </tr>
+                        <tr>
+                            <td class="weather-icon"><i class={"fa-solid " + weatherIconStyleClass(getCurrentDay().weatherConditions())}></i></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </Show>
-
     </div>
 };

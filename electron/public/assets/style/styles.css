@@ -148,6 +148,22 @@ div.current-weather-icon {
     font-size: 32pt;
 }
 
+div.forecast-weather-icon {
+    font-size: 32pt;
+}
+
+table.forecast-weather-table th {
+    font-weight: 600;
+}
+
+table.forecast-weather-table td {
+    text-align: center;
+}
+
+table.forecast-weather-table td.weather-icon {
+    font-size: 24pt;
+}
+
 @media (min-width: 800px) {
     div.home-time {
         font-size: 80pt;
@@ -174,6 +190,9 @@ div.current-weather-icon {
         font-size: 28pt;
     }
     div.current-weather-icon {
+        font-size: 34pt;
+    }
+    div.forecast-weather-icon {
         font-size: 34pt;
     }
 }
@@ -204,6 +223,9 @@ div.current-weather-icon {
         font-size: 32pt;
     }
     div.current-weather-icon {
+        font-size: 36pt;
+    }
+    div.forecast-weather-icon {
         font-size: 36pt;
     }
 }
