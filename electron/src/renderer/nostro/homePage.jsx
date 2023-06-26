@@ -1,25 +1,19 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addServiceDataCallback } from '../ipc';
-import { weatherIconStyleClass } from '../weatherIcon';
-import { kelvinToCelsiusText } from '../temperature';
-import { apiErrorTimeout, second } from '../timing';
+import { addServiceDataCallback } from '../classic/ipc';
+import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
+import { removeDataCallback } from './ipc';
+import { CurrentWeather } from './currentWeather';
 
-class HomePageSignals {
+class Signals {
   constructor() {
-    [this.isAPIError, this.setAPIError] = createSignal(false);
     [this.locale, this.setLocale] = createSignal("");
     [this.timeZone, this.setTimezone] = createSignal("");
     [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
-    [this.lastRefreshText, this.setLastRefreshText] = createSignal("");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
     [this.myTime, this.setMyTime] = createSignal("");
     [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
-    [this.temp, this.setTemp] = createSignal("");
-    [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
     [this.location, this.setLocation] = createSignal("");
-    [this.currentWeatherConditions, this.setCurrentWeatherConditions] = createSignal("");
-    [this.todayWeatherConditions, this.setTodayWeatherConditions] = createSignal("");
     [this.nextEvent, this.setNextEvent] = createSignal(null);
   }
 }
@@ -53,31 +47,13 @@ function getDateText(locale) {
   return dateText.replace(',', '');
 }
 
-function updateHomePageSignals(signals, data) {
+function updateSignals(signals, data) {
   let calendar = data["Calendar"];
   let clock = data["Clock"];
   let hourCycleOption = clock["HourCycleOption"];
   let timeZone = clock["Timezone"];
   let locale = clock["Locale"];
   let location = clock["Location"];
-  let weather = data["Weather"];
-  if (weather) {
-    let currentWeather = weather["Current"];
-    let temp = currentWeather["Temp"];
-    let feelsLike = currentWeather["FeelsLike"];
-    let weatherConditions = currentWeather["WeatherConditions"];
-    let feelsLikeText = kelvinToCelsiusText(feelsLike);
-    let tempText = kelvinToCelsiusText(temp);
-    signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
-    signals.setFeelsLikeTemp(feelsLikeText);
-    signals.setTemp(tempText);
-    let daily = weather["Daily"];
-    if (daily && daily.length > 0) {
-      let today = daily[0];
-      let todayConditions = today["WeatherConditions"];
-      signals.setTodayWeatherConditions(todayConditions["ConditionCode"]);
-    }
-  }
  
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
@@ -85,15 +61,6 @@ function updateHomePageSignals(signals, data) {
   signals.setLocation(location);
   signals.setLastUpdateTime(new Date());
   if (calendar.Calendar) {
-    // calendar.Calendar.Events.forEach(data => {
-    //   const cev = new CalendarEvent(data);
-    //   console.log(data);
-    //   if (data["End"] != 0) {
-    //     console.log(`starts: ${cev.formatStartTime(getLocale(signals))} end: ${cev.formatEndTime(getLocale(signals))} event: ${cev.eventShortText()}`)
-    //   } else {
-    //     console.log(`starts: ${cev.formatStartTime(getLocale(signals))} event: ${cev.eventShortText()}`)
-    //   }    
-    // });
     const nextEvent = findNextEvent(calendar.Calendar.Events);
     signals.setNextEvent(nextEvent);
   }
@@ -157,90 +124,40 @@ function hasNextEvent(signals) {
   return true;
 }
 
-function timeDifferenceToNowText(lastUpdateTime) {
-  const now = new Date();
-  const diff = now.getTime() - lastUpdateTime.getTime();
-  if (diff < apiErrorTimeout) {
-    return "Updated just now"
-  } else {
-    return "Connection error"
-  }
-}
-
-function isErrorTimeout(lastUpdateTime) {
-  const now = new Date();
-  const diff = now.getTime() - lastUpdateTime.getTime();
-  return diff >= apiErrorTimeout;
-}
-
-var initialised = false;
-let homePageSignals = new HomePageSignals();
 export const HomePage = () => {
-
-  if (!initialised) {
-    addServiceDataCallback((data) => updateHomePageSignals(homePageSignals, data));
-    initialised = true;
-  }
+  const signals = new Signals();
+  addServiceDataCallback("HomePage", (data) => updateSignals(signals, data));
   
   let timeInterval = setInterval(
     () => {
-      homePageSignals.setMyTime(getTimeText(homePageSignals));
-      homePageSignals.setMyDate(getDateText(getLocale(homePageSignals)));
+      signals.setMyTime(getTimeText(signals));
+      signals.setMyDate(getDateText(getLocale(signals)));
     },
     second / 10
   );
-  let updateRefreshTimeInterval = setInterval(
-    () => {
-      const lastUpdateTime = homePageSignals.lastUpdateTime();
-      const text = timeDifferenceToNowText(lastUpdateTime);
-      homePageSignals.setLastRefreshText(text);
-      homePageSignals.setAPIError(isErrorTimeout(lastUpdateTime));
-    },
-    second
-  );
 
   onCleanup(() => {
-    clearInterval(updateRefreshTimeInterval);
     clearInterval(timeInterval);
+    removeDataCallback("HomePage");
   });
 
   return <div class="home-screen flex-row">
       <div class="home-lhs-column flex-column">
-        <div class='home-weather-title'>Weather</div>
-        <div class="weather-temp-wrapper flex-row">
-          <div class="weather-temp-label-wrapper flex-column">
-            <div class="weather-temp-label weather-label data-label">temp</div>
-            <div class="weather-temp-feels-label weather-label data-label">feels</div>
-          </div>
-          <div class="weather-temp-data-wrapper flex-column">
-            <div class='weather-temp weather-data'>{homePageSignals.temp}</div>
-            <div class='weather-temp-feels weather-data'>{homePageSignals.feelsLikeTemp}</div>
-          </div>
-        </div>
-        <div class="weather-condition-bar flex-row">
-          <div class="weather-condition-current-wrapper flex-column">
-            <div class='weather-condition-current-icon weather-icon'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.currentWeatherConditions())}></i></div>
-            <div class="weather-condition-current-label weather-label data-label">current</div>
-          </div>
-          <div class="weather-condition-today-wrapper flex-column">
-            <div class='weather-condition-today-icon weather-icon'><i class={"fa-solid " + weatherIconStyleClass(homePageSignals.todayWeatherConditions())}></i></div>
-            <div class="weather-condition-today-label weather-label data-label">today</div>
-          </div>
-        </div>
+        <CurrentWeather />
       </div>
       <div class='home-rhs-column flex-column'>
-        <div class="home-time-large">{homePageSignals.myTime}</div>
-        <div class="home-date-large">{homePageSignals.myDate}</div>
-        <div class='home-location'>{homePageSignals.location}</div>
+        <div class="home-time-large">{signals.myTime}</div>
+        <div class="home-date-large">{signals.myDate}</div>
+        <div class='home-location'>{signals.location}</div>
         <div class="home-action-center">
-        <Show when={hasNextEvent(homePageSignals)}>
+        <Show when={hasNextEvent(signals)}>
           <div class='next-event-summary flex-column'>
             <div class='next-event-time flex-row'>
               <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
-              <div class='next-event-time'>{getNextEventStartTime(homePageSignals)}</div>
+              <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
             </div>
             <div class='next-event-shorttext'>
-              {getNextEventShortText(homePageSignals)}
+              {getNextEventShortText(signals)}
             </div>
           </div>
         </Show>

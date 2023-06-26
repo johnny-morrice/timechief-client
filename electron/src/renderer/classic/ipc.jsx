@@ -1,4 +1,4 @@
-import { apiRefreshInterval, deviceRefreshInterval } from "./timing";
+import { apiRefreshInterval, deviceRefreshInterval } from "../timing";
 
 class APIResultReceiver {
     constructor(channel) {
