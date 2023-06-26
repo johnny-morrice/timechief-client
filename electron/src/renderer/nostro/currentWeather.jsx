@@ -66,12 +66,12 @@ export const CurrentWeather = () => {
             </div>
             <div class="weather-condition-bar flex-row flex-grow">
                 <div class="weather-condition-current-wrapper flex-column flex-grow">
-                    <div class='weather-condition-current-icon weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></div>
-                    <div class="weather-condition-current-label weather-label data-label">current</div>
+                    <div class='weather-condition-current-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></div>
+                    <div class="weather-condition-current-label weather-label weather-icon-label">current</div>
                 </div>
                 <div class="weather-condition-today-wrapper flex-column flex-grow">
-                    <div class='weather-condition-today-icon weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i></div>
-                    <div class="weather-condition-today-label weather-label data-label">today</div>
+                    <div class='weather-condition-today-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i></div>
+                    <div class="weather-condition-today-label weather-label weather-icon-label">today</div>
                 </div>
             </div>
         </Show>
