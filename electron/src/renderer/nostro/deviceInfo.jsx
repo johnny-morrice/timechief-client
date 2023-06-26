@@ -1,5 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addDataCallback, addDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin, removeDataCallback, removeDeviceStatusCallback } from './ipc';
+import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback } from './ipc';
+import { callbackName } from "./callback";
 
 class Signals {
     constructor() {
@@ -40,11 +41,13 @@ function updateSignalsForElectronStatus(signals, statusResponse) {
 
 export const DeviceInfo = () => {
     const signals = new Signals();
-    addDataCallback("DeviceInfo", (data) => updateSignalsForAPIData(signals, data));
-    addDeviceStatusCallback("DeviceInfo", (statusResponse) => updateSignalsForElectronStatus(signals, statusResponse));
+    const cbName = callbackName("DeviceInfo");
+
+    addDataCallback(cbName, (data) => updateSignalsForAPIData(signals, data));
+    addDeviceStatusCallback(cbName, (statusResponse) => updateSignalsForElectronStatus(signals, statusResponse));
     onCleanup(() => {
-        removeDataCallback("DeviceInfo");
-        removeDeviceStatusCallback("DeviceInfo");
+        removeDataCallback(cbName);
+        removeDeviceStatusCallback(cbName);
     });
 
     return <div class="device-control flex-grow">

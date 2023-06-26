@@ -1,6 +1,7 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, addPairingGetCallback, addPairingCreateCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from './ipc';
 import { toCanvas } from 'qrcode';
+import { callbackName } from "./callback";
 
 class Signals {
     constructor() {
@@ -23,27 +24,28 @@ function updateAccountPageSignalsFromDevice(signals, deviceStatus) {
 
 export const Pairing = () => {
     let signals = new Signals();
-    addServiceDataCallback("Pairing", (data) => updateAccountPageSignals(signals, data));
-    addDeviceStatusCallback("Pairing", (data) => updateAccountPageSignalsFromDevice(signals, data));
+    const cbName = callbackName("Pairing");
+    addServiceDataCallback(cbName, (data) => updateAccountPageSignals(signals, data));
+    addDeviceStatusCallback(cbName, (data) => updateAccountPageSignalsFromDevice(signals, data));
     var pairingGetInterval = null;
     var pairingQrCodeCanvas = null;
     onCleanup(() => {
         if (pairingGetInterval != null) {
             clearInterval(pairingGetInterval);
         }
-        removeDataCallback("Pairing");
-        removeDeviceStatusCallback("Pairing");
-        removePairingCreateCallback("PairingCreate");
-        removePairingGetCallback("PairingGet");
+        removeDataCallback(cbName);
+        removeDeviceStatusCallback(cbName);
+        removePairingCreateCallback(cbName);
+        removePairingGetCallback(cbName);
         removeQrCode();
     });
-    addPairingCreateCallback("PairingCreate", () => {
+    addPairingCreateCallback(cbName, () => {
         pairingGetInterval = setInterval(() => {
             sendPairingGetRequest();
         }, 300);
     });
 
-    addPairingGetCallback("PairingGet", (data) => {
+    addPairingGetCallback(cbName, (data) => {
         if (hasPairingCode(data["Code"])) {
             signals.setPairingCode(data["Code"]);
         }
