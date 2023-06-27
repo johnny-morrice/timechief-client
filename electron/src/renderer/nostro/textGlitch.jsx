@@ -1,3 +1,8 @@
+export const glitchStyle = (text) => {
+    const size = text.length + 2;
+    return `width: ${size}em;`;
+};
+
 export const runTextGlitch = (when, out, text, delayMs) => {
     let isGlitching = when();
     if (isGlitching) {

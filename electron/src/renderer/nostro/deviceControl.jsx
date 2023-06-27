@@ -1,7 +1,7 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { callbackName } from "./callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from './ipc';
-import { runTextGlitch } from './textGlitch';
+import { glitchStyle, runTextGlitch } from './textGlitch';
 
 class Signals {
     constructor() {
@@ -97,7 +97,7 @@ export const DeviceControl = () => {
                     <button class='action-button crt-box flex-grow' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                 </Show>
                 <Show when={isShutdownDisabled(signals)}>
-                    <button class='action-button crt-box flex-grow' disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                    <button class='action-button crt-box flex-grow' style={glitchStyle("Reboot")} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                 </Show>
             </div>
             <div class="flex-grow flex-row">
@@ -105,7 +105,7 @@ export const DeviceControl = () => {
                     <button class='action-button crt-box flex-grow' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                 </Show>
                 <Show when={isShutdownDisabled(signals)}>
-                    <button class='action-button crt-box flex-grow' disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                    <button class='action-button crt-box flex-grow' style={glitchStyle("Reboot")} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                 </Show>
             </div>
             <div class="flex-grow flex-row">
