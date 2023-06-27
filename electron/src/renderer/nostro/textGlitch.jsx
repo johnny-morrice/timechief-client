@@ -2,7 +2,7 @@ import { createSignal, createResource } from "solid-js";
 import { second } from "../timing";
 
 export const glitchStyle = (text) => {
-    const size = text.length + 2;
+    const size = text.length + 4;
     return `width: ${size}em;`;
 };
 
