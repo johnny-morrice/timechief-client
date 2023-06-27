@@ -100,7 +100,7 @@ func getCLIApp() *cli.App {
 				},
 				&cli.DurationFlag{
 					Name:  "version-update-interval",
-					Value: 1 * time.Minute,
+					Value: 126 * time.Second,
 				},
 				&cli.DurationFlag{
 					Name:  "pairing-check-interval",
