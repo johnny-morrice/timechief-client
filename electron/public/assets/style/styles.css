@@ -97,7 +97,7 @@ div.current-weather {
 
 div.current-weather-grid {
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr 0.5fr;
+    grid-template-rows: 1fr 1fr 0.5fr 0.5fr;
     grid-template-columns: 1fr 1fr;
     grid-gap: 1em;
 }
@@ -136,7 +136,7 @@ div.astro {
 }
 
 div.weather-data {
-    font-size: 30pt;
+    font-size: 34pt;
 }
 
 div.current-weather-icon {
@@ -220,7 +220,7 @@ div.next-event-summary {
         font-size: 110pt;
     }
     div.home-date {
-        font-size: 30pt;
+        font-size: 38pt;
     }
     div.current-weather {
         font-size: 24pt
@@ -262,7 +262,7 @@ div.next-event-summary {
         font-size: 120pt;
     }
     div.home-date {
-        font-size: 30pt;
+        font-size: 40pt;
     }
     div.current-weather {
         font-size: 28pt
