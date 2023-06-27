@@ -1,4 +1,4 @@
-import { createSignal, createResource } from "solid-js";
+import { createSignal, createResource, onCleanup } from "solid-js";
 import { random, randomButtonGlitchSymbol, randomGlitchTransitionSymbol } from './fakeRandom';
 
 export const buttonGlitchStyle = (text) => {
@@ -11,9 +11,10 @@ export const runButtonGlitch = (when, out, text, delayMs) => {
     if (isGlitching) {
         const glitched = buttonGlitchText(text, 2);
         out(glitched);
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
             runButtonGlitch(when, out, text, delayMs);
         }, delayMs);
+        onCleanup(() => clearTimeout(timeout));
     }
 };
 
@@ -92,7 +93,8 @@ export const textTransitionGlitch = (buffer, display, setter, n) => {
     let more = transitionBuffer(buffer, display, setter, n);
     let delayMs = 150;
     if (more) {
-        setTimeout(() => textTransitionGlitch(buffer, display, setter, n), delayMs);
+        const timer = setTimeout(() => textTransitionGlitch(buffer, display, setter, n), delayMs);
+        onCleanup(() => clearTimeout(timer));
     }
 }
 const transitionBuffer = (buffer, display, setter, n) => {

@@ -136,7 +136,10 @@ export const WebSetupPage = (props) => {
             // Set a timeout to remove the CRT jank after 1.6 + n second.
             // Where n is between 1.6 second and 2.4 second.
             const timeout = 2800 + (random() * 800);
-            setTimeout(removeCRTJank, timeout);
+            const timer = setTimeout(removeCRTJank, timeout);
+            onCleanup(() => {
+                clearTimeout(timer);
+            });
         }
     };
 
