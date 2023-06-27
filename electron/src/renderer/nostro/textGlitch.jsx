@@ -59,6 +59,21 @@ export const textGlitch = (text, n) => {
     return arr.join("");
 }
 
+export const textTransitionResource = (value, getter, setter, transform) => {
+    const [textBuffer] = createResource(getter, transform);
+    const [intermediate, setIntermediate] = createSignal("");
+    const applyHighlight = (text) => {
+        return highlightSpansGlitch(text, textBuffer());
+    };
+    const [out] = createResource(intermediate, applyHighlight);
+    function doSet(data) {
+        setter(data);
+        textTransitionGlitch(textBuffer, intermediate, setIntermediate, 2);
+    }
+    doSet(value);
+    return [out, doSet];
+};
+
 export const textTransitionSignal = (value) => {
     const [buffer, setBuffer] = createSignal("");
     const [intermediate, setIntermediate] = createSignal("");
