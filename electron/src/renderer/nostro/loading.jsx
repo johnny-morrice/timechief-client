@@ -1,7 +1,7 @@
 import { createSignal, onCleanup } from "solid-js";
-import { randomLoadingSymbol } from './fakeRandom';
+import { random, randomLoadingSymbol } from './fakeRandom';
 
-class Signals {
+class GridSignals {
     constructor() {
         [this.gapIndex, this.setGapIndex] = createSignal(0);
         [this.characterA, this.setCharacterA] = createSignal("");
@@ -17,7 +17,43 @@ class Signals {
     }
 }
 
+class LineSignals {
+    constructor() {
+        [this.direction, this.setDirection] = createSignal(random() < 0.5 ? 1 : -1);
+        [this.lineIndex, this.setLineIndex] = createSignal(3);
+        [this.lineText, this.setLineText] = createSignal("...幽...");
+    }
+}
+
+function advanceLoadingLine(signals) {
+    const lineIndex = signals.lineIndex();
+    const maxLineIndex = 6;
+    const direction = signals.direction();
+    let newIndex = lineIndex + direction;
+    if (newIndex > maxLineIndex) {
+        newIndex = maxLineIndex;
+        signals.setDirection(-1);
+    } else if (newIndex < 0) {
+        newIndex = 0;
+        signals.setDirection(1);
+    }
+    const symbol = randomLoadingSymbol();
+    const line = [".", ".", ".", ".", ".", ".", "."];
+    line[newIndex] = symbol;
+    signals.setLineText("".concat(...line));
+    signals.setLineIndex(newIndex);
+}
+
 export const Loading = () => {
+    const signals = new LineSignals();
+    const interval = setInterval(() => advanceLoadingLine(signals), 150);
+    onCleanup(() => {
+        clearInterval(interval);
+    });
+    return <div class="loading-line">{signals.lineText}</div>
+}
+
+export const GridLoading = () => {
     // const symbols = [
     //     "@",
     //     "#",
@@ -42,7 +78,7 @@ export const Loading = () => {
     //     "幽", // Ghost
     // ];
     const maxGapIndex = 3;
-    const signals = new Signals();
+    const signals = new GridSignals();
     const incrementGapIndex = () => {
         const gapIndex = signals.gapIndex();
         let newIndex = gapIndex + 1;

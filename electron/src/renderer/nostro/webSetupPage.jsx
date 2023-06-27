@@ -227,7 +227,9 @@ export const WebSetupPage = (props) => {
                             </div>
                         </Show>
                     </div>
-                    <Loading />
+                    <div class="flex-column flex-grow">
+                        <Loading />
+                    </div>
                 </div>
             </div>
         </Show>
