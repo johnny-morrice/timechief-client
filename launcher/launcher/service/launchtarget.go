@@ -26,6 +26,13 @@ func LaunchTargetFromStore(storeLT store.LaunchTarget) LaunchTarget {
 	}
 }
 
+func (lt LaunchTarget) DeleteFiles() error {
+	system.Lock()
+	defer system.Unlock()
+	log.Printf("deleting files for launch target %s %s", lt.Version, lt.Path)
+	return os.RemoveAll(lt.Path)
+}
+
 func (lt LaunchTarget) Run(cfg store.Config) error {
 	logFile := cfg.GetClientLogFilePath()
 	return lt.Execute(cfg, "target", "run", "--target-root", lt.Path, "--log-file", logFile, "--version", lt.Version.Details())
