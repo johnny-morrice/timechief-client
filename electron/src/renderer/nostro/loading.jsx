@@ -2,7 +2,6 @@ import { createSignal, onCleanup } from "solid-js";
 
 class Signals {
     constructor() {
-        [this.gapIndex, this.setGapIndex] = createSignal(0);
         [this.characterA, this.setCharacterA] = createSignal("");
         [this.characterB, this.setCharacterB] = createSignal("夢");
         [this.characterC, this.setCharacterC] = createSignal("幻");
@@ -19,12 +18,13 @@ class Signals {
 export const Loading = () => {
     const maxGapIndex = 3;
     const signals = new Signals();
+    var gapIndex = 0;
     const incrementGapIndex = () => {
-        let newIndex = signals.gapIndex() + 1;
+        let newIndex = gapIndex + 1;
         if (newIndex > maxGapIndex) {
             newIndex = 0;
         }
-        signals.setGapIndex(newIndex);
+        gapIndex = newIndex;
     }
     const symbols = [
         "@",
@@ -51,8 +51,6 @@ export const Loading = () => {
 
     ];
     const updateSignals = () => {
-        incrementGapIndex();
-        const gapIndex = signals.gapIndex();
         const gapCharacter = " ";
         const setCharacterFuncs = signals.setCharacters;
         for (let i = 0; i < setCharacterFuncs.length; i++) {
