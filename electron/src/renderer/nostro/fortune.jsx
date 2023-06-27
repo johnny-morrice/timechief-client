@@ -199,7 +199,7 @@ export const Fortune = () => {
     };
 
     updatePoem();
-    const interval = setInterval(updatePoem, 5 * second);
+    const interval = setInterval(updatePoem, 60 * second);
     onCleanup(() => {
         clearInterval(interval);
     });
