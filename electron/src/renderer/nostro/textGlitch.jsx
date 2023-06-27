@@ -1,5 +1,6 @@
 import { createSignal, createResource } from "solid-js";
 import { second } from "../timing";
+import { random } from './fakeRandom';
 
 export const glitchStyle = (text) => {
     const size = text.length + 4;
@@ -38,11 +39,11 @@ export const textGlitch = (text, n) => {
     ];
     let arr = [];
     // Random choice from 1 to n will change.
-    let indicesChangeCount = Math.floor(Math.random() * n) + 1;
+    let indicesChangeCount = Math.floor(random() * n) + 1;
     // Choose indices to change.
     let indices = [];
     for (let i = 0; i < indicesChangeCount; i++) {
-        let index = Math.floor(Math.random() * text.length);
+        let index = Math.floor(random() * text.length);
         if (!indices.includes(index)) {
             indices.push(index);
         }
@@ -50,7 +51,7 @@ export const textGlitch = (text, n) => {
     // Change indices.
     for (let i = 0; i < text.length; i++) {
         if (indices.includes(i)) {
-            let symbolIndex = Math.floor(Math.random() * symbols.length);
+            let symbolIndex = Math.floor(random() * symbols.length);
             arr.push(symbols[symbolIndex]);
         } else {
             arr.push(text[i]);
@@ -124,7 +125,7 @@ const transitionBuffer = (buffer, display, setter, n) => {
     let maxLettersToChange = Math.min(n, diffIndices.length);
     let lettersToChange = [];
     while (lettersToChange.length < maxLettersToChange) {
-        let index = Math.floor(Math.random() * diffIndices.length);
+        let index = Math.floor(random() * diffIndices.length);
         let diffIndex = diffIndices[index];
         if (!lettersToChange.includes(diffIndex)) {
             lettersToChange.push(diffIndex);
@@ -230,9 +231,9 @@ export const highlightSpansGlitch = (displayText, bufferText) => {
         ];
         let arr = [];
         for (let i = 0; i < fortuneSlice.length; i++) {
-            const isSymbol = Math.random() < 0.5;
+            const isSymbol = random() < 0.5;
             if (isSymbol) {
-                arr.push(symbols[Math.floor(Math.random() * symbols.length)]);
+                arr.push(symbols[Math.floor(random() * symbols.length)]);
             } else {
                 arr.push(fortuneSlice[i]);
             }

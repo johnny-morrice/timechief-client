@@ -4,6 +4,7 @@ import { callbackName } from "./callback";
 import { glitchStyle, runTextGlitch } from './textGlitch';
 import { Loading } from './loading';
 import { textTransitionSignal } from './textGlitch';
+import { random } from './fakeRandom';
 
 class Signals {
     constructor() {
@@ -124,7 +125,7 @@ export const WebSetupPage = (props) => {
         const crtRoot = document.getElementById("crt-root");
         const boxes = document.getElementsByClassName("crt-box");
         // There is a 1 in 120 chance of the CRT jank being applied.
-        if (Math.random() < 0.008333) {
+        if (random() < 0.008333) {
             // The CRT jank is applied crt-jank class to the crt-root element.
             crtRoot.classList.add("crt-jank");
             // Add jank to all the boxes;
@@ -134,7 +135,7 @@ export const WebSetupPage = (props) => {
             // console.log("CRT Jank applied");
             // Set a timeout to remove the CRT jank after 1.6 + n second.
             // Where n is between 1.6 second and 2.4 second.
-            const timeout = 2800 + (Math.random() * 800);
+            const timeout = 2800 + (random() * 800);
             setTimeout(removeCRTJank, timeout);
         }
     };

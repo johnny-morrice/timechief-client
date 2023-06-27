@@ -1,4 +1,5 @@
 import { createSignal, onCleanup } from "solid-js";
+import { random } from './fakeRandom';
 
 class Signals {
     constructor() {
@@ -57,9 +58,9 @@ export const Loading = () => {
             if (i === gapIndex) {
                 setCharacterFuncs[i](gapCharacter);
             } else {
-                setCharacterFuncs[i](symbols[Math.floor(Math.random() * symbols.length)]);
+                setCharacterFuncs[i](symbols[Math.floor(random() * symbols.length)]);
             }
-            const isColorInverted = Math.random() < 0.1;
+            const isColorInverted = random() < 0.1;
             const setInvert = signals.setInverts[i];
             setInvert(isColorInverted);
         }

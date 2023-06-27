@@ -1,6 +1,7 @@
 import { onCleanup } from "solid-js";
 import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
+import { random } from './fakeRandom';
 
 export const Fortune = () => {
     const poems = [
@@ -36,7 +37,7 @@ export const Fortune = () => {
     ];
     const [fortune, setFortune] = textTransitionSignal("");
     const updatePoem = () => {
-        setFortune(poems[Math.floor(Math.random() * poems.length)]);
+        setFortune(poems[Math.floor(random() * poems.length)]);
     };
 
     updatePoem();
