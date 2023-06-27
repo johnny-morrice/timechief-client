@@ -48,7 +48,6 @@ export const Loading = () => {
         "映", // Reflection
         "影", // Shadow
         "幽", // Ghost
-
     ];
     const updateSignals = () => {
         incrementGapIndex();
