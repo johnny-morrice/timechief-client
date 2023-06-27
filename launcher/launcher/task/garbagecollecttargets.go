@@ -20,6 +20,7 @@ func (task GarbageCollectTargets) RunTask(ctx *cli.Context) error {
 	if task.Keep == 0 {
 		task.Keep = 3
 	}
+	log.Printf("garbage collecting targets, keeping newest %d", task.Keep)
 	garbage, err := task.LaunchTargetStore.ListGarbage(task.Keep)
 	if err != nil {
 		log.Printf("failed to list garbage targets: %s", err)
