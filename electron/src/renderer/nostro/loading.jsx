@@ -60,12 +60,12 @@ export const Loading = () => {
             } else {
                 setCharacterFuncs[i](symbols[Math.floor(random() * symbols.length)]);
             }
-            const isColorInverted = random() < 0.1;
-            const setInvert = signals.setInverts[i];
-            setInvert(isColorInverted);
+            // const isColorInverted = random() < 0.1;
+            // const setInvert = signals.setInverts[i];
+            // setInvert(isColorInverted);
         }
     };
-    const interval = setInterval(updateSignals, 300);
+    const interval = setInterval(updateSignals, 150);
     onCleanup(() => {
         clearInterval(interval);
     });
@@ -73,9 +73,13 @@ export const Loading = () => {
         return "loading-grid-item" + (signal() ? " inverted-color" : "");
     }
     return <div class="loading-grid">
-        <div class={gridSquareClass(signals.invertA)}>{signals.characterA}</div>
+        {/* <div class={gridSquareClass(signals.invertA)}>{signals.characterA}</div>
         <div class={gridSquareClass(signals.invertB)}>{signals.characterB}</div>
         <div class={gridSquareClass(signals.invertC)}>{signals.characterC}</div>
-        <div class={gridSquareClass(signals.invertD)}>{signals.characterD}</div>
+        <div class={gridSquareClass(signals.invertD)}>{signals.characterD}</div> */}
+        <div class="loading-grid-item">{signals.characterA}</div>
+        <div class="loading-grid-item">{signals.characterB}</div>
+        <div class="loading-grid-item">{signals.characterC}</div>
+        <div class="loading-grid-item">{signals.characterD}</div>
     </div>;
 };
