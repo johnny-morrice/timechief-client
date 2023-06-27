@@ -72,6 +72,7 @@ After=network.target
 WorkingDirectory=/opt/timechief-launcher
 ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound
 Restart=always
+Nice=1
 
 [Install]
 WantedBy=multi-user.target
