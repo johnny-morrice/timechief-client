@@ -15,7 +15,7 @@ type ExpandRootFS struct {
 	System        system.System
 }
 
-func (task ExpandRootFS) HandleMarker(ctx *cli.Context) error {
+func (task ExpandRootFS) RunTask(ctx *cli.Context) error {
 	log.Println("checking for rootfs expansion")
 	proceed, err := task.isProceed()
 	if err != nil {

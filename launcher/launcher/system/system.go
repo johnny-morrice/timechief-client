@@ -502,3 +502,11 @@ func (sys System) ExpandRootFS() error {
 	}
 	return sys.runScript(cfg, "timechief-expand-rootfs")
 }
+
+func (sys System) EnsureAutoLogin() error {
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	return sys.runScript(cfg, "timechief-ensure-autologin")
+}

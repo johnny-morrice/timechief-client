@@ -134,12 +134,21 @@ func Daemon(ctx *cli.Context) error {
 		Syncer: system,
 	}
 
-	marker := task.ExpandRootFS{
+	expandRootFS := task.ExpandRootFS{
 		KeyValueStore: keyValueStore,
 		System:        system,
 	}
 
-	err = marker.HandleMarker(ctx)
+	err = expandRootFS.RunTask(ctx)
+	if err != nil {
+		return err
+	}
+
+	ensureAutoLogin := task.EnsureAutologin{
+		System: system,
+	}
+
+	err = ensureAutoLogin.RunTask(ctx)
 	if err != nil {
 		return err
 	}
