@@ -1,41 +1,40 @@
 import { createSignal, createResource } from "solid-js";
-import { random } from './fakeRandom';
+import { random, randomButtonGlitchSymbol, randomGlitchTransitionSymbol } from './fakeRandom';
 
-export const glitchStyle = (text) => {
+export const buttonGlitchStyle = (text) => {
     const size = text.length + 4;
     return `width: ${size}em;`;
 };
 
-export const runTextGlitch = (when, out, text, delayMs) => {
+export const runButtonGlitch = (when, out, text, delayMs) => {
     let isGlitching = when();
     if (isGlitching) {
-        const glitched = textGlitch(text, 2);
+        const glitched = buttonGlitchText(text, 2);
         out(glitched);
         setTimeout(() => {
-            runTextGlitch(when, out, text, delayMs);
+            runButtonGlitch(when, out, text, delayMs);
         }, delayMs);
     }
 };
 
-export const textGlitch = (text, n) => {
-    const symbols = [
-        "!",
-        "#",
-        "$",
-        "%",
-        "^",
-        "&",
-        "*",
-        "+",
-        "=",
-        "|",
-        ":",
-        ";",
-        ".",
-        "?",
-        "/",
-        "~",
-    ];
+export const buttonGlitchText = (text, n) => {
+    // const symbols = [
+    //     "!",
+	// 	"#",
+	// 	"$",
+	// 	"%",
+	// 	"^",
+	// 	"&",
+	// 	"*",
+	// 	"+",
+	// 	"=",
+	// 	"|",
+	// 	":",
+	// 	";",
+	// 	".",
+	// 	"?",
+	// 	"/",
+    // ];
     let arr = [];
     // Random choice from 1 to n will change.
     let indicesChangeCount = Math.floor(random() * n) + 1;
@@ -50,8 +49,8 @@ export const textGlitch = (text, n) => {
     // Change indices.
     for (let i = 0; i < text.length; i++) {
         if (indices.includes(i)) {
-            let symbolIndex = Math.floor(random() * symbols.length);
-            arr.push(symbols[symbolIndex]);
+            const symbol = randomButtonGlitchSymbol()
+            arr.push(symbol);
         } else {
             arr.push(text[i]);
         }
@@ -184,46 +183,25 @@ export const highlightSpansGlitch = (displayText, bufferText) => {
         }
     }
 
-    const symbols = [
-        "!",
-        "@",
-        "#",
-        "$",
-        "%",
-        "^",
-        "&",
-        "*",
-        "+",
-        "=",
-        "|",
-        ":",
-        ";",
-        ".",
-        "?",
-        "/",
-        "~",
-        // "電", // Electric
-        // "神", // God
-        // "夢", // Dream
-        // "幻", // Illusion
-        // "現", // Reality
-        // "結", // Connection
-        // "遠", // Distance
-        // "界", // World
-        // "道", // Path
-        // "意", // Mind
-        // "覚", // Perception
-        // "網", // Network
-        // "暗", // Darkness
-        // "映", // Reflection
-        // "影", // Shadow
-        // "幽", // Ghost
-        // "光", // Light
-        // "無", // Nothingness
-        // "碑", // Monument
-        // "迷", // Lost
-        // "儀" // Ritual
-    ];
+    // const symbols = [
+    //     "!",
+    //     "@",
+    //     "#",
+    //     "$",
+    //     "%",
+    //     "^",
+    //     "&",
+    //     "*",
+    //     "+",
+    //     "=",
+    //     "|",
+    //     ":",
+    //     ";",
+    //     ".",
+    //     "?",
+    //     "/",
+    //     "~",
+    // ];
 
     function sliceFortune(span) {
         const fortuneSlice = displayText.substring(span[1], span[2] + 1);
@@ -234,7 +212,7 @@ export const highlightSpansGlitch = (displayText, bufferText) => {
         for (let i = 0; i < fortuneSlice.length; i++) {
             const isSymbol = random() < 0.5;
             if (isSymbol) {
-                arr.push(symbols[Math.floor(random() * symbols.length)]);
+                arr.push(randomGlitchTransitionSymbol());
             } else {
                 arr.push(fortuneSlice[i]);
             }

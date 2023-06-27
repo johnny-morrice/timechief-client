@@ -1,8 +1,9 @@
 import { createSignal, onCleanup } from "solid-js";
-import { random } from './fakeRandom';
+import { randomLoadingSymbol } from './fakeRandom';
 
 class Signals {
     constructor() {
+        [this.gapIndex, this.setGapIndex] = createSignal(0);
         [this.characterA, this.setCharacterA] = createSignal("");
         [this.characterB, this.setCharacterB] = createSignal("夢");
         [this.characterC, this.setCharacterC] = createSignal("幻");
@@ -17,48 +18,49 @@ class Signals {
 }
 
 export const Loading = () => {
+    // const symbols = [
+    //     "@",
+    //     "#",
+    //     "$",
+    //     "%",
+    //     "&",
+    //     "電", // Electric
+    //     "神", // God
+    //     "夢", // Dream
+    //     "幻", // Illusion
+    //     "現", // Reality
+    //     "結", // Connection
+    //     "遠", // Distance
+    //     "界", // World
+    //     "道", // Path
+    //     "意", // Mind
+    //     "覚", // Perception
+    //     "網", // Network
+    //     "暗", // Darkness
+    //     "映", // Reflection
+    //     "影", // Shadow
+    //     "幽", // Ghost
+    // ];
     const maxGapIndex = 3;
     const signals = new Signals();
-    var gapIndex = 0;
     const incrementGapIndex = () => {
+        const gapIndex = signals.gapIndex();
         let newIndex = gapIndex + 1;
         if (newIndex > maxGapIndex) {
             newIndex = 0;
         }
-        gapIndex = newIndex;
+        signals.setGapIndex(newIndex);
     }
-    const symbols = [
-        "@",
-        "#",
-        "$",
-        "%",
-        "&",
-        "電", // Electric
-        "神", // God
-        "夢", // Dream
-        "幻", // Illusion
-        "現", // Reality
-        "結", // Connection
-        "遠", // Distance
-        "界", // World
-        "道", // Path
-        "意", // Mind
-        "覚", // Perception
-        "網", // Network
-        "暗", // Darkness
-        "映", // Reflection
-        "影", // Shadow
-        "幽", // Ghost
-    ];
     const updateSignals = () => {
         incrementGapIndex();
         const gapCharacter = " ";
         const setCharacterFuncs = signals.setCharacters;
+        const gapIndex = signals.gapIndex();
         for (let i = 0; i < setCharacterFuncs.length; i++) {
             if (i === gapIndex) {
                 setCharacterFuncs[i](gapCharacter);
             } else {
-                setCharacterFuncs[i](symbols[Math.floor(random() * symbols.length)]);
+                setCharacterFuncs[i](randomLoadingSymbol());
             }
             // const isColorInverted = random() < 0.1;
             // const setInvert = signals.setInverts[i];
