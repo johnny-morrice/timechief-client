@@ -12,6 +12,7 @@ import (
 type Update struct {
 	Updater               update.Updater
 	StateFlagStore        store.StateFlagStore
+	KeyValueStore         store.KeyValueStore
 	VersionUpdateInterval time.Duration
 }
 
@@ -30,7 +31,18 @@ func (daemon Update) Start(ctx *cli.Context) {
 
 func (daemon Update) doTick(ctx *cli.Context) error {
 	log.Println("checking for updates")
-	err := daemon.StateFlagStore.CreateIfNotExists(UpdatingFlag)
+
+	setupState, err := daemon.KeyValueStore.Get("setup")
+	if err != nil {
+		return err
+	}
+
+	if setupState != SetupFlagInternetConnected {
+		log.Println("not connected to internet, skipping update")
+		return nil
+	}
+
+	err = daemon.StateFlagStore.CreateIfNotExists(UpdatingFlag)
 	if err != nil {
 		return err
 	}

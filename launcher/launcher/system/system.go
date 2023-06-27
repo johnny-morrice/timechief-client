@@ -492,5 +492,21 @@ func (sys System) SyncRTC() error {
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)
 	}
-	return sys.runScript(cfg, "sudo", "secure/pyrtc", "timesync", "--type", "rv3028")
+	return sys.runScript(cfg, "timechief-pyrtc", "timesync", "--type", "rv3028")
+}
+
+func (sys System) ExpandRootFS() error {
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	return sys.runScript(cfg, "timechief-expand-rootfs")
+}
+
+func (sys System) EnsureAutoLogin() error {
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	return sys.runScript(cfg, "timechief-ensure-autologin")
 }

@@ -12,6 +12,7 @@ import (
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/task"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
 )
@@ -69,6 +70,7 @@ func Daemon(ctx *cli.Context) error {
 	updateDaemon := daemon.Update{
 		Updater:               up,
 		StateFlagStore:        flagStore,
+		KeyValueStore:         keyValueStore,
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
 	deviceDataDaemon := daemon.DeviceData{
@@ -118,7 +120,6 @@ func Daemon(ctx *cli.Context) error {
 	networkStatus := daemon.NetworkStatus{
 		System: system,
 	}
-
 	setup := daemon.Setup{
 		KeyValueStore:    keyValueStore,
 		WifiNetworkStore: wifiNetworkStore,
@@ -131,6 +132,25 @@ func Daemon(ctx *cli.Context) error {
 
 	timeSync := daemon.TimeSync{
 		Syncer: system,
+	}
+
+	expandRootFS := task.ExpandRootFS{
+		KeyValueStore: keyValueStore,
+		System:        system,
+	}
+
+	err = expandRootFS.RunTask(ctx)
+	if err != nil {
+		return err
+	}
+
+	ensureAutoLogin := task.EnsureAutologin{
+		System: system,
+	}
+
+	err = ensureAutoLogin.RunTask(ctx)
+	if err != nil {
+		return err
 	}
 
 	go timeSync.Start(ctx)

@@ -1,0 +1,230 @@
+import { createSignal, onCleanup, Show } from 'solid-js';
+import { addServiceDataCallback, removeDataCallback } from './ipc';
+import { kelvinToCelsiusText } from '../temperature';
+import { weatherIconStyleClass } from '../weatherIcon';
+import { callbackName } from './callback';
+
+let dayForecastCount = 5;
+class Signals {
+    constructor() {
+        this.days = [];
+        for (var i = 0; i < dayForecastCount; i++) {
+            this.days.push(new DaySignals())
+        }
+        [this.dayCount, this.setDayCount] = createSignal(0);
+        [this.dayIndex, this.setDayIndex] = createSignal(0);
+    }
+}
+
+class DaySignals {
+    constructor() {
+        [this.date, this.setDate] = createSignal("");
+        [this.shortDate, this.setShortDate] = createSignal("");
+        [this.mornTemp, this.setMornTemp] = createSignal("");
+        [this.dayTemp, this.setDayTemp] = createSignal("");
+        [this.eveTemp, this.setEveTemp] = createSignal("");
+        [this.nightTemp, this.setNightTemp] = createSignal("");
+        [this.mornFeelsLike, this.setMornFeelsLike] = createSignal("");
+        [this.dayFeelsLike, this.setDayFeelsLike] = createSignal("");
+        [this.eveFeelsLike, this.setEveFeelsLike] = createSignal("");
+        [this.nightFeelsLike, this.setNightFeelsLike] = createSignal("");
+        [this.weatherConditions, this.setWeatherConditions] = createSignal("");
+    }
+}
+
+function updateSignals(signals, data) {
+    var locale = "en-GB";
+    if ("Clock" in data) {
+        if ("Locale" in data["Clock"] && data["Clock"]["Locale"] !== "") {
+            locale = data["Clock"]["Locale"];
+        }
+    }
+    if ("Weather" in data) {
+        if ("Daily" in data["Weather"]) {
+            let daily = data["Weather"]["Daily"];
+            var dayCount = daily.length;
+            if (dayCount > dayForecastCount) {
+                dayCount = dayForecastCount;
+            }
+            signals.setDayCount(dayCount);
+            for (var i = 0; i < dayCount; i++) {
+                let forecast = daily[i];
+                let daySignals = signals.days[i];
+                let dt = forecast["Dt"];
+                let date = parseUnixDate(dt);
+                let dateText = renderLongDateText(locale, date);
+                let shortText = renderShortDateText(locale, date);
+                daySignals.setShortDate(shortText);
+                daySignals.setDate(dateText);
+                let temp = forecast["Temp"];
+                let mornTemp = temp["Morn"];
+                let dayTemp = temp["Day"];
+                let eveTemp = temp["Eve"];
+                let nightTemp = temp["Night"];
+                let feelsLike = forecast["FeelsLike"];
+                let mornFeelsLike = feelsLike["Morn"];
+                let dayFeelsLike = feelsLike["Day"];
+                let eveFeelsLike = feelsLike["Eve"];
+                let nightFeelsLike = feelsLike["Night"];
+                daySignals.setMornTemp(kelvinToCelsiusText(mornTemp));
+                daySignals.setDayTemp(kelvinToCelsiusText(dayTemp));
+                daySignals.setEveTemp(kelvinToCelsiusText(eveTemp));
+                daySignals.setNightTemp(kelvinToCelsiusText(nightTemp));
+                daySignals.setMornFeelsLike(kelvinToCelsiusText(mornFeelsLike));
+                daySignals.setDayFeelsLike(kelvinToCelsiusText(dayFeelsLike));
+                daySignals.setEveFeelsLike(kelvinToCelsiusText(eveFeelsLike));
+                daySignals.setNightFeelsLike(kelvinToCelsiusText(nightFeelsLike));
+                let weatherConditions = forecast["WeatherConditions"];
+                daySignals.setWeatherConditions(weatherConditions["ConditionCode"]);
+            }
+        }
+    }
+}
+
+function parseUnixDate(seconds) {
+    let date = new Date(seconds * 1000);
+    return date;
+}
+
+// renderShortDateText renders a short date text for the given date.  It consists of the day of the week and the day of the month.
+function renderShortDateText(locale, date) {
+    let dateOptions = { weekday: 'short', day: 'numeric' };
+    var dateText = date.toLocaleDateString(locale, dateOptions);
+    return dateText;
+}
+
+function renderLongDateText(locale, date) {
+    let dateOptions = { month: 'long', day: 'numeric' };
+    var dateText = date.toLocaleDateString(locale, dateOptions);
+    return dateText;
+}
+
+export const Forecast = () => {
+    let signals = new Signals();
+    const cbName = callbackName("Forecast");
+    addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
+    onCleanup(() => {
+        removeDataCallback(cbName);
+    });
+
+    function getCurrentDay() {
+        const dayIndex = signals.dayIndex();
+        return signals.days[dayIndex];
+    }
+
+    function hasDay() {
+        const dayCount = signals.dayCount();
+        return dayCount > 0;
+    }
+
+    function hasDayLoaded() {
+        const dayIndex = signals.dayIndex();
+        return signals.days[dayIndex].shortDate() !== "";
+    }
+
+    function hasPrevDay() {
+        const dayIndex = signals.dayIndex();
+        return dayIndex > 0;
+    }
+
+    function hasNextDay() {
+        const dayIndex = signals.dayIndex();
+        const dayCount = signals.dayCount();
+        return dayIndex < dayCount - 1;
+    }
+
+    function onClickPrev() {
+        if (hasPrevDay()) {
+            const dayIndex = signals.dayIndex();
+            signals.setDayIndex(dayIndex - 1);
+        }
+    }
+
+    function onClickNext() {
+        if (hasNextDay()) {
+            const dayIndex = signals.dayIndex();
+            signals.setDayIndex(dayIndex + 1);
+        }
+    }
+
+    function getPrevDay() {
+        if (hasPrevDay()) {
+            const dayIndex = signals.dayIndex();
+            return signals.days[dayIndex - 1];
+        }
+        return {
+            'shortDate': '',
+        };
+    }
+
+    function getNextDay() {
+        if (hasNextDay()) {
+            const dayIndex = signals.dayIndex();
+            return signals.days[dayIndex + 1];
+        }
+        return {
+            'shortDate': '',
+        };
+    }
+
+    return <div class="forecast flex-column">
+        <Show when={!hasDay() || !hasDayLoaded()}>
+            <div class="forecast-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+        </Show>
+        <Show when={hasDay() && hasDayLoaded}>
+            <div class="forecast-day flex-column flex-grow">
+                <div class="forecast-day-controls">
+                    <Show when={hasPrevDay()}>
+                        <div class="forecast-day-prev-button-wrapper">
+                            <button class="forecast-control-button forecast-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {getPrevDay().shortDate}</button>
+                        </div>
+                    </Show>
+                    <Show when={!hasPrevDay()}>
+                        <div class="forecast-day-prev-button-wrapper forecast-day-prev-button-disabled">
+                        </div>
+                    </Show>
+                    <div class="forecast-control-label forecast-date">{getCurrentDay().shortDate}</div>
+                    <Show when={hasNextDay()}>
+                        <div class="forecast-day-next-button-wrapper">
+                            <button class="forecast-control-button forecast-day-next-button" onClick={onClickNext}>{getNextDay().shortDate} <i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </Show>
+                </div>
+                <table class="forecast-weather-table flex-grow">
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th>temp</th>
+                            <th>feels like</th>
+                        </tr>
+                        <tr>
+                            <th>morn</th>
+                            <td>{getCurrentDay().mornTemp}</td>
+                            <td>{getCurrentDay().mornFeelsLike}</td>
+                        </tr>
+                        <tr>
+                            <th>day</th>
+                            <td>{getCurrentDay().dayTemp}</td>
+                            <td>{getCurrentDay().dayFeelsLike}</td>
+                        </tr>
+                        <tr>
+                            <th>eve</th>
+                            <td>{getCurrentDay().eveTemp}</td>
+                            <td>{getCurrentDay().eveFeelsLike}</td>
+                        </tr>
+                        <tr>
+                            <th>night</th>
+                            <td>{getCurrentDay().nightTemp}</td>
+                            <td>{getCurrentDay().nightFeelsLike}</td>
+                        </tr>
+                        <tr>
+                            <td class="weather-icon"><i class={"fa-solid " + weatherIconStyleClass(getCurrentDay().weatherConditions())}></i></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </Show>
+    </div>
+};

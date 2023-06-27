@@ -1,6 +1,6 @@
 import { onCleanup } from 'solid-js';
 import { createSignal } from 'solid-js';
-import { isCalendarExists } from './calendarHelper';
+import { isCalendarExists } from '../calendarHelper';
 import { addServiceDataCallback } from './ipc';
 import { showHome, showAstro, showDevice, showForecast, showAccount, showLocale, showCalendar } from './routes';
 

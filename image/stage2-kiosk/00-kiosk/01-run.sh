@@ -31,12 +31,12 @@ if [ "$CURSOR" = "yes" ]; then
 fi
 
 # Autologin
-on_chroot << EOF
+on_chroot << 'EOF'
     systemctl --quiet set-default multi-user.target
     cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << CATEND
 [Service]
 ExecStart=
-ExecStart=-/sbin/agetty --noissue --skip-login --autologin $FIRST_USER_NAME --noclear %I \$TERM
+ExecStart=-/sbin/agetty --noissue --skip-login --autologin timechief --noclear %I $TERM
 CATEND
 EOF
 
@@ -72,6 +72,7 @@ After=network.target
 WorkingDirectory=/opt/timechief-launcher
 ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound
 Restart=always
+Nice=1
 
 [Install]
 WantedBy=multi-user.target
@@ -98,7 +99,7 @@ CATEND
 EOF
 
 # Hostapd unit file.
-on_chroot << EOF
+on_chroot << 'EOF'
 cat > /etc/systemd/system/hostapd-timechief.service << CATEND
 [Unit]
 Description=HostAP Daemon
@@ -107,7 +108,7 @@ After=syslog.target network.target
 [Service]
 Type=simple
 ExecStart=/usr/sbin/hostapd -B -P /run/hostapd.pid /tmp/hostapd.conf
-ExecReload=/bin/kill -HUP \$MAINPID
+ExecReload=/bin/kill -HUP $MAINPID
 PIDFile=/run/hostapd.pid
 User=root
 Group=root

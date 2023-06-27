@@ -1,7 +1,7 @@
 import { createSignal, Show } from 'solid-js';
 import { addServiceDataCallback } from './ipc';
-import { kelvinToCelsiusText } from './temperature';
-import { weatherIconStyleClass } from './weatherIcon';
+import { kelvinToCelsiusText } from '../temperature';
+import { weatherIconStyleClass } from '../weatherIcon';
 
 let dayForecastCount = 3;
 class ForecastPageSignals {

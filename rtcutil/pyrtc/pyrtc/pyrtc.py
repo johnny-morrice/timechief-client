@@ -47,7 +47,7 @@ def timesync(args):
     rtc = get_rtc()
     rtc_time = rtc.get_time_and_date()
     date_string = f"{rtc_time.year:04d}-{rtc_time.month:02d}-{rtc_time.day:02d}T{rtc_time.hour:02d}:{rtc_time.minute:02d}:{rtc_time.second:02d}Z"
-    sync_script = "/opt/timechief-launcher/bin/secure/set-system-time.sh"
+    sync_script = "/opt/timechief-launcher/bin/secure/timechief-set-system-time"
     subprocess.run([sync_script, date_string])
 
 def get_rtc():

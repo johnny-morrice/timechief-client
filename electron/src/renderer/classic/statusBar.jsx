@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js';
-import { isCalendarExists } from './calendarHelper';
+import { isCalendarExists } from '../calendarHelper';
 import { addDataCallback } from './ipc';
-import { apiErrorTimeout } from './timing'
+import { apiErrorTimeout } from '../timing'
 
 class StatusBarSignals {
     constructor() {
