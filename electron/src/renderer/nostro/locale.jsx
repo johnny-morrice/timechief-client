@@ -4,6 +4,7 @@ import { callbackName } from "./callback";
 
 class Signals {
     constructor() {
+        [this.location, this.setLocation] = createSignal("");
         [this.latitude, this.setLatitude] = createSignal("");
         [this.longitude, this.setLongitude] = createSignal("");
         [this.timezone, this.setTimezone] = createSignal("");
@@ -12,12 +13,14 @@ class Signals {
 
 function updateSignals(signals, data) {
     let clock = data["Clock"];
+    let location = clock["Location"];
     let latitude = clock["Latitude"];
     let longitude = clock["Longitude"];
     let timezone = clock["Timezone"];
     signals.setLatitude(latitude);
     signals.setLongitude(longitude);
     signals.setTimezone(timezone);
+    signals.setLocation(location);
 }
 
 function hasLocaleInfo(signals) {
@@ -38,10 +41,12 @@ export const Locale = () => {
         </Show>
         <div class="flex-row flex-grow">
             <div class="locale-labels flex-column flex-grow">
+                <div class='data-label flex-grow'>Location</div>
                 <div class='data-label flex-grow'>Timezone</div>
                 <div class='data-label flex-grow'>Coords</div>
             </div>
             <div class="locale-values flex-column flex-grow">
+                <div class='data-value flex-grow'>{signals.location}</div>
                 <div class='data-value flex-grow'>{signals.timezone}</div>
                 <div class='data-value flex-grow'>{signals.latitude}, {signals.longitude}</div>
             </div>

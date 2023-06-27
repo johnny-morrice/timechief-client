@@ -46,11 +46,7 @@ div.border {
 }
 
 div.home-date {
-    font-size: 30pt;
-}
-
-div.home-location {
-    font-size: 30pt;
+    font-size: 36pt;
 }
 
 div.home-time {
@@ -101,7 +97,7 @@ div.current-weather {
 
 div.current-weather-grid {
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 0.5fr 0.5fr;
     grid-template-columns: 1fr 1fr;
     grid-gap: 1em;
 }
@@ -118,14 +114,6 @@ button.action-button {
     border: 1px solid green;
     background-color: black;
     color: green;
-    font-size: 18pt
-}
-
-button.action-button:disabled {
-    border: 1px solid green;
-    background-color: black;
-    color: green;
-    text-decoration: line-through;
     font-size: 18pt
 }
 
@@ -148,7 +136,7 @@ div.astro {
 }
 
 div.weather-data {
-    font-size: 26pt;
+    font-size: 34pt;
 }
 
 div.current-weather-icon {
@@ -223,15 +211,16 @@ div.fortune-text {
     font-size: 14pt;
 }
 
+div.next-event-summary {
+    font-size: 24pt;
+}
+
 @media (min-width: 800px) {
     div.home-time {
         font-size: 110pt;
     }
     div.home-date {
-        font-size: 30pt;
-    }
-    div.home-location {
-        font-size: 30pt;
+        font-size: 38pt;
     }
     div.current-weather {
         font-size: 24pt
@@ -273,10 +262,7 @@ div.fortune-text {
         font-size: 120pt;
     }
     div.home-date {
-        font-size: 30pt;
-    }
-    div.home-location {
-        font-size: 24pt;
+        font-size: 40pt;
     }
     div.current-weather {
         font-size: 28pt

@@ -159,10 +159,10 @@ export const HomePage = () => {
         [
           { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
           { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl />},
-          { icon: () => <i class="fa-solid fa-user"></i>, element: () => <Pairing /> },
           { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo />},
-          { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
+          { icon: () => <i class="fa-solid fa-user"></i>, element: () => <Pairing /> },
           { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
+          { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
           { icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },
           { icon: () => <i class="fa-solid fa-calendar-days"></i>, element: () => <EventCalendar /> },
         ]
@@ -172,7 +172,6 @@ export const HomePage = () => {
       <div class="home-time-wrapper flex-grow">
         <div class="home-time">{signals.myTime}</div>
         <div class="home-date">{signals.myDate}</div>
-        <div class='home-location'>{signals.location}</div>
       </div>
 
       <div class="home-action-center flex-row flex-grow border crt-box">

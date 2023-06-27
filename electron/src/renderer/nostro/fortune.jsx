@@ -37,7 +37,7 @@ export const Fortune = () => {
     const [fortuneBuffer, setFortuneBuffer] = createSignal("");
     const updatePoem = () => {
         setFortuneBuffer(poems[Math.floor(Math.random() * poems.length)]);
-        transitionOverTime(3);
+        transitionOverTime(2);
     };
     const transitionOverTime = (n) => {
         let more = transitionBuffer(n);
