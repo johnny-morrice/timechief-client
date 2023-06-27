@@ -1,3 +1,4 @@
+import { createSignal, createResource } from "solid-js";
 import { second } from "../timing";
 
 export const glitchStyle = (text) => {
@@ -56,6 +57,20 @@ export const textGlitch = (text, n) => {
         }
     }
     return arr.join("");
+}
+
+export const textTransitionSignal = () => {
+    const [buffer, setBuffer] = createSignal("");
+    const [intermediate, setIntermediate] = createSignal("");
+    const applyHighlight = (text) => {
+        return highlightSpansGlitch(text, buffer());
+    };
+    const [out] = createResource(intermediate, applyHighlight);
+    function doSet(data) {
+        setBuffer(data);
+        textTransitionGlitch(buffer, intermediate, setIntermediate, 2);
+    }
+    return [out, doSet];
 }
 
 export const textTransitionGlitch = (buffer, display, setter, n) => {

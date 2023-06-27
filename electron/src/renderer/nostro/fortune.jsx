@@ -1,6 +1,6 @@
-import { createSignal, onCleanup } from "solid-js";
+import { onCleanup } from "solid-js";
 import { second } from "../timing";
-import { textTransitionGlitch, highlightSpansGlitch } from "./textGlitch";
+import { textTransitionSignal } from "./textGlitch";
 
 export const Fortune = () => {
     const poems = [
@@ -34,11 +34,9 @@ export const Fortune = () => {
         "Teletype clatters, words unfold.",
         "Oscillating waves, invisible messages transmit.",
     ];
-    const [fortune, setFortune] = createSignal("");
-    const [fortuneBuffer, setFortuneBuffer] = createSignal("");
+    const [fortune, setFortune] = textTransitionSignal();
     const updatePoem = () => {
-        setFortuneBuffer(poems[Math.floor(Math.random() * poems.length)]);
-        textTransitionGlitch(fortuneBuffer, fortune, setFortune, 2);
+        setFortune(poems[Math.floor(Math.random() * poems.length)]);
     };
 
     updatePoem();
@@ -47,6 +45,6 @@ export const Fortune = () => {
         clearInterval(interval);
     });
     return <div class="fortune-wrapper flex-column flex-grow">
-        <div class="fortune-text">{highlightSpansGlitch(fortune(), fortuneBuffer())}</div>
+        <div class="fortune-text">{fortune}</div>
     </div>;
 }
