@@ -1,4 +1,4 @@
-import { onCleanup } from 'solid-js';
+import { onCleanup, createSignal } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { Loading } from './loading';
@@ -6,6 +6,7 @@ import { textTransitionSignal } from './textGlitch';
 
 class Signals {
     constructor() {
+        [this.isLoaded, this.setIsLoaded] = createSignal(false);
         [this.location, this.setLocation] = textTransitionSignal("");
         [this.coords, this.setCoords] = textTransitionSignal("");
         [this.timezone, this.setTimezone] = textTransitionSignal("");
@@ -21,10 +22,11 @@ function updateSignals(signals, data) {
     signals.setCoords(`${latitude}, ${longitude}`);
     signals.setTimezone(timezone);
     signals.setLocation(location);
+    signals.setIsLoaded(true);
 }
 
 function hasLocaleInfo(signals) {
-    return signals.latitude() !== "" && signals.longitude() !== "" && signals.timezone() !== "";
+    return signals.isLoaded();
 }
 
 export const Locale = () => {
