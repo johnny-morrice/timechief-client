@@ -108,7 +108,6 @@ export const Fortune = () => {
                 diffIndices.push(i);
             }
         }
-        console.log("diffIndices: " + diffIndices);
         // Let's create a list of spans.
         // We need to merge adjacent indices.
         // We need to marke when it's different.
@@ -131,7 +130,6 @@ export const Fortune = () => {
                 spans.push(span);
             }
         }
-        console.log(spans);
 
         // Construct a jsx element with spans around the letters that are different.
         // The spans should use class "inverted-color".

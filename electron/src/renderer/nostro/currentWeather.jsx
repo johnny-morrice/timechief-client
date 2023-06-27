@@ -55,30 +55,20 @@ export const CurrentWeather = () => {
     });
 
     return <div class="current-weather flex-column flex-grow">
-        <Show when={hasWeather(signals)}>
-            <div class="weather-temp-wrapper flex-row flex-grow">
-                <div class="weather-temp-label-wrapper flex-column flex-grow">
-                    <div class="weather-temp-label weather-label data-label">temp</div>
-                    <div class="weather-temp-feels-label weather-label data-label">feels</div>
-                </div>
-                <div class="weather-temp-data-wrapper flex-column flex-grow">
-                    <div class='weather-temp weather-data'>{signals.temp}</div>
-                    <div class='weather-temp-feels weather-data'>{signals.feelsLikeTemp}</div>
-                </div>
-            </div>
-            <div class="weather-condition-bar flex-row flex-grow">
-                <div class="weather-condition-current-wrapper flex-column flex-grow">
-                    <div class='weather-condition-current-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></div>
-                    <div class="weather-condition-current-label weather-label weather-icon-label">current</div>
-                </div>
-                <div class="weather-condition-today-wrapper flex-column flex-grow">
-                    <div class='weather-condition-today-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i></div>
-                    <div class="weather-condition-today-label weather-label weather-icon-label">today</div>
-                </div>
-            </div>
-        </Show>
         <Show when={!hasWeather(signals)}>
             <div class="weather-temp-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
         </Show>
-    </div>
+        <Show when={hasWeather(signals)}>
+            <div class="current-weather-grid flex-grow">
+                <div class="weather-temp-label weather-label data-label">temp</div>
+                <div class='weather-temp weather-data'>{signals.temp}</div>
+                <div class="weather-temp-feels-label weather-label data-label">feels</div>
+                <div class='weather-temp-feels weather-data'>{signals.feelsLikeTemp}</div>
+                <div class='weather-condition-current-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></div>
+                <div class='weather-condition-today-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i></div>
+                <div class="weather-condition-current-label weather-label weather-icon-label">current</div>
+                <div class="weather-condition-today-label weather-label weather-icon-label">today</div>
+            </div>
+        </Show >
+    </div >
 }

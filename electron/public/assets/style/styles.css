@@ -99,6 +99,13 @@ div.current-weather {
     font-size: 22pt
 }
 
+div.current-weather-grid {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1em;
+}
+
 button:active {
     outline: 0;
 }
@@ -141,7 +148,7 @@ div.astro {
 }
 
 div.weather-data {
-    font-size: 26pt;
+    font-size: 34pt;
 }
 
 div.current-weather-icon {
@@ -245,7 +252,7 @@ div.fortune-text {
         font-size: 18pt;
     }
     div.weather-data {
-        font-size: 28pt;
+        font-size: 36pt;
     }
     div.current-weather-icon {
         font-size: 34pt;
@@ -255,6 +262,9 @@ div.fortune-text {
     }
     div.calendar-day-date {
         font-size: 22pt;
+    }
+    div.fortune-text {
+        font-size: 16pt;
     }
 }
 
@@ -287,7 +297,7 @@ div.fortune-text {
         font-size: 20pt;
     }
     div.weather-data {
-        font-size: 32pt;
+        font-size: 38pt;
     }
     div.current-weather-icon {
         font-size: 36pt;
@@ -297,5 +307,8 @@ div.fortune-text {
     }
     div.calendar-day-date {
         font-size: 24pt;
+    }
+    div.fortune-text {
+        font-size: 18pt;
     }
 }
