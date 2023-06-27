@@ -1,6 +1,7 @@
 import { Show, createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
+import { Loading } from './loading';
 
 class Signals {
     constructor() {
@@ -84,9 +85,7 @@ export const Astro = () => {
 
     return <div class="astro">
         <Show when={!hasAstro(signals)}>
-            <div class="astro-loading">
-                <div><i class="fa-solid fa-spinner fa-spin"></i></div>
-            </div>
+            <Loading />
         </Show>
         <Show when={hasAstro(signals)}>
             <div class="flex-row flex-grow">

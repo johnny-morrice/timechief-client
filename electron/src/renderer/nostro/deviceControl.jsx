@@ -2,6 +2,7 @@ import { createSignal, onCleanup } from 'solid-js';
 import { callbackName } from "./callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from './ipc';
 import { glitchStyle, runTextGlitch } from './textGlitch';
+import { Loading } from './loading';
 
 class Signals {
     constructor() {
@@ -118,9 +119,7 @@ export const DeviceControl = () => {
                 </div>
             </Show>
             <Show when={!hasDeviceStatus(signals)}>
-                <div class="flex-row flex-grow">
-                    <div><i class="fa-solid fa-spinner fa-spin"></i></div>
-                </div>
+                <Loading />
             </Show>
         </div>
     </div>;

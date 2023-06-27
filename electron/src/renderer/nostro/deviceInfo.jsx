@@ -1,6 +1,7 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback } from './ipc';
 import { callbackName } from "./callback";
+import { Loading } from './loading';
 
 class Signals {
     constructor() {
@@ -52,7 +53,7 @@ export const DeviceInfo = () => {
 
     return <div class="device-control flex-grow">
         <Show when={!hasDeviceInfo(signals)}>
-            <div class="device-info-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            <Loading />
         </Show>
         <Show when={hasDeviceInfo(signals)}>
             <div class="flex-row flex-grow">

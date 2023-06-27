@@ -3,6 +3,7 @@ import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { kelvinToCelsiusText } from '../temperature';
 import { weatherIconStyleClass } from '../weatherIcon';
 import { callbackName } from './callback';
+import { Loading } from './loading';
 
 let dayForecastCount = 5;
 class Signals {
@@ -169,7 +170,7 @@ export const Forecast = () => {
 
     return <div class="forecast flex-column">
         <Show when={!hasDay() || !hasDayLoaded()}>
-            <div class="forecast-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            <Loading />
         </Show>
         <Show when={hasDay() && hasDayLoaded}>
             <div class="forecast-day flex-column flex-grow">

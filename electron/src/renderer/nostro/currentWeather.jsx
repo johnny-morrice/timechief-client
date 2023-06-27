@@ -3,6 +3,7 @@ import { callbackName } from "./callback"
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { weatherIconStyleClass } from '../weatherIcon';
 import { kelvinToCelsiusText } from '../temperature';
+import { Loading } from "./loading";
 
 class Signals {
     constructor() {
@@ -56,7 +57,7 @@ export const CurrentWeather = () => {
 
     return <div class="current-weather flex-column flex-grow">
         <Show when={!hasWeather(signals)}>
-            <div class="weather-temp-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            <Loading />
         </Show>
         <Show when={hasWeather(signals)}>
             <div class="current-weather-grid flex-grow">

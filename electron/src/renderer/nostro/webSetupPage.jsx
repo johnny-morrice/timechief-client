@@ -2,6 +2,7 @@ import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { glitchStyle, runTextGlitch } from './textGlitch';
+import { Loading } from './loading';
 
 class Signals {
     constructor() {
@@ -216,9 +217,7 @@ export const WebSetupPage = (props) => {
                             </div>
                         </Show>
                     </div>
-                    <div class="setup-loading">
-                        <div><i class="fa-solid fa-spinner fa-spin"></i></div>
-                    </div>
+                    <Loading />
                 </div>
             </div>
         </Show>

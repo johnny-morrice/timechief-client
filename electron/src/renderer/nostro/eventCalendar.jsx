@@ -3,6 +3,7 @@ import { CalendarEvent, makeCanonicalDateText, sortCalendarEvents } from '../cal
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { day } from '../timing';
 import { callbackName } from './callback';
+import { Loading } from './loading';
 
 class Signals {
   constructor() {
@@ -222,7 +223,7 @@ export const EventCalendar = () => {
 
   return <div id="calendar-screen">
     <Show when={!signals.loaded()}>
-      <div class="event-calendar-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      <Loading />
     </Show>
     <Show when={signals.loaded()}>
       <div class="flex-column flex-grow">
