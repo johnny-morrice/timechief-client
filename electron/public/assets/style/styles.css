@@ -46,11 +46,7 @@ div.border {
 }
 
 div.home-date {
-    font-size: 34pt;
-}
-
-div.home-location {
-    font-size: 26pt;
+    font-size: 36pt;
 }
 
 div.home-time {
@@ -226,9 +222,6 @@ div.next-event-summary {
     div.home-date {
         font-size: 30pt;
     }
-    div.home-location {
-        font-size: 30pt;
-    }
     div.current-weather {
         font-size: 24pt
     }
@@ -270,9 +263,6 @@ div.next-event-summary {
     }
     div.home-date {
         font-size: 30pt;
-    }
-    div.home-location {
-        font-size: 24pt;
     }
     div.current-weather {
         font-size: 28pt
