@@ -81,6 +81,15 @@ func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v st
 }
 
 func (up Updater) Update(ctx *cli.Context) error {
+	garbageCollector := task.GarbageCollectTargets{
+		LaunchTargetStore: up.LaunchTargetStore,
+	}
+	defer func() {
+		myErr := garbageCollector.RunTask(ctx)
+		if myErr != nil {
+			log.Printf("failed to garbage collect: %s", myErr)
+		}
+	}()
 	err := up.SyncAPIVersions(ctx)
 	if err != nil {
 		return err
@@ -109,14 +118,7 @@ func (up Updater) Update(ctx *cli.Context) error {
 		return err
 	}
 
-	err = up.CreateNewLaunchTarget(ctx, cfg, newVersion)
-	if err != nil {
-		return err
-	}
-	garbageCollector := task.GarbageCollectTargets{
-		LaunchTargetStore: up.LaunchTargetStore,
-	}
-	return garbageCollector.RunTask(ctx)
+	return up.CreateNewLaunchTarget(ctx, cfg, newVersion)
 }
 
 func (up Updater) SyncAPIVersions(ctx *cli.Context) error {
