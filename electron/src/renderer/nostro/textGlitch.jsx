@@ -59,7 +59,7 @@ export const textGlitch = (text, n) => {
     return arr.join("");
 }
 
-export const textTransitionSignal = () => {
+export const textTransitionSignal = (value) => {
     const [buffer, setBuffer] = createSignal("");
     const [intermediate, setIntermediate] = createSignal("");
     const applyHighlight = (text) => {
@@ -70,6 +70,7 @@ export const textTransitionSignal = () => {
         setBuffer(data);
         textTransitionGlitch(buffer, intermediate, setIntermediate, 2);
     }
+    doSet(value);
     return [out, doSet];
 }
 

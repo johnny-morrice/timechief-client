@@ -4,15 +4,16 @@ import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { weatherIconStyleClass } from '../weatherIcon';
 import { kelvinToCelsiusText } from '../temperature';
 import { Loading } from "./loading";
+import { textTransitionSignal } from "./textTransition";
 
 class Signals {
     constructor() {
-        [this.temp, this.setTemp] = createSignal("");
-        [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
+        [this.temp, this.setTemp] = textTransitionSignal("");
+        [this.feelsLikeTemp, this.setFeelsLikeTemp] = textTransitionSignal("");
         [this.tempK, this.setTempK] = createSignal(0);
         [this.feelsLikeTempK, this.setFeelsLikeTempK] = createSignal(0);
-        [this.currentWeatherConditions, this.setCurrentWeatherConditions] = createSignal("");
-        [this.todayWeatherConditions, this.setTodayWeatherConditions] = createSignal("");
+        [this.currentWeatherConditions, this.setCurrentWeatherConditions] = textTransitionSignal("");
+        [this.todayWeatherConditions, this.setTodayWeatherConditions] = textTransitionSignal("");
     }
 }
 

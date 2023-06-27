@@ -34,7 +34,7 @@ export const Fortune = () => {
         "Teletype clatters, words unfold.",
         "Oscillating waves, invisible messages transmit.",
     ];
-    const [fortune, setFortune] = textTransitionSignal();
+    const [fortune, setFortune] = textTransitionSignal("");
     const updatePoem = () => {
         setFortune(poems[Math.floor(Math.random() * poems.length)]);
     };

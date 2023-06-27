@@ -3,12 +3,13 @@ import { callbackName } from "./callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from './ipc';
 import { glitchStyle, runTextGlitch } from './textGlitch';
 import { Loading } from './loading';
+import { textTransitionSignal } from './textGlitch';
 
 class Signals {
     constructor() {
-        [this.deviceStatus, this.setDeviceStatus] = createSignal("");
+        [this.deviceStatus, this.setDeviceStatus] = textTransitionSignal("");
         [this.launcherState, this.setLauncherState] = createSignal({});
-        [this.clientVersion, this.setClientVersion] = createSignal("");
+        [this.clientVersion, this.setClientVersion] = textTransitionSignal("");
         [this.disableShutdown, this.setDisableShutdown] = createSignal(false);
         [this.rebootGlitch, this.setRebootGlitch] = createSignal("Reboot");
         [this.shutdownGlitch, this.setShutdownGlitch] = createSignal("Shutdown");

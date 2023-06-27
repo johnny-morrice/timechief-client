@@ -4,6 +4,7 @@ import { kelvinToCelsiusText } from '../temperature';
 import { weatherIconStyleClass } from '../weatherIcon';
 import { callbackName } from './callback';
 import { Loading } from './loading';
+import { textTransitionSignal } from "./textGlitch";
 
 let dayForecastCount = 5;
 class Signals {
@@ -19,17 +20,17 @@ class Signals {
 
 class DaySignals {
     constructor() {
-        [this.date, this.setDate] = createSignal("");
-        [this.shortDate, this.setShortDate] = createSignal("");
-        [this.mornTemp, this.setMornTemp] = createSignal("");
-        [this.dayTemp, this.setDayTemp] = createSignal("");
-        [this.eveTemp, this.setEveTemp] = createSignal("");
-        [this.nightTemp, this.setNightTemp] = createSignal("");
-        [this.mornFeelsLike, this.setMornFeelsLike] = createSignal("");
-        [this.dayFeelsLike, this.setDayFeelsLike] = createSignal("");
-        [this.eveFeelsLike, this.setEveFeelsLike] = createSignal("");
-        [this.nightFeelsLike, this.setNightFeelsLike] = createSignal("");
-        [this.weatherConditions, this.setWeatherConditions] = createSignal("");
+        [this.date, this.setDate] = textTransitionSignal("");
+        [this.shortDate, this.setShortDate] = textTransitionSignal("");
+        [this.mornTemp, this.setMornTemp] = textTransitionSignal("");
+        [this.dayTemp, this.setDayTemp] = textTransitionSignal("");
+        [this.eveTemp, this.setEveTemp] = textTransitionSignal("");
+        [this.nightTemp, this.setNightTemp] = textTransitionSignal("");
+        [this.mornFeelsLike, this.setMornFeelsLike] = textTransitionSignal("");
+        [this.dayFeelsLike, this.setDayFeelsLike] = textTransitionSignal("");
+        [this.eveFeelsLike, this.setEveFeelsLike] = textTransitionSignal("");
+        [this.nightFeelsLike, this.setNightFeelsLike] = textTransitionSignal("");
+        [this.weatherConditions, this.setWeatherConditions] = textTransitionSignal("");
     }
 }
 

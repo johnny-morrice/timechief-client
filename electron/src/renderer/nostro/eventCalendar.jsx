@@ -4,13 +4,14 @@ import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { day } from '../timing';
 import { callbackName } from './callback';
 import { Loading } from './loading';
+import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
   constructor() {
     [this.calendarDays, this.setCalendarDays] = createSignal([]);
     [this.loaded, this.setLoaded] = createSignal(false);
-    [this.locale, this.setLocale] = createSignal("en-GB");
-    [this.timeZone, this.setTimeZone] = createSignal("Europe/London");
+    [this.locale, this.setLocale] = textTransitionSignal("en-GB");
+    [this.timeZone, this.setTimeZone] = textTransitionSignal("Europe/London");
     [this.dayIndex, this.setDayIndex] = createSignal(0);
   }
 }

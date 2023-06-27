@@ -1,13 +1,14 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { onCleanup } from 'solid-js';
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback } from './ipc';
 import { callbackName } from "./callback";
 import { Loading } from './loading';
+import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
     constructor() {
-        [this.ipAddress, this.setIpAddress] = createSignal("");
-        [this.activeTargetVersion, this.setActiveTargetVersion] = createSignal("");
-        [this.clientVersion, this.setClientVersion] = createSignal("");
+        [this.ipAddress, this.setIpAddress] = textTransitionSignal("");
+        [this.activeTargetVersion, this.setActiveTargetVersion] = textTransitionSignal("");
+        [this.clientVersion, this.setClientVersion] = textTransitionSignal("");
     }
 }
 

@@ -2,13 +2,14 @@ import { createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { Loading } from './loading';
+import { textTransitionSignal } from './textGlitch';
 
 class Signals {
     constructor() {
-        [this.location, this.setLocation] = createSignal("");
-        [this.latitude, this.setLatitude] = createSignal("");
-        [this.longitude, this.setLongitude] = createSignal("");
-        [this.timezone, this.setTimezone] = createSignal("");
+        [this.location, this.setLocation] = textTransitionSignal("");
+        [this.latitude, this.setLatitude] = textTransitionSignal("");
+        [this.longitude, this.setLongitude] = textTransitionSignal("");
+        [this.timezone, this.setTimezone] = textTransitionSignal("");
     }
 }
 
