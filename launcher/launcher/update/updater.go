@@ -13,6 +13,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/task"
 	"github.com/urfave/cli/v2"
 )
 
@@ -80,6 +81,15 @@ func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v st
 }
 
 func (up Updater) Update(ctx *cli.Context) error {
+	garbageCollector := task.GarbageCollectTargets{
+		LaunchTargetStore: up.LaunchTargetStore,
+	}
+	defer func() {
+		myErr := garbageCollector.RunTask(ctx)
+		if myErr != nil {
+			log.Printf("failed to garbage collect: %s", myErr)
+		}
+	}()
 	err := up.SyncAPIVersions(ctx)
 	if err != nil {
 		return err

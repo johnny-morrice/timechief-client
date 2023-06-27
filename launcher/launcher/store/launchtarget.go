@@ -3,12 +3,15 @@ package store
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type LaunchTarget struct {
-	gorm.Model
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 	VersionID uint
 	Version   Version `gorm:"foreignKey:VersionID"`
 	Path      string
@@ -19,10 +22,26 @@ type LaunchTargetStore struct {
 	DB *gorm.DB
 }
 
-func (store LaunchTargetStore) GetLaunchTargets() ([]LaunchTarget, error) {
+func (store LaunchTargetStore) List() ([]LaunchTarget, error) {
 	var launchTargets []LaunchTarget
 	result := store.DB.Find(&launchTargets)
 	return launchTargets, result.Error
+}
+
+func (store LaunchTargetStore) ListGarbage(keep int) ([]LaunchTarget, error) {
+	_, err := store.GetActiveLaunchTarget()
+	if err != nil {
+		return nil, err
+	}
+	const query = `SELECT * FROM launch_targets WHERE is_active = 0 AND id NOT IN (SELECT id FROM launch_targets WHERE is_active = 0 ORDER BY updated_at DESC LIMIT ?);`
+	var launchTargets []LaunchTarget
+	result := store.DB.Raw(query, keep).Scan(&launchTargets)
+	return launchTargets, result.Error
+}
+
+func (store LaunchTargetStore) Delete(lt LaunchTarget) error {
+	result := store.DB.Delete(&lt)
+	return result.Error
 }
 
 func (store LaunchTargetStore) GetActiveLaunchTarget() (LaunchTarget, error) {
