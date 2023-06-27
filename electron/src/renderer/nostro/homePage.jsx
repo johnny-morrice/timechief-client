@@ -143,13 +143,20 @@ export const HomePage = () => {
   let timeInterval = setInterval(
     () => {
       signals.setMyTime(getTimeText(signals));
-      signals.setMyDate(getDateText(getLocale(signals)));
     },
     second / 10
   );
 
+  let dateInterval = setInterval(
+    () => {
+      signals.setMyDate(getDateText(getLocale(signals)));
+    },
+    second * 60
+  );
+
   onCleanup(() => {
     clearInterval(timeInterval);
+    clearInterval(dateInterval);
     removeDataCallback(cbName);
   });
 
