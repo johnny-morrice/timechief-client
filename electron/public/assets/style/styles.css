@@ -101,7 +101,7 @@ div.current-weather {
 
 div.current-weather-grid {
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 0.5fr;
     grid-template-columns: 1fr 1fr;
     grid-gap: 1em;
 }
@@ -140,7 +140,7 @@ div.astro {
 }
 
 div.weather-data {
-    font-size: 26pt;
+    font-size: 30pt;
 }
 
 div.current-weather-icon {
@@ -216,7 +216,7 @@ div.fortune-text {
 }
 
 div.next-event-summary {
-    font-size: 18pt;
+    font-size: 24pt;
 }
 
 @media (min-width: 800px) {
