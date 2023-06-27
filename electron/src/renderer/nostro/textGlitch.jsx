@@ -2,7 +2,7 @@ import { createSignal, createResource } from "solid-js";
 import { second } from "../timing";
 
 export const glitchStyle = (text) => {
-    const size = text.length + 2;
+    const size = text.length + 4;
     return `width: ${size}em;`;
 };
 
@@ -58,6 +58,21 @@ export const textGlitch = (text, n) => {
     }
     return arr.join("");
 }
+
+export const textTransitionResource = (value, getter, setter, transform) => {
+    const [textBuffer] = createResource(getter, transform);
+    const [intermediate, setIntermediate] = createSignal("");
+    const applyHighlight = (text) => {
+        return highlightSpansGlitch(text, textBuffer());
+    };
+    const [out] = createResource(intermediate, applyHighlight);
+    function doSet(data) {
+        setter(data);
+        textTransitionGlitch(textBuffer, intermediate, setIntermediate, 2);
+    }
+    doSet(value);
+    return [out, doSet];
+};
 
 export const textTransitionSignal = (value) => {
     const [buffer, setBuffer] = createSignal("");

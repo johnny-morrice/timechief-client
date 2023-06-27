@@ -3,6 +3,7 @@ import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShu
 import { callbackName } from "./callback";
 import { glitchStyle, runTextGlitch } from './textGlitch';
 import { Loading } from './loading';
+import { textTransitionSignal } from './textGlitch';
 
 class Signals {
     constructor() {
@@ -10,6 +11,11 @@ class Signals {
         [this.deviceSetupURL, this.setDeviceSetupURL] = createSignal("");
         [this.hotspotSSID, this.setHotspotSSID] = createSignal("");
         [this.hotspotKey, this.setHotspotKey] = createSignal("");
+
+        [this.deviceSetupURLText, this.setDeviceSetupURLText] = textTransitionSignal("");
+        [this.hotspotSSIDText, this.setHotspotSSIDText] = textTransitionSignal("");
+        [this.hotspotKeyText, this.setHotspotKeyText] = textTransitionSignal("");
+
         [this.wifiError, this.setWifiError] = createSignal(false);
         [this.activeSSID, this.setActiveSSID] = createSignal("");
         [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
@@ -39,6 +45,7 @@ function updateSignals(signals, data) {
         if ("WebURL" in launcherState) {
             let setupURL = launcherState["WebURL"];
             signals.setDeviceSetupURL(setupURL);
+            signals.setDeviceSetupURLText(setupURL);
         }
 
         let isUpdating = launcherState["Flags"].includes("isUpdating");
@@ -55,7 +62,9 @@ function updateSignals(signals, data) {
 
             if (hotspotSSID && hotspotKey && hotspotSSID.length > 0 && hotspotKey.length > 0) {
                 signals.setHotspotSSID(hotspotSSID);
+                signals.setHotspotSSIDText(hotspotSSID);
                 signals.setHotspotKey(hotspotKey);
+                signals.setHotspotKeyText(hotspotKey);
             }
         }
     }
@@ -175,15 +184,15 @@ export const WebSetupPage = (props) => {
                     <div class="setup-instructions flex-column">
                         <div class='flex-row'>
                             <div class="data-label">Connect to Wifi Network</div>
-                            <div class="data-value">{signals.hotspotSSID}</div>
+                            <div class="data-value">{signals.hotspotSSIDText}</div>
                         </div>
                         <div class='flex-row'>
                             <div class="data-label">Wifi Key</div>
-                            <div class="data-value">{signals.hotspotKey}</div>
+                            <div class="data-value">{signals.hotspotKeyText}</div>
                         </div>
                         <div class='flex-row'>
                             <div class="data-label">Continue setup via your browser</div>
-                            <div class="data-value">{signals.deviceSetupURL}</div>
+                            <div class="data-value">{signals.deviceSetupURLText}</div>
                         </div>
                         <Show when={isConnectionError(signals)}>
                             <div class='flex-row'>

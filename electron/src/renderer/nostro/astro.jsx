@@ -2,7 +2,7 @@ import { Show, createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { Loading } from './loading';
-import { textTransitionSignal } from "./textGlitch";
+import { textTransitionSignal, textTransitionResource } from "./textGlitch";
 
 class Signals {
     constructor() {
@@ -11,6 +11,7 @@ class Signals {
         [this.moonrise, this.setMoonrise] = textTransitionSignal("");
         [this.moonset, this.setMoonset] = textTransitionSignal("");
         [this.moonPhase, this.setMoonPhase] = createSignal(0);
+        [this.moonPhaseText, this.setMoonPhaseText] = textTransitionResource("", this.moonPhase, this.setMoonPhase, moonPhaseDescription);
     }
 }
 
@@ -31,7 +32,7 @@ function updateAstroPageSignals(signals, data) {
         signals.setSunset(parseUnixTime(sunsetUnix));
         signals.setMoonrise(parseUnixTime(moonriseUnix));
         signals.setMoonset(parseUnixTime(moonsetUnix));
-        signals.setMoonPhase(moonphase);
+        signals.setMoonPhaseText(moonphase);
     }
 }
 
@@ -102,7 +103,7 @@ export const Astro = () => {
                     <div class="data-value">{signals.sunset}</div>
                     <div class="data-value">{signals.moonrise}</div>
                     <div class="data-value">{signals.moonset}</div>
-                    <div class="data-value">{moonPhaseDescription(signals.moonPhase())}</div>
+                    <div class="data-value">{signals.moonPhaseText}</div>
                 </div>
             </div>
         </Show>
