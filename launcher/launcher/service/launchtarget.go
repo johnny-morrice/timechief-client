@@ -29,7 +29,7 @@ func LaunchTargetFromStore(storeLT store.LaunchTarget) LaunchTarget {
 func (lt LaunchTarget) DeleteFiles() error {
 	system.Lock()
 	defer system.Unlock()
-	log.Printf("deleting files for launch target %s %s", lt.Version, lt.Path)
+	log.Printf("deleting files for launch target %s", lt.Path)
 	return os.RemoveAll(lt.Path)
 }
 
