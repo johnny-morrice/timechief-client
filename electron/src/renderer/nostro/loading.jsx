@@ -33,7 +33,7 @@ function advanceLoadingLine(signals) {
     signals.setLineText(newLineText);
 }
 
-export const Loading = () => {
+export const LineLoading = () => {
     const signals = new LineSignals();
     const interval = setInterval(() => advanceLoadingLine(signals), 150);
     onCleanup(() => {
@@ -109,4 +109,8 @@ export const GridLoading = () => {
         <div class="loading-grid-item">{signals.characterC}</div>
         <div class="loading-grid-item">{signals.characterD}</div>
     </div>;
+};
+
+export const Loading = () => {
+    return <GridLoading />;
 };
