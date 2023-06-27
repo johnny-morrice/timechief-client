@@ -140,7 +140,7 @@ div.setup-title {
 }
 
 div.data-label {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 div.astro {
@@ -160,7 +160,7 @@ div.forecast-weather-icon {
 }
 
 table.forecast-weather-table th {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 table.forecast-weather-table td {
@@ -190,11 +190,11 @@ div.forecast-day-controls {
 
 div.calendar-day-date {
     font-size: 20pt;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 div.calendar-event-when {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 div.calendar-day {
