@@ -25,6 +25,11 @@
     user-select: none;
 }
 
+@font-face {
+    src: url('../webfonts/NotoSansJP-VariableFont_wght.ttf') format('truetype');
+    font-family: 'Noto Sans JP';
+}
+
 body {
     color: green;
     background-color: black;
@@ -233,6 +238,7 @@ div.next-event-summary {
 }
 
 div.loading-grid {
+    font-family: "Noto Sans JP";
     font-size: 16pt;
     display: grid;
     grid-template-rows: 0.1fr 0.1fr;
@@ -242,6 +248,14 @@ div.loading-grid {
     animation: loading-fade 0.5s linear infinite;
     justify-self: center;
     align-self: center;
+}
+
+div.loading-line {
+    font-family: "Noto Sans JP";
+    justify-self: center;
+    align-self: center;
+    opacity: 1;
+    animation: loading-fade 0.5s linear infinite;
 }
 
 @keyframes loading-fade {

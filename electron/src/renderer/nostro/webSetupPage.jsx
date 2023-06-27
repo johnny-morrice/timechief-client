@@ -1,9 +1,10 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
-import { glitchStyle, runTextGlitch } from './textGlitch';
+import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
 import { Loading } from './loading';
 import { textTransitionSignal } from './textGlitch';
+import { random } from './fakeRandom';
 
 class Signals {
     constructor() {
@@ -68,8 +69,8 @@ function updateSignals(signals, data) {
             }
         }
     }
-    runTextGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 100);
-    runTextGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 100);
+    runButtonGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 150);
+    runButtonGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
 }
 
 function isConnectionError(signals) {
@@ -124,7 +125,7 @@ export const WebSetupPage = (props) => {
         const crtRoot = document.getElementById("crt-root");
         const boxes = document.getElementsByClassName("crt-box");
         // There is a 1 in 120 chance of the CRT jank being applied.
-        if (Math.random() < 0.008333) {
+        if (random() < 0.008333) {
             // The CRT jank is applied crt-jank class to the crt-root element.
             crtRoot.classList.add("crt-jank");
             // Add jank to all the boxes;
@@ -134,7 +135,7 @@ export const WebSetupPage = (props) => {
             // console.log("CRT Jank applied");
             // Set a timeout to remove the CRT jank after 1.6 + n second.
             // Where n is between 1.6 second and 2.4 second.
-            const timeout = 2800 + (Math.random() * 800);
+            const timeout = 2800 + (random() * 800);
             setTimeout(removeCRTJank, timeout);
         }
     };
@@ -165,8 +166,8 @@ export const WebSetupPage = (props) => {
                 <div class="setup-content-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
                         <Show when={isUpdating(signals)}>
-                            <button class='action-button crt-box' style={glitchStyle("Reboot")} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button class='action-button crt-box' style={glitchStyle("Shutdown")} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            <button class='action-button crt-box' style={buttonGlitchStyle("Reboot")} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button class='action-button crt-box' style={buttonGlitchStyle("Shutdown")} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         </Show>
                         <Show when={!isUpdating(signals)}>
                             <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
@@ -204,13 +205,13 @@ export const WebSetupPage = (props) => {
             </div>
         </Show>
         <Show when={isLoading(signals)}>
-            <div class="setup-wrapper column-flex flex-grow">
+            <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-action-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
                         <Show when={isUpdating(signals)}>
-                            <button disabled class='action-button crt-box' style={glitchStyle("Reboot")} onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button disabled class='action-button crt-box' style={glitchStyle("Shutdown")} onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            <button disabled class='action-button crt-box' style={buttonGlitchStyle("Reboot")} onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button disabled class='action-button crt-box' style={buttonGlitchStyle("Shutdown")} onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         </Show>
                         <Show when={!isUpdating(signals)}>
                             <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
@@ -226,7 +227,9 @@ export const WebSetupPage = (props) => {
                             </div>
                         </Show>
                     </div>
-                    <Loading />
+                    <div class="flex-column flex-grow">
+                        <Loading />
+                    </div>
                 </div>
             </div>
         </Show>
