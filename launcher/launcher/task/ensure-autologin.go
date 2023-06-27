@@ -22,8 +22,12 @@ func (task EnsureAutologin) RunTask(ctx *cli.Context) error {
 	_, err := os.Stat(AutoLoginUnitPath)
 	if err == nil && errors.Is(err, os.ErrNotExist) {
 		log.Println("autologin systemd unit missing, reinstalling")
-		return task.System.EnsureAutoLogin()
+		err = task.System.EnsureAutoLogin()
+		if err != nil {
+			return err
+		}
+		log.Println("restarting to ensure autologin systemd unit is active")
+		return task.System.Reboot()
 	}
-	log.Println("restarting to ensure autologin systemd unit is active")
-	return task.System.Reboot()
+	return nil
 }
