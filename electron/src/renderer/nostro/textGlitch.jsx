@@ -57,7 +57,7 @@ export const textGlitch = (text, n) => {
             arr.push(text[i]);
         }
     }
-    return arr.join("");
+    return "".concat(...arr);
 }
 
 export const textTransitionResource = (value, getter, setter, transform) => {
@@ -238,7 +238,7 @@ export const highlightSpansGlitch = (displayText, bufferText) => {
                 arr.push(fortuneSlice[i]);
             }
         }
-        return arr.join("");
+        return "".concat(...arr);
     }
     return <div style="inline-block">
         <For each={spans}>{(span, i) =>
