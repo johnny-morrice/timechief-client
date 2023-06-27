@@ -19,29 +19,18 @@ class GridSignals {
 
 class LineSignals {
     constructor() {
-        [this.direction, this.setDirection] = createSignal(random() < 0.5 ? 1 : -1);
-        [this.lineIndex, this.setLineIndex] = createSignal(3);
-        [this.lineText, this.setLineText] = createSignal("...幽...");
+        [this.lineText, this.setLineText] = createSignal("神現夢幽暗影映");
     }
 }
 
 function advanceLoadingLine(signals) {
-    const lineIndex = signals.lineIndex();
-    const maxLineIndex = 6;
-    const direction = signals.direction();
-    let newIndex = lineIndex + direction;
-    if (newIndex > maxLineIndex) {
-        newIndex = maxLineIndex;
-        signals.setDirection(-1);
-    } else if (newIndex < 0) {
-        newIndex = 0;
-        signals.setDirection(1);
+    const lineText = signals.lineText();
+    const arr = [];
+    for (let i = 0; i < lineText.length; i++) {
+        arr.push(randomLoadingSymbol());
     }
-    const symbol = randomLoadingSymbol();
-    const line = [".", ".", ".", ".", ".", ".", "."];
-    line[newIndex] = symbol;
-    signals.setLineText("".concat(...line));
-    signals.setLineIndex(newIndex);
+    const newLineText = "".concat(...arr);
+    signals.setLineText(newLineText);
 }
 
 export const Loading = () => {

@@ -252,14 +252,6 @@ div.loading-line {
     animation: loading-outer-rotate 2s linear infinite;
 }
 
-div.loading-line-span {
-    animation: loading-inner-rotate 2s linear infinite;
-}
-
-@keyframes loading-inner-rotate {
-    100% { transform: rotate(-360deg); }
-}
-
 @keyframes loading-outer-rotate { 
     100% { transform: rotate(360deg); } 
 }
