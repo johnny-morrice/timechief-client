@@ -65,7 +65,7 @@ export const Loading = () => {
             setInvert(isColorInverted);
         }
     };
-    const interval = setInterval(updateSignals, 200);
+    const interval = setInterval(updateSignals, 300);
     onCleanup(() => {
         clearInterval(interval);
     });

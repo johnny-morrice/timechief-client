@@ -69,7 +69,7 @@ export const textTransitionResource = (value, getter, setter, transform) => {
     const [out] = createResource(intermediate, applyHighlight);
     function doSet(data) {
         setter(data);
-        textTransitionGlitch(textBuffer, intermediate, setIntermediate, 2);
+        textTransitionGlitch(textBuffer, intermediate, setIntermediate, 3);
     }
     doSet(value);
     return [out, doSet];
@@ -84,7 +84,7 @@ export const textTransitionSignal = (value) => {
     const [out] = createResource(intermediate, applyHighlight);
     function doSet(data) {
         setBuffer(data);
-        textTransitionGlitch(buffer, intermediate, setIntermediate, 2);
+        textTransitionGlitch(buffer, intermediate, setIntermediate, 3);
     }
     doSet(value);
     return [out, doSet];
@@ -92,7 +92,7 @@ export const textTransitionSignal = (value) => {
 
 export const textTransitionGlitch = (buffer, display, setter, n) => {
     let more = transitionBuffer(buffer, display, setter, n);
-    let delayMs = second / 10;
+    let delayMs = 150;
     if (more) {
         setTimeout(() => textTransitionGlitch(buffer, display, setter, n), delayMs);
     }
@@ -143,6 +143,9 @@ const transitionBuffer = (buffer, display, setter, n) => {
     setter(transitionArray.join(""));
     return true;
 };
+
+// Construct a jsx element with spans around the letters that are different.
+// The spans should use class "inverted-color".
 export const highlightSpansGlitch = (displayText, bufferText) => {
     // Compare fortune to fortuneBuffer and highlight the differences.
     // We will pad fortune and fortuneBuffer so they are the same length.
@@ -150,10 +153,10 @@ export const highlightSpansGlitch = (displayText, bufferText) => {
     if (displayText === bufferText) {
         return <div><span>{displayText}</span></div>;
     }
-    let maxLen = Math.max(displayText.length, bufferText.length);
+    const maxLen = Math.max(displayText.length, bufferText.length);
     displayText = displayText.padEnd(maxLen, " ");
     bufferText = bufferText.padEnd(maxLen, " ");
-    let diffIndices = [];
+    const diffIndices = [];
     for (let i = 0; i < displayText.length; i++) {
         if (displayText[i] !== bufferText[i]) {
             diffIndices.push(i);
@@ -164,13 +167,13 @@ export const highlightSpansGlitch = (displayText, bufferText) => {
     // We need to marke when it's different.
     // For example, if diffIndices is [1,2,3,5,6,7], and the length of the string is 10, the output will be it to [[false,0,0][true,1,3],[false,4,4],[true,5,7],[false,8,9]].
     // The first element is whether it's different, the second is the start index, and the third is the end index.
-    let spans = [];
+    const spans = [];
     let span = [diffIndices.includes(0), 0, 0];
     for (let i = 1; i < displayText.length; i++) {
-        let isLast = i === displayText.length - 1;
-        let isDiff = diffIndices.includes(i);
-        let isSpanDiff = span[0];
-        let isChangeSpan = isDiff !== isSpanDiff;
+        const isLast = i === displayText.length - 1;
+        const isDiff = diffIndices.includes(i);
+        const isSpanDiff = span[0];
+        const isChangeSpan = isDiff !== isSpanDiff;
         if (isChangeSpan) {
             spans.push(span);
             span = [isDiff, i, i];
@@ -182,54 +185,53 @@ export const highlightSpansGlitch = (displayText, bufferText) => {
         }
     }
 
-    // Construct a jsx element with spans around the letters that are different.
-    // The spans should use class "inverted-color".
+    const symbols = [
+        "!",
+        "@",
+        "#",
+        "$",
+        "%",
+        "^",
+        "&",
+        "*",
+        "+",
+        "=",
+        "|",
+        ":",
+        ";",
+        ".",
+        "?",
+        "/",
+        "~",
+        // "電", // Electric
+        // "神", // God
+        // "夢", // Dream
+        // "幻", // Illusion
+        // "現", // Reality
+        // "結", // Connection
+        // "遠", // Distance
+        // "界", // World
+        // "道", // Path
+        // "意", // Mind
+        // "覚", // Perception
+        // "網", // Network
+        // "暗", // Darkness
+        // "映", // Reflection
+        // "影", // Shadow
+        // "幽", // Ghost
+        // "光", // Light
+        // "無", // Nothingness
+        // "碑", // Monument
+        // "迷", // Lost
+        // "儀" // Ritual
+    ];
+
     function sliceFortune(span) {
-        let fortuneSlice = displayText.substring(span[1], span[2] + 1);
+        const fortuneSlice = displayText.substring(span[1], span[2] + 1);
         if (!span[0]) {
             return fortuneSlice;
         }
-        const symbols = [
-            "!",
-            "@",
-            "#",
-            "$",
-            "%",
-            "^",
-            "&",
-            "*",
-            "+",
-            "=",
-            "|",
-            ":",
-            ";",
-            ".",
-            "?",
-            "/",
-            "~",
-            // "電", // Electric
-            // "神", // God
-            // "夢", // Dream
-            // "幻", // Illusion
-            // "現", // Reality
-            // "結", // Connection
-            // "遠", // Distance
-            // "界", // World
-            // "道", // Path
-            // "意", // Mind
-            // "覚", // Perception
-            // "網", // Network
-            // "暗", // Darkness
-            // "映", // Reflection
-            // "影", // Shadow
-            // "幽", // Ghost
-            // "光", // Light
-            // "無", // Nothingness
-            // "碑", // Monument
-            // "迷", // Lost
-            // "儀" // Ritual
-        ];
-        let arr = [];
+        const arr = [];
         for (let i = 0; i < fortuneSlice.length; i++) {
             const isSymbol = random() < 0.5;
             if (isSymbol) {

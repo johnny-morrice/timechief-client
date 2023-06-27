@@ -55,8 +55,8 @@ function updateSignalsForAPIData(signals, data) {
         }
     }
     signals.setDisableShutdown(disableShutdown);
-    runTextGlitch(() => isShutdownDisabled(signals), signals.setRebootGlitch, "Reboot", 100);
-    runTextGlitch(() => isShutdownDisabled(signals), signals.setShutdownGlitch, "Shutdown", 100);
+    runTextGlitch(() => isShutdownDisabled(signals), signals.setRebootGlitch, "Reboot", 150);
+    runTextGlitch(() => isShutdownDisabled(signals), signals.setShutdownGlitch, "Shutdown", 150);
 }
 
 function updateSignalsForElectronStatus(signals, statusResponse) {

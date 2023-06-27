@@ -69,8 +69,8 @@ function updateSignals(signals, data) {
             }
         }
     }
-    runTextGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 100);
-    runTextGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 100);
+    runTextGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 150);
+    runTextGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
 }
 
 function isConnectionError(signals) {
