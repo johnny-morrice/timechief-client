@@ -7,8 +7,8 @@ import { textTransitionSignal } from './textGlitch';
 class Signals {
     constructor() {
         [this.location, this.setLocation] = textTransitionSignal("");
-        [this.latitude, this.setLatitude] = textTransitionSignal("");
-        [this.longitude, this.setLongitude] = textTransitionSignal("");
+        [this.latitude, this.setLatitude] = createSignal("");
+        [this.longitude, this.setLongitude] = createSignal("");
         [this.timezone, this.setTimezone] = textTransitionSignal("");
     }
 }

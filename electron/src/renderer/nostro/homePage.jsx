@@ -19,12 +19,12 @@ import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
   constructor() {
-    [this.locale, this.setLocale] = textTransitionSignal("europe/london");
-    [this.timeZone, this.setTimezone] = textTransitionSignal("");
-    [this.hourCycleOption, this.setHourCycleOption] = textTransitionSignal("");
+    [this.locale, this.setLocale] = createSignal("");
+    [this.timeZone, this.setTimezone] = createSignal("");
+    [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
-    [this.myTime, this.setMyTime] = textTransitionSignal("");
-    [this.myDate, this.setMyDate] = textTransitionSignal(getDateText(this.locale()));
+    [this.myTime, this.setMyTime] = createSignal("");
+    [this.myDate, this.setMyDate] = textTransitionSignal(getDateText("en-GB"));
     [this.nextEvent, this.setNextEvent] = createSignal(null);
   }
 }
