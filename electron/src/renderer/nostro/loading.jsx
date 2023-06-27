@@ -4,9 +4,9 @@ class Signals {
     constructor() {
         [this.gapIndex, this.setGapIndex] = createSignal(0);
         [this.characterA, this.setCharacterA] = createSignal("");
-        [this.characterB, this.setCharacterB] = createSignal("");
-        [this.characterC, this.setCharacterC] = createSignal("");
-        [this.characterD, this.setCharacterD] = createSignal("");
+        [this.characterB, this.setCharacterB] = createSignal("夢");
+        [this.characterC, this.setCharacterC] = createSignal("幻");
+        [this.characterD, this.setCharacterD] = createSignal("幽");
         [this.invertA, this.setInvertA] = createSignal(false);
         [this.invertB, this.setInvertB] = createSignal(false);
         [this.invertC, this.setInvertC] = createSignal(false);
