@@ -121,14 +121,6 @@ button.action-button {
     font-size: 18pt
 }
 
-button.action-button:disabled {
-    border: 1px solid green;
-    background-color: black;
-    color: green;
-    text-decoration: line-through;
-    font-size: 18pt
-}
-
 div.setup-wrapper {
     height: 100vh;
     padding: 1em;
