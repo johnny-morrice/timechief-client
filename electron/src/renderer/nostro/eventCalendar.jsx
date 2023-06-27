@@ -51,6 +51,7 @@ class CalendarDay {
       throw new Error("expected non empty calendarEvents");
     }
     this._calendarEvents = calendarEvents
+    this._laterEventsNotShown = false;
   }
 
   date() {
@@ -68,6 +69,14 @@ class CalendarDay {
 
   events() {
     return this._calendarEvents;
+  }
+
+  setLaterEventsNotShown(NotShown) {
+    this._laterEventsNotShown = NotShown;
+  }
+
+  hasLaterEventsNotShown() {
+    return this._laterEventsNotShown;
   }
 }
 
@@ -101,18 +110,13 @@ class CalendarDays {
     let allDays = this._allDays();
     let canonicalDates = dates.map(d => makeCanonicalDateText(d));
     let out = [];
-    var eventCount = 0;
-    canonicalDates.forEach(text => {
-      if (eventCount < eventLimit) {
-        var events = allDays[text];
-        if (events) {
-          var exceeds = (eventCount + events.length) - eventLimit;
-          if (exceeds > 0) {
-            events = events.slice(0, exceeds);
-          }
-          out.push(new CalendarDay(events));
-          eventCount += events.length;
-        }
+    canonicalDates.forEach(dateText => {
+      const events = allDays[dateText];
+      if (events) {
+        const eventsUpTolimit = events.slice(0, eventLimit);
+        const calendarDay = new CalendarDay(eventsUpTolimit)
+        calendarDay.setLaterEventsNotShown(events.length > eventLimit);
+        out.push(calendarDay);
       }
     });
     return out;
@@ -261,6 +265,11 @@ export const EventCalendar = () => {
                   <div class="calendar-event-shorttext flex-grow">{cev.eventShortText()}</div>
                 </div>
               }</For>
+              <Show when={getCurrentDay().hasLaterEventsNotShown()}>
+                <div class="calendar-later-events-not-included flex-grow">
+                  Later events this day not shown
+                </div>
+              </Show>
             </div>
           </div>
         </Show>

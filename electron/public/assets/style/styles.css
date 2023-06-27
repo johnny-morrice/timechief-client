@@ -207,6 +207,14 @@ button.event-calendar-control-button {
     font-size: 16pt
 }
 
+span.inverted-color {
+    color: black;
+    background-color: green;
+}
+
+div.fortune-text {
+    font-size: 14pt;
+}
 
 @media (min-width: 800px) {
     div.home-time {
