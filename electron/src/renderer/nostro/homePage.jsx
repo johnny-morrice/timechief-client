@@ -176,7 +176,7 @@ export const HomePage = () => {
       </div>
 
       <div class="home-action-center flex-row flex-grow border crt-box">
-        {/* <Show when={hasNextEvent(signals)}>
+        <Show when={hasNextEvent(signals)}>
           <div class='next-event-summary flex-column flex-grow'>
             <div class='next-event-time flex-row'>
               <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
@@ -186,10 +186,10 @@ export const HomePage = () => {
               {getNextEventShortText(signals)}
             </div>
           </div>
-        </Show> */}
-        {/* <Show when={!hasNextEvent(signals)}> */}
+        </Show>
+        <Show when={!hasNextEvent(signals)}>
           <Fortune />
-        {/* </Show> */}
+        </Show>
         <StatusNote />
       </div>
     </div>
