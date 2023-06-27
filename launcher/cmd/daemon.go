@@ -12,6 +12,7 @@ import (
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/task"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
 )
@@ -119,7 +120,6 @@ func Daemon(ctx *cli.Context) error {
 	networkStatus := daemon.NetworkStatus{
 		System: system,
 	}
-
 	setup := daemon.Setup{
 		KeyValueStore:    keyValueStore,
 		WifiNetworkStore: wifiNetworkStore,
@@ -132,6 +132,16 @@ func Daemon(ctx *cli.Context) error {
 
 	timeSync := daemon.TimeSync{
 		Syncer: system,
+	}
+
+	marker := task.ExpandRootFS{
+		KeyValueStore: keyValueStore,
+		System:        system,
+	}
+
+	err = marker.HandleMarker(ctx)
+	if err != nil {
+		return err
 	}
 
 	go timeSync.Start(ctx)
