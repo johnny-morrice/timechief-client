@@ -51,6 +51,7 @@ export const Loading = () => {
 
     ];
     const updateSignals = () => {
+        incrementGapIndex();
         const gapCharacter = " ";
         const setCharacterFuncs = signals.setCharacters;
         for (let i = 0; i < setCharacterFuncs.length; i++) {

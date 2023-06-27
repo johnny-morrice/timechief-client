@@ -51,7 +51,7 @@ export const DeviceInfo = () => {
         removeDeviceStatusCallback(cbName);
     });
 
-    return <div class="device-control flex-grow">
+    return <div class="device-control flex-column flex-grow">
         <Show when={!hasDeviceInfo(signals)}>
             <Loading />
         </Show>

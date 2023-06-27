@@ -22,6 +22,7 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
+    user-select: none;
 }
 
 body {
@@ -223,6 +224,8 @@ div.loading-grid {
     grid-gap: 0.1em;
     opacity: 1;
     animation: loading-fade 0.5s linear infinite;
+    justify-self: center;
+    align-self: center;
 }
 
 @keyframes loading-fade {
