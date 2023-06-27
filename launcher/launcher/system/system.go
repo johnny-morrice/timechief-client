@@ -328,10 +328,10 @@ func (sys System) LoadNetworkStatus() error {
 	if err != nil {
 		return fmt.Errorf("failed to load network status: %w", err)
 	}
-	log.Printf("network status: %v", status)
+	// log.Printf("network status: %v", status)
 	if status.Mode == InfraMode && status.SSID != "" {
 		if status.State == "up" {
-			log.Printf("connected to %s", status.SSID)
+			// log.Printf("connected to %s", status.SSID)
 			err = sys.WifiNetworkStore.MarkConnectionSuccess(status.SSID)
 			if err != nil {
 				return fmt.Errorf("failed to mark wifi network as connected: %w", err)
@@ -341,7 +341,7 @@ func (sys System) LoadNetworkStatus() error {
 				return fmt.Errorf("failed to delete wifi error flag: %w", err)
 			}
 		} else {
-			log.Printf("not connected to %s", status.SSID)
+			// log.Printf("not connected to %s", status.SSID)
 			err = sys.WifiNetworkStore.MarkConnectionFailure(status.SSID)
 			if err != nil {
 				return fmt.Errorf("failed to mark wifi network as disconnected: %w", err)
