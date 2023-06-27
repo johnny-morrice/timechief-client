@@ -1,13 +1,15 @@
 import { Show, createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
+import { Loading } from './loading';
+import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
     constructor() {
-        [this.sunrise, this.setSunrise] = createSignal("");
-        [this.sunset, this.setSunset] = createSignal("");
-        [this.moonrise, this.setMoonrise] = createSignal("");
-        [this.moonset, this.setMoonset] = createSignal("");
+        [this.sunrise, this.setSunrise] = textTransitionSignal("");
+        [this.sunset, this.setSunset] = textTransitionSignal("");
+        [this.moonrise, this.setMoonrise] = textTransitionSignal("");
+        [this.moonset, this.setMoonset] = textTransitionSignal("");
         [this.moonPhase, this.setMoonPhase] = createSignal(0);
     }
 }
@@ -84,9 +86,7 @@ export const Astro = () => {
 
     return <div class="astro">
         <Show when={!hasAstro(signals)}>
-            <div class="astro-loading">
-                <div><i class="fa-solid fa-spinner fa-spin"></i></div>
-            </div>
+            <Loading />
         </Show>
         <Show when={hasAstro(signals)}>
             <div class="flex-row flex-grow">

@@ -1,13 +1,15 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
+import { Loading } from './loading';
+import { textTransitionSignal } from './textGlitch';
 
 class Signals {
     constructor() {
-        [this.location, this.setLocation] = createSignal("");
+        [this.location, this.setLocation] = textTransitionSignal("");
         [this.latitude, this.setLatitude] = createSignal("");
         [this.longitude, this.setLongitude] = createSignal("");
-        [this.timezone, this.setTimezone] = createSignal("");
+        [this.timezone, this.setTimezone] = textTransitionSignal("");
     }
 }
 
@@ -37,7 +39,7 @@ export const Locale = () => {
 
     return <div class="locale-root flex-grow">
         <Show when={!hasLocaleInfo(signals)}>
-            <div class="locale-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            <Loading />
         </Show>
         <div class="flex-row flex-grow">
             <div class="locale-labels flex-column flex-grow">

@@ -3,11 +3,13 @@ import { callbackName } from "./callback"
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { weatherIconStyleClass } from '../weatherIcon';
 import { kelvinToCelsiusText } from '../temperature';
+import { Loading } from "./loading";
+import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
     constructor() {
-        [this.temp, this.setTemp] = createSignal("");
-        [this.feelsLikeTemp, this.setFeelsLikeTemp] = createSignal("");
+        [this.temp, this.setTemp] = textTransitionSignal("");
+        [this.feelsLikeTemp, this.setFeelsLikeTemp] = textTransitionSignal("");
         [this.tempK, this.setTempK] = createSignal(0);
         [this.feelsLikeTempK, this.setFeelsLikeTempK] = createSignal(0);
         [this.currentWeatherConditions, this.setCurrentWeatherConditions] = createSignal("");
@@ -39,7 +41,7 @@ function updateSignals(signals, data) {
 }
 
 function hasWeather(signals) {
-    return signals.tempK() > 0 && signals.feelsLikeTempK() > 0 && signals.temp().length > 0 && signals.feelsLikeTemp().length > 0 && signals.currentWeatherConditions().length > 0 && signals.todayWeatherConditions().length > 0;
+    return signals.tempK() > 0 && signals.feelsLikeTempK() > 0 && signals.currentWeatherConditions().length > 0 && signals.todayWeatherConditions().length > 0;
 }
 
 
@@ -56,7 +58,7 @@ export const CurrentWeather = () => {
 
     return <div class="current-weather flex-column flex-grow">
         <Show when={!hasWeather(signals)}>
-            <div class="weather-temp-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            <Loading />
         </Show>
         <Show when={hasWeather(signals)}>
             <div class="current-weather-grid flex-grow">

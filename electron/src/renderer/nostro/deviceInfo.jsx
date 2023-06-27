@@ -1,19 +1,20 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback } from './ipc';
 import { callbackName } from "./callback";
+import { Loading } from './loading';
+import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
     constructor() {
-        [this.ipAddress, this.setIpAddress] = createSignal("");
+        [this.ipAddress, this.setIpAddress] = textTransitionSignal("");
         [this.activeTargetVersion, this.setActiveTargetVersion] = createSignal("");
         [this.clientVersion, this.setClientVersion] = createSignal("");
     }
 }
 
 function hasDeviceInfo(signals) {
-    const ipAddress = signals.ipAddress();
     const clientVersion = signals.clientVersion();
-    return ipAddress.length > 0 && clientVersion.length > 0;
+    return clientVersion.length > 0;
 }
 
 function hasUpdateVersion(signals) {
@@ -50,9 +51,9 @@ export const DeviceInfo = () => {
         removeDeviceStatusCallback(cbName);
     });
 
-    return <div class="device-control flex-grow">
+    return <div class="device-control flex-column flex-grow">
         <Show when={!hasDeviceInfo(signals)}>
-            <div class="device-info-loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            <Loading />
         </Show>
         <Show when={hasDeviceInfo(signals)}>
             <div class="flex-row flex-grow">

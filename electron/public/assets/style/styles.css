@@ -22,6 +22,7 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
+    user-select: none;
 }
 
 body {
@@ -202,7 +203,7 @@ button.event-calendar-control-button {
     font-size: 16pt
 }
 
-span.inverted-color {
+div.inverted-color, span.inverted-color {
     color: black;
     background-color: green;
 }
@@ -213,6 +214,23 @@ div.fortune-text {
 
 div.next-event-summary {
     font-size: 24pt;
+}
+
+div.loading-grid {
+    font-size: 16pt;
+    display: grid;
+    grid-template-rows: 0.1fr 0.1fr;
+    grid-template-columns: 0.1fr 0.1fr;
+    grid-gap: 0.1em;
+    opacity: 1;
+    animation: loading-fade 0.5s linear infinite;
+    justify-self: center;
+    align-self: center;
+}
+
+@keyframes loading-fade {
+  0%,100% { opacity: 1 }
+  50% { opacity: 0.7 }
 }
 
 @media (min-width: 800px) {

@@ -15,6 +15,7 @@ import { Locale } from './locale';
 import { callbackName } from "./callback";
 import { Forecast } from './forecast';
 import { EventCalendar } from './eventCalendar';
+import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
   constructor() {
@@ -23,8 +24,7 @@ class Signals {
     [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
     [this.myTime, this.setMyTime] = createSignal("");
-    [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
-    [this.location, this.setLocation] = createSignal("");
+    [this.myDate, this.setMyDate] = textTransitionSignal(getDateText("en-GB"));
     [this.nextEvent, this.setNextEvent] = createSignal(null);
   }
 }
@@ -64,12 +64,10 @@ function updateSignals(signals, data) {
   let hourCycleOption = clock["HourCycleOption"];
   let timeZone = clock["Timezone"];
   let locale = clock["Locale"];
-  let location = clock["Location"];
 
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
   signals.setTimezone(timeZone);
-  signals.setLocation(location);
   signals.setLastUpdateTime(new Date());
   if (calendar.Calendar) {
     const nextEvent = findNextEvent(calendar.Calendar.Events);
