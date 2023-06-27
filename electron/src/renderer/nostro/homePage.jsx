@@ -25,7 +25,7 @@ class Signals {
     [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
     [this.myTime, this.setMyTime] = createSignal("");
-    [this.myDate, this.setMyDate] = textTransitionSignal(getDateText("en-GB"));
+    [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
     [this.nextEvent, this.setNextEvent] = createSignal(null);
   }
 }
