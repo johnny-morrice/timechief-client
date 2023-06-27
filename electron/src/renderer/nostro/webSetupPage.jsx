@@ -205,7 +205,7 @@ export const WebSetupPage = (props) => {
             </div>
         </Show>
         <Show when={isLoading(signals)}>
-            <div class="setup-wrapper column-flex flex-grow">
+            <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-action-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
