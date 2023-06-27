@@ -39,6 +39,7 @@ func Install(ctx *cli.Context) error {
 		"bin/timechief-wifi-hotspot",
 		"bin/timechief-wifi-interface",
 		"bin/timechief-wifi-scan",
+		"bin/timechief-expand-rootfs",
 		"bin/secure/timechief-reboot",
 		"bin/secure/timechief-shutdown",
 		"bin/secure/timechief-wifi-connect",
