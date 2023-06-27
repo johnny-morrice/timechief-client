@@ -8,6 +8,6 @@ export default defineConfig({
     build: {
         target: 'esnext',
         outDir: 'frontend-dist',
-        minify: true,
+        minify: false,
     }
 });
