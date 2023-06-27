@@ -2,6 +2,7 @@ package task
 
 import (
 	"errors"
+	"log"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
@@ -15,6 +16,7 @@ type ExpandRootFS struct {
 }
 
 func (task ExpandRootFS) HandleMarker(ctx *cli.Context) error {
+	log.Println("checking for rootfs expansion")
 	proceed, err := task.isProceed()
 	if err != nil {
 		return err
@@ -22,6 +24,7 @@ func (task ExpandRootFS) HandleMarker(ctx *cli.Context) error {
 	if !proceed {
 		return nil
 	}
+	log.Println("expanding rootfs")
 	err = task.doExpandRootFs()
 	if err != nil {
 		return err
@@ -31,6 +34,8 @@ func (task ExpandRootFS) HandleMarker(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	log.Println("expand rootfs success, rebooting")
 
 	return task.System.Reboot()
 }
