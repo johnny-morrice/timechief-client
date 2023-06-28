@@ -20,7 +20,6 @@ import { textTransitionSignal } from "./textGlitch";
 class Signals {
   constructor() {
     [this.locale, this.setLocale] = createSignal("");
-    [this.location, this.setLocation] = textTransitionSignal("");
     [this.timeZone, this.setTimezone] = createSignal("");
     [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
@@ -65,8 +64,6 @@ function updateSignals(signals, data) {
   let hourCycleOption = clock["HourCycleOption"];
   let timeZone = clock["Timezone"];
   let locale = clock["Locale"];
-  let location = clock["Location"];
-  signals.setLocation(location);
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
   signals.setTimezone(timeZone);
@@ -179,7 +176,6 @@ export const HomePage = () => {
       <div class="home-time-wrapper flex-grow">
         <div class="home-time">{signals.myTime}</div>
         <div class="home-date">{signals.myDate}</div>
-        <div class="home-location">{signals.location}</div>
       </div>
 
       <div class="home-action-center flex-row flex-grow border crt-box">

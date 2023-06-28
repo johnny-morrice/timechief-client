@@ -8,6 +8,7 @@ import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
     constructor() {
+        [this.location, this.setLocation] = textTransitionSignal("");
         [this.temp, this.setTemp] = textTransitionSignal("");
         [this.feelsLikeTemp, this.setFeelsLikeTemp] = textTransitionSignal("");
         [this.tempK, this.setTempK] = createSignal(0);
@@ -18,6 +19,9 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
+    let clock =   data["Clock"];
+    let location = clock["Location"];
+    signals.setLocation(location);
     let weather = data["Weather"];
     if (weather) {
         let currentWeather = weather["Current"];
@@ -56,11 +60,12 @@ export const CurrentWeather = () => {
         removeDataCallback(cbName);
     });
 
-    return <div class="current-weather flex-column flex-grow">
+    return <div class="current-weather flex-grow">
         <Show when={!hasWeather(signals)}>
             <Loading />
         </Show>
         <Show when={hasWeather(signals)}>
+            <div class="current-weather-location">{signals.location}</div>
             <div class="current-weather-grid flex-grow">
                 <div class="weather-temp-label weather-label data-label">temp</div>
                 <div class='weather-temp weather-data'>{signals.temp}</div>

@@ -46,6 +46,10 @@ function formatShortDate(signals, day) {
   return day.shortDate(signals.locale(), signals.timeZone());
 }
 
+function formatDayOfWeek(signals, day) {
+  return day.dayOfWeek(signals.locale(), signals.timeZone());
+}
+
 class CalendarDay {
   constructor(calendarEvents) {
     if (calendarEvents.length == 0) {
@@ -57,6 +61,11 @@ class CalendarDay {
 
   date() {
     return this._calendarEvents[0].startTime();
+  }
+
+  dayOfWeek(locale, timeZone) {
+    // format using day of week only
+    return this.date().toLocaleDateString(locale, { weekday: 'short', timeZone: timeZone });
   }
 
   shortDate(locale, timeZone) {
@@ -234,7 +243,7 @@ export const EventCalendar = () => {
           <div class="event-calendar-day-controls">
             <Show when={hasPrevDay()}>
               <div class="event-calendar-day-prev-button-wrapper">
-                <button class="event-calendar-control-button event-calendar-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {formatShortDate(signals, getPrevDay())}</button>
+                <button class="event-calendar-control-button event-calendar-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {formatDayOfWeek(signals, getPrevDay())}</button>
               </div>
             </Show>
             <Show when={!hasPrevDay()}>
@@ -244,7 +253,7 @@ export const EventCalendar = () => {
             <div class="event-calendar-control-label event-calendar-date">{formatShortDate(signals, getCurrentDay())}</div>
             <Show when={hasNextDay()}>
               <div class="event-calendar-day-next-button-wrapper">
-                <button class="event-calendar-control-button event-calendar-day-next-button" onClick={onClickNext}>{formatShortDate(signals, getNextDay())} <i class="fa-solid fa-chevron-right"></i></button>
+                <button class="event-calendar-control-button event-calendar-day-next-button" onClick={onClickNext}>{formatDayOfWeek(signals, getNextDay())} <i class="fa-solid fa-chevron-right"></i></button>
               </div>
             </Show>
           </div>

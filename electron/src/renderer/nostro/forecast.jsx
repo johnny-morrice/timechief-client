@@ -20,8 +20,9 @@ class Signals {
 
 class DaySignals {
     constructor() {
-        [this.date, this.setDate] = textTransitionSignal("");
-        [this.shortDate, this.setShortDate] = textTransitionSignal("");
+        [this.date, this.setDate] = createSignal("");
+        [this.dayOfWeek, this.setDayOfWeek] = createSignal("");
+        [this.shortDate, this.setShortDate] = createSignal("");
         [this.mornTemp, this.setMornTemp] = textTransitionSignal("");
         [this.dayTemp, this.setDayTemp] = textTransitionSignal("");
         [this.eveTemp, this.setEveTemp] = textTransitionSignal("");
@@ -30,15 +31,16 @@ class DaySignals {
         [this.dayFeelsLike, this.setDayFeelsLike] = textTransitionSignal("");
         [this.eveFeelsLike, this.setEveFeelsLike] = textTransitionSignal("");
         [this.nightFeelsLike, this.setNightFeelsLike] = textTransitionSignal("");
-        [this.weatherConditions, this.setWeatherConditions] = textTransitionSignal("");
+        [this.weatherConditions, this.setWeatherConditions] = createSignal("");
     }
 }
 
 function updateSignals(signals, data) {
     var locale = "en-GB";
     if ("Clock" in data) {
-        if ("Locale" in data["Clock"] && data["Clock"]["Locale"] !== "") {
-            locale = data["Clock"]["Locale"];
+        const clock = data["Clock"];
+        if ("Locale" in clock && clock["Locale"] !== "") {
+            locale = clock["Locale"];
         }
     }
     if ("Weather" in data) {
@@ -58,6 +60,8 @@ function updateSignals(signals, data) {
                 let shortText = renderShortDateText(locale, date);
                 daySignals.setShortDate(shortText);
                 daySignals.setDate(dateText);
+                let dayOfWeek = date.toLocaleDateString(locale, { weekday: 'short' });
+                daySignals.setDayOfWeek(dayOfWeek);
                 let temp = forecast["Temp"];
                 let mornTemp = temp["Morn"];
                 let dayTemp = temp["Day"];
@@ -178,7 +182,7 @@ export const Forecast = () => {
                 <div class="forecast-day-controls">
                     <Show when={hasPrevDay()}>
                         <div class="forecast-day-prev-button-wrapper">
-                            <button class="forecast-control-button forecast-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {getPrevDay().shortDate}</button>
+                            <button class="forecast-control-button forecast-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {getPrevDay().dayOfWeek}</button>
                         </div>
                     </Show>
                     <Show when={!hasPrevDay()}>
@@ -188,7 +192,7 @@ export const Forecast = () => {
                     <div class="forecast-control-label forecast-date">{getCurrentDay().shortDate}</div>
                     <Show when={hasNextDay()}>
                         <div class="forecast-day-next-button-wrapper">
-                            <button class="forecast-control-button forecast-day-next-button" onClick={onClickNext}>{getNextDay().shortDate} <i class="fa-solid fa-chevron-right"></i></button>
+                            <button class="forecast-control-button forecast-day-next-button" onClick={onClickNext}>{getNextDay().dayOfWeek} <i class="fa-solid fa-chevron-right"></i></button>
                         </div>
                     </Show>
                 </div>
