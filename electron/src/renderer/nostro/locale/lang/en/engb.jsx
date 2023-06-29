@@ -1,11 +1,11 @@
 export const Text = {
     "db-name": "engb", 
     "astro": {
-        "sunrise": "sunrise",
-        "sunset": "sunset",
-        "moonrise": "moonrise",
-        "moonset": "moonset",
-        "moon-phase": "moon phase",
+        "sunrise": "Sunrise",
+        "sunset": "Sunset",
+        "moonrise": "Moonrise",
+        "moonset": "Moonset",
+        "moon-phase": "Moon phase",
     },
     "current-weather": {
         "temp": "temp",
@@ -14,19 +14,19 @@ export const Text = {
         "today-condition": "today",
     },
     "device-control": {
-        "reboot": "reboot",
-        "shutdown": "shutdown",
-        "setup": "setup device",
-        "status": "status",
+        "reboot": "Reboot",
+        "shutdown": "Shutdown",
+        "setup": "Setup device",
+        "status": "Status",
     },
     "device-info": {
         "ip-address": "IP address",
-        "software-version": "software version",
-        "update-version": "update version",
+        "software-version": "Software version",
+        "update-version": "Update version",
     },
     "event-calendar": {
-        "no-events": "no calendar events",
-        "func-events-on": (day) => `events on ${day}`,
+        "no-events": "No calendar events",
+        "func-events-on": (day) => `Events on ${day}`,
         "more-events-not-shown": "More events not shown",
     },
     "forecast": {
@@ -37,23 +37,30 @@ export const Text = {
         "evening": "eve",
         "night": "night"
     },
+    "locale": {
+        "location": "Location",
+        "timezone": "Timezone",
+        "locale": "Locale",
+        "coordinates": "Coords",
+
+    },
     "pairing": {
         "title": "Account Pairing",
-        "change-linked-account": "change linked account",
-        "link-account": "link account",
-        "in-your-browser": "in your browser",
-        "enter-code": "enter your pairing code",
-        "scan-qr": "or scan the QR code",
+        "change-linked-account": "Change linked account",
+        "link-account": "Link account",
+        "in-your-browser": "In your browser",
+        "enter-code": "Enter your pairing code",
+        "scan-qr": "Or scan the QR code",
     },
     "web-setup": {
         "welcome": "Welcome to Timechief",
-        "reboot": "reboot",
-        "shutdown": "shutdown",
-        "cancel-setup": "cancel setup",
-        "restart-setup": "restart setup",
-        "connect-wifi": "connect to WiFi Network",
+        "reboot": "Reboot",
+        "shutdown": "Shutdown",
+        "cancel-setup": "Cancel setup",
+        "restart-setup": "Restart setup",
+        "connect-wifi": "Connect to WiFi Network",
         "wifi-key": "WiFi password",
-        "continue-via-browser": "continue setup via your browser",
+        "continue-via-browser": "Continue setup via your browser",
         "connection-error": "Error connecting to network, please run through setup again"
     },
 

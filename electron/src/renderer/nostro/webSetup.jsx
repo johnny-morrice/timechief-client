@@ -5,7 +5,7 @@ import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
 import { Loading } from './loading';
 import { textTransitionSignal } from './textGlitch';
 import { random } from './fakeRandom';
-import { labelMaker } from './label';
+import { labelMaker, textMaker } from './label';
 
 class Signals {
     constructor() {

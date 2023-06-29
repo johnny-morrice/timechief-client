@@ -15,7 +15,6 @@ import { Locale } from './locale';
 import { callbackName } from "./callback";
 import { Forecast } from './forecast';
 import { EventCalendar } from './eventCalendar';
-import { textTransitionSignal } from "./textGlitch";
 
 class Signals {
   constructor() {

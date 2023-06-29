@@ -217,7 +217,7 @@ export const Forecast = () => {
                             <td>{getCurrentDay().dayFeelsLike}</td>
                         </tr>
                         <tr>
-                            <th>{label("eve")}</th>
+                            <th>{label("evening")}</th>
                             <td>{getCurrentDay().eveTemp}</td>
                             <td>{getCurrentDay().eveFeelsLike}</td>
                         </tr>

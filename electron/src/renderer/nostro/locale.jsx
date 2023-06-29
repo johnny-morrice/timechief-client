@@ -3,10 +3,12 @@ import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { Loading } from './loading';
 import { textTransitionSignal } from './textGlitch';
+import { labelMaker } from './label';
 
 class Signals {
     constructor() {
         [this.isLoaded, this.setIsLoaded] = createSignal(false);
+        [this.locale, this.setLocale] = textTransitionSignal("");
         [this.location, this.setLocation] = textTransitionSignal("");
         [this.coords, this.setCoords] = textTransitionSignal("");
         [this.timezone, this.setTimezone] = textTransitionSignal("");
@@ -19,9 +21,11 @@ function updateSignals(signals, data) {
     let latitude = clock["Latitude"];
     let longitude = clock["Longitude"];
     let timezone = clock["Timezone"];
+    let locale = clock["Locale"];
     signals.setCoords(`${latitude}, ${longitude}`);
     signals.setTimezone(timezone);
     signals.setLocation(location);
+    signals.setLocale(locale);
     signals.setIsLoaded(true);
 }
 
@@ -36,6 +40,7 @@ export const Locale = () => {
     onCleanup(() => {
         removeDataCallback(cbName);
     });
+    const label = labelMaker("locale");
 
     return <div class="locale-root flex-grow">
         <Show when={!hasLocaleInfo(signals)}>
@@ -43,12 +48,14 @@ export const Locale = () => {
         </Show>
         <div class="flex-row flex-grow">
             <div class="locale-labels flex-column flex-grow">
-                <div class='data-label flex-grow'>Location</div>
-                <div class='data-label flex-grow'>Timezone</div>
-                <div class='data-label flex-grow'>Coords</div>
+                <div class='data-label flex-grow'>{label("location")}</div>
+                <div class='data-label flex-grow'>{label("locale")}</div>
+                <div class='data-label flex-grow'>{label("timezone")}</div>
+                <div class='data-label flex-grow'>{label("coordinates")}</div>
             </div>
             <div class="locale-values flex-column flex-grow">
                 <div class='data-value flex-grow'>{signals.location}</div>
+                <div class='data-value flex-grow'>{signals.locale}</div>
                 <div class='data-value flex-grow'>{signals.timezone}</div>
                 <div class='data-value flex-grow'>{signals.coords}</div>
             </div>
