@@ -1,4 +1,5 @@
-import { createSignal, onCleanup } from "solid-js";
+import { createSignal } from "solid-js";
+import { fadeTransition } from "./fadeTransition";
 
 function hasWidget(widgets) {
     return widgets.length > 0;
@@ -28,8 +29,6 @@ function getNextWidget(widgets, currentIndex) {
     return widgets[index];
 }
 
-const transitionDurationMs = 100;
-
 function onClickNext(widgets, currentIndex, setCurrentIndex) {
     return changeSwitcherContent(nextIndex, widgets, currentIndex, setCurrentIndex);
 }
@@ -40,35 +39,7 @@ function onClickPrev(widgets, currentIndex, setCurrentIndex) {
 
 function changeSwitcherContent(func, widgets, currentIndex, setCurrentIndex) {
     return () => {
-        applyClassToElement("fade-out", "switcher-widget-content");
-        const timerA = setTimeout(() => {
-            removeClassFromElement("fade-out", "switcher-widget-content");
-            applyClassToElement("fade-in", "switcher-widget-content");
-            setCurrentIndex(func(currentIndex(), widgets));
-            const timerB = setTimeout(() => {
-                removeClassFromElement("fade-in", "switcher-widget-content");
-            }, transitionDurationMs);
-            onCleanup(() => {
-                clearTimeout(timerB);
-            });
-        }, transitionDurationMs);
-        onCleanup(() => {
-            clearTimeout(timerA);
-        });
-    };
-}
-
-function applyClassToElement(cls, id) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.classList.add(cls);
-    }
-}
-
-function removeClassFromElement(cls, id) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.classList.remove(cls);
+        fadeTransition(() => setCurrentIndex(func(currentIndex(), widgets)), "switcher-widget-content");
     }
 }
 
