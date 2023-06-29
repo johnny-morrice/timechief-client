@@ -61,15 +61,15 @@ function updateSignals(signals, data) {
   let calendar = data["Calendar"];
   let clock = data["Clock"];
   let hourCycleOption = clock["HourCycleOption"];
-  let timeZone = clock["Timezone"];
+  let timezone = clock["Timezone"];
   let locale = clock["Locale"];
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
-  signals.setTimezone(timeZone);
+  signals.setTimezone(timezone);
   signals.setLastUpdateTime(new Date());
   if (calendar.Calendar) {
     const nextEvent = findNextEvent(calendar.Calendar.Events);
-    signals.setNextEvent(nextEvent);
+    signals.setNextEvent(nextEvent, timezone);
   }
 }
 
@@ -81,15 +81,15 @@ function getTimeZone(signals) {
   return "Europe/London";
 }
 
-function findNextEvent(eventData) {
+function findNextEvent(eventData, timezone) {
   if (!eventData) {
     return null;
   }
   let calendarEvents = eventData.map(ev => new CalendarEvent(ev));
-  sortCalendarEvents(calendarEvents);
+  sortCalendarEvents(calendarEvents, timezone);
   for (var i = 0; i < calendarEvents.length; i++) {
     let cev = calendarEvents[i];
-    if (cev.isHighlight()) {
+    if (cev.isHighlight(timezone)) {
       return cev;
     }
   }

@@ -17,6 +17,11 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
+  let clock = data["Clock"];
+  signals.setLocale(clock["Locale"]);
+  const tz = clock["Timezone"]
+  signals.setTimeZone(tz);
+  signals.setLoaded(true);
   let calendarResp = data["Calendar"];
   if ("Calendar" in calendarResp && calendarResp["Calendar"] != null) {
     let calendar = calendarResp["Calendar"];
@@ -24,7 +29,7 @@ function updateSignals(signals, data) {
       let dataEvents = calendar["Events"];
       if (dataEvents) {
         let events = dataEvents.map(cev => new CalendarEvent(cev));
-        let calendarDays = new CalendarDays();
+        let calendarDays = new CalendarDays(tz);
         events.forEach(cev => calendarDays.addNewEvent(cev));
         let ourCalendar = calendarDays.nextEvents(30, 3);
         // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
@@ -32,10 +37,7 @@ function updateSignals(signals, data) {
       }
     }
   }
-  let clock = data["Clock"];
-  signals.setLocale(clock["Locale"]);
-  signals.setTimeZone(clock["Timezone"]);
-  signals.setLoaded(true);
+
 }
 
 
@@ -106,7 +108,8 @@ class NullCalendarDay {
 
 class CalendarDays {
 
-  constructor() {
+  constructor(timezone) {
+    this.timezone = timezone
     this._days = {};
   }
 
@@ -119,7 +122,7 @@ class CalendarDays {
       dates.push(nextDate);
     }
     let allDays = this._allDays();
-    let canonicalDates = dates.map(d => makeCanonicalDateText(d));
+    let canonicalDates = dates.map(d => makeCanonicalDateText(d, this.timezone));
     let out = [];
     canonicalDates.forEach(dateText => {
       const events = allDays[dateText];
@@ -135,13 +138,13 @@ class CalendarDays {
 
   _allDays() {
     for (let [_, day] of Object.entries(this._days)) {
-      sortCalendarEvents(day);
+      sortCalendarEvents(day, this.timezone);
     }
     return this._days;
   }
 
   addNewEvent(event) {
-    let canonicalDate = event.canonicalStartDateText();
+    let canonicalDate = event.canonicalStartDateText(this.timezone);
     if (canonicalDate in this._days) {
       this._days[canonicalDate].push(event);
     } else {
