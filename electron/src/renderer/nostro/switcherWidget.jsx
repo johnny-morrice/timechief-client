@@ -39,7 +39,7 @@ function onClickPrev(widgets, currentIndex, setCurrentIndex) {
 
 function changeSwitcherContent(func, widgets, currentIndex, setCurrentIndex) {
     return () => {
-        fadeTransition(() => setCurrentIndex(func(currentIndex(), widgets)), "switcher-widget-content");
+        fadeTransition("switcher-widget-content", () => setCurrentIndex(func(currentIndex(), widgets)));
     }
 }
 

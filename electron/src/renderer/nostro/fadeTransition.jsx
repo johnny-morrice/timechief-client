@@ -1,6 +1,6 @@
 import { onCleanup } from "solid-js";
 
-export const fadeTransition = (doChange, contentID) => {
+export const fadeTransition = (contentID, doChange) => {
     applyClassToElement("fade-out", contentID);
     const timerA = setTimeout(() => {
         removeClassFromElement("fade-out", contentID);

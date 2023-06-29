@@ -5,6 +5,7 @@ import { day } from '../timing';
 import { callbackName } from './callback';
 import { Loading } from './loading';
 import { labelMaker, textMaker } from './label';
+import { fadeTransition } from './fadeTransition';
 
 class Signals {
   constructor() {
@@ -29,7 +30,7 @@ function updateSignals(signals, data) {
       let dataEvents = calendar["Events"];
       if (dataEvents) {
         let events = dataEvents.map(cev => new CalendarEvent(cev));
-        let calendarDays = new CalendarDays(tz);
+        let calendarDays = new CalendarDaysModel(tz);
         events.forEach(cev => calendarDays.addNewEvent(cev));
         let ourCalendar = calendarDays.nextEvents(30, 3);
         // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
@@ -49,11 +50,13 @@ function formatShortDate(signals, day) {
   return day.shortDate(signals.locale(), signals.timeZone());
 }
 
-function formatDayOfWeek(signals, day) {
-  return day.dayOfWeek(signals.locale(), signals.timeZone());
+
+function formatDayOfMonth(signals, day) {
+  return day.dayOfMonth(signals.locale(), signals.timeZone());
 }
 
-class CalendarDay {
+
+class CalendarDayModel {
   constructor(calendarEvents) {
     if (calendarEvents.length == 0) {
       throw new Error("expected non empty calendarEvents");
@@ -69,6 +72,11 @@ class CalendarDay {
   dayOfWeek(locale, timeZone) {
     // format using day of week only
     return this.date().toLocaleDateString(locale, { weekday: 'short', timeZone: timeZone });
+  }
+
+  dayOfMonth(locale, timeZone) {
+    // format using day of month only
+    return this.date().toLocaleDateString(locale, { day: 'numeric', timeZone: timeZone });
   }
 
   shortDate(locale, timeZone) {
@@ -106,7 +114,7 @@ class NullCalendarDay {
 }
 
 
-class CalendarDays {
+class CalendarDaysModel {
 
   constructor(timezone) {
     this.timezone = timezone
@@ -128,7 +136,7 @@ class CalendarDays {
       const events = allDays[dateText];
       if (events) {
         const eventsUpTolimit = events.slice(0, eventLimit);
-        const calendarDay = new CalendarDay(eventsUpTolimit)
+        const calendarDay = new CalendarDayModel(eventsUpTolimit)
         calendarDay.setLaterEventsNotShown(events.length > eventLimit);
         out.push(calendarDay);
       }
@@ -160,7 +168,6 @@ function formatCalendarEventStartTime(signals, calendarEvent) {
 function formatCalendarEventEndTime(signals, calendarEvent) {
   return calendarEvent.formatEndTime(signals.locale(), signals.timeZone());
 }
-
 
 export const EventCalendar = () => {
   let signals = new Signals();
@@ -200,15 +207,21 @@ export const EventCalendar = () => {
 
   function onClickPrev() {
     if (hasPrevDay()) {
-      const dayIndex = signals.dayIndex();
-      signals.setDayIndex(dayIndex - 1);
+      fadeTransition("calendar-screen",
+      () => {
+        const dayIndex = signals.dayIndex();
+        signals.setDayIndex(dayIndex - 1);
+      });
     }
   }
 
   function onClickNext() {
     if (hasNextDay()) {
-      const dayIndex = signals.dayIndex();
-      signals.setDayIndex(dayIndex + 1);
+      fadeTransition("calendar-screen",
+      () => {
+        const dayIndex = signals.dayIndex();
+        signals.setDayIndex(dayIndex + 1);
+      });
     }
   }
 
@@ -249,7 +262,7 @@ export const EventCalendar = () => {
           <div class="event-calendar-day-controls">
             <Show when={hasPrevDay()}>
               <div class="event-calendar-day-prev-button-wrapper">
-                <button class="event-calendar-control-button event-calendar-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {formatDayOfWeek(signals, getPrevDay())}</button>
+                <button class="event-calendar-control-button event-calendar-day-prev-button" onClick={onClickPrev}><i class="fa-solid fa-chevron-left"></i> {formatDayOfMonth(signals, getPrevDay())}</button>
               </div>
             </Show>
             <Show when={!hasPrevDay()}>
@@ -259,7 +272,7 @@ export const EventCalendar = () => {
             <div class="event-calendar-control-label event-calendar-date">{formatShortDate(signals, getCurrentDay())}</div>
             <Show when={hasNextDay()}>
               <div class="event-calendar-day-next-button-wrapper">
-                <button class="event-calendar-control-button event-calendar-day-next-button" onClick={onClickNext}>{formatDayOfWeek(signals, getNextDay())} <i class="fa-solid fa-chevron-right"></i></button>
+                <button class="event-calendar-control-button event-calendar-day-next-button" onClick={onClickNext}>{formatDayOfMonth(signals, getNextDay())} <i class="fa-solid fa-chevron-right"></i></button>
               </div>
             </Show>
           </div>

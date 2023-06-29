@@ -6,6 +6,7 @@ import { callbackName } from './callback';
 import { Loading } from './loading';
 import { textTransitionSignal } from "./textGlitch";
 import { labelMaker } from './label';
+import { fadeTransition } from './fadeTransition';
 
 let dayForecastCount = 5;
 class Signals {
@@ -142,15 +143,19 @@ export const Forecast = () => {
 
     function onClickPrev() {
         if (hasPrevDay()) {
-            const dayIndex = signals.dayIndex();
-            signals.setDayIndex(dayIndex - 1);
+            fadeTransition("forecast-widget", () => {
+                const dayIndex = signals.dayIndex();
+                signals.setDayIndex(dayIndex - 1);
+            });
         }
     }
 
     function onClickNext() {
         if (hasNextDay()) {
-            const dayIndex = signals.dayIndex();
-            signals.setDayIndex(dayIndex + 1);
+            fadeTransition("forecast-widget", () => {
+                const dayIndex = signals.dayIndex();
+                signals.setDayIndex(dayIndex + 1);
+            });
         }
     }
 
@@ -176,7 +181,7 @@ export const Forecast = () => {
 
     const label = labelMaker("forecast");
 
-    return <div class="forecast flex-column">
+    return <div id="forecast-widget" class="forecast flex-column">
         <Show when={!hasDay() || !hasDayLoaded()}>
             <Loading />
         </Show>
