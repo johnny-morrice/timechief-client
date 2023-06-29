@@ -67,11 +67,6 @@ div.home-time {
     font-size: 100pt;
 }
 
-div.home-location {
-    align-self: flex-end;
-    font-size: 22pt;
-}
-
 div.home-action-center {
     flex-basis: 40%;
 }
@@ -114,14 +109,22 @@ div.switcher-widget-button-wrapper {
 }
 
 div.current-weather {
-    font-size: 22pt
+    font-size: 22pt;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+div.current-weather-location {
+    align-self: center;
+    font-weight: 500;
 }
 
 div.current-weather-grid {
     display: grid;
     grid-template-rows: 1fr 1fr 0.5fr 0.5fr;
     grid-template-columns: 1fr 1fr;
-    grid-gap: 1em;
+    grid-gap: 0.4em;
 }
 
 button:active {

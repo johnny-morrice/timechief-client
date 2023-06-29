@@ -26,5 +26,6 @@ export function weatherIconStyleClass(weatherCode) {
         case "Volcano":
             return "fa-volcano"
     }
+    console.log(`weatherCode: ${weatherCode} not found in weatherIconStyleClass`);
     return "";
 }

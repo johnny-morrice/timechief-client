@@ -1,4 +1,4 @@
-import { createSignal, createResource } from "solid-js";
+import { createSignal, createResource, onCleanup } from "solid-js";
 import { random, randomButtonGlitchSymbol, randomGlitchTransitionSymbol } from './fakeRandom';
 
 export const buttonGlitchStyle = (text) => {
@@ -11,9 +11,17 @@ export const runButtonGlitch = (when, out, text, delayMs) => {
     if (isGlitching) {
         const glitched = buttonGlitchText(text, 2);
         out(glitched);
-        setTimeout(() => {
-            runButtonGlitch(when, out, text, delayMs);
+        const interval = setInterval(() => {
+            const stillGlitching = when();
+            if (stillGlitching) {
+                const glitched = buttonGlitchText(text, 2);
+                out(glitched);
+            } else {
+                clearInterval(interval);
+            }
         }, delayMs);
+
+        onCleanup(() => clearInterval(interval));
     }
 };
 
@@ -89,12 +97,21 @@ export const textTransitionSignal = (value) => {
 }
 
 export const textTransitionGlitch = (buffer, display, setter, n) => {
-    let more = transitionBuffer(buffer, display, setter, n);
     let delayMs = 150;
+
+    let more = transitionBuffer(buffer, display, setter, n);
+    
     if (more) {
-        setTimeout(() => textTransitionGlitch(buffer, display, setter, n), delayMs);
+        const interval = setInterval(() => {
+            const more = transitionBuffer(buffer, display, setter, n);
+            if (!more) {
+                clearInterval(interval);
+            }
+        }, delayMs);
+        onCleanup(() => clearInterval(interval));
     }
 }
+
 const transitionBuffer = (buffer, display, setter, n) => {
     // Compare the contents of fortune and fortuneBuffer, and transition fortune to fortuneBuffer if they are different.
     // We change n letter at a time, so that the transition is smooth.
