@@ -25,8 +25,8 @@ class Signals {
         [this.isUpdating, this.setUpdating] = createSignal(false);
         [this.rebootGlitch, this.setRebootGlitch] = createSignal("Reboot");
         [this.shutdownGlitch, this.setShutdownGlitch] = createSignal("Shutdown");
-        [this.displayStateBuffer, this.setDisplayStateBuffer] = createSignal([true, true, false]);
-        [this.displayState, this.setDisplayState] = createSignal([true, false, false]);
+        [this.displayStateBuffer, this.setDisplayStateBuffer] = createSignal([false, false, false]);
+        [this.displayState, this.setDisplayState] = createSignal([false, false, false]);
     }
 }
 
