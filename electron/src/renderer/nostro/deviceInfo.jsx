@@ -3,6 +3,7 @@ import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDev
 import { callbackName } from "./callback";
 import { Loading } from './loading';
 import { textTransitionSignal } from "./textGlitch";
+import { labelMaker } from './label';
 
 class Signals {
     constructor() {
@@ -55,6 +56,7 @@ export const DeviceInfo = () => {
         removeDeviceStatusCallback(cbName);
     });
 
+    const label = labelMaker("device-info");
     return <div class="device-control flex-column flex-grow">
         <Show when={!hasDeviceInfo(signals)}>
             <Loading />
@@ -62,10 +64,10 @@ export const DeviceInfo = () => {
         <Show when={hasDeviceInfo(signals)}>
             <div class="flex-row flex-grow">
                 <div class="device-info-labels flex-column flex-grow">
-                    <div class="data-label flex-grow">IP</div>
-                    <div class="data-label flex-grow">Software version</div>
+                    <div class="data-label flex-grow">{label("ip-address")}</div>
+                    <div class="data-label flex-grow">{label("software-version")}</div>
                     <Show when={hasUpdateVersion(signals)}>
-                        <div class="data-label flex-grow">Update version</div>
+                        <div class="data-label flex-grow">{label("update-version")}</div>
                     </Show>
                 </div>
                 <div class="device-info-values flex-column flex-grow">

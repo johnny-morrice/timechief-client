@@ -4,6 +4,7 @@ import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { day } from '../timing';
 import { callbackName } from './callback';
 import { Loading } from './loading';
+import { labelMaker } from './label';
 
 class Signals {
   constructor() {
@@ -230,6 +231,8 @@ export const EventCalendar = () => {
     return new NullCalendarDay();
   }
 
+  const label = labelMaker("event-calendar;")
+
   return <div id="calendar-screen">
     <Show when={!signals.loaded()}>
       <Loading />
@@ -237,7 +240,7 @@ export const EventCalendar = () => {
     <Show when={signals.loaded()}>
       <div class="flex-column flex-grow">
         <Show when={!hasDay(signals)}>
-          <div class="data-label">No calendar events</div>
+          <div class="data-label">{label("no-events")}</div>
         </Show>
         <Show when={hasMultipleDays(signals)}>
           <div class="event-calendar-day-controls">
@@ -260,7 +263,7 @@ export const EventCalendar = () => {
         </Show>
         <Show when={hasDay(signals)}>
           <div class="calendar-day flex-column flex-grow">
-            <div class="calendar-day-date flex-grow">Events on {formatCalendarDayDate(signals, getCurrentDay())}</div>
+            <div class="calendar-day-date flex-grow">{label("func-events-on")(formatCalendarDayDate(signals, getCurrentDay()))}</div>
             <div class="calendar-events flex-column flex-grow">
               <For each={getCurrentDay().events()}>{(cev, j) =>
                 <div class="calendar-event-wrapper flex-column flex-grow">
@@ -277,7 +280,7 @@ export const EventCalendar = () => {
               }</For>
               <Show when={getCurrentDay().hasLaterEventsNotShown()}>
                 <div class="calendar-later-events-not-included flex-grow">
-                  Later events this day not shown
+                  {label("more-events-not-shown")}
                 </div>
               </Show>
             </div>
