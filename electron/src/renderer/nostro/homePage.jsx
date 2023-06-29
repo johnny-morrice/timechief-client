@@ -147,7 +147,7 @@ export const HomePage = () => {
     () => {
       signals.setMyDate(getDateText(getLocale(signals)));
     },
-    second * 60
+    second
   );
 
   onCleanup(() => {

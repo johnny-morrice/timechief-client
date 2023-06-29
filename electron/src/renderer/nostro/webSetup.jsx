@@ -1,4 +1,4 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
@@ -6,6 +6,7 @@ import { Loading } from './loading';
 import { textTransitionSignal } from './textGlitch';
 import { random } from './fakeRandom';
 import { labelMaker, textMaker } from './label';
+import { fadeTransition } from './fadeTransition';
 
 class Signals {
     constructor() {
@@ -24,6 +25,8 @@ class Signals {
         [this.isUpdating, this.setUpdating] = createSignal(false);
         [this.rebootGlitch, this.setRebootGlitch] = createSignal("Reboot");
         [this.shutdownGlitch, this.setShutdownGlitch] = createSignal("Shutdown");
+        [this.displayStateBuffer, this.setDisplayStateBuffer] = createSignal([true, true, false]);
+        [this.displayState, this.setDisplayState] = createSignal([true, false, false]);
     }
 }
 
@@ -112,6 +115,17 @@ function onClickReboot() {
     sendReboot();
 }
 
+function isDisplayStateLoading(signals) {
+    return signals.displayState()[0];
+}
+
+function isDisplayStateHotspot(signals) {
+    return signals.displayState()[1];
+}
+
+function isDisplayStateInternet(signals) {
+    return signals.displayState()[2];
+}
 
 export const WebSetupPage = (props) => {
     const signals = new Signals();
@@ -119,6 +133,17 @@ export const WebSetupPage = (props) => {
     addDataCallback(cbName, (data) => updateSignals(signals, data));
     onCleanup(() => {
         removeDataCallback(cbName);
+    });
+
+    createEffect(() => {
+        signals.setDisplayStateBuffer([isLoading(signals), isHotspotReady(signals), isInternetConnectedState(signals)]);
+    });
+    createEffect(() => {
+        const displayStateBuffer = signals.displayStateBuffer();
+        const displayState = signals.displayState();
+        if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
+            fadeTransition("crt-root", () => signals.setDisplayState(displayStateBuffer));
+        }
     });
 
     const applyCRTJank = () => {
@@ -166,7 +191,7 @@ export const WebSetupPage = (props) => {
     const label = labelMaker("web-setup");
     const plainText = textMaker("web-setup");
     return <div id="crt-root" class="crt">
-        <Show when={isHotspotReady(signals)}>
+        <Show when={isDisplayStateHotspot(signals)}>
             <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-content-wrapper flex-row">
@@ -210,7 +235,7 @@ export const WebSetupPage = (props) => {
                 </div>
             </div>
         </Show>
-        <Show when={isLoading(signals)}>
+        <Show when={isDisplayStateLoading(signals)}>
             <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-action-wrapper flex-row">
@@ -239,7 +264,7 @@ export const WebSetupPage = (props) => {
                 </div>
             </div>
         </Show>
-        <Show when={isInternetConnectedState(signals)}>
+        <Show when={isDisplayStateInternet(signals)}>
             {props.element}
         </Show>
     </div>;
