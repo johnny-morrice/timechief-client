@@ -5,6 +5,7 @@ import { weatherIconStyleClass } from '../weatherIcon';
 import { callbackName } from './callback';
 import { Loading } from './loading';
 import { textTransitionSignal } from "./textGlitch";
+import { labelMaker } from './label';
 
 let dayForecastCount = 5;
 class Signals {
@@ -173,6 +174,8 @@ export const Forecast = () => {
         };
     }
 
+    const label = labelMaker("forecast");
+
     return <div class="forecast flex-column">
         <Show when={!hasDay() || !hasDayLoaded()}>
             <Loading />
@@ -200,26 +203,26 @@ export const Forecast = () => {
                     <tbody>
                         <tr>
                             <th></th>
-                            <th>temp</th>
-                            <th>feels like</th>
+                            <th>{label("temp")}</th>
+                            <th>{label("feels")}</th>
                         </tr>
                         <tr>
-                            <th>morn</th>
+                            <th>{label("morning")}</th>
                             <td>{getCurrentDay().mornTemp}</td>
                             <td>{getCurrentDay().mornFeelsLike}</td>
                         </tr>
                         <tr>
-                            <th>day</th>
+                            <th>{label("day")}</th>
                             <td>{getCurrentDay().dayTemp}</td>
                             <td>{getCurrentDay().dayFeelsLike}</td>
                         </tr>
                         <tr>
-                            <th>eve</th>
+                            <th>{label("eve")}</th>
                             <td>{getCurrentDay().eveTemp}</td>
                             <td>{getCurrentDay().eveFeelsLike}</td>
                         </tr>
                         <tr>
-                            <th>night</th>
+                            <th>{label("night")}</th>
                             <td>{getCurrentDay().nightTemp}</td>
                             <td>{getCurrentDay().nightFeelsLike}</td>
                         </tr>

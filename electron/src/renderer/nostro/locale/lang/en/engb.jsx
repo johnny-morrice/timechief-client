@@ -38,6 +38,9 @@ export const Text = {
         "night": "night"
     },
     "pairing": {
+        "title": "Account Pairing",
+        "change-linked-account": "change linked account",
+        "link-account": "link account",
         "in-your-browser": "in your browser",
         "enter-code": "enter your pairing code",
         "scan-qr": "or scan the QR code",
@@ -48,10 +51,10 @@ export const Text = {
         "shutdown": "shutdown",
         "cancel-setup": "cancel setup",
         "restart-setup": "restart setup",
-        "connect": "connect to WiFi Network",
+        "connect-wifi": "connect to WiFi Network",
         "wifi-key": "WiFi password",
-        "continue": "continue setup via your browser",
-        "error": "Error connecting to network, please run through setup again"
+        "continue-via-browser": "continue setup via your browser",
+        "connection-error": "Error connecting to network, please run through setup again"
     },
 
 

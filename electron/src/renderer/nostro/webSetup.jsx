@@ -5,6 +5,7 @@ import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
 import { Loading } from './loading';
 import { textTransitionSignal } from './textGlitch';
 import { random } from './fakeRandom';
+import { labelMaker } from './label';
 
 class Signals {
     constructor() {
@@ -162,6 +163,8 @@ export const WebSetupPage = (props) => {
         clearInterval(jankInterval);
     });
 
+    const label = labelMaker("web-setup");
+    const plainText = textMaker("web-setup");
     return <div id="crt-root" class="crt">
         <Show when={isHotspotReady(signals)}>
             <div class="setup-wrapper flex-column flex-grow">
@@ -169,15 +172,15 @@ export const WebSetupPage = (props) => {
                 <div class="setup-content-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
                         <Show when={isUpdating(signals)}>
-                            <button class='action-button crt-box' style={buttonGlitchStyle("Reboot")} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button class='action-button crt-box' style={buttonGlitchStyle("Shutdown")} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            <button class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         </Show>
                         <Show when={!isUpdating(signals)}>
-                            <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         </Show>
                         <Show when={isDisplayBackButton(signals)}>
-                            <button class='action-button crt-box' onClick={onClickBack}>Cancel setup &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                            <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
                         </Show>
                         <Show when={isUpdating(signals)}>
                             <div class="setup-button-box-isUpdating">
@@ -187,20 +190,20 @@ export const WebSetupPage = (props) => {
                     </div>
                     <div class="setup-instructions flex-column">
                         <div class='flex-row'>
-                            <div class="data-label">Connect to Wifi Network</div>
+                            <div class="data-label">{label("connect-wifi")}</div>
                             <div class="data-value">{signals.hotspotSSIDText}</div>
                         </div>
                         <div class='flex-row'>
-                            <div class="data-label">Wifi Key</div>
+                            <div class="data-label">{label("wifi-key")}</div>
                             <div class="data-value">{signals.hotspotKeyText}</div>
                         </div>
                         <div class='flex-row'>
-                            <div class="data-label">Continue setup via your browser</div>
+                            <div class="data-label">{label("continue-via-browser")}</div>
                             <div class="data-value">{signals.deviceSetupURLText}</div>
                         </div>
                         <Show when={isConnectionError(signals)}>
                             <div class='flex-row'>
-                                <div class="hotspot-error">Error connecting to network, please run through setup again</div>
+                                <div class="hotspot-error">{label("connection-error")}</div>
                             </div>
                         </Show>
                     </div>
@@ -213,16 +216,16 @@ export const WebSetupPage = (props) => {
                 <div class="setup-action-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
                         <Show when={isUpdating(signals)}>
-                            <button disabled class='action-button crt-box' style={buttonGlitchStyle("Reboot")} onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button disabled class='action-button crt-box' style={buttonGlitchStyle("Shutdown")} onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         </Show>
                         <Show when={!isUpdating(signals)}>
-                            <button class='action-button crt-box' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button class='action-button crt-box' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         </Show>
-                        <button class='action-button crt-box' onClick={onClickRestartSetup}>Restart setup &nbsp;&nbsp; <i class='fa-solid <i class="fa-solid fa-backward"></i>'></i></button>
+                        <button class='action-button crt-box' onClick={onClickRestartSetup}>{plainText("restart-setup")} &nbsp;&nbsp; <i class='fa-solid <i class="fa-solid fa-backward"></i>'></i></button>
                         <Show when={isDisplayBackButton(signals)}>
-                            <button class='action-button crt-box' onClick={onClickBack}>Cancel setup &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                            <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
                         </Show>
                         <Show when={isUpdating(signals)}>
                             <div class="setup-button-box-isUpdating">
