@@ -8,14 +8,24 @@ set -x
 # PRODUCT
 # STREAM
 # UPLOAD_FILENAME
+# BUILD_DIR
 
 if [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$UPLOAD_FILENAME" ] ; then
   echo "missing parameters"
   exit 1
 fi
 
-SHA256=$(cat $UPLOAD_FILENAME | openssl dgst -binary -sha256 | openssl base64 -A)
-URL="https://storage.googleapis.com/$BUCKET_NAME/$UPLOAD_FILENAME"
+if [ -z "$BUILD_DIR" ] ; then
+  BUILD_DIR=$(mktemp -d)
+fi
+
+cp $UPLOAD_FILENAME $BUILD_DIR
+pushd $BUILD_DIR
+# MY_UPLOAD_FILENAME should be the first .tar.gz file in the build dir
+MY_UPLOAD_FILENAME=$(ls *.tar.gz | head -n 1)
+
+SHA256=$(cat $MY_UPLOAD_FILENAME | openssl dgst -binary -sha256 | openssl base64 -A)
+URL="https://storage.googleapis.com/$BUCKET_NAME/$MY_UPLOAD_FILENAME"
 
 # type Version struct {
 # 	UUID    string
@@ -44,8 +54,9 @@ METADATA=$(cat <<EOF
 EOF
 )
 
-echo "Uploading file: $UPLOAD_FILENAME"
-gcloud storage cp $UPLOAD_FILENAME gs://$BUCKET_NAME/$UNIQUE_NAME
+echo "Uploading file: $MY_UPLOAD_FILENAME"
+gcloud storage cp $MY_UPLOAD_FILENAME gs://$BUCKET_NAME/$MY_UPLOAD_FILENAME
 echo "Uploading metadata: $METADATA"
 timechief client core version-create --body "$METADATA"
 popd
+rm -rf $BUILD_DIR
