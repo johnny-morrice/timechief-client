@@ -8,6 +8,11 @@ set -x
 # BUILD_DIR
 set -e
 
+if [ -z "$IMAGE_OUTPUT" ] ; then
+  echo "missing parameters"
+  exit 1
+fi
+
 # If BUILD_DIR is empty, then we will use a temporary directory
 if [ -z "$BUILD_DIR" ]; then
   BUILD_DIR=$(mktemp -d)
@@ -20,6 +25,7 @@ echo $BUILD_DIR >> $TIDY_NOTE
 
 pushd $BUILD_DIR
 git clone https://github.com/johnny-morrice/timechief-client.git
+cd timechief-client
 git checkout $VERSION
 pushd image
 ./init.sh
