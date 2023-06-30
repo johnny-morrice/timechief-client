@@ -14,6 +14,7 @@ if [ -z "$BUILD_DIR" ]; then
 fi
 
 # We cannot at this moment easily tidy up the build directory so let's note where they are and we can have a process garbage collect them.
+mkdir -p $HOME/scratch
 TIDY_NOTE="$HOME/scratch/tidy-images.txt"
 echo $BUILD_DIR >> $TIDY_NOTE
 
