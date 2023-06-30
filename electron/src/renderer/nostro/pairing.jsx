@@ -2,6 +2,7 @@ import { createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, addDeviceStatusCallback, sendPairingCreateRequest, sendPairingGetRequest, addPairingGetCallback, addPairingCreateCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from './ipc';
 import { toCanvas } from 'qrcode';
 import { callbackName } from "./callback";
+import { labelMaker, textMaker } from './label';
 
 class Signals {
     constructor() {
@@ -89,30 +90,31 @@ export const Pairing = () => {
     function onClickLinkAccountButton() {
         sendPairingCreateRequest();
     }
-
+    const label = labelMaker("pairing");
+    const plainText = textMaker("pairing");
     return <div class="pairing flex-column flex-grow">
-        <div class="pairing-title flex-grow">Account Pairing</div>
+        <div class="pairing-title flex-grow">{label("title")}</div>
         <Show when={hasPrincipalSerial(signals.principalSerial()) && !hasPairingCode(signals.pairingCode())}>
             <div class='pairing-button-wrapper flex-grow'>
-                <button onClick={onClickLinkAccountButton} class="action-button crt-box">Relink your account &nbsp;&nbsp; <i class="fa-solid fa-user-plus"></i></button>
+                <button onClick={onClickLinkAccountButton} class="action-button crt-box">{plainText("change-linked-account")} &nbsp;&nbsp; <i class="fa-solid fa-user-plus"></i></button>
             </div>
         </Show>
         <Show when={!hasPrincipalSerial(signals.principalSerial()) && !hasPairingCode(signals.pairingCode())}>
             <div class="pairing-button-wrapper flex-grow">
-                <button onClick={onClickLinkAccountButton} class="action-button crt-box">Link your account &nbsp;&nbsp; <i class="fa-solid fa-user-plus"></i></button>
+                <button onClick={onClickLinkAccountButton} class="action-button crt-box">{plainText("link-account")} &nbsp;&nbsp; <i class="fa-solid fa-user-plus"></i></button>
             </div>
         </Show>
         <Show when={hasPairingCode(signals.pairingCode())}>
             <div class="flex-column flex-grow">
                 <div class='flex-row'>
-                    <div class="data-label">In your browser</div>
+                    <div class="data-label">{label("in-your-browser")}</div>
                     <div class="data-value">{signals.wwwBaseURL() + "/pairing"}</div>
                 </div>
                 <div class='flex-row'>
-                    <div class="data-label">And enter your pairing code</div>
+                    <div class="data-label">{label("enter-code")}</div>
                     <div class="data-value">{signals.pairingCode}</div>
                 </div>
-                <div class="data-label">Or scan the QR code</div>
+                <div class="data-label">{label("scan-qr")}</div>
                 <div id="pairing-qrcode-canvas-wrapper"></div>
             </div>
         </Show>

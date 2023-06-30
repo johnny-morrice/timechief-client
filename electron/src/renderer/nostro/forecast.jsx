@@ -5,6 +5,8 @@ import { weatherIconStyleClass } from '../weatherIcon';
 import { callbackName } from './callback';
 import { Loading } from './loading';
 import { textTransitionSignal } from "./textGlitch";
+import { labelMaker } from './label';
+import { fadeTransition } from './fadeTransition';
 
 let dayForecastCount = 5;
 class Signals {
@@ -141,15 +143,19 @@ export const Forecast = () => {
 
     function onClickPrev() {
         if (hasPrevDay()) {
-            const dayIndex = signals.dayIndex();
-            signals.setDayIndex(dayIndex - 1);
+            fadeTransition("forecast-widget", () => {
+                const dayIndex = signals.dayIndex();
+                signals.setDayIndex(dayIndex - 1);
+            });
         }
     }
 
     function onClickNext() {
         if (hasNextDay()) {
-            const dayIndex = signals.dayIndex();
-            signals.setDayIndex(dayIndex + 1);
+            fadeTransition("forecast-widget", () => {
+                const dayIndex = signals.dayIndex();
+                signals.setDayIndex(dayIndex + 1);
+            });
         }
     }
 
@@ -173,7 +179,9 @@ export const Forecast = () => {
         };
     }
 
-    return <div class="forecast flex-column">
+    const label = labelMaker("forecast");
+
+    return <div id="forecast-widget" class="forecast flex-column">
         <Show when={!hasDay() || !hasDayLoaded()}>
             <Loading />
         </Show>
@@ -200,26 +208,26 @@ export const Forecast = () => {
                     <tbody>
                         <tr>
                             <th></th>
-                            <th>temp</th>
-                            <th>feels like</th>
+                            <th>{label("temp")}</th>
+                            <th>{label("feels")}</th>
                         </tr>
                         <tr>
-                            <th>morn</th>
+                            <th>{label("morning")}</th>
                             <td>{getCurrentDay().mornTemp}</td>
                             <td>{getCurrentDay().mornFeelsLike}</td>
                         </tr>
                         <tr>
-                            <th>day</th>
+                            <th>{label("day")}</th>
                             <td>{getCurrentDay().dayTemp}</td>
                             <td>{getCurrentDay().dayFeelsLike}</td>
                         </tr>
                         <tr>
-                            <th>eve</th>
+                            <th>{label("evening")}</th>
                             <td>{getCurrentDay().eveTemp}</td>
                             <td>{getCurrentDay().eveFeelsLike}</td>
                         </tr>
                         <tr>
-                            <th>night</th>
+                            <th>{label("night")}</th>
                             <td>{getCurrentDay().nightTemp}</td>
                             <td>{getCurrentDay().nightFeelsLike}</td>
                         </tr>

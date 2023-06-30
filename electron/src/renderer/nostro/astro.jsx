@@ -3,6 +3,7 @@ import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { Loading } from './loading';
 import { textTransitionSignal, textTransitionResource } from "./textGlitch";
+import { labelMaker } from './label';
 
 class Signals {
     constructor() {
@@ -85,6 +86,8 @@ export const Astro = () => {
         removeDataCallback(cbName);
     });
 
+    const label = labelMaker("astro");
+
     return <div class="astro">
         <Show when={!hasAstro(signals)}>
             <Loading />
@@ -92,11 +95,11 @@ export const Astro = () => {
         <Show when={hasAstro(signals)}>
             <div class="flex-row flex-grow">
                 <div class="astro-labels flex-column flex-grow">
-                    <div class="data-label">Sunrise</div>
-                    <div class="data-label">Sunset</div>
-                    <div class="data-label">Moonrise</div>
-                    <div class="data-label">Moonset</div>
-                    <div class="data-label">Moon Phase</div>
+                    <div class="data-label">{label("sunrise")} </div>
+                    <div class="data-label">{label("sunset")} </div>
+                    <div class="data-label">{label("moonrise")} </div>
+                    <div class="data-label">{label("moonset")} </div>
+                    <div class="data-label">{label("moon-phase")} </div>
                 </div>
                 <div class="astro-values flex-column flex-grow">
                     <div class="data-value">{signals.sunrise}</div>

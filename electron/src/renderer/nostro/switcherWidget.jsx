@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { fadeTransition } from "./fadeTransition";
 
 function hasWidget(widgets) {
     return widgets.length > 0;
@@ -29,15 +30,17 @@ function getNextWidget(widgets, currentIndex) {
 }
 
 function onClickNext(widgets, currentIndex, setCurrentIndex) {
-    return () => {
-        setCurrentIndex(nextIndex(currentIndex(), widgets));
-    };
-    
+    return changeSwitcherContent(nextIndex, widgets, currentIndex, setCurrentIndex);
 }
+
 function onClickPrev(widgets, currentIndex, setCurrentIndex) {
+    return changeSwitcherContent(prevIndex, widgets, currentIndex, setCurrentIndex);
+}
+
+function changeSwitcherContent(func, widgets, currentIndex, setCurrentIndex) {
     return () => {
-        setCurrentIndex(prevIndex(currentIndex(), widgets));
-    };
+        fadeTransition("switcher-widget-content", () => setCurrentIndex(func(currentIndex(), widgets)));
+    }
 }
 
 export const SwitcherWidget = (props) => {
@@ -46,7 +49,9 @@ export const SwitcherWidget = (props) => {
 
     return <div class="switcher-widget flex-column flex-grow">
         <Show when={hasWidget(widgets)}>
-            {getCurrentWidget(widgets, currentIndex).element()}
+            <div id="switcher-widget-content">
+                {getCurrentWidget(widgets, currentIndex).element()}
+            </div>
             <div class="switcher-widget-button-wrapper flex-row flex-grow">
                 <div class="switcher-widget-button switcher-widget-prev-button">
                     <button class="action-button crt-box" onClick={onClickPrev(widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-left"></i> &nbsp;&nbsp; {getPrevWidget(widgets, currentIndex).icon()}</button>

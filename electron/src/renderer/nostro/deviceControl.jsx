@@ -3,6 +3,7 @@ import { callbackName } from "./callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from './ipc';
 import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
 import { Loading } from './loading';
+import { labelMaker, textMaker } from './label';
 
 class Signals {
     constructor() {
@@ -91,30 +92,33 @@ export const DeviceControl = () => {
         removeDataCallback(cbName);
         removeDeviceStatusCallback(cbName);
     });
+
+    const label = labelMaker("device-control");
+    const plainText = textMaker("device-control");
     return <div class="device-control flex-grow">
         <div class="flex-column flex-grow">
             <div class="flex-grow flex-row">
                 <Show when={!isShutdownDisabled(signals)}>
-                    <button class='action-button crt-box flex-grow' onClick={onClickReboot}>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                    <button class='action-button crt-box flex-grow' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                 </Show>
                 <Show when={isShutdownDisabled(signals)}>
-                    <button class='action-button crt-box flex-grow' style={buttonGlitchStyle("Reboot")} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                    <button class='action-button crt-box flex-grow' style={buttonGlitchStyle(plainText("reboot"))} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                 </Show>
             </div>
             <div class="flex-grow flex-row">
                 <Show when={!isShutdownDisabled(signals)}>
-                    <button class='action-button crt-box flex-grow' onClick={onClickShutdown}>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                    <button class='action-button crt-box flex-grow' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                 </Show>
                 <Show when={isShutdownDisabled(signals)}>
-                    <button class='action-button crt-box flex-grow' style={buttonGlitchStyle("Reboot")} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                    <button class='action-button crt-box flex-grow' style={buttonGlitchStyle(plainText("shutdown"))} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                 </Show>
             </div>
             <div class="flex-grow flex-row">
-                <button class='action-button crt-box flex-grow' onClick={onClickSetup}>Setup device &nbsp;&nbsp; <i class="fa-solid fa-gear"></i></button>
+                <button class='action-button crt-box flex-grow' onClick={onClickSetup}>{plainText("setup")} &nbsp;&nbsp; <i class="fa-solid fa-gear"></i></button>
             </div>
             <Show when={hasDeviceStatus(signals)}>
                 <div class="flex-row flex-grow">
-                    <div class="data-label">Status</div>
+                    <div class="data-label">{label("status")}</div>
                     <div class="data-value">{getDeviceStatus(signals)}</div>
                 </div>
             </Show>

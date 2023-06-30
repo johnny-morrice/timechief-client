@@ -2,7 +2,7 @@ import { render } from 'solid-js/web';
 import { onCleanup } from 'solid-js';
 import { hashIntegration, Router, Routes, Route } from "@solidjs/router";
 import { initializeIPC } from './ipc';
-import { WebSetupPage } from "./webSetupPage";
+import { WebSetupPage } from "./webSetup";
 import { HomePage } from "./homePage";
 
 const AppScreen = (props) => 

@@ -1,14 +1,60 @@
-export function makeCanonicalDateText(date) {
-    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+export function makeCanonicalDateText(date, timezone) {
+    return `${getLocalYear(date, timezone)}-${getLocalMonth(date, timezone)}-${getLocalDay(date, timezone)}`;
 }
 
-export function sortCalendarEvents(arr) {
+export function sortCalendarEvents(arr, timezone) {
     arr.sort((a, b) => {
-        return compareCalendarEvents(a, b);
+        return compareCalendarEvents(a, b, timezone);
     });
 }
 
-export function compareCalendarEvents(a, b) {
+function getLocalYear(date, timezone) {
+    return parseInt(date.toLocaleString("en-US", { timeZone: timezone, year: "numeric" }));
+}
+
+function getLocalMonth(date, timezone) {
+    return parseInt(date.toLocaleString("en-US", { timeZone: timezone, month: "numeric" }));
+}
+
+function getLocalDay(date, timezone) {
+    return parseInt(date.toLocaleString("en-US", { timeZone: timezone, day: "numeric" }));
+}
+
+export function compareCalendarEvents(a, b, timezone) {
+    // Comparing events on different days.
+    const aDate = a.startTime();
+    const bDate = b.startTime();
+    const yearA = getLocalYear(aDate, timezone);
+    const yearB = getLocalYear(bDate, timezone);
+
+    if (yearA < yearB) {
+        return -1;
+    }
+    if (yearA > yearB) {
+        return 1;
+    }
+
+    const monthA = getLocalMonth(aDate, timezone);
+    const monthB = getLocalMonth(bDate, timezone);
+
+    if (monthA < monthB) {
+        return -1;
+    }
+    if (monthA > monthB) {
+        return 1;
+    }
+
+    const dayA = getLocalDay(aDate, timezone);
+    const dayB = getLocalDay(bDate, timezone);
+
+    if (dayA < dayB) {
+        return -1;
+    }
+    if (dayA > dayB) {
+        return 1;
+    }
+
+    // Comparing events on the same day.
     if (a.isAllDay() && b.isAllDay()) {
         return 0;
       } else if (a.isAllDay() && !b.isAllDay()) {
@@ -16,7 +62,7 @@ export function compareCalendarEvents(a, b) {
       } else if (!a.isAllDay() && b.isAllDay()) {
         return -1;
       } else {
-        return cmpDate(a.startTime(), b.startTime());
+        return cmpDate(aDate, bDate);
       }
 }
 
@@ -36,8 +82,8 @@ export class CalendarEvent {
         this.data = data;
     }
 
-    canonicalStartDateText() {
-        return makeCanonicalDateText(this.startTime());
+    canonicalStartDateText(timezone) {
+        return makeCanonicalDateText(this.startTime(), timezone);
     }
 
     eventShortText() {
@@ -52,6 +98,7 @@ export class CalendarEvent {
             return this._startTime;
         }
         this._startTime = new Date(this.data.Start * 1000);
+        this._startTime.getFullYear();
         return this._startTime;
     }
 
@@ -97,16 +144,22 @@ export class CalendarEvent {
         return this.startTime() <= target;
     }
 
-    isHighlight() {
-        return this.isHappeningNow() || this.isSoon();
+    isHighlight(timezone) {
+        return this.isHappeningNow(timezone) || this.isSoon();
     }
 
-    isHappeningNow() {
+    isHappeningNow(timezone) {
         const now = new Date(); 
         if (this.data.AllDay) {
-            const isThisYear = this.startTime().getYear() == now.getYear();
-            const isThisMonth = this.startTime().getMonth() == now.getMonth();
-            const isToday = this.startTime().getDate() == now.getDate();
+            const startYear = getLocalYear(this.startTime(), timezone);
+            const nowYear = getLocalYear(now, timezone);
+            const isThisYear = startYear == nowYear;
+            const startMonth = getLocalYear(this.startTime(), timezone);
+            const nowMonth = getLocalYear(now, timezone);
+            const isThisMonth = startMonth == nowMonth;
+            const startDay = getLocalDay(this.startTime(), timezone)
+            const nowDay = getLocalDay(now, timezone);
+            const isToday = startDay == nowDay;
             return isThisYear && isThisMonth && isToday;
         }
         return this.startTime() <= now && this.endTime() >= now;
