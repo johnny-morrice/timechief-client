@@ -7,15 +7,15 @@ set -x
 # VERSION
 # PRODUCT
 # STREAM
-# FILENAME
+# UPLOAD_FILENAME
 
-if [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$FILENAME" ] ; then
+if [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$UPLOAD_FILENAME" ] ; then
   echo "missing parameters"
   exit 1
 fi
 
-SHA256=$(cat $FILENAME | openssl dgst -binary -sha256 | openssl base64 -A)
-URL="https://storage.googleapis.com/$BUCKET_NAME/$FILENAME"
+SHA256=$(cat $UPLOAD_FILENAME | openssl dgst -binary -sha256 | openssl base64 -A)
+URL="https://storage.googleapis.com/$BUCKET_NAME/$UPLOAD_FILENAME"
 
 # type Version struct {
 # 	UUID    string
@@ -44,8 +44,8 @@ METADATA=$(cat <<EOF
 EOF
 )
 
-echo "Uploading file: $FILENAME"
-gcloud storage cp $FILENAME gs://$BUCKET_NAME/$UNIQUE_NAME
+echo "Uploading file: $UPLOAD_FILENAME"
+gcloud storage cp $UPLOAD_FILENAME gs://$BUCKET_NAME/$UNIQUE_NAME
 echo "Uploading metadata: $METADATA"
 timechief client core version-create --body "$METADATA"
 popd

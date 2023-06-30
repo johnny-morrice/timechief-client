@@ -20,7 +20,6 @@ fi
 
 mkdir -p $BUNDLE_DIR
 mkdir -p $BUILD_DIR
-mkdir -p $OUTPUT_DIR
 
 # Build electron app
 pushd $BUILD_DIR
