@@ -33,5 +33,9 @@ UPLOAD_FILENAME=$BUNDLE_OUTPUT
 BUNDLE_OUTPUT=$(ls $BUNDLE__OUTPUT_DIR/*.tar.gz | head -n 1)
 
 ./script/upload-version.sh
+
+mkdir -p /opt/timechief-launcher
+rm -rf /opt/timechief-launcher/*
+
 ./script/initialise-launcher-fs.sh
 ./script/build-image.sh
