@@ -14,5 +14,14 @@ import (
 func GetDBConnection(ctx *cli.Context) (*gorm.DB, error) {
 	installRoot := ctx.String("install-root")
 	dbPath := filepath.Join(installRoot, "timechief-launcher.db")
-	return gorm.Open(sqlite.Open(dbPath), getGormConfig())
+	dialect := sqlite.Open(dbPath)
+	db, err := gorm.Open(dialect, getGormConfig())
+	if err != nil {
+		return nil, err
+	}
+	err = db.Exec("PRAGMA synchronous = FULL;").Error
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
 }
