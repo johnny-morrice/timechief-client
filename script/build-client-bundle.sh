@@ -4,18 +4,23 @@
 
 # Parameters
 #
-# OUTPUT
+# BUNDLE_OUTPUT
 # BUNDLE_DIR
 # BUILD_DIR
 
 # If BUNDLE_DIR is empty, then we will use a temporary directory
-if [ -z "$BUNDLE_DIR" ]; then
+if [ -z "$BUNDLE_DIR" ] ; then
   BUNDLE_DIR=$(mktemp -d)
 fi
 
 # If BUILD_DIR is empty, then we will use a temporary directory
-if [ -z "$BUILD_DIR" ]; then
+if [ -z "$BUILD_DIR" ] ; then
   BUILD_DIR=$(mktemp -d)
+fi
+
+if [ -z "$BUNDLE_OUTPUT" ] ; then
+    echo "missing parameters"
+    exit 1
 fi
 
 mkdir -p $BUNDLE_DIR
@@ -95,8 +100,8 @@ UNIQUE_NAME="timechief-client-bundle-$(uuidgen).tar.gz"
 tar -czf $UNIQUE_NAME timechief-client-bundle
 popd
 
-cp $BUNDLE_DIR/$UNIQUE_NAME $OUTPUT
-echo "Copied bundle to $OUTPUT"
+cp $BUNDLE_DIR/$UNIQUE_NAME $BUNDLE_OUTPUT
+echo "Copied bundle to $BUNDLE_OUTPUT"
 
 rm -rf $BUILD_DIR
 rm -rf $BUNDLE_DIR
