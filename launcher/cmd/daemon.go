@@ -93,12 +93,13 @@ func Daemon(ctx *cli.Context) error {
 
 	wifiInterfaceStore := store.WifiInterfaceStore{DB: db}
 	system := system.System{
-		ConfigStore:        cfgStore,
-		KeyValueStore:      keyValueStore,
-		WifiInterfaceStore: wifiInterfaceStore,
-		WifiNetworkStore:   wifiNetworkStore,
-		StateFlagStore:     flagStore,
-		DB:                 db,
+		ConfigStore:            cfgStore,
+		KeyValueStore:          keyValueStore,
+		WifiInterfaceStore:     wifiInterfaceStore,
+		WifiNetworkStore:       wifiNetworkStore,
+		StateFlagStore:         flagStore,
+		DB:                     db,
+		EnableSystemAutomation: ctx.Bool("system-automation"),
 	}
 
 	wifiLoad := daemon.WifiLoadInterfaces{

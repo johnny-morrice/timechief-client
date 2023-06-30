@@ -72,7 +72,7 @@ func getCLIApp() *cli.App {
 			Flags: []cli.Flag{
 				&cli.BoolFlag{
 					Name:  "system-automation",
-					Value: false,
+					Value: defaultSystemAutomation,
 				},
 				&cli.StringFlag{
 					Name:  "install-root",
@@ -200,6 +200,10 @@ func getCLIApp() *cli.App {
 							Name:  "daemon-base-url",
 							Value: daemonBaseURL,
 						},
+						&cli.BoolFlag{
+							Name:  "system-automation",
+							Value: defaultSystemAutomation,
+						},
 					},
 				},
 				{
@@ -232,4 +236,5 @@ func getCLIApp() *cli.App {
 }
 
 const defaultInstallDaemon = true
+const defaultSystemAutomation = false
 const daemonBaseURL = "http://localhost:8080"
