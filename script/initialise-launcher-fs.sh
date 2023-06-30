@@ -14,6 +14,16 @@ set -x
 
 if [ -z "$INSTALL_ROOT" ] || [ -z "$API_BASE_URL" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$WWW_BASE_URL" ] || [ -z "$WIDTH" ] || [ -z "$HEIGHT" ] || [ -z "$LAUNCHER_DEVICE_CREDENTIALS" ] ; then
     echo "missing parameters"
+	echo "INSTALL_ROOT: $INSTALL_ROOT"
+	echo "API_BASE_URL: $API_BASE_URL"
+	echo "PRODUCT: $PRODUCT"
+	echo "STREAM: $STREAM"
+	echo "WWW_BASE_URL: $WWW_BASE_URL"
+	echo "WIDTH: $WIDTH"
+	echo "HEIGHT: $HEIGHT"
+	if [ -z "$LAUNCHER_DEVICE_CREDENTIALS" ] ; then
+	    echo "LAUNCHER_DEVICE_CREDENTIALS is empty"
+	fi
     exit 1
 fi
 

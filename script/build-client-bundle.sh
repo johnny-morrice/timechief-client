@@ -22,6 +22,7 @@ fi
 
 if [ -z "$BUNDLE_OUTPUT" ] ; then
     echo "missing parameters"
+    echo "BUNDLE_OUTPUT: $BUNDLE_OUTPUT"
     exit 1
 fi
 

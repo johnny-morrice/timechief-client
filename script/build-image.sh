@@ -10,6 +10,7 @@ set -e
 
 if [ -z "$IMAGE_OUTPUT" ] ; then
   echo "missing parameters"
+  echo "IMAGE_OUTPUT: $IMAGE_OUTPUT"
   exit 1
 fi
 

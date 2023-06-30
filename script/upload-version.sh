@@ -12,6 +12,11 @@ set -x
 
 if [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$UPLOAD_FILENAME" ] ; then
   echo "missing parameters"
+  echo "BUCKET_NAME: $BUCKET_NAME"
+  echo "VERSION: $VERSION"
+  echo "PRODUCT: $PRODUCT"
+  echo "STREAM: $STREAM"
+  echo "UPLOAD_FILENAME: $UPLOAD_FILENAME"
   exit 1
 fi
 
