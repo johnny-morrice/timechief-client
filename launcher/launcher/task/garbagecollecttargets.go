@@ -17,6 +17,10 @@ type GarbageCollectTargets struct {
 // It does not return errors but does log them.
 // This is because if deleting a target fails, we still want to delete other targets, so we definitely don't want to give up.
 func (task GarbageCollectTargets) RunTask(ctx *cli.Context) error {
+	if !isSystemAutomationEnabled(ctx) {
+		return nil
+	}
+
 	if task.Keep == 0 {
 		task.Keep = 3
 	}

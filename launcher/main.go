@@ -42,7 +42,7 @@ func getCLIApp() *cli.App {
 				},
 				&cli.StringFlag{
 					Name:  "daemon-base-url",
-					Value: "http://localhost:8080",
+					Value: daemonBaseURL,
 				},
 			},
 		},
@@ -196,6 +196,10 @@ func getCLIApp() *cli.App {
 						&cli.StringFlag{
 							Name: "version",
 						},
+						&cli.StringFlag{
+							Name:  "daemon-base-url",
+							Value: daemonBaseURL,
+						},
 					},
 				},
 				{
@@ -228,3 +232,4 @@ func getCLIApp() *cli.App {
 }
 
 const defaultInstallDaemon = true
+const daemonBaseURL = "http://localhost:8080"

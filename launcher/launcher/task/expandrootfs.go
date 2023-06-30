@@ -17,6 +17,9 @@ type ExpandRootFS struct {
 
 func (task ExpandRootFS) RunTask(ctx *cli.Context) error {
 	log.Println("checking for rootfs expansion")
+	if !isSystemAutomationEnabled(ctx) {
+		return nil
+	}
 	proceed, err := task.isProceed()
 	if err != nil {
 		return err

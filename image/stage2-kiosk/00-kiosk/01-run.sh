@@ -52,7 +52,7 @@ After=network.target
 User=$FIRST_USER_NAME
 Group=$FIRST_USER_NAME
 WorkingDirectory=/opt/timechief-launcher
-ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon --system-automation true
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon --system-automation
 Restart=always
 
 [Install]
