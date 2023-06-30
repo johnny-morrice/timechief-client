@@ -20,6 +20,7 @@ echo $BUILD_DIR >> $TIDY_NOTE
 
 pushd $BUILD_DIR
 git clone https://github.com/johnny-morrice/timechief-client.git
+git checkout $VERSION
 pushd image
 ./init.sh
 sudo ./build.sh
