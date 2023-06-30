@@ -31,8 +31,8 @@ UPLOAD_FILENAME=$BUNDLE_OUTPUT
 
 ./script/build-client-bundle.sh
 
-# Get the output filename, should be a .tar.gz file in BUNDLE__OUTPUT_DIR
-BUNDLE_OUTPUT=$(ls $BUNDLE__OUTPUT_DIR/*.tar.gz | head -n 1)
+# Get the output filename, should be a .tar.gz file in BUNDLE_OUTPUT_DIR
+BUNDLE_OUTPUT=$(ls $BUNDLE_OUTPUT_DIR/*.tar.gz | head -n 1)
 
 ./script/upload-version.sh
 
