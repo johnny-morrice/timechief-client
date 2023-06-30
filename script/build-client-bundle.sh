@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+set -x
 
 # This script builds a client bundle and prints out its path.
 
@@ -23,8 +25,10 @@ if [ -z "$BUNDLE_OUTPUT" ] ; then
     exit 1
 fi
 
-mkdir -p $BUNDLE_DIR
 mkdir -p $BUILD_DIR
+
+BUNDLE_UNPACK=$BUNDLE_DIR/timechief-client-bundle
+mkdir -p $BUNDLE_UNPACK
 
 # Build electron app
 pushd $BUILD_DIR
@@ -41,28 +45,12 @@ fi
 popd
 popd
 
-if [ -z "$ELECTRON" ]; then
-  if [ "$GOOS" = "windows" ]; then
-    cp -a $BUILD_DIR/timechief-client/electron/dist/win-unpacked $BUNDLE_DIR
-  else
-    cp $BUILD_DIR/timechief-client/electron/dist/timechief-client-electron $BUNDLE_DIR
-  fi
-else
-  cp -a $ELECTRON $BUNDLE_DIR
-fi
+cp $BUILD_DIR/timechief-client/electron/dist/timechief-client-electron $BUNDLE_UNPACK
 
-# If the GOOS environment variable is set to "windows" then we copy the powershell hook, otherwise we copy the bash hook
-if [ "$GOOS" = "windows" ]; then
-  cp $BUILD_DIR/timechief-client/launcher/integration-scripts/hook/powershell/timechief-client.ps1 $BUNDLE_DIR
-else
-  if [ "$STREAM" = "dev" ]; then
-    cp -a $BUILD_DIR/timechief-client/launcher/integration-scripts/system/mock/bin $BUNDLE_DIR
-  else
-    cp -a $BUILD_DIR/timechief-client/launcher/integration-scripts/system/bin $BUNDLE_DIR
-  fi
-  cp $BUILD_DIR/timechief-client/launcher/integration-scripts/hook/bash/timechief-client $BUNDLE_DIR
-  cp $BUILD_DIR/timechief-client/launcher/integration-scripts/bootstrap/timechief-bootstrap $BUNDLE_DIR/bin
-fi
+cp -a $BUILD_DIR/timechief-client/launcher/integration-scripts/system/bin $BUNDLE_UNPACK
+cp $BUILD_DIR/timechief-client/launcher/integration-scripts/hook/bash/timechief-client $BUNDLE_UNPACK
+cp $BUILD_DIR/timechief-client/launcher/integration-scripts/bootstrap/timechief-bootstrap $BUNDLE_UNPACK/bin
+
 
 # Build the python RTC application
 pushd $BUILD_DIR/timechief-client/rtcutil/pyrtc
@@ -74,11 +62,11 @@ pip install .
 deactivate
 popd
 
-mkdir -p $BUNDLE_DIR/bin/secure
-cp $BUILD_DIR/timechief-client/rtcutil/pyrtc/dist/pyrtc $BUNDLE_DIR/bin/secure/timechief-pyrtc
+mkdir -p $BUNDLE_UNPACK/bin/secure
+cp $BUILD_DIR/timechief-client/rtcutil/pyrtc/dist/pyrtc $BUNDLE_UNPACK/bin/secure/timechief-pyrtc
 
 # Copy images
-cp -a $BUILD_DIR/timechief-client/launcher/assets $BUNDLE_DIR
+cp -a $BUILD_DIR/timechief-client/launcher/assets $BUNDLE_UNPACK
 
 # Build launcher
 pushd $BUILD_DIR/timechief-client/launcher
@@ -86,11 +74,7 @@ mkdir -p bin
 go build -o bin/timechief-launcher
 popd
 
-if [ "$GOOS" = "windows" ]; then
-  cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_DIR/timechief-launcher.exe
-else
-  cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_DIR/timechief-launcher
-fi
+cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_UNPACK/timechief-launcher
 
 
 
