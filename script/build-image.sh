@@ -13,6 +13,10 @@ if [ -z "$BUILD_DIR" ]; then
   BUILD_DIR=$(mktemp -d)
 fi
 
+# We cannot at this moment easily tidy up the build directory so let's note where they are and we can have a process garbage collect them.
+TIDY_NOTE="$HOME/scratch/tidy-images.txt"
+echo $BUILD_DIR >> $TIDY_NOTE
+
 pushd $BUILD_DIR
 git clone https://github.com/johnny-morrice/timechief-client.git
 pushd image
