@@ -19,6 +19,7 @@ func (monitor RebootOnExit) RunTask(ctx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("command monitor failed: %w", err)
 	}
+	log.Println("client app terminated")
 	if !isSystemAutomationEnabled(ctx) {
 		return nil
 	}
