@@ -18,7 +18,7 @@ export const fadeTransition = (contentID, doChange) => {
     });
 }
 
-const transitionDurationMs = 200;
+const transitionDurationMs = 190;
 
 function applyClassToElement(cls, id) {
     const element = document.getElementById(id);
