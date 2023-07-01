@@ -22,7 +22,6 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
-    user-select: none;
 }
 
 @font-face {
@@ -38,6 +37,10 @@ body {
     font-family: 'Titillium Web', sans-serif;
     font-size: 16pt;
     font-weight: 400;
+    user-select: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
 div.home-screen {
