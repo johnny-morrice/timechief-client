@@ -1,17 +1,20 @@
-import { createSignal, onCleanup } from 'solid-js';
-import { isCalendarExists } from '../calendarHelper';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, removeDataCallback } from './ipc';
-import { apiErrorTimeout } from '../timing'
+import { apiErrorTimeout, second } from '../timing'
 import { callbackName } from "./callback";
+import { fadeTransition } from './fadeTransition';
 
 class Signals {
     constructor() {
         [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
-        [this.isAccountLinked, this.setAccountLinked] = createSignal(false);
-        [this.isCalendarExists, this.setCalendarExists] = createSignal(false);
+        [this.isCalendarErrorBuffer, this.setCalendarErrorBuffer] = createSignal(false);
         [this.isCalendarError, this.setCalendarError] = createSignal(false);
+        [this.isUpdatingBuffer, this.setUpdatingBuffer] = createSignal(false);
         [this.isUpdating, this.setUpdating] = createSignal(false);
+        [this.isDeviceDataErrorBuffer, this.setDeviceDataErrorBuffer] = createSignal(false);
         [this.isDeviceDataError, this.setDeviceDataError] = createSignal(false);
+        [this.isIPCTimeoutBuffer, this.setIPCTimeoutBuffer] = createSignal(false);
+        [this.isIPCTimeout, this.setIPCTimeout] = createSignal(false);
     }
 }
 
@@ -28,14 +31,9 @@ function hasStateFlag(data, flag) {
 
 function updateSignals(signals, data) {
     signals.setLastUpdateTime(new Date());
-    let serviceData = data["ServiceData"];
-    if (serviceData) {
-        signals.setCalendarExists(isCalendarExists(serviceData));
-    }
-    signals.setCalendarError(hasStateFlag(data, "calendar-error"))
-    signals.setAccountLinked(hasStateFlag(data, "principal-linked"));
-    signals.setDeviceDataError(hasStateFlag(data, "device-data-error"));
-    signals.setUpdating(hasStateFlag(data, "updating"));
+    signals.setCalendarErrorBuffer(hasStateFlag(data, "calendar-error"))
+    signals.setDeviceDataErrorBuffer(hasStateFlag(data, "device-data-error"));
+    signals.setUpdatingBuffer(hasStateFlag(data, "updating"));
 }
 
 function isTimeout(lastTime, timeout) {
@@ -45,18 +43,39 @@ function isTimeout(lastTime, timeout) {
 }
 
 function isDeviceDataError(signals) {
-    return signals.isDeviceDataError() || isTimeout(signals.lastUpdateTime(), apiErrorTimeout);
+    return signals.isDeviceDataError() || signals.isIPCTimeout();
+}
+
+function fadeChange(action) {
+    fadeTransition("status-note-content", action);
 }
 
 export const StatusNote = () => {
     const signals = new Signals();
     const cbName = callbackName("StatusNote");
     addDataCallback(cbName, (data) => updateSignals(signals, data));
+    const ipcCheckInterval = setInterval(() => {
+        signals.setIPCTimeoutBuffer(isTimeout(signals.lastUpdateTime(), 6 * second));
+    }, 3 * second);
     onCleanup(() => {
         removeDataCallback(cbName);
+        clearInterval(ipcCheckInterval);
     });
-    return <div class="status-note-root">
-        <div class="status-note flex-column">
+    createEffect(() => {
+        if (signals.isCalendarErrorBuffer() !== signals.isCalendarError() || 
+            signals.isDeviceDataErrorBuffer() !== signals.isDeviceDataError() ||
+            signals.isUpdatingBuffer() !== signals.isUpdating() ||
+            signals.isIPCTimeoutBuffer() !== signals.isIPCTimeout()) {
+            fadeChange(() => {
+                signals.setCalendarError(signals.isCalendarErrorBuffer());
+                signals.setDeviceDataError(signals.isDeviceDataErrorBuffer());
+                signals.setUpdating(signals.isUpdatingBuffer());
+                signals.setIPCTimeout(signals.isIPCTimeoutBuffer());
+            });
+        }
+    });
+
+    return <div id="status-note-content" class="status-note flex-column">
             <Show when={signals.isCalendarError()}>
                 <div class="status-note-calendar-error-indicator">
                     <i class='fa-solid fa-calendar-xmark is-error api-error-indicator'></i>
@@ -72,6 +91,5 @@ export const StatusNote = () => {
                     <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
                 </div>
             </Show>
-        </div>
     </div>
 };
