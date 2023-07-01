@@ -44,7 +44,7 @@ export BUNDLE_OUTPUT=$(mktemp -d)
 ./script/build-client-bundle.sh
 
 # Get the output filename, should be a .tar.gz file in BUNDLE_OUTPUT_DIR
-export UPLOAD_FILENAME=$(ls $BUNDLE_OUTPUT_DIR/*.tar.gz | head -n 1)
+export UPLOAD_FILENAME=$(ls $BUNDLE_OUTPUT/*.tar.gz | head -n 1)
 
 ./script/upload-version.sh
 
