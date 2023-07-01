@@ -16,12 +16,13 @@ import (
 )
 
 type System struct {
-	DB                 *gorm.DB
-	ConfigStore        store.ConfigStore
-	KeyValueStore      store.KeyValueStore
-	StateFlagStore     store.StateFlagStore
-	WifiInterfaceStore store.WifiInterfaceStore
-	WifiNetworkStore   store.WifiNetworkStore
+	DB                     *gorm.DB
+	ConfigStore            store.ConfigStore
+	KeyValueStore          store.KeyValueStore
+	StateFlagStore         store.StateFlagStore
+	WifiInterfaceStore     store.WifiInterfaceStore
+	WifiNetworkStore       store.WifiNetworkStore
+	EnableSystemAutomation bool
 }
 
 func (sys System) stopApp() error {
@@ -76,6 +77,12 @@ func (sys System) doReboot() error {
 func (sys System) Shutdown() error {
 	Lock()
 	defer Unlock()
+
+	if !sys.EnableSystemAutomation {
+		log.Println("system automation disabled, not shutting down")
+		return nil
+	}
+
 	err := sys.doShutdown()
 	if err != nil {
 		log.Printf("shutdown error: %v", err)
@@ -86,6 +93,12 @@ func (sys System) Shutdown() error {
 func (sys System) Reboot() error {
 	Lock()
 	defer Unlock()
+
+	if !sys.EnableSystemAutomation {
+		log.Println("system automation disabled, not rebooting")
+		return nil
+	}
+
 	err := sys.doReboot()
 	if err != nil {
 		log.Printf("reboot error: %v", err)
@@ -94,10 +107,6 @@ func (sys System) Reboot() error {
 }
 
 var ErrNoWifi error = errors.New("no wifi card found")
-
-func (sys System) ReadWifiCards() ([]WifiInterface, error) {
-	panic("not implemented")
-}
 
 func toStoreCards(cards []WifiInterface) []*store.WifiInterface {
 	storeCards := make([]*store.WifiInterface, len(cards))
@@ -488,6 +497,11 @@ func (sys System) CheckInternet() error {
 // SyncRTC syncs the system clock with the RTC.  By running the following command:
 // bin/secure/pyrtc timesync --type rv3028
 func (sys System) SyncRTC() error {
+	if !sys.EnableSystemAutomation {
+		log.Println("system automation disabled, not syncing rtc")
+		return nil
+	}
+
 	cfg, err := sys.ConfigStore.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)
@@ -496,6 +510,10 @@ func (sys System) SyncRTC() error {
 }
 
 func (sys System) ExpandRootFS() error {
+	if !sys.EnableSystemAutomation {
+		log.Println("system automation disabled, not expanding rootfs")
+		return nil
+	}
 	cfg, err := sys.ConfigStore.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)
@@ -504,6 +522,10 @@ func (sys System) ExpandRootFS() error {
 }
 
 func (sys System) EnsureAutoLogin() error {
+	if !sys.EnableSystemAutomation {
+		log.Println("system automation disabled, not ensuring autologin")
+		return nil
+	}
 	cfg, err := sys.ConfigStore.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)

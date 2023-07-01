@@ -69,6 +69,15 @@ func (dc DaemonClient) PostTargetRecover() (launcher.TargetStatus, error) {
 	return result, nil
 }
 
+func (dc DaemonClient) PostReboot() error {
+	resp, err := http.Post(dc.makeURL("/api/system/reboot"), "", nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
 func unmarsalJSON(resp *http.Response, result interface{}) error {
 	decoder := json.NewDecoder(resp.Body)
 	return decoder.Decode(result)

@@ -36,13 +36,9 @@ func getCLIApp() *cli.App {
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
 				},
-				&cli.BoolFlag{
-					Name:  "standalone",
-					Value: false,
-				},
 				&cli.StringFlag{
 					Name:  "daemon-base-url",
-					Value: "http://localhost:8080",
+					Value: daemonBaseURL,
 				},
 			},
 		},
@@ -70,6 +66,10 @@ func getCLIApp() *cli.App {
 			Usage:   "Run the launcher daemon",
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "system-automation",
+					Value: defaultSystemAutomation,
+				},
 				&cli.StringFlag{
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
@@ -149,25 +149,6 @@ func getCLIApp() *cli.App {
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
 				},
-				&cli.StringFlag{
-					Name:  "api-base-url",
-					Value: store.DefaultBaseURL,
-				},
-				&cli.StringFlag{
-					Name:  "product",
-					Value: store.DefaultProduct,
-				},
-				&cli.StringFlag{
-					Name:  "stream",
-					Value: store.DefaultStream,
-				},
-				&cli.BoolFlag{
-					Name:  "install-daemon",
-					Value: defaultInstallDaemon,
-				},
-				&cli.StringFlag{
-					Name: "device-credentials",
-				},
 				&cli.DurationFlag{
 					Name:  "service-request-timeout",
 					Value: 20 * time.Second,
@@ -191,6 +172,14 @@ func getCLIApp() *cli.App {
 						},
 						&cli.StringFlag{
 							Name: "version",
+						},
+						&cli.StringFlag{
+							Name:  "daemon-base-url",
+							Value: daemonBaseURL,
+						},
+						&cli.BoolFlag{
+							Name:  "system-automation",
+							Value: defaultSystemAutomation,
 						},
 					},
 				},
@@ -224,3 +213,5 @@ func getCLIApp() *cli.App {
 }
 
 const defaultInstallDaemon = true
+const defaultSystemAutomation = false
+const daemonBaseURL = "http://localhost:8080"

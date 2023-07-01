@@ -18,6 +18,9 @@ type EnsureAutologin struct {
 // RunTask checks for the existence of the autologin systemd unit.
 // For reasons unknown, related to expanding the filesystem, this file can disappear from the system!
 func (task EnsureAutologin) RunTask(ctx *cli.Context) error {
+	if !isSystemAutomationEnabled(ctx) {
+		return nil
+	}
 	log.Println("checking for autologin systemd unit")
 	_, err := os.Stat(AutoLoginUnitPath)
 	if err == nil && errors.Is(err, os.ErrNotExist) {

@@ -4,10 +4,11 @@ package target
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 	"path/filepath"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/task"
 	"github.com/urfave/cli/v2"
 )
 
@@ -20,10 +21,26 @@ func Run(ctx *cli.Context) error {
 	version := ctx.String("version")
 	targetBundle := filepath.Join(targetRoot, tarDirectory)
 	clientExecutable := filepath.Join(targetBundle, execName)
-	out, err := exec.Command(clientExecutable, targetBundle, logFile, version).CombinedOutput()
-	log.Println("client output: ", string(out))
+	cmd := exec.Command(clientExecutable, targetBundle, logFile, version)
+	baseURL := ctx.String("daemon-base-url")
+	dc := daemonclient.NewDaemonClient(baseURL)
+	rebooter := task.RebootOnExit{
+		Command:  cmd,
+		Rebooter: clientRebooter{dc: dc},
+	}
+
+	err := rebooter.RunTask(ctx)
+
 	if err != nil {
 		return fmt.Errorf("failed to run client at %s: %w", clientExecutable, err)
 	}
 	return nil
+}
+
+type clientRebooter struct {
+	dc daemonclient.DaemonClient
+}
+
+func (rebooter clientRebooter) Reboot() error {
+	return rebooter.dc.PostReboot()
 }

@@ -17,16 +17,12 @@ func Update(ctx *cli.Context) error {
 
 	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{DB: db}
-	flagCfg := cfgFlags(ctx)
 
 	cfg, err := cfgStore.GetConfig()
 
 	if err != nil {
 		return err
 	}
-
-	cfg = cfg.Merge(flagCfg)
-	cfgStore.SetConfig(cfg)
 
 	clnt, err := client.MakePublicClient(cfg)
 	if err != nil {

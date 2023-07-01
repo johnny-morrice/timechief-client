@@ -122,7 +122,7 @@ func (dd DeviceData) doFetchLatest() (viewmodel.ClockData, error) {
 	token, err := dd.getToken(authnClient, credentials)
 
 	if err != nil {
-		return viewmodel.ClockData{}, err
+		return viewmodel.ClockData{}, fmt.Errorf("error getting token: %s", err)
 	}
 
 	err = dd.saveToken(token)
@@ -139,7 +139,7 @@ func (dd DeviceData) doFetchLatest() (viewmodel.ClockData, error) {
 	clockData, err := dd.getClockData(apiClient)
 
 	if err != nil {
-		return viewmodel.ClockData{}, err
+		return viewmodel.ClockData{}, fmt.Errorf("error getting clock data: %s", err)
 	}
 
 	return *clockData, nil
