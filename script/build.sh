@@ -19,6 +19,11 @@ set -x
 # LAUNCHER_DEVICE_CREDENTIALS
 # INSTALL_ROOT
 
+# If $1 is set, it's the phase, otherwise use the env var PHASE
+if [ -n "$1" ] ; then
+  PHASE="$1"
+fi
+
 # PHASE can be one of:
 # bundle - build the client bundle and exit
 # upload - upload the client bundle and exit
@@ -31,12 +36,6 @@ else
   echo "PHASE must be one of: bundle, upload, init-fs, all"
   exit 1
 fi
-
-# If $1 is set, it's the phase, otherwise use the env var PHASE
-if [ -n "$1" ] ; then
-  PHASE="$1"
-fi
-
 
 if [ -z "$PHASE" ] ; then
   PHASE="all"
