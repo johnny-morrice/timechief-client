@@ -31,17 +31,17 @@ mkdir -p $BUILD_DIR
 BUNDLE_UNPACK=$BUNDLE_DIR/timechief-client-bundle
 mkdir -p $BUNDLE_UNPACK
 
-# Copy integration scripts
-cp -a $BUILD_DIR/timechief-client/launcher/integration-scripts/system/bin $BUNDLE_UNPACK
-cp $BUILD_DIR/timechief-client/launcher/integration-scripts/hook/bash/timechief-client $BUNDLE_UNPACK
-cp $BUILD_DIR/timechief-client/launcher/integration-scripts/bootstrap/timechief-bootstrap $BUNDLE_UNPACK/bin
-
 # Setup repo
 pushd $BUILD_DIR
 git clone https://github.com/johnny-morrice/timechief-client.git
 git fetch --tags
 git checkout $VERSION
 popd
+
+# Copy integration scripts
+cp -a $BUILD_DIR/timechief-client/launcher/integration-scripts/system/bin $BUNDLE_UNPACK
+cp $BUILD_DIR/timechief-client/launcher/integration-scripts/hook/bash/timechief-client $BUNDLE_UNPACK
+cp $BUILD_DIR/timechief-client/launcher/integration-scripts/bootstrap/timechief-bootstrap $BUNDLE_UNPACK/bin
 
 # Build launcher
 pushd $BUILD_DIR/timechief-client/launcher
