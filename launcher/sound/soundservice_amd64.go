@@ -18,6 +18,18 @@ func initialiseSoundService(pin int) (soundService, error) {
 	return nullSoundService{}, nil
 }
 
+type nullSoundService{} struct {
+
+}
+
+func (svc nullSoundService) PlaySong(songOpts service.SongOptions) error {
+	return nil
+}
+
+func (svc nullSoundService) StopSong() error {
+	return nil
+}
+
 func finaliseSoundService() {
 
 }
