@@ -34,8 +34,10 @@ mkdir -p $BUNDLE_UNPACK
 # Setup repo
 pushd $BUILD_DIR
 git clone https://github.com/johnny-morrice/timechief-client.git
+pushd timechief-client
 git fetch --tags
 git checkout $VERSION
+popd
 popd
 
 # Copy integration scripts
