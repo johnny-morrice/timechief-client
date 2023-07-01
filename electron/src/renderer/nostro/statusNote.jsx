@@ -1,18 +1,20 @@
-import { createSignal, onCleanup } from 'solid-js';
-import { isCalendarExists } from '../calendarHelper';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, removeDataCallback } from './ipc';
-import { apiErrorTimeout, second } from '../timing'
+import { apiErrorTimeout } from '../timing'
 import { callbackName } from "./callback";
+import { fadeTransition } from './fadeTransition';
 
 class Signals {
     constructor() {
         [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
-        [this.isAccountLinked, this.setAccountLinked] = createSignal(false);
-        [this.isCalendarExists, this.setCalendarExists] = createSignal(false);
+        [this.isCalendarErrorBuffer, this.setCalendarErrorBuffer] = createSignal(false);
         [this.isCalendarError, this.setCalendarError] = createSignal(false);
+        [this.isUpdatingBuffer, this.setUpdatingBuffer] = createSignal(false);
         [this.isUpdating, this.setUpdating] = createSignal(false);
+        [this.isDeviceDataErrorBuffer, this.setDeviceDataErrorBuffer] = createSignal(false);
         [this.isDeviceDataError, this.setDeviceDataError] = createSignal(false);
-        [this.pulse, this.setPulse] = createSignal(false);
+        [this.isIPCTimeoutBuffer, this.setIPCTimeoutBuffer] = createSignal(false);
+        [this.isIPCTimeout, this.setIPCTimeout] = createSignal(false);
     }
 }
 
@@ -29,14 +31,9 @@ function hasStateFlag(data, flag) {
 
 function updateSignals(signals, data) {
     signals.setLastUpdateTime(new Date());
-    let serviceData = data["ServiceData"];
-    if (serviceData) {
-        signals.setCalendarExists(isCalendarExists(serviceData));
-    }
-    signals.setCalendarError(hasStateFlag(data, "calendar-error"))
-    signals.setAccountLinked(hasStateFlag(data, "principal-linked"));
-    signals.setDeviceDataError(hasStateFlag(data, "device-data-error"));
-    signals.setUpdating(hasStateFlag(data, "updating"));
+    signals.setCalendarErrorBuffer(hasStateFlag(data, "calendar-error"))
+    signals.setDeviceDataErrorBuffer(hasStateFlag(data, "device-data-error"));
+    signals.setUpdatingBuffer(hasStateFlag(data, "updating"));
 }
 
 function isTimeout(lastTime, timeout) {
@@ -46,21 +43,54 @@ function isTimeout(lastTime, timeout) {
 }
 
 function isDeviceDataError(signals) {
-    return signals.isDeviceDataError() || isTimeout(signals.lastUpdateTime(), apiErrorTimeout);
+    return signals.isDeviceDataError() || signals.isIPCTimeout();
+}
+
+function fadeChange(action) {
+    fadeTransition("status-note-content", action);
 }
 
 export const StatusNote = () => {
     const signals = new Signals();
     const cbName = callbackName("StatusNote");
     addDataCallback(cbName, (data) => updateSignals(signals, data));
-    const pulseInterval = setInterval(() => signals.setPulse(!signals.pulse()), 3 * second);
+    const ipcCheckInterval = setInterval(() => {
+        signals.setIPCTimeout(isTimeout(signals.lastUpdateTime(), apiErrorTimeout));
+    }, 3 * second);
     onCleanup(() => {
         removeDataCallback(cbName);
-        clearInterval(pulseInterval);
+        clearInterval(ipcCheckInterval);
+    });
+    createEffect(() => {
+        if (signals.isCalendarErrorBuffer() !== signals.isCalendarError()) {
+            fadeChange(() => {
+                signals.setCalendarError(signals.isCalendarErrorBuffer());
+            });
+        }
+    });
+    createEffect(() => {
+        if (signals.isDeviceDataErrorBuffer() !== signals.isDeviceDataError()) {
+            fadeChange(() => {
+                signals.setDeviceDataError(signals.isDeviceDataErrorBuffer());
+            });
+        }
+    });
+    createEffect(() => {
+        if (signals.isUpdatingBuffer() !== signals.isUpdating()) {
+            fadeChange(() => {
+                signals.setUpdating(signals.isUpdatingBuffer());
+            });
+        }
+    });
+    createEffect(() => {
+        if (signals.isIPCTimeoutBuffer() !== signals.isIPCTimeout()) {
+            fadeChange(() => {
+                signals.setIPCTimeout(signals.isIPCTimeoutBuffer());
+            });
+        }
     });
 
-    return <div class="status-note-root">
-        <div class="status-note flex-column">
+    return <div id="status-note-content" class="status-note flex-column">
             <Show when={signals.isCalendarError()}>
                 <div class="status-note-calendar-error-indicator">
                     <i class='fa-solid fa-calendar-xmark is-error api-error-indicator'></i>
@@ -68,7 +98,7 @@ export const StatusNote = () => {
             </Show>
             <Show when={isDeviceDataError(signals)}>
                 <div class="status-note-api-error-indicator">
-                    <i class='fa-solid fa-heart-crack is-error api-error-indicator'></i>
+                    <i class='fa-solid fa-xmark is-error api-error-indicator'></i>
                 </div>
             </Show>
             <Show when={signals.isUpdating()}>
@@ -76,6 +106,5 @@ export const StatusNote = () => {
                     <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
                 </div>
             </Show>
-        </div>
     </div>
 };

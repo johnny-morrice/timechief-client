@@ -69,36 +69,56 @@ function updateSignals(signals, data) {
   signals.setLocale(locale);
   signals.setTimezone(timezone);
   signals.setLastUpdateTime(new Date());
-  setFakeEvent(signals, timezone);
-  // if (calendar.Calendar) {
-  //   const nextEvent = findNextEvent(calendar.Calendar.Events);
-  //   signals.setNextEventBuffer(nextEvent, timezone);
-  // }
-}
-
-function setFakeEvent(signals) {
-  // Chance of events:
-  // 10% chance of creating the event if not created
-  // 10% chance of removing the event if created
-  const bufEvent = signals.nextEventBuffer();
-  const isCreated = bufEvent !== null;
-  if (Math.random() < 0.1) {
-    if (isCreated) {
-      signals.setNextEventBuffer(null);
-    } else {
-      // Start time is now + 3 hours in unix time.
-      const startTime = Math.floor(Date.now() / 1000) + 3 * 60 * 60;
-      const event = new CalendarEvent({
-          "ShortText": "Fake event",
-          "Start": startTime,
-          "End": 0,
-          "AllDay": true,
-      });
-      signals.setNextEventBuffer(event);
-    }
-    return;
+  if (calendar.Calendar) {
+    const nextEvent = findNextEvent(calendar.Calendar.Events);
+    signals.setNextEventBuffer(nextEvent, timezone);
   }
 }
+
+// setFakeEvent is a useful test utility
+// function setFakeEvent(signals) {
+//   const bufEvent = signals.nextEventBuffer();
+//   const isCreated = bufEvent !== null;
+//   if (Math.random() < 0.1) {
+//     if (isCreated) {
+//       if (Math.random() < 0.2) {
+//         signals.setNextEventBuffer(null);
+//       } else if (Math.random() < 0.5) {
+//         // Start time is now + 3 hours in unix time.
+//         const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60) + (Math.random() * 1000 * 60 * 60);
+//         const event = new CalendarEvent({
+//           "ShortText": "Fake event",
+//           "Start": startTime,
+//           "End": 0,
+//           "AllDay": true,
+//         });
+//         signals.setNextEventBuffer(event);
+//       } else {
+//         // Start time is now + 3 hours in unix time.
+//         const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60);
+//         const shortRandomText = Math.random().toString(36).substring(2, 15);
+//         const event = new CalendarEvent({
+//           "ShortText": "Fake event" + shortRandomText,
+//           "Start": startTime,
+//           "End": 0,
+//           "AllDay": true,
+//         });
+//         signals.setNextEventBuffer(event);
+//       }
+//     }
+//   } else {
+//     // Start time is now + 3 hours in unix time.
+//     const startTime = Math.floor(Date.now() / 1000) + 3 * 60 * 60;
+//     const event = new CalendarEvent({
+//       "ShortText": "Fake event",
+//       "Start": startTime,
+//       "End": 0,
+//       "AllDay": true,
+//     });
+//     signals.setNextEventBuffer(event);
+//   }
+//   return;
+// }
 
 function getTimeZone(signals) {
   let tz = signals.timeZone();
@@ -185,7 +205,7 @@ export const HomePage = () => {
 
   const moveEventBufferToEvent = () => {
     fadeTransition("home-action-center-content", () => {
-      signals.setNextEvent(nextEventBuf);
+      signals.setNextEvent(signals.nextEventBuffer());
     });
   };
 
@@ -201,8 +221,8 @@ export const HomePage = () => {
       moveEventBufferToEvent();
     }
 
-    // If both are null we stop here.
-    if (nextEventBuf == null && nextEvent == null) {
+    // If either are null we stop here.
+    if (nextEventBuf == null || nextEvent == null) {
       return;
     }
 
@@ -212,8 +232,9 @@ export const HomePage = () => {
     const nextEventShortText = nextEvent.eventShortText();
     if (bufEventStartTime != nextEventStartTime ||
       bufEventShortText != nextEventShortText) {
-        moveEventBufferToEvent();
+      moveEventBufferToEvent();
     }
+
   });
 
 
@@ -222,8 +243,8 @@ export const HomePage = () => {
       <SwitcherWidget widgets={
         [
           { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
-          { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl />},
-          { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo />},
+          { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl /> },
+          { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo /> },
           { icon: () => <i class="fa-solid fa-user"></i>, element: () => <Pairing /> },
           { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
           { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
@@ -238,8 +259,8 @@ export const HomePage = () => {
         <div class="home-date">{signals.myDate}</div>
       </div>
 
-      <div class="home-action-center flex-row flex-grow border crt-box">
-        <div class="home-action-center-content">
+      <div class="home-action-center flex-grow border crt-box">
+        <div id="home-action-center-content" class="flex-row flex-grow">
           <Show when={hasNextEvent(signals)}>
             <div class='next-event-summary flex-column flex-grow'>
               <div class='next-event-time flex-row'>
