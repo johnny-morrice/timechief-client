@@ -4,13 +4,6 @@
 package sound
 
 import (
-	"log"
-	"os"
-	"os/signal"
-	"syscall"
-
-	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
-	"github.com/johnny-morrice/timechief-client/launcher/sound/rpio"
 	"github.com/johnny-morrice/timechief-client/launcher/sound/service"
 )
 
@@ -21,7 +14,7 @@ func initialiseSoundService(pin int) (soundService, error) {
 type nullSoundService struct {
 }
 
-func (svc nullSoundService) PlaySong(songOpts service.SongOptions) error {
+func (svc nullSoundService) StartSong(songOpts service.SongOptions) error {
 	return nil
 }
 
