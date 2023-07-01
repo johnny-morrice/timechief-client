@@ -153,25 +153,6 @@ func getCLIApp() *cli.App {
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
 				},
-				&cli.StringFlag{
-					Name:  "api-base-url",
-					Value: store.DefaultBaseURL,
-				},
-				&cli.StringFlag{
-					Name:  "product",
-					Value: store.DefaultProduct,
-				},
-				&cli.StringFlag{
-					Name:  "stream",
-					Value: store.DefaultStream,
-				},
-				&cli.BoolFlag{
-					Name:  "install-daemon",
-					Value: defaultInstallDaemon,
-				},
-				&cli.StringFlag{
-					Name: "device-credentials",
-				},
 				&cli.DurationFlag{
 					Name:  "service-request-timeout",
 					Value: 20 * time.Second,
