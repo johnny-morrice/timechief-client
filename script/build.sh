@@ -32,6 +32,11 @@ else
   exit 1
 fi
 
+# If $1 is set, it's the phase, otherwise use the env var PHASE
+if [ -n "$1" ] ; then
+  PHASE="$1"
+fi
+
 
 if [ -z "$PHASE" ] ; then
   PHASE="all"
