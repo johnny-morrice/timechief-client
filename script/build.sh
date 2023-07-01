@@ -19,6 +19,20 @@ set -x
 # LAUNCHER_DEVICE_CREDENTIALS
 # INSTALL_ROOT
 
+# PHASE can be one of:
+# bundle - build the client bundle and exit
+# upload - upload the client bundle and exit
+# init-fs - initialise the launcher filesystem and exit
+# all - do all of the above and build the image
+# Validate this:
+if [ "$PHASE" = "bundle" ] || [ "$PHASE" = "upload" ] || [ "$PHASE" = "init-fs" ] || [ "$PHASE" = "all" ] ; then
+  echo "PHASE is $PHASE"
+else
+  echo "PHASE must be one of: bundle, upload, init-fs, all"
+  exit 1
+fi
+
+
 if [ -z "$PHASE" ] ; then
   PHASE="all"
 fi
