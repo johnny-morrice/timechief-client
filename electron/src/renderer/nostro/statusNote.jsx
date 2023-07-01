@@ -1,7 +1,7 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { isCalendarExists } from '../calendarHelper';
 import { addDataCallback, removeDataCallback } from './ipc';
-import { apiErrorTimeout } from '../timing'
+import { apiErrorTimeout, second } from '../timing'
 import { callbackName } from "./callback";
 
 class Signals {
@@ -12,6 +12,7 @@ class Signals {
         [this.isCalendarError, this.setCalendarError] = createSignal(false);
         [this.isUpdating, this.setUpdating] = createSignal(false);
         [this.isDeviceDataError, this.setDeviceDataError] = createSignal(false);
+        [this.pulse, this.setPulse] = createSignal(false);
     }
 }
 
@@ -52,9 +53,12 @@ export const StatusNote = () => {
     const signals = new Signals();
     const cbName = callbackName("StatusNote");
     addDataCallback(cbName, (data) => updateSignals(signals, data));
+    const pulseInterval = setInterval(() => signals.setPulse(!signals.pulse()), 3 * second);
     onCleanup(() => {
         removeDataCallback(cbName);
+        clearInterval(pulseInterval);
     });
+
     return <div class="status-note-root">
         <div class="status-note flex-column">
             <Show when={signals.isCalendarError()}>

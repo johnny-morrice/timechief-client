@@ -1,4 +1,4 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback } from './ipc';
 import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
@@ -15,6 +15,7 @@ import { Locale } from './locale';
 import { callbackName } from "./callback";
 import { Forecast } from './forecast';
 import { EventCalendar } from './eventCalendar';
+import { fadeTransition } from './fadeTransition';
 
 class Signals {
   constructor() {
@@ -24,6 +25,7 @@ class Signals {
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
     [this.myTime, this.setMyTime] = createSignal("");
     [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
+    [this.nextEventBuffer, this.setNextEventBuffer] = createSignal(null);
     [this.nextEvent, this.setNextEvent] = createSignal(null);
   }
 }
@@ -69,7 +71,7 @@ function updateSignals(signals, data) {
   signals.setLastUpdateTime(new Date());
   if (calendar.Calendar) {
     const nextEvent = findNextEvent(calendar.Calendar.Events);
-    signals.setNextEvent(nextEvent, timezone);
+    signals.setNextEventBuffer(nextEvent, timezone);
   }
 }
 
@@ -156,6 +158,40 @@ export const HomePage = () => {
     removeDataCallback(cbName);
   });
 
+  const moveEventBufferToEvent = () => {
+    fadeTransition("home-action-center-content", () => {
+      signals.setNextEvent(nextEventBuf);
+    });
+  };
+
+  createEffect(() => {
+    const nextEventBuf = signals.nextEventBuffer();
+    const nextEvent = signals.nextEvent();
+    // A change has occured if:
+    // One is null and the other is not null.
+    // One has a different time to the other.
+    // One has a different text to the other.
+    if ((nextEventBuf == null && nextEvent != null) ||
+      (nextEventBuf != null && nextEvent == null)) {
+      moveEventBufferToEvent();
+    }
+
+    // If both are null we stop here.
+    if (nextEventBuf == null && nextEvent == null) {
+      return;
+    }
+
+    const bufEventStartTime = nextEventBuf.formatStartTime(getLocale(signals), getTimeZone(signals));
+    const bufEventShortText = nextEventBuf.eventShortText();
+    const nextEventStartTime = nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
+    const nextEventShortText = nextEvent.eventShortText();
+    if (bufEventStartTime != nextEventStartTime ||
+      bufEventShortText != nextEventShortText) {
+        moveEventBufferToEvent();
+    }
+  });
+
+
   return <div class="home-screen flex-row">
     <div class="home-lhs-column flex-column flex-grow border crt-box">
       <SwitcherWidget widgets={
@@ -178,21 +214,23 @@ export const HomePage = () => {
       </div>
 
       <div class="home-action-center flex-row flex-grow border crt-box">
-        <Show when={hasNextEvent(signals)}>
-          <div class='next-event-summary flex-column flex-grow'>
-            <div class='next-event-time flex-row'>
-              <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
-              <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
+        <div class="home-action-center-content">
+          <Show when={hasNextEvent(signals)}>
+            <div class='next-event-summary flex-column flex-grow'>
+              <div class='next-event-time flex-row'>
+                <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
+                <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
+              </div>
+              <div class='next-event-shorttext'>
+                {getNextEventShortText(signals)}
+              </div>
             </div>
-            <div class='next-event-shorttext'>
-              {getNextEventShortText(signals)}
-            </div>
-          </div>
-        </Show>
-        <Show when={!hasNextEvent(signals)}>
-          <Fortune />
-        </Show>
-        <StatusNote />
+          </Show>
+          <Show when={!hasNextEvent(signals)}>
+            <Fortune />
+          </Show>
+          <StatusNote />
+        </div>
       </div>
     </div>
   </div>
