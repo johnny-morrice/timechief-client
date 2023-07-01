@@ -69,6 +69,7 @@ function updateSignals(signals, data) {
   signals.setLocale(locale);
   signals.setTimezone(timezone);
   signals.setLastUpdateTime(new Date());
+  // setFakeEvent(signals);
   if (calendar.Calendar) {
     const nextEvent = findNextEvent(calendar.Calendar.Events);
     signals.setNextEventBuffer(nextEvent, timezone);
@@ -76,49 +77,49 @@ function updateSignals(signals, data) {
 }
 
 // setFakeEvent is a useful test utility
-// function setFakeEvent(signals) {
-//   const bufEvent = signals.nextEventBuffer();
-//   const isCreated = bufEvent !== null;
-//   if (Math.random() < 0.1) {
-//     if (isCreated) {
-//       if (Math.random() < 0.2) {
-//         signals.setNextEventBuffer(null);
-//       } else if (Math.random() < 0.5) {
-//         // Start time is now + 3 hours in unix time.
-//         const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60) + (Math.random() * 1000 * 60 * 60);
-//         const event = new CalendarEvent({
-//           "ShortText": "Fake event",
-//           "Start": startTime,
-//           "End": 0,
-//           "AllDay": true,
-//         });
-//         signals.setNextEventBuffer(event);
-//       } else {
-//         // Start time is now + 3 hours in unix time.
-//         const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60);
-//         const shortRandomText = Math.random().toString(36).substring(2, 15);
-//         const event = new CalendarEvent({
-//           "ShortText": "Fake event" + shortRandomText,
-//           "Start": startTime,
-//           "End": 0,
-//           "AllDay": true,
-//         });
-//         signals.setNextEventBuffer(event);
-//       }
-//     }
-//   } else {
-//     // Start time is now + 3 hours in unix time.
-//     const startTime = Math.floor(Date.now() / 1000) + 3 * 60 * 60;
-//     const event = new CalendarEvent({
-//       "ShortText": "Fake event",
-//       "Start": startTime,
-//       "End": 0,
-//       "AllDay": true,
-//     });
-//     signals.setNextEventBuffer(event);
-//   }
-//   return;
-// }
+function setFakeEvent(signals) {
+  const bufEvent = signals.nextEventBuffer();
+  const isCreated = bufEvent !== null;
+  if (Math.random() < 0.1) {
+    if (isCreated) {
+      if (Math.random() < 0.2) {
+        signals.setNextEventBuffer(null);
+      } else if (Math.random() < 0.5) {
+        // Start time is now + 3 hours in unix time.
+        const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60) + (Math.random() * 1000 * 60 * 60);
+        const event = new CalendarEvent({
+          "ShortText": "Fake event",
+          "Start": startTime,
+          "End": 0,
+          "AllDay": true,
+        });
+        signals.setNextEventBuffer(event);
+      } else {
+        // Start time is now + 3 hours in unix time.
+        const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60);
+        const shortRandomText = Math.random().toString(36).substring(2, 15);
+        const event = new CalendarEvent({
+          "ShortText": "Fake event" + shortRandomText,
+          "Start": startTime,
+          "End": 0,
+          "AllDay": true,
+        });
+        signals.setNextEventBuffer(event);
+      }
+    }
+  } else {
+    // Start time is now + 3 hours in unix time.
+    const startTime = Math.floor(Date.now() / 1000) + 3 * 60 * 60;
+    const event = new CalendarEvent({
+      "ShortText": "Fake event",
+      "Start": startTime,
+      "End": 0,
+      "AllDay": true,
+    });
+    signals.setNextEventBuffer(event);
+  }
+  return;
+}
 
 function getTimeZone(signals) {
   let tz = signals.timeZone();

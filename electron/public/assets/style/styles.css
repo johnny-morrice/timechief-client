@@ -105,7 +105,7 @@ div.switcher-widget-button-wrapper {
 }
 
 .is-error {
-    color: red;
+    color: orange;
 }
 
 div.current-weather {
@@ -287,8 +287,7 @@ div.fade-out {
 }
 
 div.status-note {
-    flex-basis: 40px;
-    
+    flex-basis: 25px;
 }
 
 

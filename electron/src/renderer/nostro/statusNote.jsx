@@ -1,6 +1,6 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, removeDataCallback } from './ipc';
-import { apiErrorTimeout } from '../timing'
+import { apiErrorTimeout, second } from '../timing'
 import { callbackName } from "./callback";
 import { fadeTransition } from './fadeTransition';
 
@@ -55,36 +55,21 @@ export const StatusNote = () => {
     const cbName = callbackName("StatusNote");
     addDataCallback(cbName, (data) => updateSignals(signals, data));
     const ipcCheckInterval = setInterval(() => {
-        signals.setIPCTimeout(isTimeout(signals.lastUpdateTime(), apiErrorTimeout));
+        signals.setIPCTimeoutBuffer(isTimeout(signals.lastUpdateTime(), 6 * second));
     }, 3 * second);
     onCleanup(() => {
         removeDataCallback(cbName);
         clearInterval(ipcCheckInterval);
     });
     createEffect(() => {
-        if (signals.isCalendarErrorBuffer() !== signals.isCalendarError()) {
+        if (signals.isCalendarErrorBuffer() !== signals.isCalendarError() || 
+            signals.isDeviceDataErrorBuffer() !== signals.isDeviceDataError() ||
+            signals.isUpdatingBuffer() !== signals.isUpdating() ||
+            signals.isIPCTimeoutBuffer() !== signals.isIPCTimeout()) {
             fadeChange(() => {
                 signals.setCalendarError(signals.isCalendarErrorBuffer());
-            });
-        }
-    });
-    createEffect(() => {
-        if (signals.isDeviceDataErrorBuffer() !== signals.isDeviceDataError()) {
-            fadeChange(() => {
                 signals.setDeviceDataError(signals.isDeviceDataErrorBuffer());
-            });
-        }
-    });
-    createEffect(() => {
-        if (signals.isUpdatingBuffer() !== signals.isUpdating()) {
-            fadeChange(() => {
                 signals.setUpdating(signals.isUpdatingBuffer());
-            });
-        }
-    });
-    createEffect(() => {
-        if (signals.isIPCTimeoutBuffer() !== signals.isIPCTimeout()) {
-            fadeChange(() => {
                 signals.setIPCTimeout(signals.isIPCTimeoutBuffer());
             });
         }
@@ -98,7 +83,7 @@ export const StatusNote = () => {
             </Show>
             <Show when={isDeviceDataError(signals)}>
                 <div class="status-note-api-error-indicator">
-                    <i class='fa-solid fa-xmark is-error api-error-indicator'></i>
+                    <i class='fa-solid fa-heart-crack is-error api-error-indicator'></i>
                 </div>
             </Show>
             <Show when={signals.isUpdating()}>
