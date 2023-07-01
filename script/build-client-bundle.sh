@@ -31,27 +31,33 @@ mkdir -p $BUILD_DIR
 BUNDLE_UNPACK=$BUNDLE_DIR/timechief-client-bundle
 mkdir -p $BUNDLE_UNPACK
 
-# Build electron app
-pushd $BUILD_DIR
-git clone https://github.com/johnny-morrice/timechief-client.git
-pushd timechief-client
-git fetch --tags
-git checkout $VERSION
-if [ -z "$ELECTRON" ]; then
-  pushd electron
-  npm install
-  npm run dist
-  popd
-fi
-popd
-popd
-
-cp $BUILD_DIR/timechief-client/electron/dist/timechief-client-electron $BUNDLE_UNPACK
-
+# Copy integration scripts
 cp -a $BUILD_DIR/timechief-client/launcher/integration-scripts/system/bin $BUNDLE_UNPACK
 cp $BUILD_DIR/timechief-client/launcher/integration-scripts/hook/bash/timechief-client $BUNDLE_UNPACK
 cp $BUILD_DIR/timechief-client/launcher/integration-scripts/bootstrap/timechief-bootstrap $BUNDLE_UNPACK/bin
 
+# Setup repo
+pushd $BUILD_DIR
+git clone https://github.com/johnny-morrice/timechief-client.git
+git fetch --tags
+git checkout $VERSION
+popd
+
+# Build launcher
+pushd $BUILD_DIR/timechief-client/launcher
+mkdir -p bin
+go build -o bin/timechief-launcher
+popd
+
+cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_UNPACK/timechief-launcher
+
+# Build electron app
+pushd $BUILD_DIR/timechief-client/electron
+  npm install
+  npm run dist
+popd
+
+cp $BUILD_DIR/timechief-client/electron/dist/timechief-client-electron $BUNDLE_UNPACK
 
 # Build the python RTC application
 pushd $BUILD_DIR/timechief-client/rtcutil/pyrtc
@@ -68,16 +74,6 @@ cp $BUILD_DIR/timechief-client/rtcutil/pyrtc/dist/pyrtc $BUNDLE_UNPACK/bin/secur
 
 # Copy images
 cp -a $BUILD_DIR/timechief-client/launcher/assets $BUNDLE_UNPACK
-
-# Build launcher
-pushd $BUILD_DIR/timechief-client/launcher
-mkdir -p bin
-go build -o bin/timechief-launcher
-popd
-
-cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_UNPACK/timechief-launcher
-
-
 
 pushd $BUNDLE_DIR
 UNIQUE_NAME="timechief-client-bundle-$(uuidgen).tar.gz"
