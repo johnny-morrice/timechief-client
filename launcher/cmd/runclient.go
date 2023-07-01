@@ -6,20 +6,10 @@ import (
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
 
 func RunClient(ctx *cli.Context) error {
-	standalone := ctx.Bool("standalone")
-	if standalone {
-		return runStandaloneClient(ctx)
-	}
-	return runClientWithDaemon(ctx)
-}
-
-func runClientWithDaemon(ctx *cli.Context) error {
 	baseURL := ctx.String("daemon-base-url")
 	dc := daemonclient.NewDaemonClient(baseURL)
 	err := recoverClient(dc)
@@ -67,27 +57,4 @@ func pollUntil(duration time.Duration, limit time.Duration, f func() (bool, erro
 		}
 		time.Sleep(duration)
 	}
-}
-
-func runStandaloneClient(ctx *cli.Context) error {
-	db, err := store.GetDBConnection(ctx)
-	if err != nil {
-		return err
-	}
-	defer store.CloseDB(db)
-	ltStore := store.LaunchTargetStore{DB: db}
-	storeTarget, err := ltStore.GetActiveLaunchTarget()
-	if err != nil {
-		return err
-	}
-	cfgStore := store.ConfigStore{DB: db}
-	cfg, err := cfgStore.GetConfig()
-	if err != nil {
-		return err
-	}
-
-	launchTarget := service.LaunchTargetFromStore(storeTarget)
-
-	// TODO rollback if launch fails.
-	return launchTarget.Run(cfg)
 }

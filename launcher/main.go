@@ -36,10 +36,6 @@ func getCLIApp() *cli.App {
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
 				},
-				&cli.BoolFlag{
-					Name:  "standalone",
-					Value: false,
-				},
 				&cli.StringFlag{
 					Name:  "daemon-base-url",
 					Value: daemonBaseURL,
