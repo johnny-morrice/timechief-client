@@ -69,9 +69,34 @@ function updateSignals(signals, data) {
   signals.setLocale(locale);
   signals.setTimezone(timezone);
   signals.setLastUpdateTime(new Date());
-  if (calendar.Calendar) {
-    const nextEvent = findNextEvent(calendar.Calendar.Events);
-    signals.setNextEventBuffer(nextEvent, timezone);
+  setFakeEvent(signals, timezone);
+  // if (calendar.Calendar) {
+  //   const nextEvent = findNextEvent(calendar.Calendar.Events);
+  //   signals.setNextEventBuffer(nextEvent, timezone);
+  // }
+}
+
+function setFakeEvent(signals) {
+  // Chance of events:
+  // 10% chance of creating the event if not created
+  // 10% chance of removing the event if created
+  const bufEvent = signals.nextEventBuffer();
+  const isCreated = bufEvent !== null;
+  if (Math.random() < 0.1) {
+    if (isCreated) {
+      signals.setNextEventBuffer(null);
+    } else {
+      // Start time is now + 3 hours in unix time.
+      const startTime = Math.floor(Date.now() / 1000) + 3 * 60 * 60;
+      const event = new CalendarEvent({
+          "ShortText": "Fake event",
+          "Start": startTime,
+          "End": 0,
+          "AllDay": true,
+      });
+      signals.setNextEventBuffer(event);
+    }
+    return;
   }
 }
 
