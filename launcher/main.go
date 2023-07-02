@@ -58,6 +58,10 @@ func getCLIApp() *cli.App {
 					Name:  "pwm-pin",
 					Value: 12,
 				},
+				&cli.IntFlag{
+					Name:  "duty",
+					Value: 64,
+				},
 			},
 		},
 		{
