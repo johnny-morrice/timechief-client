@@ -58,6 +58,10 @@ func getCLIApp() *cli.App {
 					Name:  "pwm-pin",
 					Value: 12,
 				},
+				&cli.IntFlag{
+					Name:  "cycle-multiplier",
+					Value: 16,
+				},
 			},
 		},
 		{

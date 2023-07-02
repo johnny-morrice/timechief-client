@@ -10,6 +10,7 @@ func Sound(ctx *cli.Context) error {
 		ListenAddr:       ctx.String("listen-addr"),
 		PlayStartupSound: ctx.Bool("startup-sound"),
 		PWMPin:           ctx.Int("pwm-pin"),
+		CycleMultiplier:  ctx.Int("cycle-multiplier"),
 	}
 	return daemon.Run(ctx.Context)
 }

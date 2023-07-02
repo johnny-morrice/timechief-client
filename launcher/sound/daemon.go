@@ -13,10 +13,11 @@ type Daemon struct {
 	ListenAddr       string
 	PlayStartupSound bool
 	PWMPin           int
+	CycleMultiplier  int
 }
 
 func (daemon Daemon) Run(ctx context.Context) error {
-	svc, err := initialiseSoundService(daemon.PWMPin)
+	svc, err := initialiseSoundService(daemon.PWMPin, daemon.CycleMultiplier)
 	if err != nil {
 		return err
 	}
