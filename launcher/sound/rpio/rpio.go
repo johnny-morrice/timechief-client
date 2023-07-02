@@ -41,7 +41,7 @@ func (tg PWMToneGenerator) PlayFreq(freq float32, duration time.Duration) {
 	// I bet we can do something clever here to get the fractional notes to sound better.
 	tg.pin.Pwm()
 	tg.pin.Freq(int(freq * float32(tg.cycleMultiplier)))
-	tg.pin.DutyCycle(1, uint32(tg.cycleMultiplier))
+	tg.pin.DutyCycle(1, 32)
 	rpio.StartPwm()
 	time.Sleep(duration)
 	rpio.StopPwm()
