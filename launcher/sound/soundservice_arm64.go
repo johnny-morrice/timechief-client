@@ -14,13 +14,13 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/sound/service"
 )
 
-func initialiseSoundService(pin, duty, cycleMultiplier int) (soundService, error) {
+func initialiseSoundService(pin, duty int) (soundService, error) {
 	err := rpio.InitialiseRPIO()
 	if err != nil {
 		return service.SoundService{}, err
 	}
 
-	tg := rpio.NewPWMToneGenerator(pin, duty, cycleMultiplier)
+	tg := rpio.NewPWMToneGenerator(pin, duty)
 
 	machine := music.NewMachine(tg)
 	go machine.Run()
