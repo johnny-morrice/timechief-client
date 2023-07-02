@@ -59,7 +59,11 @@ func getCLIApp() *cli.App {
 					Value: 12,
 				},
 				&cli.IntFlag{
-					Name:  "cycle-multiplier",
+					Name:  "freq-multiplier",
+					Value: 16,
+				},
+				&cli.IntFlag{
+					Name:  "duty",
 					Value: 16,
 				},
 			},

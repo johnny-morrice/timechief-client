@@ -7,7 +7,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/sound/service"
 )
 
-func initialiseSoundService(pin, cycleMultiplier int) (soundService, error) {
+func initialiseSoundService(pin, duty, cycleMultiplier int) (soundService, error) {
 	return nullSoundService{}, nil
 }
 

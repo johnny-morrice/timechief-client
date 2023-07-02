@@ -25,14 +25,16 @@ func ShutdownRPIO() error {
 type PWMToneGenerator struct {
 	pin             rpio.Pin
 	cycleMultiplier int
+	duty            uint32
 }
 
-func NewPWMToneGenerator(pinNumber, cycleMultiplier int) PWMToneGenerator {
+func NewPWMToneGenerator(pinNumber, dutyMultiplier, freqMultiplier int) PWMToneGenerator {
 	log.Printf("setting up PWM on pin %v", pinNumber)
 	pin := rpio.Pin(pinNumber)
 	return PWMToneGenerator{
 		pin:             pin,
-		cycleMultiplier: cycleMultiplier,
+		cycleMultiplier: freqMultiplier,
+		duty:            uint32(dutyMultiplier),
 	}
 }
 
@@ -41,7 +43,7 @@ func (tg PWMToneGenerator) PlayFreq(freq float32, duration time.Duration) {
 	// I bet we can do something clever here to get the fractional notes to sound better.
 	tg.pin.Pwm()
 	tg.pin.Freq(int(freq * float32(tg.cycleMultiplier)))
-	tg.pin.DutyCycle(1, 32)
+	tg.pin.DutyCycle(1, tg.duty)
 	rpio.StartPwm()
 	time.Sleep(duration)
 	rpio.StopPwm()

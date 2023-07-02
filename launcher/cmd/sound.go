@@ -11,6 +11,7 @@ func Sound(ctx *cli.Context) error {
 		PlayStartupSound: ctx.Bool("startup-sound"),
 		PWMPin:           ctx.Int("pwm-pin"),
 		CycleMultiplier:  ctx.Int("cycle-multiplier"),
+		Duty:             ctx.Int("duty"),
 	}
 	return daemon.Run(ctx.Context)
 }
