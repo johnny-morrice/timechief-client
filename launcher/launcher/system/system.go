@@ -22,7 +22,12 @@ type System struct {
 	StateFlagStore         store.StateFlagStore
 	WifiInterfaceStore     store.WifiInterfaceStore
 	WifiNetworkStore       store.WifiNetworkStore
+	ShutdownCallback       ShutdownCallback
 	EnableSystemAutomation bool
+}
+
+type ShutdownCallback interface {
+	OnShutdown() error
 }
 
 func (sys System) stopApp() error {
@@ -75,6 +80,12 @@ func (sys System) doReboot() error {
 }
 
 func (sys System) Shutdown() error {
+	// Do not do network IO inside a mutex lock.
+	err := sys.ShutdownCallback.OnShutdown()
+	if err != nil {
+		log.Printf("shutdown callback error: %v", err)
+	}
+
 	Lock()
 	defer Unlock()
 
@@ -83,7 +94,7 @@ func (sys System) Shutdown() error {
 		return nil
 	}
 
-	err := sys.doShutdown()
+	err = sys.doShutdown()
 	if err != nil {
 		log.Printf("shutdown error: %v", err)
 	}
@@ -91,6 +102,12 @@ func (sys System) Shutdown() error {
 }
 
 func (sys System) Reboot() error {
+	// Do not do network IO inside a mutex lock.
+	err := sys.ShutdownCallback.OnShutdown()
+	if err != nil {
+		log.Printf("shutdown callback error: %v", err)
+	}
+
 	Lock()
 	defer Unlock()
 
@@ -99,7 +116,7 @@ func (sys System) Reboot() error {
 		return nil
 	}
 
-	err := sys.doReboot()
+	err = sys.doReboot()
 	if err != nil {
 		log.Printf("reboot error: %v", err)
 	}

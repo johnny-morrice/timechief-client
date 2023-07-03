@@ -80,12 +80,12 @@ func (dc DaemonClient) PostReboot() error {
 	return nil
 }
 
-type SoundRequest struct {
+type PlaySoundRequest struct {
 	SongName string
 	Loop     bool
 }
 
-func (dc DaemonClient) PostPlaySound(req SoundRequest) error {
+func (dc DaemonClient) PostPlaySound(req PlaySoundRequest) error {
 	buf := bytes.Buffer{}
 	err := json.NewEncoder(&buf).Encode(req)
 	if err != nil {

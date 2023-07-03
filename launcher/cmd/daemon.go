@@ -4,12 +4,14 @@ import (
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	client "github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/task"
@@ -56,6 +58,8 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
+	soundService := sound.NewSoundService(soundClient)
 	launchTargetStore := store.LaunchTargetStore{DB: db}
 	up := update.Updater{
 		VersionStore:      store.VersionStore{DB: db},
@@ -100,6 +104,7 @@ func Daemon(ctx *cli.Context) error {
 		StateFlagStore:         flagStore,
 		DB:                     db,
 		EnableSystemAutomation: ctx.Bool("system-automation"),
+		ShutdownCallback:       sound.NewShutdownCallback(soundService),
 	}
 
 	wifiLoad := daemon.WifiLoadInterfaces{
