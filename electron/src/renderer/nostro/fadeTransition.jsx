@@ -1,24 +1,33 @@
 import { onCleanup } from "solid-js";
 
+const transitionDurationMs = 190;
+
 export const fadeTransition = (contentID, doChange) => {
     applyClassToElement("fade-out", contentID);
-    const timerA = setTimeout(() => {
-        removeClassFromElement("fade-out", contentID);
-        applyClassToElement("fade-in", contentID);
-        doChange();
-        const timerB = setTimeout(() => {
+    var actionIndex = 0;
+    const actions = [
+        () => {
+            removeClassFromElement("fade-out", contentID);
+            applyClassToElement("fade-in", contentID);
+            doChange();
+        },
+        () => {
             removeClassFromElement("fade-in", contentID);
-        }, transitionDurationMs);
-        onCleanup(() => {
-            clearTimeout(timerB);
-        });
+        },
+    ];
+    const interval = setInterval(() => {
+        console.log("actionIndex: " + actionIndex);
+        if (actionIndex < actions.length) {
+            actions[actionIndex]();
+            actionIndex++;
+        } else {
+            clearInterval(interval);
+        }
     }, transitionDurationMs);
     onCleanup(() => {
-        clearTimeout(timerA);
+        clearInterval(interval);
     });
-}
-
-const transitionDurationMs = 190;
+};
 
 function applyClassToElement(cls, id) {
     const element = document.getElementById(id);
