@@ -27,6 +27,7 @@ func (api Launcher) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/launcher/target", api.HandleGetTarget)
 	mux.HandleFunc("/api/launcher/target/recover", api.HandleRecoverTargetStatus)
 	mux.HandleFunc("/api/launcher/setup", api.HandlePostSetup)
+	mux.HandleFunc("/api/launcher/on-login", api.HandlePostOnLoginCallback)
 }
 
 type setupRequest struct {
