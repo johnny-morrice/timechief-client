@@ -16,6 +16,7 @@ func loadSongs() ([]music.Song, error) {
 	songsFactories := []func() (music.Song, error){
 		songs.Startup,
 		songs.Shutdown,
+		songs.Login,
 	}
 
 	songs := []music.Song{}
