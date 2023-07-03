@@ -115,7 +115,7 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
   const refreshIntervalDuration = 30 * 1000; // 30 seconds for testing
-  // const refreshIntervalDuration = 60 * 60 * 3 * 1000; // 3 hours
+  // const refreshIntervalDuration = 60 * 60 * 12 * 1000; // 12 hours
   
   if (refreshInterval) {
     clearInterval(refreshInterval);
