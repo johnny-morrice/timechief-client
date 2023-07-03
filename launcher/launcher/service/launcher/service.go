@@ -10,10 +10,30 @@ type Service struct {
 	StateFlagStore    store.StateFlagStore
 	KeyValueStore     store.KeyValueStore
 	CfgStore          store.ConfigStore
+	SoundService      SoundService
+}
+
+type SoundService interface {
+	PlayLogin() error
 }
 
 type TargetStatus struct {
 	Ready bool
+}
+
+func (svc Service) OnLogin() error {
+	done, err := svc.StateFlagStore.Exists("logged-in")
+	if err != nil {
+		return err
+	}
+	if done {
+		return nil
+	}
+	err = svc.StateFlagStore.CreateIfNotExists("logged-in")
+	if err != nil {
+		return err
+	}
+	return svc.SoundService.PlayLogin()
 }
 
 func (svc Service) SetSetupState(state string) error {

@@ -15,6 +15,7 @@ type LauncherService interface {
 	GetTarget() (service.LaunchTarget, error)
 	RecoverTarget() (launcher.TargetStatus, error)
 	SetSetupState(state string) error
+	OnLogin() error
 }
 
 type Launcher struct {
@@ -26,6 +27,7 @@ func (api Launcher) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/launcher/target", api.HandleGetTarget)
 	mux.HandleFunc("/api/launcher/target/recover", api.HandleRecoverTargetStatus)
 	mux.HandleFunc("/api/launcher/setup", api.HandlePostSetup)
+	mux.HandleFunc("/api/launcher/on-login", api.HandlePostOnLoginCallback)
 }
 
 type setupRequest struct {
@@ -91,4 +93,18 @@ func (api Launcher) HandleRecoverTargetStatus(w http.ResponseWriter, r *http.Req
 		return
 	}
 	writeJSON(w, recoveryState)
+}
+
+func (api Launcher) HandlePostOnLoginCallback(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	err := api.Service.OnLogin()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to run on login callback: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }

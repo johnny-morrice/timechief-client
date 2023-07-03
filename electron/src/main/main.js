@@ -102,6 +102,7 @@ function createWindow() {
   })
 }
 
+var refreshInterval = null;
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -113,6 +114,16 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+  // const refreshIntervalDuration = 30 * 1000; // 30 seconds for testing
+  const refreshIntervalDuration = 60 * 60 * 18 * 1000; // 18 hours
+  
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+  refreshInterval= setInterval(() => {
+    logger.info("Refreshing page");
+    mainWindow.webContents.reloadIgnoringCache();
+  }, refreshIntervalDuration);
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -157,6 +168,18 @@ class LauncherClient {
         }
       }
       return {};
+    });
+  }
+
+  postLoggedIn() {
+    let cfg = {
+      url: this.baseURL + '/api/launcher/on-login',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 204) {
+        return {};
+      }
     });
   }
 
@@ -302,6 +325,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   });
 }
 
+handleIPCAPICall("loggedIn", "loggedInResult", () => client.postLoggedIn());
 handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.createPairing());
 handleIPCAPICall("pairingGet", "pairingGetResult", () => client.getPairing());
 handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());

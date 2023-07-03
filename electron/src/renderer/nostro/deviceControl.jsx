@@ -1,6 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { callbackName } from "./callback";
-import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendShutdown, sendSetupBegin } from './ipc';
+import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendLoggedIn, sendSetupBegin } from './ipc';
 import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
 import { Loading } from './loading';
 import { labelMaker, textMaker } from './label';
@@ -69,7 +69,7 @@ function updateSignalsForElectronStatus(signals, statusResponse) {
 
 function onClickShutdown() {
     console.log("shutdown clicked")
-    sendShutdown();
+    sendLoggedIn();
 }
 
 function onClickReboot() {

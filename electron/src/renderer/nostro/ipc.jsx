@@ -125,6 +125,10 @@ export function sendShutdown() {
     window.api.send("shutdown");
 }
 
+export function sendLoggedIn() {
+    window.api.send("loggedIn");
+}
+
 export function initializeIPC() {
     let deviceInterval = setInterval(() => {
         sendDeviceHeartbeat();
@@ -145,5 +149,6 @@ export function initializeIPC() {
     rebootReceiver.receive();
     shutdownReceiver.receive();
     setupBeginReceiver.receive();
+    sendLoggedIn();
     return [deviceInterval, apiInterval];
 }

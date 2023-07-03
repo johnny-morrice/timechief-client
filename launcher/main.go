@@ -70,6 +70,10 @@ func getCLIApp() *cli.App {
 			Usage:   "Run the launcher daemon",
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "sound-daemon-base-url",
+					Value: "http://localhost:8081",
+				},
 				&cli.BoolFlag{
 					Name:  "system-automation",
 					Value: defaultSystemAutomation,
