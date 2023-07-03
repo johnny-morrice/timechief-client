@@ -114,8 +114,8 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
-  const refreshIntervalDuration = 30 * 1000; // 30 seconds for testing
-  // const refreshIntervalDuration = 60 * 60 * 12 * 1000; // 12 hours
+  // const refreshIntervalDuration = 30 * 1000; // 30 seconds for testing
+  const refreshIntervalDuration = 60 * 60 * 18 * 1000; // 18 hours
   
   if (refreshInterval) {
     clearInterval(refreshInterval);
