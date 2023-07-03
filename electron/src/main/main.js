@@ -160,6 +160,18 @@ class LauncherClient {
     });
   }
 
+  postLoggedIn() {
+    let cfg = {
+      url: this.baseURL + '/api/launcher/on-login',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 204) {
+        return {};
+      }
+    });
+  }
+
   createPairing() {
     let cfg = {
       url: this.baseURL + '/api/data/pairing',
@@ -302,6 +314,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   });
 }
 
+handleIPCAPICall("loggedIn", "loggedInResult", () => client.postLoggedIn());
 handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.createPairing());
 handleIPCAPICall("pairingGet", "pairingGetResult", () => client.getPairing());
 handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());
