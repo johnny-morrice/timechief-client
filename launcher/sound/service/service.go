@@ -14,7 +14,8 @@ type SoundService struct {
 
 func loadSongs() ([]music.Song, error) {
 	songsFactories := []func() (music.Song, error){
-		songs.StartupTone,
+		songs.Startup,
+		songs.Shutdown,
 	}
 
 	songs := []music.Song{}

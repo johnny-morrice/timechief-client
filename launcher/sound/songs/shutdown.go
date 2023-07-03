@@ -4,9 +4,9 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
 )
 
-func Startup() (music.Song, error) {
+func Shutdown() (music.Song, error) {
 	song := Song{
-		Name: "startup",
+		Name: "shutdown",
 		Notes: []music.Note{
 			// Wiggling around D4,Eb4,Ab4
 			Db4,
