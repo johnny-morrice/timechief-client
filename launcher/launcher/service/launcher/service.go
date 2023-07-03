@@ -22,6 +22,17 @@ type TargetStatus struct {
 }
 
 func (svc Service) OnLogin() error {
+	done, err := svc.StateFlagStore.Exists("logged-in")
+	if err != nil {
+		return err
+	}
+	if done {
+		return nil
+	}
+	err = svc.StateFlagStore.CreateIfNotExists("logged-in")
+	if err != nil {
+		return err
+	}
 	return svc.SoundService.PlayLogin()
 }
 
