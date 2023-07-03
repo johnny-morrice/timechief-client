@@ -1,7 +1,9 @@
 package daemonclient
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
@@ -75,6 +77,28 @@ func (dc DaemonClient) PostReboot() error {
 		return err
 	}
 	defer resp.Body.Close()
+	return nil
+}
+
+type SoundRequest struct {
+	SongName string
+	Loop     bool
+}
+
+func (dc DaemonClient) PostPlaySound(req SoundRequest) error {
+	buf := bytes.Buffer{}
+	err := json.NewEncoder(&buf).Encode(req)
+	if err != nil {
+		return err
+	}
+	resp, err := http.Post(dc.makeURL("/api/sound/play"), "application/json", &buf)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected status code: %v", resp.StatusCode)
+	}
 	return nil
 }
 
