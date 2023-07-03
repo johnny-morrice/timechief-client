@@ -198,6 +198,7 @@ func Daemon(ctx *cli.Context) error {
 				KeyValueStore:     keyValueStore,
 				StateFlagStore:    flagStore,
 				CfgStore:          cfgStore,
+				SoundService:      soundService,
 			},
 		},
 		fileserver.NewStaticFileHandler(),

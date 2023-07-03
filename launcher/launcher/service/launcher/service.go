@@ -10,10 +10,19 @@ type Service struct {
 	StateFlagStore    store.StateFlagStore
 	KeyValueStore     store.KeyValueStore
 	CfgStore          store.ConfigStore
+	SoundService      SoundService
+}
+
+type SoundService interface {
+	PlayLogin() error
 }
 
 type TargetStatus struct {
 	Ready bool
+}
+
+func (svc Service) OnLogin() error {
+	return svc.SoundService.PlayLogin()
 }
 
 func (svc Service) SetSetupState(state string) error {
