@@ -268,7 +268,7 @@ export const HomePage = () => {
                 <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
                 <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
               </div>
-              <div class='next-event-shorttext'>
+              <div class='next-event-shorttext home-event-truncate'>
                 {getNextEventShortText(signals)}
               </div>
             </div>

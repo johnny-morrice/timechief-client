@@ -82,6 +82,13 @@ div.home-rhs-column {
     flex-basis: 55%;
 }
 
+div.home-event-truncate {
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 div.flex-column {
     display: flex;
     flex-direction: column;
@@ -217,6 +224,13 @@ div.calendar-event-when {
     font-weight: 500;
 }
 
+div.calendar-event-truncate {
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 div.calendar-day {
     font-size: 14pt;
 }
@@ -296,7 +310,6 @@ div.fade-out {
 div.status-note {
     flex-basis: 25px;
 }
-
 
 @media (min-width: 800px) {
     div.home-time {
