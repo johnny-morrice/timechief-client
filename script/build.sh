@@ -27,6 +27,7 @@ fi
 # If $2 is set, it's the version, otherwise use the env var VERSION
 if [ -n "$2" ] ; then
   VERSION="$2"
+  export VERSION=$VERSION
 fi
 
 # PHASE can be one of:
