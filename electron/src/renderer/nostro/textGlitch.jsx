@@ -1,4 +1,4 @@
-import { createSignal, createResource, onCleanup, createEffect } from "solid-js";
+import { createSignal, createResource, onCleanup, } from "solid-js";
 import { random, randomButtonGlitchSymbol, randomGlitchTransitionSymbol } from './fakeRandom';
 
 export const buttonGlitchStyle = (text) => {
@@ -46,7 +46,7 @@ export const runButtonGlitch = (isGlitching, setReset, setOutput, text, delayMs)
             const glitched = buttonGlitchText(text, 2);
             setOutput(glitched);
         } else {
-            clearInterval(interval);
+            reset();
         }
     }, delayMs);
 

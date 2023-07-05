@@ -8,6 +8,20 @@ import { random } from './fakeRandom';
 import { labelMaker, textMaker } from './label';
 import { fadeTransition } from './fadeTransition';
 
+const createDisplayStateSignal = (initVal) => {
+    const [displayStateBufferSig, setDisplayStateBuffer] = createSignal(initVal);
+    const [displayStateSig, setDisplayState] = createSignal(initVal);
+    const doSet = (val) => {
+        // console.log("setting display state: " + val);
+        const bufferedState = displayStateBufferSig();
+        setDisplayStateBuffer(val);
+        if (val[0] !== bufferedState[0] || val[1] !== bufferedState[1] || val[2] !== bufferedState[2]) {
+            fadeTransition("crt-root", () => setDisplayState(val));
+        }
+    };
+    return [displayStateSig, doSet];
+}
+
 class Signals {
     constructor() {
         [this.setupState, this.setSetupState] = createSignal("");
@@ -25,12 +39,11 @@ class Signals {
         [this.isUpdating, this.setUpdating] = createSignal(false);
         [this.rebootGlitch, this.isRebootButtonReset, this.setRebootButtonGlitch] = createGlitchButtonSignal("Reboot");
         [this.shutdownGlitch, this.isShutdownButtonReset, this.setShutdownButtonGlitch] = createGlitchButtonSignal("Shutdown");
-        [this.displayStateBuffer, this.setDisplayStateBuffer] = createSignal([true, false, false]);
-        [this.displayState, this.setDisplayState] = createSignal([false, false, false]);
+        [this.displayState, this.setDisplayState] = createDisplayStateSignal([true, false, false]);
     }
 }
 
-function isUpdating(signals) {
+function disableShutdown(signals) {
     return signals.isUpdating();
 }
 
@@ -84,6 +97,10 @@ function updateSignals(signals, data) {
                 signals.setHotspotKeyText(hotspotKey);
             }
         }
+        const internetConnectedState = signals.setupState() === "InternetConnected";
+        const hotspotReady = signals.setupState() === "WaitUserSelectNetwork" && signals.hotspotSSID().length > 0 && signals.hotspotKey().length > 0;
+        const loading = signals.setupState() !== "InternetConnected" && signals.setupState() !== "WaitUserSelectNetwork"; 
+        signals.setDisplayState([loading, hotspotReady, internetConnectedState]);
     }
 }
 
@@ -92,15 +109,15 @@ function isConnectionError(signals) {
 }
 
 function isInternetConnectedState(signals) {
-    return signals.setupState() === "InternetConnected";
+    return signals.displayState()[2];
 }
 
 function isHotspotReady(signals) {
-    return signals.setupState() === "WaitUserSelectNetwork" && signals.hotspotSSID().length > 0 && signals.hotspotKey().length > 0;
+    return signals.displayState()[1];
 }
 
 function isLoading(signals) {
-    return signals.setupState() !== "InternetConnected" && signals.setupState() !== "WaitUserSelectNetwork";
+    return signals.displayState()[0];
 }
 
 function isDisplayBackButton(signals) {
@@ -108,6 +125,7 @@ function isDisplayBackButton(signals) {
 }
 
 function onClickBack() {
+    console.log("back clicked");
     sendSetupCancel();
 }
 
@@ -125,18 +143,6 @@ function onClickReboot() {
     sendReboot();
 }
 
-function isDisplayStateLoading(signals) {
-    return signals.displayState()[0];
-}
-
-function isDisplayStateHotspot(signals) {
-    return signals.displayState()[1];
-}
-
-function isDisplayStateInternet(signals) {
-    return signals.displayState()[2];
-}
-
 export const WebSetupPage = (props) => {
     const signals = new Signals();
     const cbName = callbackName("WebSetupPage");
@@ -145,19 +151,16 @@ export const WebSetupPage = (props) => {
         removeDataCallback(cbName);
     });
 
-    createEffect(() => {
-        signals.setDisplayStateBuffer([isLoading(signals), isHotspotReady(signals), isInternetConnectedState(signals)]);
-    });
-    createEffect(() => {
-        const displayStateBuffer = signals.displayStateBuffer();
-        const displayState = signals.displayState();
-        if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
-            fadeTransition("crt-root", () => signals.setDisplayState(displayStateBuffer));
-        }
-    });
+    // createEffect(() => {
+    //     const displayStateBuffer = signals.displayStateBuffer();
+    //     const displayState = signals.displayState();
+    //     if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
+    //         fadeTransition("crt-root", () => signals.setDisplayState(displayStateBuffer));
+    //     }
+    // });
 
     createEffect(() => {
-        const updating = isUpdating(signals);
+        const updating = disableShutdown(signals);
         signals.setRebootButtonGlitch(updating);
         signals.setShutdownButtonGlitch(updating);
     });
@@ -208,12 +211,12 @@ export const WebSetupPage = (props) => {
     const label = labelMaker("web-setup");
     const plainText = textMaker("web-setup");
     return <div id="crt-root" class="crt">
-        <Show when={isDisplayStateHotspot(signals)}>
+        <Show when={isHotspotReady(signals)}>
             <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-content-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
-                        <Show when={isUpdating(signals)}>
+                        <Show when={disableShutdown(signals)}>
                             <Show when={signals.isRebootButtonReset()}>
                                 <button class='action-button crt-box glitch-animation-reset' disabled>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                             </Show>
@@ -227,14 +230,14 @@ export const WebSetupPage = (props) => {
                                 <button class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} disabled>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                             </Show>
                         </Show>
-                        <Show when={!isUpdating(signals)}>
+                        <Show when={!disableShutdown(signals)}>
                             <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                             <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         </Show>
                         <Show when={isDisplayBackButton(signals)}>
                             <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
                         </Show>
-                        <Show when={isUpdating(signals)}>
+                        <Show when={disableShutdown(signals)}>
                             <div class="setup-button-box-isUpdating">
                                 <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
                             </div>
@@ -262,12 +265,12 @@ export const WebSetupPage = (props) => {
                 </div>
             </div>
         </Show>
-        <Show when={isDisplayStateLoading(signals)}>
+        <Show when={isLoading(signals)}>
             <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>
                 <div class="setup-action-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
-                        <Show when={isUpdating(signals)}>
+                        <Show when={disableShutdown(signals)}>
                             <Show when={signals.isRebootButtonReset()}>
                                 <button class='action-button crt-box glitch-animation-reset' disabled>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                             </Show>
@@ -281,7 +284,7 @@ export const WebSetupPage = (props) => {
                                 <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                             </Show>
                         </Show>
-                        <Show when={!isUpdating(signals)}>
+                        <Show when={!disableShutdown(signals)}>
                             <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                             <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                         </Show>
@@ -289,7 +292,7 @@ export const WebSetupPage = (props) => {
                         <Show when={isDisplayBackButton(signals)}>
                             <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
                         </Show>
-                        <Show when={isUpdating(signals)}>
+                        <Show when={disableShutdown(signals)}>
                             <div class="setup-button-box-isUpdating">
                                 <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
                             </div>
@@ -301,7 +304,7 @@ export const WebSetupPage = (props) => {
                 </div>
             </div>
         </Show>
-        <Show when={isDisplayStateInternet(signals)}>
+        <Show when={isInternetConnectedState(signals)}>
             {props.element}
         </Show>
     </div>;
