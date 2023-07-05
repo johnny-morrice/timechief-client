@@ -1,4 +1,4 @@
-import { createSignal, createResource, onCleanup } from "solid-js";
+import { createSignal, createResource, onCleanup, createEffect } from "solid-js";
 import { random, randomButtonGlitchSymbol, randomGlitchTransitionSymbol } from './fakeRandom';
 
 export const buttonGlitchStyle = (text) => {
@@ -10,17 +10,15 @@ export const createGlitchButtonSignal = (text) => {
     const [output, setOutput] = createSignal(text);
     const [isGlitchingSig, setGlitching] = createSignal(false);
     const [isReset, setReset] = createSignal(true);
-    const [glitchBufferSig, setGlitchBuffer] = createSignal(false);
-    createEffect(() => {
-        const isGlitching = isGlitchingSig();
-        const isGlitchBuffer = glitchBufferSig();
-        if (isGlitching != isGlitchBuffer) {
-            setGlitching(isGlitchBuffer);
+    const doSet = (triggerGlitch) => {
+        // console.log("setting glitch: " + triggerGlitch);
+        setGlitching(triggerGlitch);
+        if (triggerGlitch) {
             setReset(false);
             runButtonGlitch(isGlitchingSig, setReset, setOutput, text, 150);
         }
-    });
-    return [output, isReset, setGlitchBuffer];
+    };
+    return [output, isReset, doSet];
 }
 
 export const runButtonGlitch = (isGlitching, setReset, setOutput, text, delayMs) => {
@@ -30,7 +28,9 @@ export const runButtonGlitch = (isGlitching, setReset, setOutput, text, delayMs)
     setOutput(glitched);
     var interval;
     const reset = () => {
+        // console.log("resetting");
         if (interval) {
+            // console.log("clearing interval");
             clearInterval(interval);
         }
         setReset(true);
@@ -51,11 +51,13 @@ export const runButtonGlitch = (isGlitching, setReset, setOutput, text, delayMs)
     }, delayMs);
 
     onCleanup(() => {
+        // console.log("cleaning up")
         reset();
     });
 };
 
 export const buttonGlitchText = (text, n) => {
+    // console.log("buttonGlitchText");
     // const symbols = [
     //     "!",
 	// 	"#",

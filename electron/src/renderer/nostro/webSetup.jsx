@@ -1,7 +1,7 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
-import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
+import { buttonGlitchStyle, createGlitchButtonSignal } from './textGlitch';
 import { Loading } from './loading';
 import { textTransitionSignal } from './textGlitch';
 import { random } from './fakeRandom';
@@ -23,8 +23,8 @@ class Signals {
         [this.activeSSID, this.setActiveSSID] = createSignal("");
         [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
         [this.isUpdating, this.setUpdating] = createSignal(false);
-        [this.rebootGlitch, this.isRebootButtonReset, this.setRebootGlitch] = createSignal("Reboot");
-        [this.shutdownGlitch, this.isShutdownButtonReset, this.setShutdownGlitch] = createSignal("Shutdown");
+        [this.rebootGlitch, this.isRebootButtonReset, this.setRebootButtonGlitch] = createGlitchButtonSignal("Reboot");
+        [this.shutdownGlitch, this.isShutdownButtonReset, this.setShutdownButtonGlitch] = createGlitchButtonSignal("Shutdown");
         [this.displayStateBuffer, this.setDisplayStateBuffer] = createSignal([true, false, false]);
         [this.displayState, this.setDisplayState] = createSignal([false, false, false]);
     }
@@ -32,6 +32,17 @@ class Signals {
 
 function isUpdating(signals) {
     return signals.isUpdating();
+}
+
+var fakeUpdateLastChanged = Date.now();
+var fakeUpdateFlag = false;
+function fakeIsUpdate() {
+    const flipDuration = 10000;
+    if (Date.now() - fakeUpdateLastChanged > flipDuration) {
+        fakeUpdateLastChanged = Date.now();
+        fakeUpdateFlag = !fakeUpdateFlag;
+    }
+    return fakeUpdateFlag;
 }
 
 function updateSignals(signals, data) {
@@ -55,6 +66,7 @@ function updateSignals(signals, data) {
 
         let isUpdating = launcherState["Flags"].includes("isUpdating");
         signals.setUpdating(isUpdating);
+        // signals.setUpdating(fakeIsUpdate());
 
         if ("WifiState" in launcherState) {
             let wifiState = launcherState["WifiState"];
