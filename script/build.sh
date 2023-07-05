@@ -24,6 +24,11 @@ if [ -n "$1" ] ; then
   PHASE="$1"
 fi
 
+# If $2 is set, it's the version, otherwise use the env var VERSION
+if [ -n "$2" ] ; then
+  VERSION="$2"
+fi
+
 # PHASE can be one of:
 # bundle - build the client bundle and exit
 # upload - upload the client bundle and exit
