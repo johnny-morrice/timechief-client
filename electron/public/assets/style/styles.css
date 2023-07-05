@@ -83,6 +83,7 @@ div.home-rhs-column {
 }
 
 div.home-event-truncate {
+    font-size: 14pt;
     width: 300px;
     white-space: nowrap;
     overflow: hidden;
@@ -225,6 +226,7 @@ div.calendar-event-when {
 }
 
 div.calendar-event-truncate {
+    font-size: 14pt;
     width: 200px;
     white-space: nowrap;
     overflow: hidden;
