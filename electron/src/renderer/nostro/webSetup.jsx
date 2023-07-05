@@ -23,8 +23,8 @@ class Signals {
         [this.activeSSID, this.setActiveSSID] = createSignal("");
         [this.firstTimeSetupDone, this.setFirstTimeSetupDone] = createSignal(false);
         [this.isUpdating, this.setUpdating] = createSignal(false);
-        [this.rebootGlitch, this.setRebootGlitch] = createSignal("Reboot");
-        [this.shutdownGlitch, this.setShutdownGlitch] = createSignal("Shutdown");
+        [this.rebootGlitch, this.isRebootButtonReset, this.setRebootGlitch] = createSignal("Reboot");
+        [this.shutdownGlitch, this.isShutdownButtonReset, this.setShutdownGlitch] = createSignal("Shutdown");
         [this.displayStateBuffer, this.setDisplayStateBuffer] = createSignal([true, false, false]);
         [this.displayState, this.setDisplayState] = createSignal([false, false, false]);
     }
@@ -143,11 +143,11 @@ export const WebSetupPage = (props) => {
             fadeTransition("crt-root", () => signals.setDisplayState(displayStateBuffer));
         }
     });
+
     createEffect(() => {
-        if (isUpdating(signals)) {
-            runButtonGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 150);
-            runButtonGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
-        }
+        const updating = isUpdating(signals);
+        signals.setRebootButtonGlitch(updating);
+        signals.setShutdownButtonGlitch(updating);
     });
 
     var jankTimeout = null;
@@ -202,8 +202,18 @@ export const WebSetupPage = (props) => {
                 <div class="setup-content-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
                         <Show when={isUpdating(signals)}>
-                            <button class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            <Show when={signals.isRebootButtonReset()}>
+                                <button class='action-button crt-box glitch-animation-reset' disabled>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            </Show>
+                            <Show when={signals.isShutdownButtonReset()}>
+                                <button class='action-button crt-box glitch-animation-reset' disabled>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
+                            <Show when={!signals.isRebootButtonReset()}>
+                                <button class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} disabled>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            </Show>
+                            <Show when={!signals.isShutdownButtonReset()}>
+                                <button class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} disabled>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
                         </Show>
                         <Show when={!isUpdating(signals)}>
                             <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
@@ -246,8 +256,18 @@ export const WebSetupPage = (props) => {
                 <div class="setup-action-wrapper flex-row">
                     <div class="setup-button-box border flex-column crt-box">
                         <Show when={isUpdating(signals)}>
-                            <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            <Show when={signals.isRebootButtonReset()}>
+                                <button class='action-button crt-box glitch-animation-reset' disabled>Reboot &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            </Show>
+                            <Show when={signals.isShutdownButtonReset()}>
+                                <button class='action-button crt-box glitch-animation-reset' disabled>Shutdown &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
+                            <Show when={!signals.isRebootButtonReset()}>
+                                <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                            </Show>
+                            <Show when={!signals.isShutdownButtonReset()}>
+                                <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
                         </Show>
                         <Show when={!isUpdating(signals)}>
                             <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>

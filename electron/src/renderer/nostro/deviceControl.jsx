@@ -1,7 +1,7 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { callbackName } from "./callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendLoggedIn, sendSetupBegin } from './ipc';
-import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
+import { buttonGlitchStyle, createGlitchButtonSignal } from './textGlitch';
 import { Loading } from './loading';
 import { labelMaker, textMaker } from './label';
 
@@ -11,8 +11,8 @@ class Signals {
         [this.launcherState, this.setLauncherState] = createSignal({});
         [this.clientVersion, this.setClientVersion] = createSignal("");
         [this.disableShutdown, this.setDisableShutdown] = createSignal(false);
-        [this.rebootGlitch, this.setRebootGlitch] = createSignal("Reboot");
-        [this.shutdownGlitch, this.setShutdownGlitch] = createSignal("Shutdown");
+        [this.rebootGlitch, this.isRebootButtonReset, this.setRebootButtonGlitch] = createGlitchButtonSignal("Restart");
+        [this.shutdownGlitch, this.isShutdownButtonReset, this.setShutdownButtonGlitch] = createGlitchButtonSignal("Shutdown");
     }
 }
 
@@ -104,11 +104,10 @@ export const DeviceControl = () => {
     });
 
     createEffect(() => {
-        if (isShutdownDisabled(signals)) {
-            runButtonGlitch(() => isShutdownDisabled(signals), signals.setRebootGlitch, "Reboot", 150);
-            runButtonGlitch(() => isShutdownDisabled(signals), signals.setShutdownGlitch, "Shutdown", 150);
-        }
-    });
+        const shutdownDisabled = isShutdownDisabled(signals);
+        signals.setRebootButtonGlitch(shutdownDisabled);
+        signals.setShutdownButtonGlitch(shutdownDisabled);
+    });     
 
     const label = labelMaker("device-control");
     const plainText = textMaker("device-control");
@@ -119,7 +118,12 @@ export const DeviceControl = () => {
                     <button class='action-button crt-box flex-grow' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
                 </Show>
                 <Show when={isShutdownDisabled(signals)}>
-                    <button class='action-button crt-box flex-grow' style={buttonGlitchStyle(plainText("reboot"))} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                    <Show when={signals.isRebootButtonReset()}>
+                        <button class='action-button crt-box flex-grow glitch-animation-reset' disabled>"Reboot" &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                    </Show>
+                    <Show when={!signals.isRebootButtonReset()}>
+                        <button class='action-button crt-box flex-grow' style={buttonGlitchStyle(plainText("reboot"))} disabled>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                    </Show>
                 </Show>
             </div>
             <div class="flex-grow flex-row">
@@ -127,7 +131,12 @@ export const DeviceControl = () => {
                     <button class='action-button crt-box flex-grow' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
                 </Show>
                 <Show when={isShutdownDisabled(signals)}>
-                    <button class='action-button crt-box flex-grow' style={buttonGlitchStyle(plainText("shutdown"))} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                    <Show when={signals.isShutdownButtonReset()}>
+                        <button class='action-button crt-box flex-grow glitch-animation-reset' disabled>"Shutdown" &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                    </Show>
+                    <Show when={!signals.isShutdownButtonReset()}>
+                        <button class='action-button crt-box flex-grow' style={buttonGlitchStyle(plainText("shutdown"))} disabled>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                    </Show>
                 </Show>
             </div>
             <div class="flex-grow flex-row">

@@ -6,29 +6,53 @@ export const buttonGlitchStyle = (text) => {
     return `width: ${size}em;`;
 };
 
-export const runButtonGlitch = (when, out, text, delayMs) => {
-    let isGlitching = when();
+export const createGlitchButtonSignal = (text) => {
+    const [output, setOutput] = createSignal(text);
+    const [isGlitchingSig, setGlitching] = createSignal(false);
+    const [isReset, setReset] = createSignal(true);
+    const [glitchBufferSig, setGlitchBuffer] = createSignal(false);
+    createEffect(() => {
+        const isGlitching = isGlitchingSig();
+        const isGlitchBuffer = glitchBufferSig();
+        if (isGlitching != isGlitchBuffer) {
+            setGlitching(isGlitchBuffer);
+            setReset(false);
+            runButtonGlitch(isGlitchingSig, setReset, setOutput, text, 150);
+        }
+    });
+    return [output, isReset, setGlitchBuffer];
+}
+
+export const runButtonGlitch = (isGlitching, setReset, setOutput, text, delayMs) => {
     const timeoutDuration = 60 * 60 * 1000 // 60 minutes
     const startTime = Date.now();
-    if (isGlitching) {
-        const glitched = buttonGlitchText(text, 2);
-        out(glitched);
-        const interval = setInterval(() => {
-            if (Date.now() - startTime > timeoutDuration) {
-                clearInterval(interval);
-                return;
-            }
-            const stillGlitching = when();
-            if (stillGlitching) {
-                const glitched = buttonGlitchText(text, 2);
-                out(glitched);
-            } else {
-                clearInterval(interval);
-            }
-        }, delayMs);
+    const glitched = buttonGlitchText(text, 2);
+    setOutput(glitched);
+    var interval;
+    const reset = () => {
+        if (interval) {
+            clearInterval(interval);
+        }
+        setReset(true);
+        setOutput(text);
+    };
+    interval = setInterval(() => {
+        if (Date.now() - startTime > timeoutDuration) {
+            reset();
+            return;
+        }
+        const stillGlitching = isGlitching();
+        if (stillGlitching) {
+            const glitched = buttonGlitchText(text, 2);
+            setOutput(glitched);
+        } else {
+            clearInterval(interval);
+        }
+    }, delayMs);
 
-        onCleanup(() => clearInterval(interval));
-    }
+    onCleanup(() => {
+        reset();
+    });
 };
 
 export const buttonGlitchText = (text, n) => {
