@@ -16,7 +16,6 @@ export const fadeTransition = (contentID, doChange) => {
         },
     ];
     const interval = setInterval(() => {
-        console.log("actionIndex: " + actionIndex);
         if (actionIndex < actions.length) {
             actions[actionIndex]();
             actionIndex++;
@@ -25,6 +24,8 @@ export const fadeTransition = (contentID, doChange) => {
         }
     }, transitionDurationMs);
     onCleanup(() => {
+        removeClassFromElement("fade-out", contentID);
+        removeClassFromElement("fade-in", contentID);
         clearInterval(interval);
     });
 };

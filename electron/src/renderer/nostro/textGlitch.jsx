@@ -8,10 +8,16 @@ export const buttonGlitchStyle = (text) => {
 
 export const runButtonGlitch = (when, out, text, delayMs) => {
     let isGlitching = when();
+    const timeoutDuration = 60 * 60 * 1000 // 60 minutes
+    const startTime = Date.now();
     if (isGlitching) {
         const glitched = buttonGlitchText(text, 2);
         out(glitched);
         const interval = setInterval(() => {
+            if (Date.now() - startTime > timeoutDuration) {
+                clearInterval(interval);
+                return;
+            }
             const stillGlitching = when();
             if (stillGlitching) {
                 const glitched = buttonGlitchText(text, 2);
@@ -97,14 +103,23 @@ export const textTransitionSignal = (value) => {
 }
 
 export const textTransitionGlitch = (buffer, display, setter, n) => {
-    let delayMs = 150;
+    const delayMs = 150;
+    const timeoutDuration = 3000;
+    const startTime = Date.now();
 
-    let more = transitionBuffer(buffer, display, setter, n);
+    const firstMore = transitionBuffer(buffer, display, setter, n);
     
-    if (more) {
+    if (firstMore) {
         const interval = setInterval(() => {
-            const more = transitionBuffer(buffer, display, setter, n);
-            if (!more) {
+            const isTimeout = Date.now() - startTime > timeoutDuration;
+            if (isTimeout) {
+                // console.log("textTransitionGlitch timeout");
+                setter(buffer());
+                clearInterval(interval);
+                return;
+            }
+            const myMore = transitionBuffer(buffer, display, setter, n);
+            if (!myMore) {
                 clearInterval(interval);
             }
         }, delayMs);

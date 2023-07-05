@@ -92,7 +92,15 @@ export const GridLoading = () => {
             // setInvert(isColorInverted);
         }
     };
-    const interval = setInterval(updateSignals, 150);
+    const timeoutDuration = 10 * 60 * 1000; // Give up swirling after 10 minutes
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+        if (Date.now() - startTime > timeoutDuration) {
+            clearInterval(interval);
+            return;
+        }
+        updateSignals()
+    }, 150);
     onCleanup(() => {
         clearInterval(interval);
     });

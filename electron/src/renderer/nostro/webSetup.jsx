@@ -73,8 +73,6 @@ function updateSignals(signals, data) {
             }
         }
     }
-    runButtonGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 150);
-    runButtonGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
 }
 
 function isConnectionError(signals) {
@@ -145,7 +143,14 @@ export const WebSetupPage = (props) => {
             fadeTransition("crt-root", () => signals.setDisplayState(displayStateBuffer));
         }
     });
+    createEffect(() => {
+        if (isUpdating(signals)) {
+            runButtonGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 150);
+            runButtonGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
+        }
+    });
 
+    var jankTimeout = null;
     const applyCRTJank = () => {
         // Get the crt-root element
         const crtRoot = document.getElementById("crt-root");
@@ -162,10 +167,7 @@ export const WebSetupPage = (props) => {
             // Set a timeout to remove the CRT jank after 1.6 + n second.
             // Where n is between 1.6 second and 2.4 second.
             const timeout = 2800 + (random() * 800);
-            const timer = setTimeout(removeCRTJank, timeout);
-            onCleanup(() => {
-                clearTimeout(timer);
-            });
+            jankTimeout = setTimeout(removeCRTJank, timeout);
         }
     };
 
@@ -183,9 +185,12 @@ export const WebSetupPage = (props) => {
     };
 
     const jankInterval = setInterval(applyCRTJank, 1000);
-
     onCleanup(() => {
+        if (jankTimeout) {
+            clearTimeout(jankTimeout);
+        }
         clearInterval(jankInterval);
+        removeCRTJank();
     });
 
     const label = labelMaker("web-setup");

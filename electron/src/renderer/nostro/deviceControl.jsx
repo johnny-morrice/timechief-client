@@ -1,4 +1,4 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { callbackName } from "./callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendLoggedIn, sendSetupBegin } from './ipc';
 import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
@@ -55,9 +55,19 @@ function updateSignalsForAPIData(signals, data) {
             }
         }
     }
+    // signals.setDisableShutdown(fakeIsShutdown());
     signals.setDisableShutdown(disableShutdown);
-    runButtonGlitch(() => isShutdownDisabled(signals), signals.setRebootGlitch, "Reboot", 150);
-    runButtonGlitch(() => isShutdownDisabled(signals), signals.setShutdownGlitch, "Shutdown", 150);
+}
+
+var fakeShutdownLastChanged = Date.now();
+var fakeShutdownFlag = false;
+function fakeIsShutdown() {
+    const flipDuration = 10000;
+    if (Date.now() - fakeShutdownLastChanged > flipDuration) {
+        fakeShutdownLastChanged = Date.now();
+        fakeShutdownFlag = !fakeShutdownFlag;
+    }
+    return fakeShutdownFlag;
 }
 
 function updateSignalsForElectronStatus(signals, statusResponse) {
@@ -91,6 +101,13 @@ export const DeviceControl = () => {
     onCleanup(() => {
         removeDataCallback(cbName);
         removeDeviceStatusCallback(cbName);
+    });
+
+    createEffect(() => {
+        if (isShutdownDisabled(signals)) {
+            runButtonGlitch(() => isShutdownDisabled(signals), signals.setRebootGlitch, "Reboot", 150);
+            runButtonGlitch(() => isShutdownDisabled(signals), signals.setShutdownGlitch, "Shutdown", 150);
+        }
     });
 
     const label = labelMaker("device-control");
