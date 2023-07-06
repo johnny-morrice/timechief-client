@@ -19,6 +19,7 @@ import { fadeTransition } from './fadeTransition';
 
 class Signals {
   constructor() {
+    [this.lastCalendarUpdateTime, this.setLastCalendarUpdateTime] = createSignal(0);
     [this.locale, this.setLocale] = createSignal("");
     [this.timeZone, this.setTimezone] = createSignal("");
     [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
@@ -70,9 +71,16 @@ function updateSignals(signals, data) {
   signals.setTimezone(timezone);
   signals.setLastUpdateTime(new Date());
   // setFakeEvent(signals);
-  if (calendar.Calendar) {
-    const nextEvent = findNextEvent(calendar.Calendar.Events);
-    signals.setNextEventBuffer(nextEvent, timezone);
+  const calendarUpdateTimeoutDuration = 15 * 1000; // 15 seconds
+  const lastUpdate = signals.lastCalendarUpdateTime();
+  const now = Date.now();
+  if (lastUpdate === 0 || (now - lastUpdate) > calendarUpdateTimeoutDuration) {
+    // console.log("Updating calendar");
+    signals.setLastCalendarUpdateTime(now);
+    if (calendar.Calendar) {
+      const nextEvent = findNextEvent(calendar.Calendar.Events);
+      signals.setNextEventBuffer(nextEvent, timezone);
+    }
   }
 }
 
@@ -268,7 +276,7 @@ export const HomePage = () => {
                 <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
                 <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
               </div>
-              <div class='next-event-shorttext home-event-truncate'>
+              <div class='home-event-shorttext'>
                 {getNextEventShortText(signals)}
               </div>
             </div>

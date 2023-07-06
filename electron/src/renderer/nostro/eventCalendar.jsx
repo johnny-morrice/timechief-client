@@ -9,6 +9,7 @@ import { fadeTransition } from './fadeTransition';
 
 class Signals {
   constructor() {
+    [this.lastCalendarUpdateTime, this.setLastCalendarUpdateTime] = createSignal(0);
     [this.calendarDays, this.setCalendarDays] = createSignal([]);
     [this.loaded, this.setLoaded] = createSignal(false);
     [this.locale, this.setLocale] = createSignal("en-GB");
@@ -24,21 +25,27 @@ function updateSignals(signals, data) {
   signals.setTimeZone(tz);
   signals.setLoaded(true);
   let calendarResp = data["Calendar"];
-  if ("Calendar" in calendarResp && calendarResp["Calendar"] != null) {
-    let calendar = calendarResp["Calendar"];
-    if ("Events" in calendar) {
-      let dataEvents = calendar["Events"];
-      if (dataEvents) {
-        let events = dataEvents.map(cev => new CalendarEvent(cev));
-        let calendarDays = new CalendarDaysModel(tz);
-        events.forEach(cev => calendarDays.addNewEvent(cev));
-        let ourCalendar = calendarDays.nextEvents(30, 3);
-        // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
-        signals.setCalendarDays(ourCalendar);
+  const calendarUpdateTimeoutDuration = 15 * 1000; // 15 seconds
+  const lastUpdate = signals.lastCalendarUpdateTime();
+  const now = Date.now();
+  if (lastUpdate === 0 || (now - lastUpdate) > calendarUpdateTimeoutDuration) {
+    signals.setLastCalendarUpdateTime(now);
+    // console.log("doing calendar update")
+    if ("Calendar" in calendarResp && calendarResp["Calendar"] != null) {
+      let calendar = calendarResp["Calendar"];
+      if ("Events" in calendar) {
+        let dataEvents = calendar["Events"];
+        if (dataEvents) {
+          let events = dataEvents.map(cev => new CalendarEvent(cev));
+          let calendarDays = new CalendarDaysModel(tz);
+          events.forEach(cev => calendarDays.addNewEvent(cev));
+          let ourCalendar = calendarDays.nextEvents(30, 3);
+          // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
+          signals.setCalendarDays(ourCalendar);
+        }
       }
     }
   }
-
 }
 
 

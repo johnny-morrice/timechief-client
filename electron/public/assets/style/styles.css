@@ -82,8 +82,7 @@ div.home-rhs-column {
     flex-basis: 55%;
 }
 
-div.home-event-truncate {
-    font-size: 14pt;
+div.home-event-shorttext {
     width: 300px;
     white-space: nowrap;
     overflow: hidden;
@@ -225,7 +224,7 @@ div.calendar-event-when {
     font-weight: 500;
 }
 
-div.calendar-event-truncate {
+div.calendar-event-shorttext {
     font-size: 14pt;
     width: 200px;
     white-space: nowrap;
