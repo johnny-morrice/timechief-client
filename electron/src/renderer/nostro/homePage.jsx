@@ -54,7 +54,7 @@ function getTimeText(homePageSignals) {
 }
 
 function getDateText(locale) {
-  let dateOptions = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+  let dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
   var dateText = new Date().toLocaleDateString(locale, dateOptions);
   return dateText.replace(',', '');
 }
