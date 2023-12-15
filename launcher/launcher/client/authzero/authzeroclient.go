@@ -56,7 +56,7 @@ func (clnt AuthZeroClient) GetDeviceCode(clientID, audience string) (DeviceCodeR
 	return result, nil
 }
 
-func (clnt AuthZeroClient) doAccessTokenPoll(clientID, deviceCode string) (AccessTokenPollingResp, error) {
+func (clnt AuthZeroClient) DoAccessTokenPoll(clientID, deviceCode string) (AccessTokenPollingResp, error) {
 	if clientID == "" {
 		return AccessTokenPollingResp{}, errors.New("clientID cannot be empty")
 	}
@@ -101,7 +101,7 @@ func (clnt AuthZeroClient) GetAccessToken(clientID, deviceCode string, interval 
 		return AccessTokenResp{}, errors.New("interval cannot be 0")
 	}
 	for {
-		resp, err := clnt.doAccessTokenPoll(clientID, deviceCode)
+		resp, err := clnt.DoAccessTokenPoll(clientID, deviceCode)
 		if err != nil {
 			return AccessTokenResp{}, err
 		}

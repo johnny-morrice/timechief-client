@@ -76,6 +76,22 @@ func (cfg Config) Merge(other Config) Config {
 	return newCfg
 }
 
+func (cfg Config) GetAuthZeroClientID() (string, error) {
+	clientID, ok := cfg.Config["auth0-client-id"]
+	if !ok {
+		return "", fmt.Errorf("auth0-client-id not found: %w", ErrCfgNotFound)
+	}
+	return clientID, nil
+}
+
+func (cfg Config) GetAuthZeroAudience() (string, error) {
+	audience, ok := cfg.Config["auth0-audience"]
+	if !ok {
+		return "", fmt.Errorf("auth0-audience not found: %w", ErrCfgNotFound)
+	}
+	return audience, nil
+}
+
 func (cfg Config) GetInstallRoot() string {
 	root, ok := cfg.Config["install-root"]
 	if !ok {

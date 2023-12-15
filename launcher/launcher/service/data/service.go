@@ -58,8 +58,10 @@ type DeviceData struct {
 }
 
 type PairingStatus struct {
-	Status string
-	Code   string
+	Status    string
+	Code      string
+	URL       string
+	QRCodeURL string
 }
 
 func (svc Service) PairDevice() error {
@@ -75,6 +77,14 @@ func (svc Service) PairDevice() error {
 }
 
 func (svc Service) GetPairingStatus() (PairingStatus, error) {
+	url, err := svc.KeyValueStore.Get(store.PairingURLKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
+	}
+	qrCodeURL, err := svc.KeyValueStore.Get(store.PairingQRCodeURLKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
+	}
 	code, err := svc.KeyValueStore.Get(store.PairingCodeKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
@@ -92,8 +102,10 @@ func (svc Service) GetPairingStatus() (PairingStatus, error) {
 	}
 
 	result := PairingStatus{
-		Status: status,
-		Code:   code,
+		Status:    status,
+		Code:      code,
+		URL:       url,
+		QRCodeURL: qrCodeURL,
 	}
 
 	return result, nil

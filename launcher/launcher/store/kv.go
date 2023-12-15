@@ -21,8 +21,11 @@ type KeyValueStore struct {
 	DB *gorm.DB
 }
 
+const PairingURLKey = "pairing-url"
+const PairingQRCodeURLKey = "pairing-url-complete"
 const PairingCodeKey = "pairing-code"
 const AccessTokenKey = "access-token"
+const RefreshTokenKey = "refresh-token"
 const HotspotSSID = "hotspot-ssid"
 const HotspotKey = "hotspot-key"
 const IPAddressKey = "ip-address"

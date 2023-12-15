@@ -6,8 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/johnny-morrice/timechief-client/client/viewmodel"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -16,14 +15,25 @@ type Pairing struct {
 	KeyValueStore        store.KeyValueStore
 	ConfigStore          store.ConfigStore
 	StateFlagStore       store.StateFlagStore
+	AuthZeroClient       AuthZeroClient
 	PairingCheckInterval time.Duration
 	RequestTimeout       time.Duration
+}
+
+type AuthZeroClient interface {
+	GetDeviceCode(clientID, audience string) (authzero.DeviceCodeResp, error)
+	DoAccessTokenPoll(clientID, deviceCode string) (authzero.AccessTokenPollingResp, error)
 }
 
 func (p Pairing) Initialise() error {
 	err := p.KeyValueStore.Delete(store.PairingCodeKey)
 	if err != nil {
 		return fmt.Errorf("error deleting pairing code: %s", err)
+	}
+
+	err = p.StateFlagStore.Delete(store.PairingURLKey)
+	if err != nil {
+		return fmt.Errorf("error deleting pairing url: %s", err)
 	}
 	return nil
 }
@@ -60,14 +70,13 @@ func (p Pairing) doTick(ctx *cli.Context) error {
 		if err != nil {
 			return fmt.Errorf("error getting pairing state: %s", err)
 		}
-		switch status.Status {
-		case "complete":
-			return p.handlePairingComplete()
-		case "ready":
-			return p.handlePairingReady()
-		case "linked":
-			return p.handlePairingLinked()
+		if status.Response.AccessToken != "" {
+			return p.handlePairingComplete(status.Response)
 		}
+		if status.Error.Error != "" {
+			return p.handlePairingReady(status.Error)
+		}
+
 	}
 	return nil
 }
@@ -77,59 +86,41 @@ func (p Pairing) createPairing() error {
 	if err != nil {
 		return fmt.Errorf("error getting config: %s", err)
 	}
-	token, err := p.KeyValueStore.Get(store.AccessTokenKey)
+	clientID, err := cfg.GetAuthZeroClientID()
 	if err != nil {
-		return fmt.Errorf("error getting access token: %s", err)
+		return err
 	}
-	client, err := serviceclient.MakeAPIClient(cfg, token)
+	audience, err := cfg.GetAuthZeroAudience()
 	if err != nil {
-		return fmt.Errorf("error making api client: %s", err)
+		return err
 	}
-	ctx, cancel := p.newClientContext()
-	defer cancel()
-	code, err := client.Pairing.CreatePairing(ctx)
+	deviceResp, err := p.AuthZeroClient.GetDeviceCode(clientID, audience)
 	if err != nil {
-		return fmt.Errorf("error creating pairing: %s", err)
+		return fmt.Errorf("error getting device code: %s", err)
 	}
-	err = p.KeyValueStore.Set(store.PairingCodeKey, code.Code)
+	err = p.KeyValueStore.Set(store.PairingCodeKey, deviceResp.DeviceCode)
 	if err != nil {
 		return fmt.Errorf("error setting pairing code: %s", err)
 	}
+	err = p.KeyValueStore.Set(store.PairingURLKey, deviceResp.VerificationUri)
+	if err != nil {
+		return fmt.Errorf("error setting pairing url: %s", err)
+	}
+	err = p.KeyValueStore.Set(store.PairingQRCodeURLKey, deviceResp.VerificationUriComplete)
+	if err != nil {
+		return fmt.Errorf("error setting pairing qr code URL: %s", err)
+	}
+
 	return nil
 }
 
-func (p Pairing) handlePairingLinked() error {
-	cfg, err := p.ConfigStore.GetConfig()
-	if err != nil {
-		return fmt.Errorf("error getting config: %s", err)
-	}
-	token, err := p.KeyValueStore.Get(store.AccessTokenKey)
-	if err != nil {
-		return fmt.Errorf("error getting access token: %s", err)
-	}
-	code, err := p.KeyValueStore.Get(store.PairingCodeKey)
-	if err != nil {
-		return fmt.Errorf("error getting pairing code: %s", err)
-	}
-	client, err := serviceclient.MakeAPIClient(cfg, token)
-	if err != nil {
-		return fmt.Errorf("error making api client: %s", err)
-	}
-	ctx, cancel := p.newClientContext()
-	defer cancel()
-	err = client.Pairing.CompletePairing(ctx, code)
-	if err != nil {
-		return fmt.Errorf("error completing pairing: %s", err)
-	}
-	return nil
-}
-
-func (p Pairing) handlePairingReady() error {
+func (p Pairing) handlePairingReady(pairingError authzero.AccessTokenRespError) error {
 	// Nothing to do, wait for link.
+	log.Printf("pairing poll got another error: %s %s", pairingError.Error, pairingError.ErrorDescription)
 	return nil
 }
 
-func (p Pairing) handlePairingComplete() error {
+func (p Pairing) handlePairingComplete(accessToken authzero.AccessTokenResp) error {
 	err := p.StateFlagStore.Delete("pairing-requested")
 	if err != nil {
 		return fmt.Errorf("error deleting pairing-requested flag: %s", err)
@@ -138,34 +129,37 @@ func (p Pairing) handlePairingComplete() error {
 	if err != nil {
 		return fmt.Errorf("error clearing pairing code: %s", err)
 	}
+	err = p.KeyValueStore.Delete(store.PairingURLKey)
+	if err != nil {
+		return fmt.Errorf("error clearing pairing url: %s", err)
+	}
+	err = p.KeyValueStore.Delete(store.PairingQRCodeURLKey)
+	if err != nil {
+		return fmt.Errorf("error clearing pairing qr code url: %s", err)
+	}
+	err = p.KeyValueStore.Set(store.AccessTokenKey, accessToken.AccessToken)
+	if err != nil {
+		return fmt.Errorf("error setting access token: %s", err)
+	}
+	err = p.KeyValueStore.Set(store.RefreshTokenKey, accessToken.RefreshToken)
 	return nil
 }
 
-func (p Pairing) getPairingState() (viewmodel.PairingStatus, error) {
+func (p Pairing) getPairingState() (authzero.AccessTokenPollingResp, error) {
 	cfg, err := p.ConfigStore.GetConfig()
+	var nope authzero.AccessTokenPollingResp
 	if err != nil {
-		return viewmodel.PairingStatus{}, fmt.Errorf("error getting config: %s", err)
+		return nope, fmt.Errorf("error getting config: %s", err)
 	}
-	token, err := p.KeyValueStore.Get(store.AccessTokenKey)
+	deviceCode, err := p.KeyValueStore.Get(store.PairingCodeKey)
 	if err != nil {
-		return viewmodel.PairingStatus{}, fmt.Errorf("error getting access token: %s", err)
+		return nope, fmt.Errorf("error getting pairing code: %s", err)
 	}
-	code, err := p.KeyValueStore.Get(store.PairingCodeKey)
+	clientID, err := cfg.GetAuthZeroClientID()
 	if err != nil {
-		return viewmodel.PairingStatus{}, fmt.Errorf("error getting pairing code: %s", err)
+		return nope, err
 	}
-	client, err := serviceclient.MakeAPIClient(cfg, token)
-	if err != nil {
-		return viewmodel.PairingStatus{}, fmt.Errorf("error making api client: %s", err)
-	}
-	ctx, cancel := p.newClientContext()
-	defer cancel()
-
-	status, err := client.Pairing.GetPairing(ctx, code)
-	if err != nil {
-		return viewmodel.PairingStatus{}, fmt.Errorf("error getting pairing status: %s", err)
-	}
-	return *status, nil
+	return p.AuthZeroClient.DoAccessTokenPoll(clientID, deviceCode)
 }
 
 func (p Pairing) newClientContext() (context.Context, func()) {
