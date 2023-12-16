@@ -4,18 +4,22 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/johnny-morrice/timechief-client/client/viewmodel"
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"gorm.io/gorm"
 )
 
 type Service struct {
-	DeviceDataStore    store.DeviceDataStore
+	DeviceDataStore    DeviceDataStore
 	LaunchTargetStore  store.LaunchTargetStore
 	StateFlagStore     store.StateFlagStore
 	KeyValueStore      store.KeyValueStore
 	WifiInterfaceStore store.WifiInterfaceStore
 	WifiNetworkStore   store.WifiNetworkStore
+}
+
+type DeviceDataStore interface {
+	GetDeviceData() (v2.Data, error)
 }
 
 type LauncherState struct {
@@ -54,7 +58,7 @@ type WifiNetwork struct {
 
 type DeviceData struct {
 	LauncherState LauncherState
-	ServiceData   viewmodel.ClockData
+	ServiceData   v2.Data
 }
 
 type PairingStatus struct {
@@ -119,7 +123,7 @@ func webURL(ip string) string {
 }
 
 func (svc Service) GetDeviceData() (DeviceData, error) {
-	clockData, err := svc.DeviceDataStore.GetDeviceData()
+	deviceData, err := svc.DeviceDataStore.GetDeviceData()
 	if err != nil {
 		return DeviceData{}, err
 	}
@@ -195,7 +199,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	firstTimeSetupDone := !errors.Is(err, gorm.ErrRecordNotFound)
 
 	result := DeviceData{
-		ServiceData: clockData,
+		ServiceData: deviceData,
 		LauncherState: LauncherState{
 			WebURL:              webURL(ipAddress),
 			SetupState:          setupState,
