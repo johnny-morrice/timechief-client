@@ -35,6 +35,29 @@ type APIKey struct {
 	Uuid          *string   `json:"uuid,omitempty"`
 }
 
+// Calendar defines model for Calendar.
+type Calendar struct {
+	Dt     *int64           `json:"dt,omitempty"`
+	Events *[]CalendarEvent `json:"events,omitempty"`
+	MaxDt  *int64           `json:"max_dt,omitempty"`
+	MinDt  *int64           `json:"min_dt,omitempty"`
+}
+
+// CalendarDatum defines model for CalendarDatum.
+type CalendarDatum struct {
+	Dt    *int      `json:"dt,omitempty"`
+	Value *Calendar `json:"value,omitempty"`
+}
+
+// CalendarEvent defines model for CalendarEvent.
+type CalendarEvent struct {
+	AllDay    *bool   `json:"all_day,omitempty"`
+	End       *int64  `json:"end,omitempty"`
+	Id        *string `json:"id,omitempty"`
+	ShortText *string `json:"short_text,omitempty"`
+	Start     *int64  `json:"start,omitempty"`
+}
+
 // CurrentWeather defines model for CurrentWeather.
 type CurrentWeather struct {
 	FeelsLike         *float32          `json:"feels_like,omitempty"`
@@ -65,9 +88,11 @@ type DailyWeather struct {
 
 // Data defines model for Data.
 type Data struct {
-	DeviceProfile *DeviceProfileDatum `json:"device_profile,omitempty"`
-	Dt            *int                `json:"dt,omitempty"`
-	OwmData       *OWMDataDatum       `json:"owm_data,omitempty"`
+	DeviceProfile  *DeviceProfileDatum `json:"device_profile,omitempty"`
+	Dt             *int                `json:"dt,omitempty"`
+	GoogleCalendar *CalendarDatum      `json:"google_calendar,omitempty"`
+	GoogleProfile  *GoogleProfileDatum `json:"google_profile,omitempty"`
+	OwmData        *OWMDataDatum       `json:"owm_data,omitempty"`
 }
 
 // Device defines model for Device.
@@ -103,8 +128,8 @@ type DeviceProfile struct {
 
 // DeviceProfileDatum defines model for DeviceProfileDatum.
 type DeviceProfileDatum struct {
-	ServiceSourceDt *int           `json:"service_source_dt,omitempty"`
-	Value           *DeviceProfile `json:"value,omitempty"`
+	Dt    *int           `json:"dt,omitempty"`
+	Value *DeviceProfile `json:"value,omitempty"`
 }
 
 // Features defines model for Features.
@@ -136,6 +161,17 @@ type GoogleProfile struct {
 	Uuid         *string `json:"uuid,omitempty"`
 }
 
+// GoogleProfileData defines model for GoogleProfileData.
+type GoogleProfileData struct {
+	EmailAddress *string `json:"email_address,omitempty"`
+}
+
+// GoogleProfileDatum defines model for GoogleProfileDatum.
+type GoogleProfileDatum struct {
+	Dt    *int               `json:"dt,omitempty"`
+	Value *GoogleProfileData `json:"value,omitempty"`
+}
+
 // License defines model for License.
 type License struct {
 	Premium       *bool   `json:"premium,omitempty"`
@@ -152,8 +188,8 @@ type OWMData struct {
 
 // OWMDataDatum defines model for OWMDataDatum.
 type OWMDataDatum struct {
-	ServiceSourceDt *int     `json:"service_source_dt,omitempty"`
-	Value           *OWMData `json:"value,omitempty"`
+	Dt    *int     `json:"dt,omitempty"`
+	Value *OWMData `json:"value,omitempty"`
 }
 
 // Order defines model for Order.
