@@ -1214,7 +1214,7 @@ components:
       properties:
         value:
           $ref: "#/components/schemas/OWMData"
-        service_source_dt:
+        dt:
           type: integer
 
     DeviceProfileDatum:
@@ -1222,7 +1222,62 @@ components:
       properties:
         value:
           $ref: "#/components/schemas/DeviceProfile"
-        service_source_dt:
+        dt:
+          type: integer
+    
+    GoogleProfileData:
+      type: object
+      properties:
+        email_address:
+          type: string
+
+    GoogleProfileDatum:
+      type: object
+      properties:
+        value:
+          $ref: "#/components/schemas/GoogleProfileData"
+        dt:
+          type: integer
+
+    Calendar:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarEvent'
+        min_dt:
+          type: integer
+          format: int64
+        max_dt:
+          type: integer
+          format: int64
+        dt:
+          type: integer
+          format: int64
+
+    CalendarEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        short_text:
+          type: string
+        all_day:
+          type: boolean
+        start:
+          type: integer
+          format: int64
+        end:
+          type: integer
+          format: int64
+
+    CalendarDatum:
+      type: object
+      properties:
+        value:
+          $ref: "#/components/schemas/Calendar"
+        dt:
           type: integer
 
     Data:
@@ -1232,6 +1287,10 @@ components:
           $ref: "#/components/schemas/DeviceProfileDatum"
         owm_data:
           $ref: "#/components/schemas/OWMDataDatum"
+        google_calendar:
+          $ref: "#/components/schemas/CalendarDatum"
+        google_profile:
+          $ref: "#/components/schemas/GoogleProfileDatum"
         dt:
           type: integer
 
