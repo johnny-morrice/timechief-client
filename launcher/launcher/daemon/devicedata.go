@@ -100,6 +100,8 @@ func (dd DeviceData) doFetchLatest() (v2.Data, error) {
 	// 	return v2.Data{}, err
 	// }
 
+	// v2.NewClient(cfg.GetAPIBaseURL())
+
 	panic("not implemented")
 }
 
