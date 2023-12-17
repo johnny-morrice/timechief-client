@@ -142,6 +142,9 @@ func (p Pairing) handlePairingComplete(accessToken authzero.AccessTokenResp) err
 		return fmt.Errorf("error setting access token: %s", err)
 	}
 	err = p.KeyValueStore.Set(store.RefreshTokenKey, accessToken.RefreshToken)
+	if err != nil {
+		return fmt.Errorf("error setting refresh token: %s", err)
+	}
 	return nil
 }
 

@@ -11,18 +11,22 @@ import (
 	"github.com/johnny-morrice/timechief-client/client/apiclient"
 	"github.com/johnny-morrice/timechief-client/client/authnclient"
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
 
 type DeviceData struct {
-	DeviceDataStore store.DeviceDataStore
+	DeviceDataStore DeviceDataStore
 	CfgStore        store.ConfigStore
 	KeyValueStore   store.KeyValueStore
 	StateFlagStore  store.StateFlagStore
 	RequestTimeout  time.Duration
 	RefreshInterval time.Duration
+}
+
+type DeviceDataStore interface {
+	SetDeviceData(data v2.Data) error
 }
 
 func (dd DeviceData) Start(ctx *cli.Context) {
@@ -54,16 +58,15 @@ func (dd DeviceData) doTick(ctx *cli.Context) error {
 
 var DeviceDataErrorState = "device-data-error"
 var CalendarErrorState = "calendar-error"
-var principalLinkedState = "principal-linked"
 
-func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
+func (dd DeviceData) FetchLatest() (v2.Data, error) {
 	clockData, err := dd.doFetchLatest()
 	if err != nil {
 		myErr := dd.StateFlagStore.CreateIfNotExists(DeviceDataErrorState)
 		if myErr != nil {
 			log.Printf("error setting device data error state: %s", myErr)
 		}
-		return viewmodel.ClockData{}, err
+		return v2.Data{}, err
 	}
 
 	myErr := dd.StateFlagStore.Delete(DeviceDataErrorState)
@@ -71,9 +74,9 @@ func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
 		log.Printf("error clearing device data error state: %s", myErr)
 	}
 
-	if clockData.Calendar.Calendar != nil {
+	if clockData.GoogleCalendar != nil && clockData.GoogleCalendar.Value != nil && clockData.GoogleCalendar.Value.Dt != nil {
 		const calendarErrorTimeout = 30 * time.Minute
-		lastUpdated := time.Unix(clockData.Calendar.LastUpdated, 0)
+		lastUpdated := time.Unix(*clockData.GoogleCalendar.Value.Dt, 0)
 		now := time.Now()
 		if now.Sub(lastUpdated) > calendarErrorTimeout {
 			myErr := dd.StateFlagStore.CreateIfNotExists(CalendarErrorState)
@@ -88,61 +91,16 @@ func (dd DeviceData) FetchLatest() (viewmodel.ClockData, error) {
 		}
 	}
 
-	if clockData.LinkedPrincipal.PrincipalSerial != "" {
-		myErr := dd.StateFlagStore.CreateIfNotExists(principalLinkedState)
-		if myErr != nil {
-			log.Printf("error setting linked principal state: %s", myErr)
-		}
-	} else {
-		myErr := dd.StateFlagStore.Delete(principalLinkedState)
-		if myErr != nil {
-			log.Printf("error clearing linked principal state: %s", myErr)
-		}
-	}
-
 	return clockData, nil
 }
 
-func (dd DeviceData) doFetchLatest() (viewmodel.ClockData, error) {
-	cfg, err := dd.CfgStore.GetConfig()
-	if err != nil {
-		return viewmodel.ClockData{}, err
-	}
+func (dd DeviceData) doFetchLatest() (v2.Data, error) {
+	// cfg, err := dd.CfgStore.GetConfig()
+	// if err != nil {
+	// 	return v2.Data{}, err
+	// }
 
-	credentials, err := cfg.GetDeviceCredentials()
-	if err != nil {
-		return viewmodel.ClockData{}, err
-	}
-
-	authnClient, err := serviceclient.MakeAuthnClient(cfg)
-	if err != nil {
-		return viewmodel.ClockData{}, err
-	}
-
-	token, err := dd.getToken(authnClient, credentials)
-
-	if err != nil {
-		return viewmodel.ClockData{}, fmt.Errorf("error getting token: %s", err)
-	}
-
-	err = dd.saveToken(token)
-
-	if err != nil {
-		return viewmodel.ClockData{}, err
-	}
-
-	apiClient, err := serviceclient.MakeAPIClient(cfg, token)
-	if err != nil {
-		return viewmodel.ClockData{}, err
-	}
-
-	clockData, err := dd.getClockData(apiClient)
-
-	if err != nil {
-		return viewmodel.ClockData{}, fmt.Errorf("error getting clock data: %s", err)
-	}
-
-	return *clockData, nil
+	panic("not implemented")
 }
 
 func (dd DeviceData) saveToken(token string) error {
