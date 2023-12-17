@@ -21,6 +21,7 @@ type KeyValueStore struct {
 	DB *gorm.DB
 }
 
+const DeviceUUIDKey = "device-uuid"
 const PairingURLKey = "pairing-url"
 const PairingQRCodeURLKey = "pairing-url-complete"
 const PairingCodeKey = "pairing-code"

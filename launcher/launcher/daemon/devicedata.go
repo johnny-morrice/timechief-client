@@ -2,9 +2,11 @@ package daemon
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 	"time"
 
@@ -17,6 +19,7 @@ import (
 )
 
 type DeviceData struct {
+	Client          v2.ClientInterface
 	DeviceDataStore DeviceDataStore
 	CfgStore        store.ConfigStore
 	KeyValueStore   store.KeyValueStore
@@ -95,14 +98,28 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 }
 
 func (dd DeviceData) doFetchLatest() (v2.Data, error) {
-	// cfg, err := dd.CfgStore.GetConfig()
-	// if err != nil {
-	// 	return v2.Data{}, err
-	// }
+	// TODO add configured timeouts etc.
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, dd.RequestTimeout)
+	defer cancel()
+	deviceUUID, err := dd.KeyValueStore.Get(store.DeviceUUIDKey)
+	if err != nil {
+		return v2.Data{}, fmt.Errorf("error getting device uuid: %w", err)
+	}
+	resp, err := dd.Client.GetDataByDeviceUUID(ctx, deviceUUID)
+	if err != nil {
+		return v2.Data{}, fmt.Errorf("error getting device data: %w", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return v2.Data{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+	var result v2.Data
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return v2.Data{}, fmt.Errorf("error decoding device data: %w", err)
+	}
+	return result, nil
 
-	// v2.NewClient(cfg.GetAPIBaseURL())
-
-	panic("not implemented")
 }
 
 func (dd DeviceData) saveToken(token string) error {
