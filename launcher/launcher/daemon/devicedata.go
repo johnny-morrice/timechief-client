@@ -98,7 +98,6 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 }
 
 func (dd DeviceData) doFetchLatest() (v2.Data, error) {
-	// TODO add configured timeouts etc.
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, dd.RequestTimeout)
 	defer cancel()
@@ -110,6 +109,7 @@ func (dd DeviceData) doFetchLatest() (v2.Data, error) {
 	if err != nil {
 		return v2.Data{}, fmt.Errorf("error getting device data: %w", err)
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return v2.Data{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
