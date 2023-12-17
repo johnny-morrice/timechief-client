@@ -17,15 +17,19 @@ type MyDevices struct {
 	client          v2.ClientInterface
 	store           MyDevicesStore
 	keyValueStore   store.KeyValueStore
-	StateFlagStore  store.StateFlagStore
-	RequestTimeout  time.Duration
-	RefreshInterval time.Duration
+	stateFlagStore  store.StateFlagStore
+	requestTimeout  time.Duration
+	refreshInterval time.Duration
 }
 
-func MakeMyDevices(client v2.ClientInterface, keyValueStore store.KeyValueStore) MyDevices {
+func MakeMyDevices(client v2.ClientInterface, store MyDevicesStore, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) MyDevices {
 	return MyDevices{
-		client:        client,
-		keyValueStore: keyValueStore,
+		client:          client,
+		store:           store,
+		keyValueStore:   keyValueStore,
+		stateFlagStore:  stateFlagStore,
+		requestTimeout:  requestTimeout,
+		refreshInterval: refreshInterval,
 	}
 }
 
@@ -38,7 +42,7 @@ func (md MyDevices) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("mydevices daemon tick error: %s", err)
 	}
-	runEvery(md.RefreshInterval, func() {
+	runEvery(md.refreshInterval, func() {
 		err := md.doTick(ctx)
 		if err != nil {
 			log.Printf("mydevices daemon tick error: %s", err)
@@ -48,7 +52,7 @@ func (md MyDevices) Start(ctx *cli.Context) {
 
 func (md MyDevices) doTick(ctx *cli.Context) error {
 	log.Println("downloading mydevices")
-	needsRefresh, err := md.StateFlagStore.Exists("refresh-mydevices")
+	needsRefresh, err := md.stateFlagStore.Exists("refresh-mydevices")
 	if err != nil {
 		return err
 	}
@@ -64,16 +68,22 @@ func (md MyDevices) doTick(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	err = md.StateFlagStore.Delete("refresh-mydevices")
+	err = md.stateFlagStore.Delete("refresh-mydevices")
 	if err != nil {
 		return err
+	}
+	if len(devices) == 1 {
+		err = md.keyValueStore.Set(store.DeviceUUIDKey, *devices[0].Uuid)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func (md MyDevices) fetch() ([]v2.Device, error) {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, md.RequestTimeout)
+	ctx, cancel := context.WithTimeout(ctx, md.requestTimeout)
 	defer cancel()
 	// TODO: Pagination
 	params := v2.ListDevicesParams{
