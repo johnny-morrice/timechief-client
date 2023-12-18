@@ -1,6 +1,7 @@
 package daemon
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -15,26 +16,20 @@ import (
 
 type MyDevices struct {
 	client          v2.ClientInterface
-	store           MyDevicesStore
 	keyValueStore   store.KeyValueStore
 	stateFlagStore  store.StateFlagStore
 	requestTimeout  time.Duration
 	refreshInterval time.Duration
 }
 
-func MakeMyDevices(client v2.ClientInterface, store MyDevicesStore, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) MyDevices {
+func MakeMyDevices(client v2.ClientInterface, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) MyDevices {
 	return MyDevices{
 		client:          client,
-		store:           store,
 		keyValueStore:   keyValueStore,
 		stateFlagStore:  stateFlagStore,
 		requestTimeout:  requestTimeout,
 		refreshInterval: refreshInterval,
 	}
-}
-
-type MyDevicesStore interface {
-	SetMyDevices(devices []v2.Device) error
 }
 
 func (md MyDevices) Start(ctx *cli.Context) {
@@ -70,11 +65,24 @@ func (md MyDevices) doTick(ctx *cli.Context) error {
 			return err
 		}
 	}
-	err = md.store.SetMyDevices(devices)
+	err = md.setMyDevices(devices)
 	if err != nil {
 		return err
 	}
 	err = md.stateFlagStore.Delete("refresh-mydevices")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (md MyDevices) setMyDevices(devices []v2.Device) error {
+	buffer := bytes.Buffer{}
+	err := json.NewEncoder(&buffer).Encode(devices)
+	if err != nil {
+		return err
+	}
+	err = md.keyValueStore.Set(store.MyDevicesKey, buffer.String())
 	if err != nil {
 		return err
 	}
