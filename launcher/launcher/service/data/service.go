@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -59,6 +60,8 @@ type WifiNetwork struct {
 type DeviceData struct {
 	LauncherState LauncherState
 	ServiceData   v2.Data
+	MyDeviceUUID  string
+	MyDevices     []v2.Device
 }
 
 type PairingStatus struct {
@@ -198,8 +201,26 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	}
 	firstTimeSetupDone := !errors.Is(err, gorm.ErrRecordNotFound)
 
+	myDeviceUUID, err := svc.KeyValueStore.Get(store.DeviceUUIDKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, fmt.Errorf("failed to get my device uuid: %w", err)
+	}
+	myDevicesJSON, err := svc.KeyValueStore.Get(store.MyDevicesKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, fmt.Errorf("failed to get my devices: %w", err)
+	}
+	var myDevices []v2.Device
+	if myDevicesJSON != "" {
+		err = json.Unmarshal([]byte(myDevicesJSON), &myDevices)
+		if err != nil {
+			return DeviceData{}, fmt.Errorf("failed to unmarshal my devices: %w", err)
+		}
+	}
+
 	result := DeviceData{
-		ServiceData: deviceData,
+		MyDeviceUUID: myDeviceUUID,
+		MyDevices:    myDevices,
+		ServiceData:  deviceData,
 		LauncherState: LauncherState{
 			WebURL:              webURL(ipAddress),
 			SetupState:          setupState,
