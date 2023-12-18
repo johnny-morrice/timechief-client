@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -11,6 +12,8 @@ type DataService interface {
 	GetDeviceData() (data.DeviceData, error)
 	PairDevice() error
 	GetPairingStatus() (data.PairingStatus, error)
+	RefreshMyDevices() error
+	SetMyDevice(uuid string) error
 }
 
 type Data struct {
@@ -20,6 +23,46 @@ type Data struct {
 func (api Data) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/data/device", api.HandleGetDeviceData)
 	mux.HandleFunc("/api/data/pairing", api.HandlePairing)
+	mux.HandleFunc("/api/data/mydevice", api.HandlePostMyDevice)
+	mux.HandleFunc("/api/data/refresh-mydevices", api.RefreshMyDevices)
+}
+
+func (api Data) RefreshMyDevices(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	err := api.Service.RefreshMyDevices()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to refresh my devices: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+type DeviceUUIDRequest struct {
+	UUID string `json:"uuid"`
+}
+
+func (api Data) HandlePostMyDevice(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req DeviceUUIDRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	err = api.Service.SetMyDevice(req.UUID)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to set my device: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (api Data) HandleGetDeviceData(w http.ResponseWriter, r *http.Request) {

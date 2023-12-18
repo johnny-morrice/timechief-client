@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/glebarez/sqlite v1.7.0
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/johnny-morrice/timechief-client/client v0.0.0-20230319155715-859f7c039157
 	github.com/sarulabs/di/v2 v2.4.2
 	github.com/urfave/cli/v2 v2.24.4

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"gorm.io/gorm"
@@ -123,6 +124,23 @@ func webURL(ip string) string {
 		return ""
 	}
 	return fmt.Sprintf("http://%s/", ip)
+}
+
+func (svc Service) RefreshMyDevices() error {
+	return svc.StateFlagStore.CreateIfNotExists("refresh-mydevices")
+}
+
+func (svc Service) SetMyDevice(deviceUUID string) error {
+	// Verify UUID is valid UUID
+	_, err := uuid.Parse(deviceUUID)
+	if err != nil {
+		return fmt.Errorf("invalid device UUID: %w", err)
+	}
+	err = svc.KeyValueStore.Set(store.DeviceUUIDKey, deviceUUID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (svc Service) GetDeviceData() (DeviceData, error) {
