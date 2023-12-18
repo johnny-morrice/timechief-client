@@ -64,6 +64,12 @@ func (md MyDevices) doTick(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	if len(devices) == 1 {
+		err = md.keyValueStore.Set(store.DeviceUUIDKey, *devices[0].Uuid)
+		if err != nil {
+			return err
+		}
+	}
 	err = md.store.SetMyDevices(devices)
 	if err != nil {
 		return err
@@ -71,12 +77,6 @@ func (md MyDevices) doTick(ctx *cli.Context) error {
 	err = md.stateFlagStore.Delete("refresh-mydevices")
 	if err != nil {
 		return err
-	}
-	if len(devices) == 1 {
-		err = md.keyValueStore.Set(store.DeviceUUIDKey, *devices[0].Uuid)
-		if err != nil {
-			return err
-		}
 	}
 	return nil
 }
