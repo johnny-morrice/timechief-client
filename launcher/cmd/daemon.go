@@ -59,8 +59,6 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	// TODO make client
-
 	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
 	soundService := sound.NewSoundService(soundClient)
 	launchTargetStore := store.LaunchTargetStore{DB: db}
@@ -77,6 +75,8 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	myDevices := daemon.MakeMyDevices(timechiefClient, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
 
 	updateDaemon := daemon.Update{
 		Updater:               up,
@@ -171,6 +171,7 @@ func Daemon(ctx *cli.Context) error {
 	go networkStatus.Start(ctx)
 	go setup.Start(ctx)
 	go internetCheck.Start(ctx)
+	go myDevices.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
