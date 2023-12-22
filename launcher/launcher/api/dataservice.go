@@ -24,7 +24,7 @@ func (api Data) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/data/device", api.HandleGetDeviceData)
 	mux.HandleFunc("/api/data/pairing", api.HandlePairing)
 	mux.HandleFunc("/api/data/mydevice", api.HandlePostMyDevice)
-	mux.HandleFunc("/api/data/refresh-mydevices", api.RefreshMyDevices)
+	mux.HandleFunc("/api/data/mydevice/refresh", api.RefreshMyDevices)
 }
 
 func (api Data) RefreshMyDevices(w http.ResponseWriter, r *http.Request) {
