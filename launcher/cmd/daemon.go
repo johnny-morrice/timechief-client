@@ -6,6 +6,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	client "github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
@@ -58,6 +59,8 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	// TODO make client
+
 	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
 	soundService := sound.NewSoundService(soundClient)
 	launchTargetStore := store.LaunchTargetStore{DB: db}
@@ -70,6 +73,10 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	keyValueStore := store.KeyValueStore{DB: db}
+	timechiefClient, err := clientbuilder.MakeTimechiefClientBuilder(cfgStore, keyValueStore).Build()
+	if err != nil {
+		return err
+	}
 
 	updateDaemon := daemon.Update{
 		Updater:               up,
@@ -77,14 +84,8 @@ func Daemon(ctx *cli.Context) error {
 		KeyValueStore:         keyValueStore,
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
-	deviceDataDaemon := daemon.DeviceData{
-		StateFlagStore:  flagStore,
-		DeviceDataStore: store.DeviceDataStore{DB: db},
-		CfgStore:        cfgStore,
-		KeyValueStore:   keyValueStore,
-		RequestTimeout:  ctx.Duration("service-request-timeout"),
-		RefreshInterval: ctx.Duration("service-refresh-interval"),
-	}
+	deviceDataStore := store.DeviceDataStore{DB: db}
+	deviceDataDaemon := daemon.MakeDeviceDataDaemon(timechiefClient, deviceDataStore, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
 	pairingDaemon := daemon.Pairing{
 		ConfigStore:          cfgStore,
 		StateFlagStore:       flagStore,
@@ -182,16 +183,7 @@ func Daemon(ctx *cli.Context) error {
 				WifiNetworkStore: wifiNetworkStore,
 			},
 		},
-		api.Data{
-			Service: data.Service{
-				DeviceDataStore:    store.DeviceDataStore{DB: db},
-				LaunchTargetStore:  launchTargetStore,
-				StateFlagStore:     flagStore,
-				WifiInterfaceStore: wifiInterfaceStore,
-				WifiNetworkStore:   wifiNetworkStore,
-				KeyValueStore:      keyValueStore,
-			},
-		},
+		api.MakeDataAPI(data.MakeService(deviceDataStore, launchTargetStore, flagStore, keyValueStore, wifiInterfaceStore, wifiNetworkStore)),
 		api.Launcher{
 			Service: launcher.Service{
 				LaunchTargetStore: launchTargetStore,

@@ -17,7 +17,11 @@ type DataService interface {
 }
 
 type Data struct {
-	Service DataService
+	service DataService
+}
+
+func MakeDataAPI(service DataService) Data {
+	return Data{service: service}
 }
 
 func (api Data) AddRoutes(mux *http.ServeMux) {
@@ -32,7 +36,7 @@ func (api Data) RefreshMyDevices(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	err := api.Service.RefreshMyDevices()
+	err := api.service.RefreshMyDevices()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		log.Printf("failed to refresh my devices: %v", err)
@@ -56,7 +60,7 @@ func (api Data) HandlePostMyDevice(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-	err = api.Service.SetMyDevice(req.UUID)
+	err = api.service.SetMyDevice(req.UUID)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		log.Printf("failed to set my device: %v", err)
@@ -70,7 +74,7 @@ func (api Data) HandleGetDeviceData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	data, err := api.Service.GetDeviceData()
+	data, err := api.service.GetDeviceData()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		log.Printf("failed to get device data: %v", err)
@@ -95,7 +99,7 @@ func (api Data) HandlePostPairing(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	err := api.Service.PairDevice()
+	err := api.service.PairDevice()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		log.Printf("failed to create pairing: %v", err)
@@ -109,7 +113,7 @@ func (api Data) HandleGetPairing(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	status, err := api.Service.GetPairingStatus()
+	status, err := api.service.GetPairingStatus()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		log.Printf("failed to get target: %v", err)

@@ -19,13 +19,23 @@ import (
 )
 
 type DeviceData struct {
-	Client          v2.ClientInterface
-	DeviceDataStore DeviceDataStore
-	CfgStore        store.ConfigStore
-	KeyValueStore   store.KeyValueStore
-	StateFlagStore  store.StateFlagStore
-	RequestTimeout  time.Duration
-	RefreshInterval time.Duration
+	client          v2.ClientInterface
+	deviceDataStore DeviceDataStore
+	keyValueStore   store.KeyValueStore
+	stateFlagStore  store.StateFlagStore
+	requestTimeout  time.Duration
+	refreshInterval time.Duration
+}
+
+func MakeDeviceDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) DeviceData {
+	return DeviceData{
+		client:          client,
+		deviceDataStore: deviceDataStore,
+		keyValueStore:   keyValueStore,
+		stateFlagStore:  stateFlagStore,
+		requestTimeout:  requestTimeout,
+		refreshInterval: refreshInterval,
+	}
 }
 
 type DeviceDataStore interface {
@@ -37,7 +47,7 @@ func (dd DeviceData) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("device data daemon tick error: %s", err)
 	}
-	runEvery(dd.RefreshInterval, func() {
+	runEvery(dd.refreshInterval, func() {
 		err := dd.doTick(ctx)
 		if err != nil {
 			log.Printf("device data daemon tick error: %s", err)
@@ -51,7 +61,7 @@ func (dd DeviceData) doTick(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	err = dd.DeviceDataStore.SetDeviceData(data)
+	err = dd.deviceDataStore.SetDeviceData(data)
 	if err != nil {
 		return err
 	}
@@ -65,14 +75,14 @@ var CalendarErrorState = "calendar-error"
 func (dd DeviceData) FetchLatest() (v2.Data, error) {
 	clockData, err := dd.doFetchLatest()
 	if err != nil {
-		myErr := dd.StateFlagStore.CreateIfNotExists(DeviceDataErrorState)
+		myErr := dd.stateFlagStore.CreateIfNotExists(DeviceDataErrorState)
 		if myErr != nil {
 			log.Printf("error setting device data error state: %s", myErr)
 		}
 		return v2.Data{}, err
 	}
 
-	myErr := dd.StateFlagStore.Delete(DeviceDataErrorState)
+	myErr := dd.stateFlagStore.Delete(DeviceDataErrorState)
 	if myErr != nil {
 		log.Printf("error clearing device data error state: %s", myErr)
 	}
@@ -82,12 +92,12 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		lastUpdated := time.Unix(*clockData.GoogleCalendar.Value.Dt, 0)
 		now := time.Now()
 		if now.Sub(lastUpdated) > calendarErrorTimeout {
-			myErr := dd.StateFlagStore.CreateIfNotExists(CalendarErrorState)
+			myErr := dd.stateFlagStore.CreateIfNotExists(CalendarErrorState)
 			if myErr != nil {
 				log.Printf("error setting calendar error state: %s", myErr)
 			}
 		} else {
-			myErr := dd.StateFlagStore.Delete(CalendarErrorState)
+			myErr := dd.stateFlagStore.Delete(CalendarErrorState)
 			if myErr != nil {
 				log.Printf("error clearing calendar error state: %s", myErr)
 			}
@@ -99,13 +109,13 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 
 func (dd DeviceData) doFetchLatest() (v2.Data, error) {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, dd.RequestTimeout)
+	ctx, cancel := context.WithTimeout(ctx, dd.requestTimeout)
 	defer cancel()
-	deviceUUID, err := dd.KeyValueStore.Get(store.DeviceUUIDKey)
+	deviceUUID, err := dd.keyValueStore.Get(store.DeviceUUIDKey)
 	if err != nil {
 		return v2.Data{}, fmt.Errorf("error getting device uuid: %w", err)
 	}
-	resp, err := dd.Client.GetDataByDeviceUUID(ctx, deviceUUID)
+	resp, err := dd.client.GetDataByDeviceUUID(ctx, deviceUUID)
 	if err != nil {
 		return v2.Data{}, fmt.Errorf("error getting device data: %w", err)
 	}
@@ -123,7 +133,7 @@ func (dd DeviceData) doFetchLatest() (v2.Data, error) {
 }
 
 func (dd DeviceData) saveToken(token string) error {
-	err := dd.KeyValueStore.Set(store.AccessTokenKey, token)
+	err := dd.keyValueStore.Set(store.AccessTokenKey, token)
 	if err != nil {
 		return fmt.Errorf("error saving access token: %s", err)
 	}
@@ -169,6 +179,6 @@ func (dd DeviceData) getToken(authnClient *authnclient.Client, credentials strin
 
 func (dd DeviceData) newClientContext() (context.Context, func()) {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, dd.RequestTimeout)
+	ctx, cancel := context.WithTimeout(ctx, dd.requestTimeout)
 	return ctx, cancel
 }

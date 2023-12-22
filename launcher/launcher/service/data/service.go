@@ -12,12 +12,23 @@ import (
 )
 
 type Service struct {
-	DeviceDataStore    DeviceDataStore
-	LaunchTargetStore  store.LaunchTargetStore
-	StateFlagStore     store.StateFlagStore
-	KeyValueStore      store.KeyValueStore
-	WifiInterfaceStore store.WifiInterfaceStore
-	WifiNetworkStore   store.WifiNetworkStore
+	deviceDataStore    DeviceDataStore
+	launchTargetStore  store.LaunchTargetStore
+	stateFlagStore     store.StateFlagStore
+	keyValueStore      store.KeyValueStore
+	wifiInterfaceStore store.WifiInterfaceStore
+	wifiNetworkStore   store.WifiNetworkStore
+}
+
+func MakeService(deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
+	return Service{
+		deviceDataStore:    deviceDataStore,
+		launchTargetStore:  launchTargetStore,
+		stateFlagStore:     stateFlagStore,
+		keyValueStore:      keyValueStore,
+		wifiInterfaceStore: wifiInterfaceStore,
+		wifiNetworkStore:   wifiNetworkStore,
+	}
 }
 
 type DeviceDataStore interface {
@@ -73,11 +84,11 @@ type PairingStatus struct {
 }
 
 func (svc Service) PairDevice() error {
-	err := svc.KeyValueStore.Delete(store.PairingCodeKey)
+	err := svc.keyValueStore.Delete(store.PairingCodeKey)
 	if err != nil {
 		return fmt.Errorf("failed to delete pairing code: %w", err)
 	}
-	err = svc.StateFlagStore.CreateIfNotExists("pairing-requested")
+	err = svc.stateFlagStore.CreateIfNotExists("pairing-requested")
 	if err != nil {
 		return fmt.Errorf("failed to create pairing-requested flag: %w", err)
 	}
@@ -85,20 +96,20 @@ func (svc Service) PairDevice() error {
 }
 
 func (svc Service) GetPairingStatus() (PairingStatus, error) {
-	url, err := svc.KeyValueStore.Get(store.PairingURLKey)
+	url, err := svc.keyValueStore.Get(store.PairingURLKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
 	}
-	qrCodeURL, err := svc.KeyValueStore.Get(store.PairingQRCodeURLKey)
+	qrCodeURL, err := svc.keyValueStore.Get(store.PairingQRCodeURLKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
 	}
-	code, err := svc.KeyValueStore.Get(store.PairingCodeKey)
+	code, err := svc.keyValueStore.Get(store.PairingCodeKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
 	}
 
-	isPairing, err := svc.StateFlagStore.Exists("pairing-requested")
+	isPairing, err := svc.stateFlagStore.Exists("pairing-requested")
 
 	if err != nil {
 		return PairingStatus{}, fmt.Errorf("failed to check pairing-requested flag: %w", err)
@@ -127,7 +138,7 @@ func webURL(ip string) string {
 }
 
 func (svc Service) RefreshMyDevices() error {
-	return svc.StateFlagStore.CreateIfNotExists("refresh-mydevices")
+	return svc.stateFlagStore.CreateIfNotExists("refresh-mydevices")
 }
 
 func (svc Service) SetMyDevice(deviceUUID string) error {
@@ -136,7 +147,7 @@ func (svc Service) SetMyDevice(deviceUUID string) error {
 	if err != nil {
 		return fmt.Errorf("invalid device UUID: %w", err)
 	}
-	err = svc.KeyValueStore.Set(store.DeviceUUIDKey, deviceUUID)
+	err = svc.keyValueStore.Set(store.DeviceUUIDKey, deviceUUID)
 	if err != nil {
 		return err
 	}
@@ -144,38 +155,38 @@ func (svc Service) SetMyDevice(deviceUUID string) error {
 }
 
 func (svc Service) GetDeviceData() (DeviceData, error) {
-	deviceData, err := svc.DeviceDataStore.GetDeviceData()
+	deviceData, err := svc.deviceDataStore.GetDeviceData()
 	if err != nil {
 		return DeviceData{}, err
 	}
 
-	flags, err := svc.StateFlagStore.List()
+	flags, err := svc.stateFlagStore.List()
 	if err != nil {
 		return DeviceData{}, err
 	}
 
-	target, err := svc.LaunchTargetStore.GetActiveLaunchTarget()
+	target, err := svc.launchTargetStore.GetActiveLaunchTarget()
 
 	if err != nil {
 		return DeviceData{}, err
 	}
 
-	wifiInterface, err := svc.WifiInterfaceStore.GetActive()
+	wifiInterface, err := svc.wifiInterfaceStore.GetActive()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, err
 	}
 
-	storeNets, err := svc.WifiNetworkStore.List()
+	storeNets, err := svc.wifiNetworkStore.List()
 	if err != nil {
 		return DeviceData{}, err
 	}
 
-	activeNet, err := svc.WifiNetworkStore.GetActive()
+	activeNet, err := svc.wifiNetworkStore.GetActive()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, err
 	}
 
-	isWifiError, err := svc.StateFlagStore.Exists("wifi-error")
+	isWifiError, err := svc.stateFlagStore.Exists("wifi-error")
 	if err != nil {
 		return DeviceData{}, err
 	}
@@ -188,42 +199,42 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		}
 	}
 
-	ipAddress, err := svc.KeyValueStore.Get(store.IPAddressKey)
+	ipAddress, err := svc.keyValueStore.Get(store.IPAddressKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, err
 	}
 
-	interfaceMode, err := svc.KeyValueStore.Get(store.InterfaceModeKey)
+	interfaceMode, err := svc.keyValueStore.Get(store.InterfaceModeKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, err
 	}
 
-	setupState, err := svc.KeyValueStore.Get("setup")
+	setupState, err := svc.keyValueStore.Get("setup")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, err
 	}
 
-	hotspotSSID, err := svc.KeyValueStore.Get(store.HotspotSSID)
+	hotspotSSID, err := svc.keyValueStore.Get(store.HotspotSSID)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, fmt.Errorf("failed to get hotspot ssid: %w", err)
 	}
 
-	hotspotKey, err := svc.KeyValueStore.Get(store.HotspotKey)
+	hotspotKey, err := svc.keyValueStore.Get(store.HotspotKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, fmt.Errorf("failed to get hotspot key: %w", err)
 	}
 
-	_, err = svc.KeyValueStore.Get("firstTimeSetupDone")
+	_, err = svc.keyValueStore.Get("firstTimeSetupDone")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, fmt.Errorf("failed to get firstTimeSetupDone: %w", err)
 	}
 	firstTimeSetupDone := !errors.Is(err, gorm.ErrRecordNotFound)
 
-	myDeviceUUID, err := svc.KeyValueStore.Get(store.DeviceUUIDKey)
+	myDeviceUUID, err := svc.keyValueStore.Get(store.DeviceUUIDKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, fmt.Errorf("failed to get my device uuid: %w", err)
 	}
-	myDevicesJSON, err := svc.KeyValueStore.Get(store.MyDevicesKey)
+	myDevicesJSON, err := svc.keyValueStore.Get(store.MyDevicesKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, fmt.Errorf("failed to get my devices: %w", err)
 	}
