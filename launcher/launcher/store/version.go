@@ -16,7 +16,6 @@ type Version struct {
 	Version string `gorm:"uniqueIndex:version_product_stream_idx"`
 	Product string `gorm:"uniqueIndex:version_product_stream_idx"`
 	Stream  string `gorm:"uniqueIndex:version_product_stream_idx"`
-	URL     string
 	SHA256  []byte
 	Command string
 }

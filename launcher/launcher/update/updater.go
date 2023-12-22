@@ -140,6 +140,7 @@ func (up Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer versionResp.Body.Close()
 	if versionResp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", versionResp.StatusCode)
 	}
