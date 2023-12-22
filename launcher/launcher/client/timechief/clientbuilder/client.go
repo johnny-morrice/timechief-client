@@ -12,6 +12,7 @@ import (
 type TimechiefClientBuilder struct {
 	cfgStore ConfigStore
 	kvStore  store.KeyValueStore
+	noAuth   bool
 }
 
 func MakeTimechiefClientBuilder(cfgStore ConfigStore, kvStore store.KeyValueStore) TimechiefClientBuilder {
@@ -21,12 +22,21 @@ func MakeTimechiefClientBuilder(cfgStore ConfigStore, kvStore store.KeyValueStor
 	}
 }
 
+func (builder TimechiefClientBuilder) UseAuth(useAuth bool) TimechiefClientBuilder {
+	builder.noAuth = !useAuth
+	return builder
+}
+
 func (builder TimechiefClientBuilder) Build() (v2.ClientInterface, error) {
 	cfg, err := builder.cfgStore.GetConfig()
 	if err != nil {
 		return nil, err
 	}
-	client, err := v2.NewClient(cfg.GetAPIBaseURL(), accessTokenOption(builder.kvStore))
+	options := []v2.ClientOption{}
+	if !builder.noAuth {
+		options = append(options, accessTokenOption(builder.kvStore))
+	}
+	client, err := v2.NewClient(cfg.GetAPIBaseURL(), options...)
 	if err != nil {
 		return nil, err
 	}
