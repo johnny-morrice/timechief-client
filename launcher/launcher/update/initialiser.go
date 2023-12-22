@@ -19,7 +19,7 @@ func (init Initialiser) Initialise(ctx *cli.Context, cfg store.Config) error {
 	if err != nil {
 		return err
 	}
-	err = init.CfgStore.SetConfig(cfg)
+	err = init.cfgStore.SetConfig(cfg)
 	if err != nil {
 		return err
 	}
@@ -36,6 +36,6 @@ func (init Initialiser) Initialise(ctx *cli.Context, cfg store.Config) error {
 }
 
 func (init Initialiser) IsInitialised() bool {
-	lt, err := init.LaunchTargetStore.GetActiveLaunchTarget()
+	lt, err := init.launchTargetStore.GetActiveLaunchTarget()
 	return err == nil && lt.ID != 0
 }
