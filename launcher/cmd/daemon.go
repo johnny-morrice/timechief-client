@@ -5,7 +5,6 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
-	client "github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
@@ -51,30 +50,23 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	cfgStore := store.ConfigStore{DB: db}
-	cfg, err := cfgStore.GetConfig()
-	if err != nil {
-		return err
-	}
-	clnt, err := client.MakePublicClient(cfg)
-	if err != nil {
-		return err
-	}
+
 	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
 	soundService := sound.NewSoundService(soundClient)
 	launchTargetStore := store.LaunchTargetStore{DB: db}
-	up := update.Updater{
-		VersionStore:      store.VersionStore{DB: db},
-		LaunchTargetStore: launchTargetStore,
-		CfgStore:          cfgStore,
-		Client:            clnt,
-		RequestTimeout:    ctx.Duration("service-request-timeout"),
-	}
 
 	keyValueStore := store.KeyValueStore{DB: db}
-	timechiefClient, err := clientbuilder.MakeTimechiefClientBuilder(cfgStore, keyValueStore).Build()
+	timechiefClient, err := clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).Build()
 	if err != nil {
 		return err
 	}
+
+	noAuthClient, err := clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).UseAuth(false).Build()
+	if err != nil {
+		return err
+	}
+
+	up := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, launchTargetStore, noAuthClient, ctx.Duration("service-request-timeout"))
 
 	myDevices := daemon.MakeMyDevices(timechiefClient, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
 

@@ -9,25 +9,28 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 )
 
-type TimechiefClientBuilder struct {
+type Builder struct {
 	cfgStore ConfigStore
 	kvStore  store.KeyValueStore
 	noAuth   bool
 }
 
-func MakeTimechiefClientBuilder(cfgStore ConfigStore, kvStore store.KeyValueStore) TimechiefClientBuilder {
-	return TimechiefClientBuilder{
-		cfgStore: cfgStore,
-		kvStore:  kvStore,
-	}
+func (builder Builder) CfgStore(cfgStore ConfigStore) Builder {
+	builder.cfgStore = cfgStore
+	return builder
 }
 
-func (builder TimechiefClientBuilder) UseAuth(useAuth bool) TimechiefClientBuilder {
+func (builder Builder) KVStore(kvStore store.KeyValueStore) Builder {
+	builder.kvStore = kvStore
+	return builder
+}
+
+func (builder Builder) UseAuth(useAuth bool) Builder {
 	builder.noAuth = !useAuth
 	return builder
 }
 
-func (builder TimechiefClientBuilder) Build() (v2.ClientInterface, error) {
+func (builder Builder) Build() (v2.ClientInterface, error) {
 	cfg, err := builder.cfgStore.GetConfig()
 	if err != nil {
 		return nil, err

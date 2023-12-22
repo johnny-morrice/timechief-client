@@ -3,14 +3,14 @@ package update
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
-	"github.com/johnny-morrice/timechief-client/client/client"
-	"github.com/johnny-morrice/timechief-client/client/publicclient"
-	"github.com/johnny-morrice/timechief-client/client/viewmodel"
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/task"
@@ -18,11 +18,21 @@ import (
 )
 
 type Updater struct {
-	VersionStore      store.VersionStore
-	LaunchTargetStore store.LaunchTargetStore
-	CfgStore          store.ConfigStore
-	Client            *publicclient.Client
-	RequestTimeout    time.Duration
+	versionStore      store.VersionStore
+	launchTargetStore store.LaunchTargetStore
+	cfgStore          store.ConfigStore
+	client            v2.ClientInterface
+	requestTimeout    time.Duration
+}
+
+func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, client v2.ClientInterface, requestTimeout time.Duration) Updater {
+	return Updater{
+		versionStore:      versionStore,
+		launchTargetStore: launchTargetStore,
+		cfgStore:          cfgStore,
+		client:            client,
+		requestTimeout:    requestTimeout,
+	}
 }
 
 func (up Updater) FirstUpdate(ctx *cli.Context) error {
@@ -30,11 +40,11 @@ func (up Updater) FirstUpdate(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	versions, err := up.VersionStore.GetVersions()
+	versions, err := up.versionStore.GetVersions()
 	if err != nil {
 		return err
 	}
-	cfg, err := up.CfgStore.GetConfig()
+	cfg, err := up.cfgStore.GetConfig()
 	if err != nil {
 		return err
 	}
@@ -65,12 +75,12 @@ func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v st
 		return err
 	}
 
-	err = up.LaunchTargetStore.Create(&newStoreLt)
+	err = up.launchTargetStore.Create(&newStoreLt)
 	if err != nil {
 		return err
 	}
 
-	err = up.LaunchTargetStore.SetActive(newStoreLt)
+	err = up.launchTargetStore.SetActive(newStoreLt)
 	if err != nil {
 		return err
 	}
@@ -82,7 +92,7 @@ func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v st
 
 func (up Updater) Update(ctx *cli.Context) error {
 	garbageCollector := task.GarbageCollectTargets{
-		LaunchTargetStore: up.LaunchTargetStore,
+		LaunchTargetStore: up.launchTargetStore,
 	}
 	defer func() {
 		myErr := garbageCollector.RunTask(ctx)
@@ -94,16 +104,16 @@ func (up Updater) Update(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	versions, err := up.VersionStore.GetVersions()
+	versions, err := up.versionStore.GetVersions()
 	if err != nil {
 		return err
 	}
-	lt, err := up.LaunchTargetStore.GetActiveLaunchTarget()
+	lt, err := up.launchTargetStore.GetActiveLaunchTarget()
 	if err != nil {
 		return err
 	}
 	log.Printf("update seeking newer version than %s", lt.Version.Details())
-	cfg, err := up.CfgStore.GetConfig()
+	cfg, err := up.cfgStore.GetConfig()
 	if err != nil {
 		return err
 	}
@@ -121,49 +131,50 @@ func (up Updater) Update(ctx *cli.Context) error {
 	return up.CreateNewLaunchTarget(ctx, cfg, newVersion)
 }
 
+func (up Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
+	requestContext, cancel := context.WithTimeout(context.Background(), up.requestTimeout)
+	defer cancel()
+	product := ""
+	stream := ""
+	versionResp, err := up.client.ListLatestVersions(requestContext, product, stream)
+	if err != nil {
+		return nil, err
+	}
+	if versionResp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", versionResp.StatusCode)
+	}
+	var result []v2.Version
+	err = json.NewDecoder(versionResp.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (up Updater) SyncAPIVersions(ctx *cli.Context) error {
-	var versions []*viewmodel.Version
-	cursor := ""
-	for {
-		params := []client.QueryParam{}
-		if cursor != "" {
-			params = append(params, client.CursorParam(cursor))
-		}
-		requestContext, cancel := context.WithTimeout(context.Background(), up.RequestTimeout)
-		defer cancel()
-		versionPage, err := up.Client.Version.List(requestContext, params...)
-		if err != nil {
-			return err
-		}
-		versions = append(versions, versionPage.Versions...)
-
-		if versionPage.NextCursor == "" {
-			break
-		}
-
-		cursor = versionPage.NextCursor
+	versions, err := up.fetchVersions(ctx)
+	if err != nil {
+		return err
 	}
 
 	for _, version := range versions {
 		// Decode base64 encoded SHA256
-		// log.Printf("processing version %s UUID: %s Command: %v", version.Version, version.UUID, version.Command)
-		// log.Printf("decoding sha %s", version.SHA256)
-		shaBytes, err := base64.StdEncoding.DecodeString(version.SHA256)
+		// TODO nil checks
+		shaBytes, err := base64.StdEncoding.DecodeString(*version.Sha256)
 		if err != nil {
 			return err
 		}
-		// log.Printf("decoded sha %x", shaBytes)
+
 		storeVersion := store.Version{
-			UUID:    version.UUID,
-			Version: version.Version,
-			Product: version.Product,
-			Stream:  version.Stream,
-			URL:     version.URL,
+			UUID:    *version.Uuid,
+			Version: *version.Version,
+			Product: *version.Product,
+			Stream:  *version.Stream,
 			SHA256:  shaBytes,
-			Command: version.Command,
+			Command: *version.Command,
 		}
 
-		err = up.VersionStore.CreateIfNotExists(&storeVersion)
+		err = up.versionStore.CreateIfNotExists(&storeVersion)
 		if err != nil {
 			return err
 		}

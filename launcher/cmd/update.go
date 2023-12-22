@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	client "github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
@@ -24,18 +24,12 @@ func Update(ctx *cli.Context) error {
 		return err
 	}
 
-	clnt, err := client.MakePublicClient(cfg)
+	noAuthClient, err := clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(store.KeyValueStore{DB: db}).UseAuth(false).Build()
 	if err != nil {
 		return err
 	}
 
-	updater := update.Updater{
-		CfgStore:          cfgStore,
-		Client:            clnt,
-		LaunchTargetStore: store.LaunchTargetStore{DB: db},
-		VersionStore:      store.VersionStore{DB: db},
-		RequestTimeout:    ctx.Duration("service-request-timeout"),
-	}
+	updater := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, noAuthClient, ctx.Duration("service-request-timeout"))
 
 	init := update.Initialiser{
 		DB:      db,
