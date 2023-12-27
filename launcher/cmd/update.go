@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
@@ -29,7 +30,9 @@ func Update(ctx *cli.Context) error {
 		return err
 	}
 
-	updater := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, noAuthClient, ctx.Duration("service-request-timeout"))
+	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClient)
+
+	updater := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClient, ctx.Duration("service-request-timeout"))
 
 	init := update.Initialiser{
 		DB:      db,

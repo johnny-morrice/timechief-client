@@ -66,7 +66,7 @@ func (lt LaunchTarget) targetPath() string {
 	return filepath.Join(lt.Path, lt.Version.Command)
 }
 
-func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
+func (lt LaunchTarget) Install(cfg store.Config, versionDownloader VersionDownloader, doInstallDaemon bool) error {
 	system.Lock()
 	defer system.Unlock()
 	log.Printf("installing version %s %s %s to %s", lt.Version.Version, lt.Version.Product, lt.Version.Stream, lt.Path)
@@ -77,7 +77,7 @@ func (lt LaunchTarget) Install(cfg store.Config, doInstallDaemon bool) error {
 			log.Printf("failed to remove temp file %s: %v", tempFile, err)
 		}
 	}()
-	err := lt.Version.Download(cfg, tempFile)
+	err := versionDownloader.Download(lt.Version, tempFile)
 	if err != nil {
 		return err
 	}

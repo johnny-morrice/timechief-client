@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
@@ -40,10 +41,11 @@ func Initialise(ctx *cli.Context) error {
 		return err
 	}
 
+	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClient)
 	init := update.Initialiser{
 		DB:            db,
 		KeyValueStore: store.KeyValueStore{DB: db},
-		Updater:       update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, noAuthClient, ctx.Duration("service-request-timeout")),
+		Updater:       update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClient, ctx.Duration("service-request-timeout")),
 	}
 	if !init.IsInitialised() {
 		log.Println("initialising client")

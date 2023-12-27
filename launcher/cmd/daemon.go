@@ -8,6 +8,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
@@ -66,7 +67,8 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	up := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, launchTargetStore, noAuthClient, ctx.Duration("service-request-timeout"))
+	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClient)
+	up := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, launchTargetStore, versionDownloader, noAuthClient, ctx.Duration("service-request-timeout"))
 
 	myDevices := daemon.MakeMyDevices(timechiefClient, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
 

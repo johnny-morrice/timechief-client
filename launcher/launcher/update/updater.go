@@ -20,12 +20,13 @@ import (
 type Updater struct {
 	versionStore      store.VersionStore
 	launchTargetStore store.LaunchTargetStore
+	versionDownloader service.VersionDownloader
 	cfgStore          store.ConfigStore
 	client            v2.ClientInterface
 	requestTimeout    time.Duration
 }
 
-func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, client v2.ClientInterface, requestTimeout time.Duration) Updater {
+func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader service.VersionDownloader, client v2.ClientInterface, requestTimeout time.Duration) Updater {
 	return Updater{
 		versionStore:      versionStore,
 		launchTargetStore: launchTargetStore,
@@ -70,7 +71,7 @@ func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v st
 	newStoreLt.VersionID = v.ID
 	doInstallDaemon := ctx.Bool("install-daemon")
 	lt := service.LaunchTargetFromStore(newStoreLt)
-	err := lt.Install(cfg, doInstallDaemon)
+	err := lt.Install(cfg, up.versionDownloader, doInstallDaemon)
 	if err != nil {
 		return err
 	}

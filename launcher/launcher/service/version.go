@@ -42,10 +42,6 @@ func (v Version) Details() string {
 	return fmt.Sprintf("%s %s %s", v.Product, v.Stream, v.Version)
 }
 
-func (v Version) Download(cfg store.Config, path string) error {
-	panic("removed")
-}
-
 // verifySHA256 verifies that the SHA256 of the file at path matches the given hash.
 func verifySHA256(expected []byte, path string) error {
 	hasher := sha256.New()
