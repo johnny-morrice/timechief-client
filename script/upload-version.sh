@@ -63,8 +63,7 @@ EOF
 
 echo "Uploading file: $MY_UPLOAD_FILENAME"
 gcloud storage cp $MY_UPLOAD_FILENAME gs://$BUCKET_NAME/$MY_UPLOAD_FILENAME
-echo "Uploading metadata: $METADATA"
-API_URL="$API_BASE_URL"
-./script/apicall.sh /version "-d \"$METADATA\" -H \"Content-Type: application/json\""
 popd
+echo "Uploading metadata: $METADATA"
+./script/apicall.sh /version "-d \"$METADATA\" -H \"Content-Type: application/json\""
 rm -rf $BUILD_DIR
