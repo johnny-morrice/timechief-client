@@ -10,6 +10,12 @@ set -x
 # BUNDLE_DIR
 # BUILD_DIR
 
+if [ -z "$VERSION" ] ; then
+  echo "missing parameters"
+  echo "VERSION: $VERSION"
+  exit 1
+fi
+
 # If BUNDLE_DIR is empty, then we will use a temporary directory
 if [ -z "$BUNDLE_DIR" ] ; then
   BUNDLE_DIR=$(mktemp -d)
