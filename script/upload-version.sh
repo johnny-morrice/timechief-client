@@ -73,3 +73,4 @@ echo "Uploading metadata: $METADATA"
 
 ./script/apicall.sh /version $METADATA_TMPFILE
 rm -rf $BUILD_DIR
+rm -f $METADATA_TMPFILE
