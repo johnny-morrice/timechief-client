@@ -42,12 +42,14 @@ func Initialise(ctx *cli.Context) error {
 		return clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).UseAuth(false).Build()
 	}
 
+	log.Println("DEBUG building initialisation services")
 	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClientFactory)
 	init := update.Initialiser{
 		DB:            db,
 		KeyValueStore: store.KeyValueStore{DB: db},
 		Updater:       update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout")),
 	}
+	log.Println("DEBUG built initialisation services")
 	if !init.IsInitialised() {
 		log.Println("initialising client")
 		return init.Initialise(ctx, cfg)
