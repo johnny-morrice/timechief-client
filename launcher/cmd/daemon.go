@@ -6,6 +6,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
@@ -61,14 +62,12 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-
-	noAuthClient, err := clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).UseAuth(false).Build()
-	if err != nil {
-		return err
+	noAuthClientFactory := func() (v2.ClientInterface, error) {
+		return clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).UseAuth(false).Build()
 	}
 
-	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClient)
-	up := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, launchTargetStore, versionDownloader, noAuthClient, ctx.Duration("service-request-timeout"))
+	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClientFactory)
+	up := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, launchTargetStore, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout"))
 
 	myDevices := daemon.MakeMyDevices(timechiefClient, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
 

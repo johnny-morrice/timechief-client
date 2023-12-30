@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sync"
 	"time"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
@@ -62,25 +63,42 @@ func verifySHA256(expected []byte, path string) error {
 }
 
 type VersionDownloader struct {
-	cfgStore store.ConfigStore
-	client   v2.ClientInterface
+	cfgStore      store.ConfigStore
+	clientFactory ClientFactory
+	client        v2.ClientInterface
+	once          *sync.Once
 }
 
-func MakeVersionDownloader(cfgStore store.ConfigStore, client v2.ClientInterface) VersionDownloader {
+type ClientFactory func() (v2.ClientInterface, error)
+
+func MakeVersionDownloader(cfgStore store.ConfigStore, clientFactory ClientFactory) VersionDownloader {
 	return VersionDownloader{
-		cfgStore: cfgStore,
-		client:   client,
+		cfgStore:      cfgStore,
+		once:          &sync.Once{},
+		clientFactory: clientFactory,
 	}
 }
 
 // TODO use a timeout from the config?
 const defaultTimeout = 10 * time.Second
 
+func (vd VersionDownloader) getClient() (v2.ClientInterface, error) {
+	var err error
+	vd.once.Do(func() {
+		vd.client, err = vd.clientFactory()
+	})
+	return vd.client, err
+}
+
 func (vd VersionDownloader) fetchVersionDownload(version Version) (v2.VersionDownload, error) {
 	requestContext := context.Background()
 	requestContext, cancel := context.WithTimeout(requestContext, defaultTimeout)
 	defer cancel()
-	resp, err := vd.client.GetVersionDownloadById(requestContext, version.UUID)
+	client, err := vd.getClient()
+	if err != nil {
+		return v2.VersionDownload{}, fmt.Errorf("error creating client: %v", err)
+	}
+	resp, err := client.GetVersionDownloadById(requestContext, version.UUID)
 	if err != nil {
 		return v2.VersionDownload{}, fmt.Errorf("error fetching version download: %v", err)
 	}

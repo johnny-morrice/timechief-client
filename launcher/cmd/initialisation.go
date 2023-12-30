@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
@@ -36,16 +37,16 @@ func Initialise(ctx *cli.Context) error {
 	cfgStore := store.ConfigStore{DB: db}
 	cfg := cfgFlags(ctx)
 
-	noAuthClient, err := clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(store.KeyValueStore{DB: db}).UseAuth(false).Build()
-	if err != nil {
-		return err
+	keyValueStore := store.KeyValueStore{DB: db}
+	noAuthClientFactory := func() (v2.ClientInterface, error) {
+		return clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).UseAuth(false).Build()
 	}
 
-	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClient)
+	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClientFactory)
 	init := update.Initialiser{
 		DB:            db,
 		KeyValueStore: store.KeyValueStore{DB: db},
-		Updater:       update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClient, ctx.Duration("service-request-timeout")),
+		Updater:       update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout")),
 	}
 	if !init.IsInitialised() {
 		log.Println("initialising client")

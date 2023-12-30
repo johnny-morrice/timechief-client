@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
@@ -22,18 +23,32 @@ type Updater struct {
 	launchTargetStore store.LaunchTargetStore
 	versionDownloader service.VersionDownloader
 	cfgStore          store.ConfigStore
+	clientFactory     ClientFactory
 	client            v2.ClientInterface
 	requestTimeout    time.Duration
+	once              *sync.Once
 }
 
-func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader service.VersionDownloader, client v2.ClientInterface, requestTimeout time.Duration) Updater {
+func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader service.VersionDownloader, clientFactory ClientFactory, requestTimeout time.Duration) Updater {
 	return Updater{
 		versionStore:      versionStore,
 		launchTargetStore: launchTargetStore,
 		cfgStore:          cfgStore,
-		client:            client,
+		clientFactory:     clientFactory,
+		versionDownloader: versionDownloader,
 		requestTimeout:    requestTimeout,
+		once:              &sync.Once{},
 	}
+}
+
+type ClientFactory func() (v2.ClientInterface, error)
+
+func (up Updater) getClient() (v2.ClientInterface, error) {
+	var err error
+	up.once.Do(func() {
+		up.client, err = up.clientFactory()
+	})
+	return up.client, err
 }
 
 func (up Updater) FirstUpdate(ctx *cli.Context) error {
@@ -137,7 +152,11 @@ func (up Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
 	defer cancel()
 	product := ""
 	stream := ""
-	versionResp, err := up.client.ListLatestVersions(requestContext, product, stream)
+	client, err := up.getClient()
+	if err != nil {
+		return nil, err
+	}
+	versionResp, err := client.ListLatestVersions(requestContext, product, stream)
 	if err != nil {
 		return nil, err
 	}
