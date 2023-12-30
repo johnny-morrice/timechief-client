@@ -1,10 +1,12 @@
 #!/bin/bash
 set -e
+set -x
 
 API_PATH=$1
-API_EXTRA=$2
+shift
+API_EXTRA=("$@")
 
-if [ -z "$API_BASE_URL" ] || [ -z "$API_TOKEN"] || [ -z "$API_PATH" ] ; then
+if [ -z "$API_BASE_URL" ] || [ -z "$API_TOKEN" ] || [ -z "$API_PATH" ] ; then
   echo "missing parameters"
   echo "API_BASE_URL: $API_BASE_URL"
   echo "API_TOKEN: $API_TOKEN"
@@ -12,4 +14,4 @@ if [ -z "$API_BASE_URL" ] || [ -z "$API_TOKEN"] || [ -z "$API_PATH" ] ; then
   exit 1
 fi
 
-curl --fail -X POST -H "Authorization: Bearer $API_TOKEN" $API_EXTRA "$API_BASE_URL/$API_PATH"
+curl --fail -X POST -H "Authorization: Bearer $API_TOKEN" "${API_EXTRA[@]}" "$API_BASE_URL$API_PATH"
