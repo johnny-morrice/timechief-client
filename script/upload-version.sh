@@ -10,13 +10,14 @@ set -x
 # UPLOAD_FILENAME
 # BUILD_DIR
 
-if [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$UPLOAD_FILENAME" ] ; then
+if [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$UPLOAD_FILENAME" ] || [ -z "$API_BASE_URL" ] ; then
   echo "missing parameters"
   echo "BUCKET_NAME: $BUCKET_NAME"
   echo "VERSION: $VERSION"
   echo "PRODUCT: $PRODUCT"
   echo "STREAM: $STREAM"
   echo "UPLOAD_FILENAME: $UPLOAD_FILENAME"
+  echo "API_BASE_URL: $API_BASE_URL"
   exit 1
 fi
 
@@ -63,6 +64,7 @@ EOF
 echo "Uploading file: $MY_UPLOAD_FILENAME"
 gcloud storage cp $MY_UPLOAD_FILENAME gs://$BUCKET_NAME/$MY_UPLOAD_FILENAME
 echo "Uploading metadata: $METADATA"
-timechief client core version-create --body "$METADATA"
+API_URL="$API_BASE_URL/todo/api/v2/version"
+curl -X POST -H "Content-Type: application/json" -d "$METADATA" $API_URL
 popd
 rm -rf $BUILD_DIR
