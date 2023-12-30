@@ -53,7 +53,8 @@ METADATA=$(cat <<EOF
   "product": "$PRODUCT",
   "stream": "$STREAM",
   "command": "$COMMAND",
-  "url": "$URL",
+  "bucket": "$BUCKET_NAME",
+  "object": "$MY_UPLOAD_FILENAME",
   "sha256": "$SHA256"
 }
 EOF
