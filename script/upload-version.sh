@@ -64,7 +64,7 @@ EOF
 echo "Uploading file: $MY_UPLOAD_FILENAME"
 gcloud storage cp $MY_UPLOAD_FILENAME gs://$BUCKET_NAME/$MY_UPLOAD_FILENAME
 echo "Uploading metadata: $METADATA"
-API_URL="$API_BASE_URL/todo/api/v2/version"
+API_URL="$API_BASE_URL/version"
 curl --fail -X POST -H "Content-Type: application/json" -d "$METADATA" $API_URL
 popd
 rm -rf $BUILD_DIR
