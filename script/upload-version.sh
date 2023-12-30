@@ -61,9 +61,15 @@ METADATA=$(cat <<EOF
 EOF
 )
 
+# Create temporary file:
+METADATA_TMPFILE=$(mktemp /tmp/upload.XXXXXXXXXX)
+# Write metadata to temporary file:
+echo "$METADATA" > $METADATA_TMPFILE
+
 echo "Uploading file: $MY_UPLOAD_FILENAME"
 gcloud storage cp $MY_UPLOAD_FILENAME gs://$BUCKET_NAME/$MY_UPLOAD_FILENAME
 popd
 echo "Uploading metadata: $METADATA"
-./script/apicall.sh /version "-d \"$METADATA\" -H \"Content-Type: application/json\""
+
+./script/apicall.sh /version $METADATA_TMPFILE
 rm -rf $BUILD_DIR

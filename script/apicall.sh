@@ -3,8 +3,7 @@ set -e
 set -x
 
 API_PATH=$1
-shift
-API_EXTRA=("$@")
+JSON_BODY_FILE=$2
 
 if [ -z "$API_BASE_URL" ] || [ -z "$API_TOKEN" ] || [ -z "$API_PATH" ] ; then
   echo "missing parameters"
@@ -14,4 +13,11 @@ if [ -z "$API_BASE_URL" ] || [ -z "$API_TOKEN" ] || [ -z "$API_PATH" ] ; then
   exit 1
 fi
 
-curl --fail -X POST -H "Authorization: Bearer $API_TOKEN" "${API_EXTRA[@]}" "$API_BASE_URL$API_PATH"
+if [ -z "$JSON_BODY_FILE" ] ; then
+  curl --fail -X POST -H "Authorization: Bearer $API_TOKEN" "$API_BASE_URL$API_PATH"
+  exit 0
+fi
+JSON_BODY=$(cat $JSON_BODY_FILE)
+
+curl --fail -X POST -H "Authorization: Bearer $API_TOKEN" -d "$JSON_BODY" -H "Content-Type: application/json" "$API_BASE_URL$API_PATH"
+
