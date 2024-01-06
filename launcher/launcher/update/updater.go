@@ -175,7 +175,7 @@ func (up Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
 func (up Updater) SyncAPIVersions(ctx *cli.Context) error {
 	versions, err := up.fetchVersions(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to fetch versions: %w", err)
 	}
 
 	for _, version := range versions {
