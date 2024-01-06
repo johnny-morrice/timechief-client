@@ -160,6 +160,7 @@ func (up Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Println("fetching versions for product", product, "stream", stream)
 	versionResp, err := client.ListLatestVersions(requestContext, product, stream)
 	if err != nil {
 		return nil, err
