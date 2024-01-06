@@ -150,8 +150,12 @@ func (up Updater) Update(ctx *cli.Context) error {
 func (up Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
 	requestContext, cancel := context.WithTimeout(context.Background(), up.requestTimeout)
 	defer cancel()
-	product := ""
-	stream := ""
+	cfg, err := up.cfgStore.GetConfig()
+	if err != nil {
+		return nil, err
+	}
+	product := cfg.GetProduct()
+	stream := cfg.GetStream()
 	client, err := up.getClient()
 	if err != nil {
 		return nil, err
