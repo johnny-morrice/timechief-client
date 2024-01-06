@@ -12,7 +12,7 @@ set -x
 # HEIGHT
 # LAUNCHER_DEVICE_CREDENTIALS
 
-if [ -z "$INSTALL_ROOT" ] || [ -z "$API_BASE_URL" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$WWW_BASE_URL" ] || [ -z "$WIDTH" ] || [ -z "$HEIGHT" ] || [ -z "$LAUNCHER_DEVICE_CREDENTIALS" ] ; then
+if [ -z "$INSTALL_ROOT" ] || [ -z "$API_BASE_URL" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$WWW_BASE_URL" ] || [ -z "$WIDTH" ] || [ -z "$HEIGHT" ] || [ -z "$LAUNCHER_BIN" ] ; then
     echo "missing parameters"
 	echo "INSTALL_ROOT: $INSTALL_ROOT"
 	echo "API_BASE_URL: $API_BASE_URL"
@@ -21,13 +21,10 @@ if [ -z "$INSTALL_ROOT" ] || [ -z "$API_BASE_URL" ] || [ -z "$PRODUCT" ] || [ -z
 	echo "WWW_BASE_URL: $WWW_BASE_URL"
 	echo "WIDTH: $WIDTH"
 	echo "HEIGHT: $HEIGHT"
-	if [ -z "$LAUNCHER_DEVICE_CREDENTIALS" ] ; then
-	    echo "LAUNCHER_DEVICE_CREDENTIALS is empty"
-	fi
+	echo "LAUNCHER_BIN: $LAUNCHER_BIN"
     exit 1
 fi
 
-LAUNCHER_BIN=$(which timechief-launcher)
 FS_LAUNCHER_BIN=$INSTALL_ROOT/bin/timechief-launcher-initial
 mkdir -p $INSTALL_ROOT/bin
 mkdir -p $INSTALL_ROOT/assets/images

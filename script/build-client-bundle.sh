@@ -10,9 +10,10 @@ set -x
 # BUNDLE_DIR
 # BUILD_DIR
 
-if [ -z "$VERSION" ] ; then
+if [ -z "$VERSION" ] || [ -z "$LAUNCHER_BIN" ] ; then
   echo "missing parameters"
   echo "VERSION: $VERSION"
+  echo "LAUNCHER_BIN: $LAUNCHER_BIN"
   exit 1
 fi
 
@@ -55,6 +56,7 @@ cp $BUILD_DIR/timechief-client/launcher/integration-scripts/bootstrap/timechief-
 pushd $BUILD_DIR/timechief-client/launcher
 mkdir -p bin
 go build -o bin/timechief-launcher
+cp bin/timechief-launcher $LAUNCHER_BIN
 popd
 
 cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_UNPACK/timechief-launcher
