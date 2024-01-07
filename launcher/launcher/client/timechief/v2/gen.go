@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"log"
 
 	"github.com/oapi-codegen/runtime"
 )
@@ -2662,6 +2663,10 @@ func NewListLatestVersionsRequest(server string, product string, stream string) 
 	if err != nil {
 		return nil, err
 	}
+
+	// TODO delete these debugs
+	log.Println("operationPath: ", operationPath)
+	log.Println("query URL: ", queryURL.String())
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
 	if err != nil {
