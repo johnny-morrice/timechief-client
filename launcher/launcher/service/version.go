@@ -116,14 +116,17 @@ func (vd VersionDownloader) fetchVersionDownload(version Version) (v2.VersionDow
 
 func (vd VersionDownloader) Download(version Version, path string) error {
 	log.Printf("downloading version %s", version.Details())
-	downloadURL := ""
-	log.Printf("downloading %s to %s", downloadURL, path)
+	download, err := vd.fetchVersionDownload(version)
+	if err != nil {
+		return err
+	}
+	log.Printf("downloading %s to %s", *download.DownloadUrl, path)
 	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	netURL, err := url.Parse(downloadURL)
+	netURL, err := url.Parse(*download.DownloadUrl)
 	if err != nil {
 		return err
 	}
