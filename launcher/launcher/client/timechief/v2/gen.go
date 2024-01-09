@@ -239,8 +239,13 @@ type Version struct {
 
 // VersionDownload defines model for VersionDownload.
 type VersionDownload struct {
-	DownloadUrl *string  `json:"download_url,omitempty"`
-	Version     *Version `json:"version,omitempty"`
+	Command     *string `json:"command,omitempty"`
+	DownloadUrl *string `json:"download_url,omitempty"`
+	Product     *string `json:"product,omitempty"`
+	Sha256      *string `json:"sha256,omitempty"`
+	Stream      *string `json:"stream,omitempty"`
+	Uuid        *string `json:"uuid,omitempty"`
+	Version     *string `json:"version,omitempty"`
 }
 
 // WeatherCondition defines model for WeatherCondition.

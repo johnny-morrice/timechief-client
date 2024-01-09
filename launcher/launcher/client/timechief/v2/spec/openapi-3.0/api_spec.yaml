@@ -1106,8 +1106,18 @@ components:
     VersionDownload:
       type: "object"
       properties:
+        uuid:
+          type: "string"
         version:
-          $ref: "#/components/schemas/Version"
+          type: "string"
+        product:
+          type: "string"
+        stream:
+          type: "string"
+        sha256:
+          type: "string"
+        command:
+          type: "string"
         download_url:
           type: "string"
 
