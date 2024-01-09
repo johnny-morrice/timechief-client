@@ -114,7 +114,7 @@ func (vd VersionDownloader) fetchVersionDownload(ctx context.Context, version Ve
 	return download, nil
 }
 
-func (vd VersionDownloader) fechVersionDownloadURL(version Version) (string, error) {
+func (vd VersionDownloader) fetchVersionDownloadURL(version Version) (string, error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
@@ -133,17 +133,17 @@ func (vd VersionDownloader) fechVersionDownloadURL(version Version) (string, err
 
 func (vd VersionDownloader) Download(version Version, path string) error {
 	log.Printf("downloading version %s", version.Details())
-	download, err := vd.fetchVersionDownload(version)
+	downloadURL, err := vd.fetchVersionDownloadURL(version)
 	if err != nil {
 		return err
 	}
-	log.Printf("downloading %s to %s", *download.DownloadUrl, path)
+	log.Printf("downloading %s to %s", downloadURL, path)
 	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	netURL, err := url.Parse(*download.DownloadUrl)
+	netURL, err := url.Parse(downloadURL)
 	if err != nil {
 		return err
 	}
