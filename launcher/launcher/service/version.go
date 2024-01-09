@@ -106,8 +106,15 @@ func (vd VersionDownloader) fetchVersionDownload(version Version) (v2.VersionDow
 	if resp.StatusCode != http.StatusOK {
 		return v2.VersionDownload{}, fmt.Errorf("expected 200, got %d", resp.StatusCode)
 	}
+	buf := &bytes.Buffer{}
+	_, err = io.Copy(buf, resp.Body)
+	if err != nil {
+		return v2.VersionDownload{}, fmt.Errorf("error reading version download: %v", err)
+	}
+	log.Println("version download: ", buf.String())
+
 	var download v2.VersionDownload
-	err = json.NewDecoder(resp.Body).Decode(&download)
+	err = json.NewDecoder(buf).Decode(&download)
 	if err != nil {
 		return v2.VersionDownload{}, fmt.Errorf("error decoding version download: %v", err)
 	}
