@@ -90,15 +90,14 @@ func (vd VersionDownloader) getClient() (v2.ClientInterface, error) {
 	return vd.client, err
 }
 
-func (vd VersionDownloader) fetchVersionDownload(version Version) (v2.VersionDownload, error) {
-	requestContext := context.Background()
-	requestContext, cancel := context.WithTimeout(requestContext, defaultTimeout)
+func (vd VersionDownloader) fetchVersionDownload(ctx context.Context, version Version) (v2.VersionDownload, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 	client, err := vd.getClient()
 	if err != nil {
 		return v2.VersionDownload{}, fmt.Errorf("error creating client: %v", err)
 	}
-	resp, err := client.GetVersionDownloadById(requestContext, version.UUID)
+	resp, err := client.GetVersionDownloadById(ctx, version.UUID)
 	if err != nil {
 		return v2.VersionDownload{}, fmt.Errorf("error fetching version download: %v", err)
 	}
@@ -106,19 +105,30 @@ func (vd VersionDownloader) fetchVersionDownload(version Version) (v2.VersionDow
 	if resp.StatusCode != http.StatusOK {
 		return v2.VersionDownload{}, fmt.Errorf("expected 200, got %d", resp.StatusCode)
 	}
-	buf := &bytes.Buffer{}
-	_, err = io.Copy(buf, resp.Body)
-	if err != nil {
-		return v2.VersionDownload{}, fmt.Errorf("error reading version download: %v", err)
-	}
-	log.Println("version download: ", buf.String())
 
 	var download v2.VersionDownload
-	err = json.NewDecoder(buf).Decode(&download)
+	err = json.NewDecoder(resp.Body).Decode(&download)
 	if err != nil {
 		return v2.VersionDownload{}, fmt.Errorf("error decoding version download: %v", err)
 	}
 	return download, nil
+}
+
+func (vd VersionDownloader) fechVersionDownloadURL(version Version) (string, error) {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
+	defer cancel()
+	for {
+		download, err := vd.fetchVersionDownload(ctx, version)
+		if err != nil {
+			return "", err
+		}
+		if download.DownloadUrl == nil || *download.DownloadUrl == "" {
+			log.Printf("waiting for download url for %s", version.Details())
+			continue
+		}
+		return *download.DownloadUrl, nil
+	}
 }
 
 func (vd VersionDownloader) Download(version Version, path string) error {
