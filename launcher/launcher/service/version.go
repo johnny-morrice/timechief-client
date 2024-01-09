@@ -82,7 +82,7 @@ func MakeVersionDownloader(cfgStore store.ConfigStore, clientFactory ClientFacto
 // TODO use a timeout from the config?
 const defaultTimeout = 10 * time.Second
 
-func (vd VersionDownloader) getClient() (v2.ClientInterface, error) {
+func (vd *VersionDownloader) getClient() (v2.ClientInterface, error) {
 	var err error
 	vd.once.Do(func() {
 		vd.client, err = vd.clientFactory()
@@ -90,7 +90,7 @@ func (vd VersionDownloader) getClient() (v2.ClientInterface, error) {
 	return vd.client, err
 }
 
-func (vd VersionDownloader) fetchVersionDownload(ctx context.Context, version Version) (v2.VersionDownload, error) {
+func (vd *VersionDownloader) fetchVersionDownload(ctx context.Context, version Version) (v2.VersionDownload, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 	client, err := vd.getClient()
@@ -114,7 +114,7 @@ func (vd VersionDownloader) fetchVersionDownload(ctx context.Context, version Ve
 	return download, nil
 }
 
-func (vd VersionDownloader) fetchVersionDownloadURL(version Version) (string, error) {
+func (vd *VersionDownloader) fetchVersionDownloadURL(version Version) (string, error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
@@ -125,13 +125,14 @@ func (vd VersionDownloader) fetchVersionDownloadURL(version Version) (string, er
 		}
 		if download.DownloadUrl == nil || *download.DownloadUrl == "" {
 			log.Printf("waiting for download url for %s", version.Details())
+			time.Sleep(time.Second * 1)
 			continue
 		}
 		return *download.DownloadUrl, nil
 	}
 }
 
-func (vd VersionDownloader) Download(version Version, path string) error {
+func (vd *VersionDownloader) Download(version Version, path string) error {
 	log.Printf("downloading version %s", version.Details())
 	downloadURL, err := vd.fetchVersionDownloadURL(version)
 	if err != nil {
