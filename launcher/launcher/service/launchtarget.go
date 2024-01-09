@@ -66,6 +66,10 @@ func (lt LaunchTarget) targetPath() string {
 	return filepath.Join(lt.Path, lt.Version.Command)
 }
 
+type VersionDownloader interface {
+	Download(version Version, path string) error
+}
+
 func (lt LaunchTarget) Install(cfg store.Config, versionDownloader VersionDownloader, doInstallDaemon bool) error {
 	system.Lock()
 	defer system.Unlock()

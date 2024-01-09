@@ -21,7 +21,7 @@ import (
 type Updater struct {
 	versionStore      store.VersionStore
 	launchTargetStore store.LaunchTargetStore
-	versionDownloader service.VersionDownloader
+	versionDownloader VersionDownloader
 	cfgStore          store.ConfigStore
 	clientFactory     ClientFactory
 	client            v2.ClientInterface
@@ -29,7 +29,7 @@ type Updater struct {
 	once              *sync.Once
 }
 
-func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader service.VersionDownloader, clientFactory ClientFactory, requestTimeout time.Duration) Updater {
+func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader VersionDownloader, clientFactory ClientFactory, requestTimeout time.Duration) Updater {
 	return Updater{
 		versionStore:      versionStore,
 		launchTargetStore: launchTargetStore,
@@ -39,6 +39,10 @@ func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, la
 		requestTimeout:    requestTimeout,
 		once:              &sync.Once{},
 	}
+}
+
+type VersionDownloader interface {
+	Download(version service.Version, path string) error
 }
 
 type ClientFactory func() (v2.ClientInterface, error)

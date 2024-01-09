@@ -5,7 +5,7 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
@@ -31,7 +31,7 @@ func Update(ctx *cli.Context) error {
 		return clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).UseAuth(false).Build()
 	}
 
-	versionDownloader := service.MakeVersionDownloader(cfgStore, noAuthClientFactory)
+	versionDownloader := versiondownload.MakeVersionDownloader(cfgStore, noAuthClientFactory)
 
 	updater := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout"))
 
