@@ -16,7 +16,6 @@ set -x
 # WIDTH
 # HEIGHT
 # API_BASE_URL
-# LAUNCHER_DEVICE_CREDENTIALS
 # INSTALL_ROOT
 
 # If $1 is set, it's the phase, otherwise use the env var PHASE

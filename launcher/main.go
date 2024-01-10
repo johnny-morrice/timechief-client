@@ -139,9 +139,6 @@ func getCLIApp() *cli.App {
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
 				},
-				&cli.StringFlag{
-					Name: "device-credentials",
-				},
 				&cli.DurationFlag{
 					Name:  "service-request-timeout",
 					Value: 20 * time.Second,

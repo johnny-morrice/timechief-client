@@ -13,7 +13,7 @@ import (
 
 // Read the given configKeys from the cli.Context and return a store.Config instance.
 func cfgFlags(ctx *cli.Context) store.Config {
-	configKeys := []string{"install-root", "api-base-url", "product", "stream", "device-credentials"}
+	configKeys := []string{"install-root", "api-base-url", "product", "stream"}
 	cfg := store.Config{
 		Config: make(map[string]string),
 	}

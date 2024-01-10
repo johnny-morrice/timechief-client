@@ -110,15 +110,6 @@ func (cfg Config) GetAPIBaseURL() string {
 
 var ErrCfgNotFound = fmt.Errorf("config item not found")
 
-// TODO this will potentially go away with the new API.
-func (cfg Config) GetDeviceCredentials() (string, error) {
-	credentials, ok := cfg.Config["device-credentials"]
-	if !ok {
-		return "", fmt.Errorf("device-credentials not found: %w", ErrCfgNotFound)
-	}
-	return credentials, nil
-}
-
 func (cfg Config) GetProduct() string {
 	product, ok := cfg.Config["product"]
 	if !ok {

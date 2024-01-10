@@ -10,7 +10,6 @@ set -x
 # WWW_BASE_URL
 # WIDTH
 # HEIGHT
-# LAUNCHER_DEVICE_CREDENTIALS
 
 if [ -z "$INSTALL_ROOT" ] || [ -z "$API_BASE_URL" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$WWW_BASE_URL" ] || [ -z "$WIDTH" ] || [ -z "$HEIGHT" ] || [ -z "$LAUNCHER_BIN" ] ; then
     echo "missing parameters"
@@ -51,4 +50,4 @@ cat <<EOF > $INSTALL_ROOT/client-config.json
 EOF
 
 # TODO delete device credentials usage when we have fixed in API
-$FS_LAUNCHER_BIN initialise --install-root "$INSTALL_ROOT" --api-base-url "$API_BASE_URL" --product "$PRODUCT" --stream "$STREAM" --device-credentials "$LAUNCHER_DEVICE_CREDENTIALS"
+$FS_LAUNCHER_BIN initialise --install-root "$INSTALL_ROOT" --api-base-url "$API_BASE_URL" --product "$PRODUCT" --stream "$STREAM"
