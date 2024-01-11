@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
@@ -79,13 +80,26 @@ func Daemon(ctx *cli.Context) error {
 	}
 	deviceDataStore := store.DeviceDataStore{DB: db}
 	deviceDataDaemon := daemon.MakeDeviceDataDaemon(timechiefClient, deviceDataStore, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
-	pairingDaemon := daemon.Pairing{
-		ConfigStore:          cfgStore,
-		StateFlagStore:       flagStore,
-		KeyValueStore:        keyValueStore,
-		PairingCheckInterval: ctx.Duration("pairing-check-interval"),
-		RequestTimeout:       ctx.Duration("service-request-timeout"),
+	// pairingDaemon := daemon.Pairing{
+	// 	ConfigStore:          cfgStore,
+	// 	StateFlagStore:       flagStore,
+	// 	KeyValueStore:        keyValueStore,
+	// 	PairingCheckInterval: ctx.Duration("pairing-check-interval"),
+	// 	RequestTimeout:       ctx.Duration("service-request-timeout"),
+	// }
+	cfg, err := cfgStore.GetConfig()
+	if err != nil {
+		return err
 	}
+	authZeroBaseURL, err := cfg.GetAuthZeroBaseURL()
+	if err != nil {
+		return err
+	}
+	authZeroClient, err := authzero.MakeAuthZeroClient(authZeroBaseURL)
+	if err != nil {
+		return err
+	}
+	pairingDaemon := daemon.MakePairingDaemon(cfgStore, keyValueStore, flagStore, authZeroClient, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
 
 	wifiNetworkStore := store.WifiNetworkStore{DB: db}
 

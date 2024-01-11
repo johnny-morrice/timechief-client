@@ -20,6 +20,17 @@ type Pairing struct {
 	RequestTimeout       time.Duration
 }
 
+func MakePairingDaemon(cfgStore store.ConfigStore, kvStore store.KeyValueStore, stateFlagStore store.StateFlagStore, authZeroClient AuthZeroClient, pairingCheckInterval time.Duration, requestTimeout time.Duration) Pairing {
+	return Pairing{
+		KeyValueStore:        kvStore,
+		ConfigStore:          cfgStore,
+		StateFlagStore:       stateFlagStore,
+		AuthZeroClient:       authZeroClient,
+		PairingCheckInterval: pairingCheckInterval,
+		RequestTimeout:       requestTimeout,
+	}
+}
+
 type AuthZeroClient interface {
 	GetDeviceCode(clientID, audience string) (authzero.DeviceCodeResp, error)
 	DoAccessTokenPoll(clientID, deviceCode string) (authzero.AccessTokenPollingResp, error)

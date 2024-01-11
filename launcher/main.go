@@ -143,6 +143,10 @@ func getCLIApp() *cli.App {
 					Name:     "auth0-audience",
 					Required: true,
 				},
+				&cli.StringFlag{
+					Name:     "auth0-base-url",
+					Required: true,
+				},
 				&cli.BoolFlag{
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,

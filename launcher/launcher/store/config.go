@@ -76,6 +76,14 @@ func (cfg Config) Merge(other Config) Config {
 	return newCfg
 }
 
+func (cfg Config) GetAuthZeroBaseURL() (string, error) {
+	baseURL, ok := cfg.Config["auth0-base-url"]
+	if !ok {
+		return "", fmt.Errorf("auth0-base-url not found: %w", ErrCfgNotFound)
+	}
+	return baseURL, nil
+}
+
 func (cfg Config) GetAuthZeroClientID() (string, error) {
 	clientID, ok := cfg.Config["auth0-client-id"]
 	if !ok {
