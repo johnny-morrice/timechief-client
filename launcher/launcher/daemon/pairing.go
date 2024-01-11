@@ -33,7 +33,7 @@ func MakePairingDaemon(cfgStore store.ConfigStore, kvStore store.KeyValueStore, 
 
 type AuthZeroClient interface {
 	GetDeviceCode(clientID, audience string) (authzero.DeviceCodeResp, error)
-	DoAccessTokenPoll(clientID, deviceCode string) (authzero.AccessTokenPollingResp, error)
+	DoAccessTokenPoll(clientID, deviceCode string) (authzero.AccessTokenResp, error)
 }
 
 func (p Pairing) Initialise() error {
@@ -81,11 +81,11 @@ func (p Pairing) doTick(ctx *cli.Context) error {
 		if err != nil {
 			return fmt.Errorf("error getting pairing state: %s", err)
 		}
-		if status.Response.AccessToken != "" {
-			return p.handlePairingComplete(status.Response)
+		if status.AccessToken != "" {
+			return p.handlePairingComplete(status)
 		}
-		if status.Error.Error != "" {
-			return p.handlePairingReady(status.Error)
+		if status.Error != "" {
+			return p.handlePairingReady(status)
 		}
 
 	}
@@ -125,7 +125,7 @@ func (p Pairing) createPairing() error {
 	return nil
 }
 
-func (p Pairing) handlePairingReady(pairingError authzero.AccessTokenRespError) error {
+func (p Pairing) handlePairingReady(pairingError authzero.AccessTokenResp) error {
 	// Nothing to do, wait for link.
 	log.Printf("pairing poll got another error: %s %s", pairingError.Error, pairingError.ErrorDescription)
 	return nil
@@ -159,9 +159,9 @@ func (p Pairing) handlePairingComplete(accessToken authzero.AccessTokenResp) err
 	return nil
 }
 
-func (p Pairing) getPairingState() (authzero.AccessTokenPollingResp, error) {
+func (p Pairing) getPairingState() (authzero.AccessTokenResp, error) {
 	cfg, err := p.ConfigStore.GetConfig()
-	var nope authzero.AccessTokenPollingResp
+	var nope authzero.AccessTokenResp
 	if err != nil {
 		return nope, fmt.Errorf("error getting config: %s", err)
 	}

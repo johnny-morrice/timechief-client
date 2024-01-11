@@ -3,11 +3,9 @@ package authzero
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type AuthZeroClient struct {
@@ -89,33 +87,6 @@ func (clnt AuthZeroClient) DoAccessTokenPoll(clientID, deviceCode string) (Acces
 		return AccessTokenResp{}, err
 	}
 	return result, nil
-}
-
-func (clnt AuthZeroClient) GetAccessToken(clientID, deviceCode string, interval time.Duration) (AccessTokenResp, error) {
-	if clientID == "" {
-		return AccessTokenResp{}, errors.New("clientID cannot be empty")
-	}
-	if deviceCode == "" {
-		return AccessTokenResp{}, errors.New("deviceCode cannot be empty")
-	}
-	if interval == 0 {
-		return AccessTokenResp{}, errors.New("interval cannot be 0")
-	}
-	for {
-		resp, err := clnt.DoAccessTokenPoll(clientID, deviceCode)
-		if err != nil {
-			return AccessTokenResp{}, err
-		}
-
-		if resp.Error != "" {
-			log.Printf("polling got access token error: %s %s", resp.Error, resp.ErrorDescription)
-		}
-
-		if resp.AccessToken != "" {
-			return resp, nil
-		}
-		time.Sleep(interval)
-	}
 }
 
 type AccessTokenResp struct {
