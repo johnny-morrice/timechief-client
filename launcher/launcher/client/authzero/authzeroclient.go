@@ -3,6 +3,7 @@ package authzero
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -56,12 +57,12 @@ func (clnt AuthZeroClient) GetDeviceCode(clientID, audience string) (DeviceCodeR
 	return result, nil
 }
 
-func (clnt AuthZeroClient) DoAccessTokenPoll(clientID, deviceCode string) (AccessTokenPollingResp, error) {
+func (clnt AuthZeroClient) DoAccessTokenPoll(clientID, deviceCode string) (AccessTokenResp, error) {
 	if clientID == "" {
-		return AccessTokenPollingResp{}, errors.New("clientID cannot be empty")
+		return AccessTokenResp{}, errors.New("clientID cannot be empty")
 	}
 	if deviceCode == "" {
-		return AccessTokenPollingResp{}, errors.New("deviceCode cannot be empty")
+		return AccessTokenResp{}, errors.New("deviceCode cannot be empty")
 	}
 	// 	curl --request POST \
 	//   --url 'https://timechief-dev.uk.auth0.com/oauth/token' \
@@ -74,18 +75,18 @@ func (clnt AuthZeroClient) DoAccessTokenPoll(clientID, deviceCode string) (Acces
 	payload := strings.NewReader("grant_type=" + grantType + "&device_code=" + deviceCode + "&client_id=" + clientID)
 	req, err := http.NewRequest("POST", tokenURL, payload)
 	if err != nil {
-		return AccessTokenPollingResp{}, err
+		return AccessTokenResp{}, err
 	}
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return AccessTokenPollingResp{}, err
+		return AccessTokenResp{}, err
 	}
 	defer res.Body.Close()
-	result := AccessTokenPollingResp{}
+	result := AccessTokenResp{}
 	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
-		return AccessTokenPollingResp{}, err
+		return AccessTokenResp{}, err
 	}
 	return result, nil
 }
@@ -105,30 +106,24 @@ func (clnt AuthZeroClient) GetAccessToken(clientID, deviceCode string, interval 
 		if err != nil {
 			return AccessTokenResp{}, err
 		}
-		if resp.Error.Error != "" {
-			return AccessTokenResp{}, err
+
+		if resp.Error != "" {
+			log.Printf("polling got access token error: %s %s", resp.Error, resp.ErrorDescription)
 		}
-		if resp.Response.AccessToken != "" {
-			return resp.Response, nil
+
+		if resp.AccessToken != "" {
+			return resp, nil
 		}
 		time.Sleep(interval)
 	}
 }
 
-type AccessTokenPollingResp struct {
-	Error    AccessTokenRespError `json:"error"`
-	Response AccessTokenResp      `json:"response"`
-}
-
-type AccessTokenRespError struct {
-	Error            string `json:"error"`
-	ErrorDescription string `json:"error_description"`
-}
-
 type AccessTokenResp struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	IDToken      string `json:"id_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
+	Error            string `json:"error,omitempty"`
+	ErrorDescription string `json:"error_description,omitempty"`
+	AccessToken      string `json:"access_token,omitempty"`
+	RefreshToken     string `json:"refresh_token,omitempty"`
+	IDToken          string `json:"id_token,omitempty"`
+	TokenType        string `json:"token_type,omitempty"`
+	ExpiresIn        int    `json:"expires_in,omitempty"`
 }
