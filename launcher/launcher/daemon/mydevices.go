@@ -46,7 +46,6 @@ func (md MyDevices) Start(ctx *cli.Context) {
 }
 
 func (md MyDevices) doTick(ctx *cli.Context) error {
-	log.Println("downloading mydevices")
 	needsRefresh, err := md.stateFlagStore.Exists("refresh-mydevices")
 	if err != nil {
 		return err
