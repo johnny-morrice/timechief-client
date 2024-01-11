@@ -135,6 +135,14 @@ func getCLIApp() *cli.App {
 					Name:  "stream",
 					Value: store.DefaultStream,
 				},
+				&cli.StringFlag{
+					Name:     "auth0-client-id",
+					Required: true,
+				},
+				&cli.StringFlag{
+					Name:     "auth0-audience",
+					Required: true,
+				},
 				&cli.BoolFlag{
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,

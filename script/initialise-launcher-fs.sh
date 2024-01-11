@@ -11,7 +11,7 @@ set -x
 # WIDTH
 # HEIGHT
 
-if [ -z "$INSTALL_ROOT" ] || [ -z "$API_BASE_URL" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$WWW_BASE_URL" ] || [ -z "$WIDTH" ] || [ -z "$HEIGHT" ] || [ -z "$LAUNCHER_BIN" ] ; then
+if [ -z "$INSTALL_ROOT" ] || [ -z "$API_BASE_URL" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$WWW_BASE_URL" ] || [ -z "$WIDTH" ] || [ -z "$HEIGHT" ] || [ -z "$LAUNCHER_BIN" ] || [ -z "$AUTH0_CLIENT_ID" ] || [ -z "$AUTH0_AUDIENCE" ] ; then
     echo "missing parameters"
 	echo "INSTALL_ROOT: $INSTALL_ROOT"
 	echo "API_BASE_URL: $API_BASE_URL"
@@ -21,6 +21,8 @@ if [ -z "$INSTALL_ROOT" ] || [ -z "$API_BASE_URL" ] || [ -z "$PRODUCT" ] || [ -z
 	echo "WIDTH: $WIDTH"
 	echo "HEIGHT: $HEIGHT"
 	echo "LAUNCHER_BIN: $LAUNCHER_BIN"
+	echo "AUTH0_CLIENT_ID: $AUTH0_CLIENT_ID"
+	echo "AUTH0_AUDIENCE: $AUTH0_AUDIENCE"
     exit 1
 fi
 
@@ -50,4 +52,4 @@ cat <<EOF > $INSTALL_ROOT/client-config.json
 EOF
 
 # TODO delete device credentials usage when we have fixed in API
-$FS_LAUNCHER_BIN initialise --install-root "$INSTALL_ROOT" --api-base-url "$API_BASE_URL" --product "$PRODUCT" --stream "$STREAM"
+$FS_LAUNCHER_BIN initialise --install-root "$INSTALL_ROOT" --api-base-url "$API_BASE_URL" --product "$PRODUCT" --stream "$STREAM" --auth0-client-id "$AUTH0_CLIENT_ID" --auth0-audience "$AUTH0_AUDIENCE"
