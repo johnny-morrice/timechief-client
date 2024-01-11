@@ -5,15 +5,18 @@ import (
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
 	"github.com/urfave/cli/v2"
 )
 
 type Update struct {
-	Updater               update.Updater
+	Updater               Updater
 	StateFlagStore        store.StateFlagStore
 	KeyValueStore         store.KeyValueStore
 	VersionUpdateInterval time.Duration
+}
+
+type Updater interface {
+	Update(ctx *cli.Context) error
 }
 
 func (daemon Update) Start(ctx *cli.Context) {

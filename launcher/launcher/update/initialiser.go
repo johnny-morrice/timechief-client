@@ -11,7 +11,7 @@ import (
 type Initialiser struct {
 	DB            *gorm.DB
 	KeyValueStore store.KeyValueStore
-	Updater
+	*Updater
 }
 
 func (init Initialiser) Initialise(ctx *cli.Context, cfg store.Config) error {

@@ -26,18 +26,18 @@ type Updater struct {
 	clientFactory     ClientFactory
 	client            v2.ClientInterface
 	requestTimeout    time.Duration
-	once              *sync.Once
+	once              sync.Once
 }
 
-func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader VersionDownloader, clientFactory ClientFactory, requestTimeout time.Duration) Updater {
-	return Updater{
+func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader VersionDownloader, clientFactory ClientFactory, requestTimeout time.Duration) *Updater {
+	return &Updater{
 		versionStore:      versionStore,
 		launchTargetStore: launchTargetStore,
 		cfgStore:          cfgStore,
 		clientFactory:     clientFactory,
 		versionDownloader: versionDownloader,
 		requestTimeout:    requestTimeout,
-		once:              &sync.Once{},
+		once:              sync.Once{},
 	}
 }
 
@@ -47,7 +47,7 @@ type VersionDownloader interface {
 
 type ClientFactory func() (v2.ClientInterface, error)
 
-func (up Updater) getClient() (v2.ClientInterface, error) {
+func (up *Updater) getClient() (v2.ClientInterface, error) {
 	var err error
 	up.once.Do(func() {
 		up.client, err = up.clientFactory()
@@ -55,7 +55,7 @@ func (up Updater) getClient() (v2.ClientInterface, error) {
 	return up.client, err
 }
 
-func (up Updater) FirstUpdate(ctx *cli.Context) error {
+func (up *Updater) FirstUpdate(ctx *cli.Context) error {
 	err := up.SyncAPIVersions(ctx)
 	if err != nil {
 		return err
@@ -82,7 +82,7 @@ func (up Updater) FirstUpdate(ctx *cli.Context) error {
 	return up.CreateNewLaunchTarget(ctx, cfg, newVersion)
 }
 
-func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v store.Version) error {
+func (up *Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v store.Version) error {
 	log.Printf("creating launch target for version: %s", v.Details())
 	newStoreLt := store.LaunchTarget{}
 	newStoreLt.Path = cfg.NewInstallPath(v.Version)
@@ -110,7 +110,7 @@ func (up Updater) CreateNewLaunchTarget(ctx *cli.Context, cfg store.Config, v st
 	return nil
 }
 
-func (up Updater) Update(ctx *cli.Context) error {
+func (up *Updater) Update(ctx *cli.Context) error {
 	garbageCollector := task.GarbageCollectTargets{
 		LaunchTargetStore: up.launchTargetStore,
 	}
@@ -151,7 +151,7 @@ func (up Updater) Update(ctx *cli.Context) error {
 	return up.CreateNewLaunchTarget(ctx, cfg, newVersion)
 }
 
-func (up Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
+func (up *Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
 	requestContext, cancel := context.WithTimeout(context.Background(), up.requestTimeout)
 	defer cancel()
 	cfg, err := up.cfgStore.GetConfig()
@@ -181,7 +181,7 @@ func (up Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
 	return result, nil
 }
 
-func (up Updater) SyncAPIVersions(ctx *cli.Context) error {
+func (up *Updater) SyncAPIVersions(ctx *cli.Context) error {
 	versions, err := up.fetchVersions(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to fetch versions: %w", err)
