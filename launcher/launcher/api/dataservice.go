@@ -9,6 +9,7 @@ import (
 )
 
 type DataService interface {
+	Logout() error
 	SetLicenseActivationCode(code string) error
 	GetDeviceData() (data.DeviceData, error)
 	PairDevice() error
@@ -29,8 +30,24 @@ func (api Data) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/data/license", api.HandlePostLicenseActivationCode)
 	mux.HandleFunc("/api/data/device", api.HandleGetDeviceData)
 	mux.HandleFunc("/api/data/pairing", api.HandlePairing)
+	mux.HandleFunc("/api/data/logout", api.HandleLogout)
 	mux.HandleFunc("/api/data/mydevice", api.HandlePostMyDevice)
 	mux.HandleFunc("/api/data/mydevice/refresh", api.RefreshMyDevices)
+
+}
+
+func (api Data) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := api.service.Logout()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to logout: %v", err)
+		return
+	}
 }
 
 type LicenseActivationCodeRequest struct {

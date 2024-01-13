@@ -70,10 +70,15 @@ type WifiNetwork struct {
 }
 
 type DeviceData struct {
-	LauncherState LauncherState
-	ServiceData   v2.Data
-	MyDeviceUUID  string
-	MyDevices     []v2.Device
+	LauncherState    LauncherState
+	ServiceData      v2.Data
+	ServiceDataState ServiceDataState
+}
+
+type ServiceDataState struct {
+	MyDeviceUUID   string
+	MyDevices      []v2.Device
+	HasAccessToken bool
 }
 
 type PairingStatus struct {
@@ -81,6 +86,10 @@ type PairingStatus struct {
 	Code      string
 	URL       string
 	QRCodeURL string
+}
+
+func (svc Service) Logout() error {
+	return svc.keyValueStore.Delete(store.AccessTokenKey)
 }
 
 func (svc Service) SetLicenseActivationCode(code string) error {
@@ -253,11 +262,18 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			return DeviceData{}, fmt.Errorf("failed to unmarshal my devices: %w", err)
 		}
 	}
+	accessToken, err := svc.keyValueStore.Get(store.AccessTokenKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, fmt.Errorf("failed to get access token: %w", err)
+	}
 
 	result := DeviceData{
-		MyDeviceUUID: myDeviceUUID,
-		MyDevices:    myDevices,
-		ServiceData:  deviceData,
+		ServiceData: deviceData,
+		ServiceDataState: ServiceDataState{
+			MyDeviceUUID:   myDeviceUUID,
+			MyDevices:      myDevices,
+			HasAccessToken: accessToken != "",
+		},
 		LauncherState: LauncherState{
 			WebURL:              webURL(ipAddress),
 			SetupState:          setupState,
