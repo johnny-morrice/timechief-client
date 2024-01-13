@@ -48,7 +48,7 @@ type KeyValueStore interface {
 	Delete(key string) error
 }
 
-func (d Daemon) Start(ctx cli.Context) {
+func (d Daemon) Start(ctx *cli.Context) {
 	err := d.doTick()
 	if err != nil {
 		log.Printf("daemon tick error: %s", err)

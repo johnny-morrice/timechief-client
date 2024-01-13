@@ -9,6 +9,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
@@ -148,6 +149,11 @@ func Daemon(ctx *cli.Context) error {
 		Syncer: system,
 	}
 
+	licenseDaemon, err := licenseactivation.MakeLicenseActivationDaemon(timechiefClient, keyValueStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
+	if err != nil {
+		return err
+	}
+
 	expandRootFS := task.ExpandRootFS{
 		KeyValueStore: keyValueStore,
 		System:        system,
@@ -179,6 +185,7 @@ func Daemon(ctx *cli.Context) error {
 	go setup.Start(ctx)
 	go internetCheck.Start(ctx)
 	go myDevices.Start(ctx)
+	go licenseDaemon.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
