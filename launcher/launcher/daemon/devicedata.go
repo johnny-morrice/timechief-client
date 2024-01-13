@@ -14,6 +14,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/client/authnclient"
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -47,7 +48,7 @@ func (dd DeviceData) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("device data daemon tick error: %s", err)
 	}
-	runEvery(dd.refreshInterval, func() {
+	util.RunEvery(dd.refreshInterval, func() {
 		err := dd.doTick(ctx)
 		if err != nil {
 			log.Printf("device data daemon tick error: %s", err)

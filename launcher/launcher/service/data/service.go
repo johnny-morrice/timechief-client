@@ -83,6 +83,14 @@ type PairingStatus struct {
 	QRCodeURL string
 }
 
+func (svc Service) SetLicenseActivationCode(code string) error {
+	err := svc.keyValueStore.Set(store.LicenseActivationCodeKey, code)
+	if err != nil {
+		return fmt.Errorf("failed to set license activation code: %w", err)
+	}
+	return nil
+}
+
 func (svc Service) PairDevice() error {
 	err := svc.keyValueStore.Delete(store.PairingCodeKey)
 	if err != nil {

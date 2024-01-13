@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -54,7 +55,7 @@ func (p Pairing) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("pairing daemon tick error: %s", err)
 	}
-	runEvery(p.PairingCheckInterval, func() {
+	util.RunEvery(p.PairingCheckInterval, func() {
 		err := p.doTick(ctx)
 		if err != nil {
 			log.Printf("pairing daemon tick error: %s", err)

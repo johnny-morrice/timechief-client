@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -24,7 +25,7 @@ func (daemon Update) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	runEvery(daemon.VersionUpdateInterval, func() {
+	util.RunEvery(daemon.VersionUpdateInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
 			log.Println(err.Error())
@@ -62,15 +63,6 @@ func (daemon Update) doTick(ctx *cli.Context) error {
 		return err
 	}
 	return nil
-}
-
-func runEvery(duration time.Duration, f func()) {
-	if duration == 0 {
-		panic("runEvery duration must be positive")
-	}
-	for range time.Tick(duration) {
-		f()
-	}
 }
 
 const UpdatingFlag = "updating"

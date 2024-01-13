@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/urfave/cli/v2"
 )
 
@@ -20,7 +21,7 @@ func (daemon TimeSync) Start(ctx *cli.Context) {
 	if daemon.RefreshInterval == 0 {
 		daemon.RefreshInterval = 5 * time.Second
 	}
-	runEvery(daemon.RefreshInterval, func() {
+	util.RunEvery(daemon.RefreshInterval, func() {
 		daemon.doTick()
 	})
 }

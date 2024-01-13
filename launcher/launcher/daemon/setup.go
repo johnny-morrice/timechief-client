@@ -7,6 +7,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 	"github.com/urfave/cli/v2"
@@ -35,7 +36,7 @@ func (daemon Setup) Start(ctx *cli.Context) {
 		log.Printf("setup daemon init error: %s", err)
 	}
 
-	runEvery(daemon.RefreshInterval, func() {
+	util.RunEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
 			log.Printf("setup daemon tick error: %s", err)

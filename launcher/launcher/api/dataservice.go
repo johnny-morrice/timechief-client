@@ -9,6 +9,7 @@ import (
 )
 
 type DataService interface {
+	SetLicenseActivationCode(code string) error
 	GetDeviceData() (data.DeviceData, error)
 	PairDevice() error
 	GetPairingStatus() (data.PairingStatus, error)
@@ -25,10 +26,35 @@ func MakeDataAPI(service DataService) Data {
 }
 
 func (api Data) AddRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("/api/data/license", api.HandlePostLicenseActivationCode)
 	mux.HandleFunc("/api/data/device", api.HandleGetDeviceData)
 	mux.HandleFunc("/api/data/pairing", api.HandlePairing)
 	mux.HandleFunc("/api/data/mydevice", api.HandlePostMyDevice)
 	mux.HandleFunc("/api/data/mydevice/refresh", api.RefreshMyDevices)
+}
+
+type LicenseActivationCodeRequest struct {
+	Code string `json:"code"`
+}
+
+func (api Data) HandlePostLicenseActivationCode(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req LicenseActivationCodeRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	err = api.service.SetLicenseActivationCode(req.Code)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to set license activation code: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (api Data) RefreshMyDevices(w http.ResponseWriter, r *http.Request) {

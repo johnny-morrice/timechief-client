@@ -10,6 +10,7 @@ import (
 	"time"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -37,7 +38,7 @@ func (md MyDevices) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("mydevices daemon tick error: %s", err)
 	}
-	runEvery(md.refreshInterval, func() {
+	util.RunEvery(md.refreshInterval, func() {
 		err := md.doTick(ctx)
 		if err != nil {
 			log.Printf("mydevices daemon tick error: %s", err)
