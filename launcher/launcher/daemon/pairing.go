@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
@@ -166,6 +167,11 @@ func (p Pairing) handlePairingComplete(accessToken authzero.AccessTokenResp) err
 	err = p.KeyValueStore.Set(store.AccessTokenKey, string(bs))
 	if err != nil {
 		return fmt.Errorf("error setting access token: %s", err)
+	}
+	tokenExpiry := refreshtoken.TokenExpiry(accessToken.ExpiresIn)
+	err = p.KeyValueStore.Set(store.TokenExpiryKey, tokenExpiry)
+	if err != nil {
+		return fmt.Errorf("error setting access token expiry: %s", err)
 	}
 
 	return nil
