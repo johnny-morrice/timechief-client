@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -57,8 +58,42 @@ func (clnt AuthZeroClient) GetDeviceCode(ctx context.Context, clientID, audience
 	return result, nil
 }
 
-func (clnt AuthZeroClient) RefreshAccessToken(ctx context.Context, refreshToken string) (AccessTokenResp, error) {
-	panic("not implemented")
+func (clnt AuthZeroClient) RefreshAccessToken(ctx context.Context, clientID, refreshToken string) (AccessTokenResp, error) {
+	if clientID == "" {
+		return AccessTokenResp{}, errors.New("clientID cannot be empty")
+	}
+	if refreshToken == "" {
+		return AccessTokenResp{}, errors.New("refreshToken cannot be empty")
+	}
+
+	tokenURL := clnt.BaseURL + "/oauth/token"
+
+	refreshToken = url.QueryEscape(refreshToken)
+	payload := strings.NewReader("grant_type=refresh_token" + "&client_id=" + clientID + "&refreshToken=" + refreshToken)
+
+	req, err := http.NewRequest("POST", tokenURL, payload)
+
+	if err != nil {
+		return AccessTokenResp{}, fmt.Errorf("error creating refresh token request")
+	}
+
+	req = req.WithContext(ctx)
+
+	req.Header.Add("content-type", "application/x-www-form-urlencoded")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return AccessTokenResp{}, err
+	}
+	defer res.Body.Close()
+	result := AccessTokenResp{}
+	err = json.NewDecoder(res.Body).Decode(&result)
+	if err != nil {
+		return AccessTokenResp{}, err
+	}
+	// If refresh token refreshing is configured on Auth0 this will break things.
+	result.RefreshToken = refreshToken
+	return result, nil
 }
 
 func (clnt AuthZeroClient) GetAccessToken(ctx context.Context, clientID, deviceCode string) (AccessTokenResp, error) {

@@ -17,6 +17,7 @@ import (
 type Daemon struct {
 	authZeroClient  AuthZeroClient
 	kvStore         KvStore
+	clientID        string
 	requestTimeout  time.Duration
 	refreshInterval time.Duration
 }
@@ -46,7 +47,7 @@ type KvStore interface {
 }
 
 type AuthZeroClient interface {
-	RefreshAccessToken(ctx context.Context, refreshToken string) (authzero.AccessTokenResp, error)
+	RefreshAccessToken(ctx context.Context, clientID, refreshToken string) (authzero.AccessTokenResp, error)
 }
 
 func (d Daemon) Start(ctx *cli.Context) {
@@ -80,7 +81,7 @@ func (d Daemon) doTick() error {
 		ctx := context.Background()
 		ctx, cancel := context.WithTimeout(ctx, d.requestTimeout)
 		defer cancel()
-		newToken, err := d.authZeroClient.RefreshAccessToken(ctx, accessToken.RefreshToken)
+		newToken, err := d.authZeroClient.RefreshAccessToken(ctx, d.clientID, accessToken.RefreshToken)
 		if err != nil {
 			return fmt.Errorf("error refreshing token: %s", err)
 		}
