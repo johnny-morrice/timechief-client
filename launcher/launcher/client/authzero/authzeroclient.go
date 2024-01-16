@@ -1,6 +1,7 @@
 package authzero
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -29,7 +30,7 @@ type DeviceCodeResp struct {
 	VerificationUriComplete string `json:"verification_uri_complete"`
 }
 
-func (clnt AuthZeroClient) GetDeviceCode(clientID, audience string) (DeviceCodeResp, error) {
+func (clnt AuthZeroClient) GetDeviceCode(ctx context.Context, clientID, audience string) (DeviceCodeResp, error) {
 	// curl --request POST \
 	//   --url 'https://timechief-dev.uk.auth0.com/oauth/device/code' \
 	//   --header 'content-type: application/x-www-form-urlencoded' \
@@ -41,6 +42,7 @@ func (clnt AuthZeroClient) GetDeviceCode(clientID, audience string) (DeviceCodeR
 	if err != nil {
 		return DeviceCodeResp{}, err
 	}
+	req = req.WithContext(ctx)
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -55,7 +57,11 @@ func (clnt AuthZeroClient) GetDeviceCode(clientID, audience string) (DeviceCodeR
 	return result, nil
 }
 
-func (clnt AuthZeroClient) DoAccessTokenPoll(clientID, deviceCode string) (AccessTokenResp, error) {
+func (clnt AuthZeroClient) RefreshToken(ctx context.Context, refreshToken string) (AccessTokenResp, error) {
+	panic("not implemented")
+}
+
+func (clnt AuthZeroClient) GetAccessToken(ctx context.Context, clientID, deviceCode string) (AccessTokenResp, error) {
 	if clientID == "" {
 		return AccessTokenResp{}, errors.New("clientID cannot be empty")
 	}
@@ -75,6 +81,7 @@ func (clnt AuthZeroClient) DoAccessTokenPoll(clientID, deviceCode string) (Acces
 	if err != nil {
 		return AccessTokenResp{}, err
 	}
+	req = req.WithContext(ctx)
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {

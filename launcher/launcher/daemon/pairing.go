@@ -2,6 +2,7 @@ package daemon
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -33,8 +34,8 @@ func MakePairingDaemon(cfgStore store.ConfigStore, kvStore store.KeyValueStore, 
 }
 
 type AuthZeroClient interface {
-	GetDeviceCode(clientID, audience string) (authzero.DeviceCodeResp, error)
-	DoAccessTokenPoll(clientID, deviceCode string) (authzero.AccessTokenResp, error)
+	GetDeviceCode(ctx context.Context, clientID, audience string) (authzero.DeviceCodeResp, error)
+	GetAccessToken(ctx context.Context, clientID, deviceCode string) (authzero.AccessTokenResp, error)
 }
 
 func (p Pairing) Initialise() error {
@@ -93,6 +94,13 @@ func (p Pairing) doTick(ctx *cli.Context) error {
 	return nil
 }
 
+func (p Pairing) createRequestContext() (context.Context, func()) {
+	// TODO configure timeout
+	const timeout = time.Second * 10
+	ctx := context.Background()
+	return context.WithTimeout(ctx, timeout)
+}
+
 func (p Pairing) createPairing() error {
 	cfg, err := p.ConfigStore.GetConfig()
 	if err != nil {
@@ -106,7 +114,9 @@ func (p Pairing) createPairing() error {
 	if err != nil {
 		return err
 	}
-	deviceResp, err := p.AuthZeroClient.GetDeviceCode(clientID, audience)
+	ctx, cancel := p.createRequestContext()
+	defer cancel()
+	deviceResp, err := p.AuthZeroClient.GetDeviceCode(ctx, clientID, audience)
 	if err != nil {
 		return fmt.Errorf("error getting device code: %s", err)
 	}
@@ -149,14 +159,15 @@ func (p Pairing) handlePairingComplete(accessToken authzero.AccessTokenResp) err
 	if err != nil {
 		return fmt.Errorf("error clearing pairing qr code url: %s", err)
 	}
-	err = p.KeyValueStore.Set(store.AccessTokenKey, accessToken.AccessToken)
+	bs, err := json.Marshal(accessToken)
+	if err != nil {
+		return fmt.Errorf("failed to marshal access token: %s", err)
+	}
+	err = p.KeyValueStore.Set(store.AccessTokenKey, string(bs))
 	if err != nil {
 		return fmt.Errorf("error setting access token: %s", err)
 	}
-	err = p.KeyValueStore.Set(store.RefreshTokenKey, accessToken.RefreshToken)
-	if err != nil {
-		return fmt.Errorf("error setting refresh token: %s", err)
-	}
+
 	return nil
 }
 
@@ -174,7 +185,9 @@ func (p Pairing) getPairingState() (authzero.AccessTokenResp, error) {
 	if err != nil {
 		return nope, err
 	}
-	return p.AuthZeroClient.DoAccessTokenPoll(clientID, deviceCode)
+	ctx, cancel := p.createRequestContext()
+	defer cancel()
+	return p.AuthZeroClient.GetAccessToken(ctx, clientID, deviceCode)
 }
 
 func (p Pairing) newClientContext() (context.Context, func()) {

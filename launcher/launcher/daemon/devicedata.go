@@ -133,14 +133,6 @@ func (dd DeviceData) doFetchLatest() (v2.Data, error) {
 
 }
 
-func (dd DeviceData) saveToken(token string) error {
-	err := dd.keyValueStore.Set(store.AccessTokenKey, token)
-	if err != nil {
-		return fmt.Errorf("error saving access token: %s", err)
-	}
-	return nil
-}
-
 func (dd DeviceData) getClockData(apiClient *apiclient.Client) (*viewmodel.ClockData, error) {
 	ctx, cancel := dd.newClientContext()
 	defer cancel()
