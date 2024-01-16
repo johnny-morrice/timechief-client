@@ -104,7 +104,7 @@ func Daemon(ctx *cli.Context) error {
 	pairingDaemon := daemon.MakePairingDaemon(cfgStore, keyValueStore, flagStore, authZeroClient, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
 
 	// TODO don't use the pairing parameter.  Or do?!
-	refreshTokenDaemon, err := refreshtoken.MakeRefreshTokenDaemon(authZeroClient, keyValueStore, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
+	refreshTokenDaemon, err := refreshtoken.MakeRefreshTokenDaemon(cfgStore, authZeroClient, keyValueStore, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
 	if err != nil {
 		return err
 	}

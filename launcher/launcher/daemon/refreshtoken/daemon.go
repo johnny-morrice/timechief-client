@@ -15,16 +15,19 @@ import (
 )
 
 type Daemon struct {
+	cfgStore        store.ConfigStore
 	authZeroClient  AuthZeroClient
 	kvStore         KvStore
-	clientID        string
 	requestTimeout  time.Duration
 	refreshInterval time.Duration
 }
 
-func MakeRefreshTokenDaemon(authZeroClient AuthZeroClient, kvStore KvStore, requestTimeout time.Duration, refreshInterval time.Duration) (Daemon, error) {
+func MakeRefreshTokenDaemon(cfgStore store.ConfigStore, authZeroClient AuthZeroClient, kvStore KvStore, requestTimeout time.Duration, refreshInterval time.Duration) (Daemon, error) {
 	if authZeroClient == nil {
 		return Daemon{}, errors.New("authZeroClient cannot be nil")
+	}
+	if kvStore == nil {
+		return Daemon{}, errors.New("kvStore cannot be nil")
 	}
 	if requestTimeout == 0 {
 		return Daemon{}, errors.New("requestTimeout cannot be 0")
@@ -33,6 +36,7 @@ func MakeRefreshTokenDaemon(authZeroClient AuthZeroClient, kvStore KvStore, requ
 		return Daemon{}, errors.New("refreshInterval cannot be 0")
 	}
 	result := Daemon{
+		cfgStore:        cfgStore,
 		authZeroClient:  authZeroClient,
 		kvStore:         kvStore,
 		requestTimeout:  requestTimeout,
@@ -81,7 +85,15 @@ func (d Daemon) doTick() error {
 		ctx := context.Background()
 		ctx, cancel := context.WithTimeout(ctx, d.requestTimeout)
 		defer cancel()
-		newToken, err := d.authZeroClient.RefreshAccessToken(ctx, d.clientID, accessToken.RefreshToken)
+		cfg, err := d.cfgStore.GetConfig()
+		if err != nil {
+			return err
+		}
+		clientID, err := cfg.GetAuthZeroClientID()
+		if err != nil {
+			return err
+		}
+		newToken, err := d.authZeroClient.RefreshAccessToken(ctx, clientID, accessToken.RefreshToken)
 		if err != nil {
 			return fmt.Errorf("error refreshing token: %s", err)
 		}
