@@ -57,7 +57,7 @@ func (clnt AuthZeroClient) GetDeviceCode(ctx context.Context, clientID, audience
 	return result, nil
 }
 
-func (clnt AuthZeroClient) RefreshToken(ctx context.Context, refreshToken string) (AccessTokenResp, error) {
+func (clnt AuthZeroClient) RefreshAccessToken(ctx context.Context, refreshToken string) (AccessTokenResp, error) {
 	panic("not implemented")
 }
 

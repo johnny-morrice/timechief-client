@@ -10,6 +10,7 @@ import (
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
@@ -102,6 +103,12 @@ func Daemon(ctx *cli.Context) error {
 	}
 	pairingDaemon := daemon.MakePairingDaemon(cfgStore, keyValueStore, flagStore, authZeroClient, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
 
+	// TODO don't use the pairing parameter.  Or do?!
+	refreshTokenDaemon, err := refreshtoken.MakeRefreshTokenDaemon(authZeroClient, keyValueStore, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
+	if err != nil {
+		return err
+	}
+
 	wifiNetworkStore := store.WifiNetworkStore{DB: db}
 
 	wifiInterfaceStore := store.WifiInterfaceStore{DB: db}
@@ -186,6 +193,7 @@ func Daemon(ctx *cli.Context) error {
 	go internetCheck.Start(ctx)
 	go myDevices.Start(ctx)
 	go licenseDaemon.Start(ctx)
+	go refreshTokenDaemon.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
