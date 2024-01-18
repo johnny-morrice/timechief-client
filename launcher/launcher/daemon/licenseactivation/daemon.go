@@ -12,6 +12,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
+	"gorm.io/gorm"
 )
 
 type Daemon struct {
@@ -64,6 +65,9 @@ func (d Daemon) Start(ctx *cli.Context) {
 func (d Daemon) doTick() error {
 	activationCode, err := d.keyValueStore.Get(store.LicenseActivationCodeKey)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return err
 	}
 
