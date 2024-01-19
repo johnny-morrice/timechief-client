@@ -148,7 +148,11 @@ func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
 				continue
 			}
 		}
-		dedupe[net.SSID] = dedupeNet
+		dedupe[net.SSID] = WifiNetwork{
+			SSID:       net.SSID,
+			Signal:     net.Signal,
+			Encryption: net.Encryption,
+		}
 	}
 
 	storeNets := make([]*store.WifiNetwork, 0, len(dedupe))

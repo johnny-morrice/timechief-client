@@ -152,7 +152,15 @@ type WiFiNetwork struct {
 }
 
 func (wn WiFiNetwork) Validate() error {
-	if wn.Security != "WPA2" {
+	allowedSecurities := []string{"WPA2", "WPA3"}
+	isAllowed := false
+	for _, allowed := range allowedSecurities {
+		if wn.Security == allowed {
+			isAllowed = true
+			break
+		}
+	}
+	if !isAllowed {
 		return fmt.Errorf("unsupported security: %s", wn.Security)
 	}
 
