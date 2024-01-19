@@ -36,57 +36,52 @@ type DeviceDataStore interface {
 }
 
 type LauncherState struct {
-	ActiveTargetVersion string
-	SetupState          string
-	WebURL              string
-	WifiState           WifiState
-	NetworkState        NetworkState
-	FirstTimeSetupDone  bool
-	Flags               []string
-}
-
-type KeyValuePair struct {
-	Key   string
-	Value string
+	ActiveTargetVersion string       `json:"active_target_version"`
+	SetupState          string       `json:"setup_state"`
+	WebURL              string       `json:"web_url"`
+	WifiState           WifiState    `json:"wifi_state"`
+	NetworkState        NetworkState `json:"network_state"`
+	FirstTimeSetupDone  bool         `json:"first_time_setup_done"`
+	Flags               []string     `json:"flags"`
 }
 
 type NetworkState struct {
-	IPAddress string
+	IPAddress string `json:"ip_address"`
 }
 
 type WifiState struct {
-	ActiveWifiInterface string
-	InterfaceMode       string
-	ActiveSSID          string
-	IsWifiError         bool
-	HotspotSSID         string
-	HotspotKey          string
-	WifiNetworks        []WifiNetwork
+	ActiveWifiInterface string        `json:"active_wifi_interface"`
+	InterfaceMode       string        `json:"interface_mode"`
+	ActiveSSID          string        `json:"active_ssid"`
+	IsWifiError         bool          `json:"is_wifi_error"`
+	HotspotSSID         string        `json:"hotspot_ssid"`
+	HotspotKey          string        `json:"hotspot_key"`
+	WifiNetworks        []WifiNetwork `json:"wifi_networks"`
 }
 
 type WifiNetwork struct {
-	SSID           string
-	SignalStrength int
-	Encryption     string
+	SSID           string `json:"ssid"`
+	SignalStrength int    `json:"signal_strength"`
+	Encryption     string `json:"encryption"`
 }
 
 type DeviceData struct {
-	LauncherState    LauncherState
-	ServiceData      v2.Data
-	ServiceDataState ServiceDataState
+	LauncherState    LauncherState    `json:"launcher_state"`
+	ServiceData      v2.Data          `json:"service_data"`
+	ServiceDataState ServiceDataState `json:"service_data_state"`
 }
 
 type ServiceDataState struct {
-	MyDeviceUUID   string
-	MyDevices      []v2.Device
-	HasAccessToken bool
+	MyDeviceUUID   string      `json:"my_device_uuid"`
+	MyDevices      []v2.Device `json:"my_devices"`
+	HasAccessToken bool        `json:"has_access_token"`
 }
 
 type PairingStatus struct {
-	Status    string
-	Code      string
-	URL       string
-	QRCodeURL string
+	Status    string `json:"status"`
+	Code      string `json:"code"`
+	URL       string `json:"url"`
+	QRCodeURL string `json:"qr_code_url"`
 }
 
 func (svc Service) Logout() error {
