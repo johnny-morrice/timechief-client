@@ -1295,7 +1295,7 @@ components:
       properties:
         device_profile:
           $ref: "#/components/schemas/DeviceProfileDatum"
-        owm_data:
+        owm:
           $ref: "#/components/schemas/OWMDataDatum"
         google_calendar:
           $ref: "#/components/schemas/CalendarDatum"
