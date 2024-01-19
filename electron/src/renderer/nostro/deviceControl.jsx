@@ -27,14 +27,14 @@ function hasDeviceStatus(signals) {
 
 function getDeviceStatus(signals) {
     let launcherState = signals.launcherState();
-    if ("Flags" in launcherState) {
-        let isUpdating = launcherState["Flags"].includes("updating");
+    if ("flags" in launcherState) {
+        let isUpdating = launcherState["flags"].includes("updating");
         if (isUpdating) {
             return "updating";
         }
     }
-    if ("ActiveTargetVersion" in launcherState) {
-        let activeTargetVersion = launcherState["ActiveTargetVersion"];
+    if ("active_target_version" in launcherState) {
+        let activeTargetVersion = launcherState["active_target_version"];
         let currentVersion = signals.clientVersion();
         if (currentVersion && activeTargetVersion && activeTargetVersion !== currentVersion) {
             return "needs restart"
@@ -45,11 +45,11 @@ function getDeviceStatus(signals) {
 
 function updateSignalsForAPIData(signals, data) {
     var disableShutdown = false;
-    if ("LauncherState" in data) {
-        let launcherState = data["LauncherState"];
+    if ("launcher_state" in data) {
+        let launcherState = data["launcher_state"];
         signals.setLauncherState(launcherState);
-        if ("Flags" in launcherState) {
-            let isUpdating = launcherState["Flags"].includes("updating");
+        if ("flags" in launcherState) {
+            let isUpdating = launcherState["flags"].includes("updating");
             if (isUpdating) {
                 disableShutdown = true;
             }

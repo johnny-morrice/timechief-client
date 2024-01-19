@@ -21,14 +21,21 @@ function hasAstro(signals) {
 }
 
 function updateAstroPageSignals(signals, data) {
-    let daily = data["Weather"]["Daily"];
+    if (!data["weather"]) {
+        return;
+    }
+    let weather = data["weather"];
+    if (!weather["daily"]) {
+        return;
+    }
+    let daily = weather["daily"];
     if (daily.length > 0) {
         let today = daily[0];
-        let sunriseUnix = today["Sunrise"];
-        let sunsetUnix = today["Sunset"];
-        let moonriseUnix = today["Moonrise"];
-        let moonsetUnix = today["Moonset"];
-        let moonphase = today["MoonPhase"];
+        let sunriseUnix = today["sunrise"];
+        let sunsetUnix = today["sunset"];
+        let moonriseUnix = today["moonrise"];
+        let moonsetUnix = today["moonset"];
+        let moonphase = today["moonPhase"];
         signals.setSunrise(parseUnixTime(sunriseUnix))
         signals.setSunset(parseUnixTime(sunsetUnix));
         signals.setMoonrise(parseUnixTime(moonriseUnix));

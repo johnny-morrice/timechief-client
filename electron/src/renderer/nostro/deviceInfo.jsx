@@ -27,10 +27,10 @@ function hasUpdateVersion(signals) {
 }
 
 function updateSignalsForAPIData(signals, data) {
-    if ("LauncherState" in data) {
-        let launcherState = data["LauncherState"];
-        if ("ActiveTargetVersion" in launcherState) {
-            let activeTargetVersion = launcherState["ActiveTargetVersion"];
+    if ("launcher_state" in data) {
+        let launcherState = data["launcher_state"];
+        if ("active_target_version" in launcherState) {
+            let activeTargetVersion = launcherState["active_target_version"];
             signals.setActiveTargetVersion(activeTargetVersion);
             signals.setActiveTargetVersionText(activeTargetVersion);
         }

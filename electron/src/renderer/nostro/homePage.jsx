@@ -60,11 +60,11 @@ function getDateText(locale) {
 }
 
 function updateSignals(signals, data) {
-  let calendar = data["Calendar"];
-  let clock = data["Clock"];
-  let hourCycleOption = clock["HourCycleOption"];
-  let timezone = clock["Timezone"];
-  let locale = clock["Locale"];
+  let calendar = data["google_calendar"];
+  let deviceProfile = data["device_profile"];
+  let hourCycleOption = deviceProfile["hour_cycle_option"];
+  let timezone = deviceProfile["timezone"];
+  let locale = deviceProfile["locale"];
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
   signals.setTimezone(timezone);
@@ -88,10 +88,10 @@ function setFakeEvent(signals) {
         // Start time is now + 3 hours in unix time.
         const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60) + (Math.random() * 1000 * 60 * 60);
         const event = new CalendarEvent({
-          "ShortText": "Fake event",
-          "Start": startTime,
-          "End": 0,
-          "AllDay": true,
+          "short_text": "Fake event",
+          "start": startTime,
+          "end": 0,
+          "all_day": true,
         });
         signals.setNextEventBuffer(event);
       } else {
@@ -99,10 +99,10 @@ function setFakeEvent(signals) {
         const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60);
         const shortRandomText = Math.random().toString(36).substring(2, 15);
         const event = new CalendarEvent({
-          "ShortText": "Fake event" + shortRandomText,
-          "Start": startTime,
-          "End": 0,
-          "AllDay": true,
+          "short_text": "Fake event" + shortRandomText,
+          "start": startTime,
+          "end": 0,
+          "all_day": true,
         });
         signals.setNextEventBuffer(event);
       }
@@ -111,10 +111,10 @@ function setFakeEvent(signals) {
     // Start time is now + 3 hours in unix time.
     const startTime = Math.floor(Date.now() / 1000) + 3 * 60 * 60;
     const event = new CalendarEvent({
-      "ShortText": "Fake event",
-      "Start": startTime,
-      "End": 0,
-      "AllDay": true,
+      "short_text": "Fake event",
+      "start": startTime,
+      "end": 0,
+      "all_day": true,
     });
     signals.setNextEventBuffer(event);
   }

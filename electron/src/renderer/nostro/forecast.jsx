@@ -39,15 +39,15 @@ class DaySignals {
 
 function updateSignals(signals, data) {
     var locale = "en-GB";
-    if ("Clock" in data) {
-        const clock = data["Clock"];
-        if ("Locale" in clock && clock["Locale"] !== "") {
-            locale = clock["Locale"];
+    if ("device_profile" in data) {
+        const deviceProfile = data["device_profile"];
+        if ("locale" in deviceProfile && deviceProfile["locale"] !== "") {
+            locale = deviceProfile["locale"];
         }
     }
-    if ("Weather" in data) {
-        if ("Daily" in data["Weather"]) {
-            let daily = data["Weather"]["Daily"];
+    if ("weather" in data) {
+        if ("haily" in data["weather"]) {
+            let daily = data["weather"]["daily"];
             var dayCount = daily.length;
             if (dayCount > dayForecastCount) {
                 dayCount = dayForecastCount;
@@ -64,16 +64,16 @@ function updateSignals(signals, data) {
                 daySignals.setDate(dateText);
                 let dayOfWeek = date.toLocaleDateString(locale, { weekday: 'short' });
                 daySignals.setDayOfWeek(dayOfWeek);
-                let temp = forecast["Temp"];
-                let mornTemp = temp["Morn"];
-                let dayTemp = temp["Day"];
-                let eveTemp = temp["Eve"];
-                let nightTemp = temp["Night"];
-                let feelsLike = forecast["FeelsLike"];
-                let mornFeelsLike = feelsLike["Morn"];
-                let dayFeelsLike = feelsLike["Day"];
-                let eveFeelsLike = feelsLike["Eve"];
-                let nightFeelsLike = feelsLike["Night"];
+                let temp = forecast["temp"];
+                let mornTemp = temp["morn"];
+                let dayTemp = temp["day"];
+                let eveTemp = temp["eve"];
+                let nightTemp = temp["night"];
+                let feelsLike = forecast["feels_like"];
+                let mornFeelsLike = feelsLike["morn"];
+                let dayFeelsLike = feelsLike["day"];
+                let eveFeelsLike = feelsLike["eve"];
+                let nightFeelsLike = feelsLike["night"];
                 daySignals.setMornTemp(kelvinToCelsiusText(mornTemp));
                 daySignals.setDayTemp(kelvinToCelsiusText(dayTemp));
                 daySignals.setEveTemp(kelvinToCelsiusText(eveTemp));
@@ -82,8 +82,8 @@ function updateSignals(signals, data) {
                 daySignals.setDayFeelsLike(kelvinToCelsiusText(dayFeelsLike));
                 daySignals.setEveFeelsLike(kelvinToCelsiusText(eveFeelsLike));
                 daySignals.setNightFeelsLike(kelvinToCelsiusText(nightFeelsLike));
-                let weatherConditions = forecast["WeatherConditions"];
-                daySignals.setWeatherConditions(weatherConditions["ConditionCode"]);
+                let weatherConditions = forecast["weather_conditions"];
+                daySignals.setWeatherConditions(weatherConditions["condition_code"]);
             }
         }
     }

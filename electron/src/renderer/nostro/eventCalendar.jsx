@@ -18,16 +18,16 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
-  let clock = data["Clock"];
-  signals.setLocale(clock["Locale"]);
-  const tz = clock["Timezone"]
+  let deviceProfile = data["device_profile"];
+  signals.setLocale(deviceProfile["locale"]);
+  const tz = deviceProfile["timezone"]
   signals.setTimeZone(tz);
   signals.setLoaded(true);
-  let calendarResp = data["Calendar"];
-  if ("Calendar" in calendarResp && calendarResp["Calendar"] != null) {
-    let calendar = calendarResp["Calendar"];
-    if ("Events" in calendar) {
-      let dataEvents = calendar["Events"];
+  let calendarResp = data["calendar"];
+  if ("calendar" in calendarResp && calendarResp["calendar"] != null) {
+    let calendar = calendarResp["google_calendar"];
+    if ("events" in calendar) {
+      let dataEvents = calendar["events"];
       if (dataEvents) {
         let events = dataEvents.map(cev => new CalendarEvent(cev));
         let calendarDays = new CalendarDaysModel(tz);

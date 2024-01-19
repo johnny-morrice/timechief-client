@@ -20,27 +20,30 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
-    let clock =   data["Clock"];
-    let location = clock["Location"];
+    let deviceProfile =   data["device_profile"];
+    if (!deviceProfile) {
+        return;
+    }
+    let location = deviceProfile["location"];
     signals.setLocation(location);
-    let weather = data["Weather"];
+    let weather = data["weather"];
     if (weather) {
-        let currentWeather = weather["Current"];
-        let temp = currentWeather["Temp"];
-        let feelsLike = currentWeather["FeelsLike"];
-        let weatherConditions = currentWeather["WeatherConditions"];
+        let currentWeather = weather["current"];
+        let temp = currentWeather["temp"];
+        let feelsLike = currentWeather["feels_like"];
+        let weatherConditions = currentWeather["weather_conditions"];
         signals.setTempK(temp);
         signals.setFeelsLikeTempK(feelsLike);
         let feelsLikeText = kelvinToCelsiusText(feelsLike);
         let tempText = kelvinToCelsiusText(temp);
-        signals.setCurrentWeatherConditions(weatherConditions["ConditionCode"]);
+        signals.setCurrentWeatherConditions(weatherConditions["condition_code"]);
         signals.setFeelsLikeTemp(feelsLikeText);
         signals.setTemp(tempText);
-        let daily = weather["Daily"];
+        let daily = weather["daily"];
         if (daily && daily.length > 0) {
             let today = daily[0];
-            let todayConditions = today["WeatherConditions"];
-            signals.setTodayWeatherConditions(todayConditions["ConditionCode"]);
+            let todayConditions = today["weather_conditions"];
+            signals.setTodayWeatherConditions(todayConditions["condition_code"]);
         }
     }
 }
