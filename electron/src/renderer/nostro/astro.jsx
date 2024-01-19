@@ -35,7 +35,7 @@ function updateAstroPageSignals(signals, data) {
         let sunsetUnix = today["sunset"];
         let moonriseUnix = today["moonrise"];
         let moonsetUnix = today["moonset"];
-        let moonphase = today["moonPhase"];
+        let moonphase = today["moon_phase"];
         signals.setSunrise(parseUnixTime(sunriseUnix))
         signals.setSunset(parseUnixTime(sunsetUnix));
         signals.setMoonrise(parseUnixTime(moonriseUnix));

@@ -87,17 +87,17 @@ export class CalendarEvent {
     }
 
     eventShortText() {
-        if (this.data.ShortText.length > 30) {
-            return this.data.ShortText.slice(0, 30) + "...";
+        if (this.data.short_text.length > 30) {
+            return this.data.short_text.slice(0, 30) + "...";
         }
-        return this.data.ShortText;
+        return this.data.short_text;
     }
 
     startTime() {
         if (this._startTime) {
             return this._startTime;
         }
-        this._startTime = new Date(this.data.Start * 1000);
+        this._startTime = new Date(this.data.start * 1000);
         this._startTime.getFullYear();
         return this._startTime;
     }
@@ -106,8 +106,8 @@ export class CalendarEvent {
         if (this._endTime) {
             return this._endTime;
         }
-        if (this.data.End != 0) {
-            this._endTime = new Date(this.data.End * 1000);
+        if (this.data.end != 0) {
+            this._endTime = new Date(this.data.end * 1000);
         }
         return this._endTime;
     }
@@ -121,7 +121,7 @@ export class CalendarEvent {
     }
 
     isAllDay() {
-        return this.data["AllDay"];
+        return this.data["all_day"];
     }
 
     formatEndTime(locale, timeZone) {

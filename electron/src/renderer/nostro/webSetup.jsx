@@ -35,33 +35,33 @@ function isUpdating(signals) {
 }
 
 function updateSignals(signals, data) {
-    if ("LauncherState" in data) {
-        let launcherState = data["LauncherState"];
-        if ("FirstTimeSetupDone" in launcherState) {
-            let firstTimeSetupDone = launcherState["FirstTimeSetupDone"];
+    if ("launcher_state" in data) {
+        let launcherState = data["launcher_state"];
+        if ("first_time_setup_done" in launcherState) {
+            let firstTimeSetupDone = launcherState["first_time_setup_done"];
             signals.setFirstTimeSetupDone(firstTimeSetupDone);
         } else {
             signals.setFirstTimeSetupDone(false);
         }
-        if ("SetupState" in launcherState) {
-            let setupState = launcherState["SetupState"];
+        if ("setup_state" in launcherState) {
+            let setupState = launcherState["setup_state"];
             signals.setSetupState(setupState);
         }
-        if ("WebURL" in launcherState) {
-            let setupURL = launcherState["WebURL"];
+        if ("web_url" in launcherState) {
+            let setupURL = launcherState["web_url"];
             signals.setDeviceSetupURL(setupURL);
             signals.setDeviceSetupURLText(setupURL);
         }
 
-        let isUpdating = launcherState["Flags"].includes("isUpdating");
+        let isUpdating = launcherState["flags"].includes("isUpdating");
         signals.setUpdating(isUpdating);
 
-        if ("WifiState" in launcherState) {
-            let wifiState = launcherState["WifiState"];
-            let hotspotSSID = wifiState["HotspotSSID"];
-            let hotspotKey = wifiState["HotspotKey"];
-            let activeSSID = wifiState["ActiveSSID"];
-            let wifiError = wifiState["IsWifiError"];
+        if ("wifi_state" in launcherState) {
+            let wifiState = launcherState["wifi_state"];
+            let hotspotSSID = wifiState["hotspot_ssid"];
+            let hotspotKey = wifiState["hotspot_key"];
+            let activeSSID = wifiState["active_ssid"];
+            let wifiError = wifiState["is_wifi_error"];
             signals.setActiveSSID(activeSSID);
             signals.setWifiError(wifiError);
 

@@ -19,9 +19,9 @@ class Signals {
 }
 
 function hasStateFlag(data, flag) {
-    let launcherState = data["LauncherState"];
+    let launcherState = data["launcher_state"];
     if (launcherState) {
-        let flags = launcherState["Flags"];
+        let flags = launcherState["flags"];
         if (flags) {
             return flags.includes(flag);
         }
@@ -61,6 +61,7 @@ export const StatusNote = () => {
         removeDataCallback(cbName);
         clearInterval(ipcCheckInterval);
     });
+    // TODO this createEffect will be breaking the clock.
     createEffect(() => {
         if (signals.isCalendarErrorBuffer() !== signals.isCalendarError() || 
             signals.isDeviceDataErrorBuffer() !== signals.isDeviceDataError() ||

@@ -16,12 +16,15 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
-    let clock = data["Clock"];
-    let location = clock["Location"];
-    let latitude = clock["Latitude"];
-    let longitude = clock["Longitude"];
-    let timezone = clock["Timezone"];
-    let locale = clock["Locale"];
+    let deviceProfile = data["device_profile"];
+    if (!deviceProfile) {
+        return;
+    }
+    let location = deviceProfile["location"];
+    let latitude = deviceProfile["latitude"];
+    let longitude = deviceProfile["longitude"];
+    let timezone = deviceProfile["timezone"];
+    let locale = deviceProfile["locale"];
     signals.setCoords(`${latitude}, ${longitude}`);
     signals.setTimezone(timezone);
     signals.setLocation(location);
