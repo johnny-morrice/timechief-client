@@ -1133,9 +1133,9 @@ components:
       type: object
       properties:
         temp:
-          type: number
+          type: string
         feels_like:
-          type: number
+          type: string
         weather_conditions:
           $ref: "#/components/schemas/WeatherCondition"
 
@@ -1143,13 +1143,13 @@ components:
       type: object
       properties:
         morn:
-          type: number
+          type: string
         day:
-          type: number
+          type: string
         eve:
-          type: number
+          type: string
         night:
-          type: number
+          type: string
 
     DailyWeather:
       type: object
@@ -1295,7 +1295,7 @@ components:
       properties:
         device_profile:
           $ref: "#/components/schemas/DeviceProfileDatum"
-        owm_data:
+        owm:
           $ref: "#/components/schemas/OWMDataDatum"
         google_calendar:
           $ref: "#/components/schemas/CalendarDatum"

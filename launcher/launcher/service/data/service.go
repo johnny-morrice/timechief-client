@@ -97,7 +97,7 @@ func (svc Service) SetLicenseActivationCode(code string) error {
 }
 
 func (svc Service) PairDevice() error {
-	err := svc.keyValueStore.Delete(store.PairingCodeKey)
+	err := svc.keyValueStore.Delete(store.PairingDeviceCodeKey)
 	if err != nil {
 		return fmt.Errorf("failed to delete pairing code: %w", err)
 	}
@@ -115,9 +115,9 @@ func (svc Service) GetPairingStatus() (PairingStatus, error) {
 	}
 	qrCodeURL, err := svc.keyValueStore.Get(store.PairingQRCodeURLKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
+		return PairingStatus{}, fmt.Errorf("failed to get pairing URL: %w", err)
 	}
-	code, err := svc.keyValueStore.Get(store.PairingCodeKey)
+	code, err := svc.keyValueStore.Get(store.PairingUserCodeKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
 	}
