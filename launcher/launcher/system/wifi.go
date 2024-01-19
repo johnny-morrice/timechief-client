@@ -30,8 +30,9 @@ func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
 			continue
 		}
 		result = append(result, WifiNetwork{
-			SSID:   nmNet.SSID,
-			Signal: nmNet.Signal,
+			SSID:       nmNet.SSID,
+			Signal:     nmNet.Signal,
+			Encryption: nmNet.Security,
 		})
 	}
 	return result, nil
@@ -89,9 +90,10 @@ func (status NetworkStatus) String() string {
 }
 
 type WifiNetwork struct {
-	SSID   string
-	Key    string
-	Signal int
+	SSID       string
+	Key        string
+	Signal     int
+	Encryption string
 }
 
 func ReadWifiInterfaces(cfg store.Config) ([]WifiInterface, error) {

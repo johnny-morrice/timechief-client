@@ -67,6 +67,7 @@ type WifiState struct {
 type WifiNetwork struct {
 	SSID           string
 	SignalStrength int
+	Encryption     string
 }
 
 type DeviceData struct {
@@ -213,6 +214,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		networks[i] = WifiNetwork{
 			SSID:           storeNet.SSID,
 			SignalStrength: storeNet.Signal,
+			Encryption:     storeNet.Encryption,
 		}
 	}
 

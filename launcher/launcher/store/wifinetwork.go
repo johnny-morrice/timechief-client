@@ -15,6 +15,7 @@ type WifiNetwork struct {
 	SSID            string `gorm:"column:ssid;uniqueIndex"`
 	Signal          int
 	Key             string
+	Encryption      string
 	Selected        bool
 	Ready           bool
 	FoundLastScan   bool
