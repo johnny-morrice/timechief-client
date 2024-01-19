@@ -60,17 +60,17 @@ type CalendarEvent struct {
 
 // CurrentWeather defines model for CurrentWeather.
 type CurrentWeather struct {
-	FeelsLike         *float32          `json:"feels_like,omitempty"`
-	Temp              *float32          `json:"temp,omitempty"`
+	FeelsLike         *string           `json:"feels_like,omitempty"`
+	Temp              *string           `json:"temp,omitempty"`
 	WeatherConditions *WeatherCondition `json:"weather_conditions,omitempty"`
 }
 
 // DailyTemperature defines model for DailyTemperature.
 type DailyTemperature struct {
-	Day   *float32 `json:"day,omitempty"`
-	Eve   *float32 `json:"eve,omitempty"`
-	Morn  *float32 `json:"morn,omitempty"`
-	Night *float32 `json:"night,omitempty"`
+	Day   *string `json:"day,omitempty"`
+	Eve   *string `json:"eve,omitempty"`
+	Morn  *string `json:"morn,omitempty"`
+	Night *string `json:"night,omitempty"`
 }
 
 // DailyWeather defines model for DailyWeather.
