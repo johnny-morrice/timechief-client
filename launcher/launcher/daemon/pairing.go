@@ -40,7 +40,7 @@ type AuthZeroClient interface {
 }
 
 func (p Pairing) Initialise() error {
-	err := p.KeyValueStore.Delete(store.PairingCodeKey)
+	err := p.KeyValueStore.Delete(store.PairingDeviceCodeKey)
 	if err != nil {
 		return fmt.Errorf("error deleting pairing code: %s", err)
 	}
@@ -73,7 +73,7 @@ func (p Pairing) doTick(ctx *cli.Context) error {
 
 	if isPairingRequested {
 		log.Println("handling pairing request")
-		exists, err := p.KeyValueStore.Exists(store.PairingCodeKey)
+		exists, err := p.KeyValueStore.Exists(store.PairingDeviceCodeKey)
 		if err != nil {
 			return fmt.Errorf("error getting pairing code: %s", err)
 		} else if !exists {
@@ -121,9 +121,13 @@ func (p Pairing) createPairing() error {
 	if err != nil {
 		return fmt.Errorf("error getting device code: %s", err)
 	}
-	err = p.KeyValueStore.Set(store.PairingCodeKey, deviceResp.DeviceCode)
+	err = p.KeyValueStore.Set(store.PairingDeviceCodeKey, deviceResp.DeviceCode)
 	if err != nil {
-		return fmt.Errorf("error setting pairing code: %s", err)
+		return fmt.Errorf("error setting pairing device code: %s", err)
+	}
+	err = p.KeyValueStore.Set(store.PairingUserCodeKey, deviceResp.UserCode)
+	if err != nil {
+		return fmt.Errorf("error setting pairing user code: %s", err)
 	}
 	err = p.KeyValueStore.Set(store.PairingURLKey, deviceResp.VerificationUri)
 	if err != nil {
@@ -148,9 +152,13 @@ func (p Pairing) handlePairingComplete(accessToken authzero.AccessTokenResp) err
 	if err != nil {
 		return fmt.Errorf("error deleting pairing-requested flag: %s", err)
 	}
-	err = p.KeyValueStore.Delete(store.PairingCodeKey)
+	err = p.KeyValueStore.Delete(store.PairingDeviceCodeKey)
 	if err != nil {
-		return fmt.Errorf("error clearing pairing code: %s", err)
+		return fmt.Errorf("error clearing pairing device code: %s", err)
+	}
+	err = p.KeyValueStore.Delete(store.PairingUserCodeKey)
+	if err != nil {
+		return fmt.Errorf("error clearing pairing user code: %s", err)
 	}
 	err = p.KeyValueStore.Delete(store.PairingURLKey)
 	if err != nil {
@@ -183,7 +191,7 @@ func (p Pairing) getPairingState() (authzero.AccessTokenResp, error) {
 	if err != nil {
 		return nope, fmt.Errorf("error getting config: %s", err)
 	}
-	deviceCode, err := p.KeyValueStore.Get(store.PairingCodeKey)
+	deviceCode, err := p.KeyValueStore.Get(store.PairingDeviceCodeKey)
 	if err != nil {
 		return nope, fmt.Errorf("error getting pairing code: %s", err)
 	}
