@@ -48,6 +48,8 @@ func (api Data) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		log.Printf("failed to logout: %v", err)
 		return
 	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 type LicenseActivationCodeRequest struct {
