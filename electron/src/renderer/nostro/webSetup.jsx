@@ -7,7 +7,7 @@ import { textTransitionSignal } from './textGlitch';
 import { random } from './fakeRandom';
 import { labelMaker, textMaker } from './label';
 import { fadeTransition } from './fadeTransition';
-import { qrcode } from 'wifi-qr-code-generator';
+import { generateWifiQRCode } from 'wifi-qr-code-generator';
 
 class Signals {
     constructor() {
@@ -72,7 +72,9 @@ function updateSignals(signals, data) {
                 signals.setHotspotSSIDText(hotspotSSID);
                 signals.setHotspotKey(hotspotKey);
                 signals.setHotspotKeyText(hotspotKey);
-                generateWifiQRCode(hotspotSSID, hotspotKey).then((data) => {
+                generateHotspotQRCode(hotspotSSID, hotspotKey).then((data) => {
+                    console.log("Hotspot QR code generated");
+                    console.log(data);
                     signals.setHotspotQRData(data);
                 }).catch((error) => {
                     console.log("Error generating hotspot QR code");
@@ -85,8 +87,8 @@ function updateSignals(signals, data) {
     runButtonGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
 }
 
-function generateWifiQRCode(hotspotSSID, hotspotKey) {
-    return qrcode.generateWifiQRCode({
+function generateHotspotQRCode(hotspotSSID, hotspotKey) {
+    return generateWifiQRCode({
         ssid: hotspotSSID,
         password: hotspotKey,
         encryption: 'WPA2',
@@ -241,7 +243,7 @@ export const WebSetupPage = (props) => {
                             <div class="data-value">{signals.hotspotKeyText}</div>
                         </div>
                         <div class='flex-row'>
-                            <img class="hotspot-qr" src={signals.hotspotQRData} alt='Hotspot QR Code' />
+                            <img class="hotspot-qr" src={signals.hotspotQRData()} alt='Hotspot QR Code' />
                         </div>
                         <Show when={isConnectionError(signals)}>
                             <div class='flex-row'>
