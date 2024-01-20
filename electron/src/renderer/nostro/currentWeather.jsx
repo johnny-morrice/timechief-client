@@ -20,13 +20,18 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
-    let deviceProfile =   data["device_profile"];
-    if (!deviceProfile) {
+    let deviceProfileWrapper =   data["device_profile"];
+    let deviceProfile = deviceProfileWrapper["value"];
+    if (!deviceProfileWrapper) {
         return;
     }
     let location = deviceProfile["location"];
     signals.setLocation(location);
-    let weather = data["weather"];
+    let owm = data["owm"];
+    if (!owm) {
+        return;
+    }
+    let weather = owm["value"];
     if (weather) {
         let currentWeather = weather["current"];
         let temp = currentWeather["temp"];

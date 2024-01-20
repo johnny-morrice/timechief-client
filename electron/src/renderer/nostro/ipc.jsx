@@ -59,11 +59,21 @@ export function removeDeviceStatusCallback(name) {
 
 export function addServiceDataCallback(name, cb) {
     clockDataReceiver.addCallback(name, (data) => {
-        if ("ServiceData" in data) {
-            cb(data["ServiceData"])
+        if ("service_data" in data && !isEmpty(data["service_data"])) {
+            cb(data["service_data"]);
         }
     });
 }
+
+function isEmpty(obj) {
+    for (const prop in obj) {
+      if (Object.hasOwn(obj, prop)) {
+        return false;
+      }
+    }
+  
+    return true;
+  }
 
 export function addDataCallback(name, cb) {
     clockDataReceiver.addCallback(name, cb);
@@ -111,6 +121,10 @@ export function sendReboot() {
 
 export function sendSetupBegin() {
     window.api.send("setupBegin");
+}
+
+export function sendLogOut() {
+    window.api.send("logOut");
 }
 
 export function sendSetupCancel() {

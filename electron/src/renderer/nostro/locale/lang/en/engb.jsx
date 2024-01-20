@@ -16,7 +16,8 @@ export const Text = {
     "device-control": {
         "reboot": "Reboot",
         "shutdown": "Shutdown",
-        "setup": "Setup device",
+        "setup-wifi": "Setup WiFi",
+        "logout": "Logout",
         "status": "Status",
     },
     "device-info": {

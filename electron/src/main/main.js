@@ -263,6 +263,18 @@ class LauncherClient {
     });
   }
 
+  postLogOut() {
+    let cfg = {
+      url: this.baseURL + '/api/data/logout',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 204) {
+        return {};
+      }
+    });
+  }
+
   postWifiMarkNotReady() {
     let cfg = {
       url: this.baseURL + '/api/system/wifi/state',
@@ -326,6 +338,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
 }
 
 handleIPCAPICall("loggedIn", "loggedInResult", () => client.postLoggedIn());
+handleIPCAPICall("logOut", "logOutResult", () => client.postLogOut());
 handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.createPairing());
 handleIPCAPICall("pairingGet", "pairingGetResult", () => client.getPairing());
 handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());

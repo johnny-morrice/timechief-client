@@ -82,6 +82,11 @@ function onClickSetup() {
     sendSetupBegin();
 }
 
+function onClickLogout() {
+    console.log("logout clicked")
+    sendLogOut();
+}
+
 export const DeviceControl = () => {
     const signals = new Signals();
     const cbName = callbackName("DeviceControl")
@@ -114,7 +119,10 @@ export const DeviceControl = () => {
                 </Show>
             </div>
             <div class="flex-grow flex-row">
-                <button class='action-button crt-box flex-grow' onClick={onClickSetup}>{plainText("setup")} &nbsp;&nbsp; <i class="fa-solid fa-gear"></i></button>
+                <button class='action-button crt-box flex-grow' onClick={onClickSetup}>{plainText("setup-wifi")} &nbsp;&nbsp; <i class="fa-solid fa-gear"></i></button>
+            </div>
+            <div class="flex-grow flex-row">
+                <button class='action-button crt-box flex-grow' onClick={onClickLogout}>{plainText("logout")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
             </div>
             <Show when={hasDeviceStatus(signals)}>
                 <div class="flex-row flex-grow">
