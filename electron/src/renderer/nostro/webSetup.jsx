@@ -7,6 +7,7 @@ import { textTransitionSignal } from './textGlitch';
 import { random } from './fakeRandom';
 import { labelMaker, textMaker } from './label';
 import { fadeTransition } from './fadeTransition';
+import { qrcode } from 'wifi-qr-code-generator';
 
 class Signals {
     constructor() {
@@ -18,6 +19,7 @@ class Signals {
         [this.deviceSetupURLText, this.setDeviceSetupURLText] = textTransitionSignal("");
         [this.hotspotSSIDText, this.setHotspotSSIDText] = textTransitionSignal("");
         [this.hotspotKeyText, this.setHotspotKeyText] = textTransitionSignal("");
+        [this.hotspotQRData, this.setHotspotQRData] = createSignal("");
 
         [this.wifiError, this.setWifiError] = createSignal(false);
         [this.activeSSID, this.setActiveSSID] = createSignal("");
@@ -70,11 +72,27 @@ function updateSignals(signals, data) {
                 signals.setHotspotSSIDText(hotspotSSID);
                 signals.setHotspotKey(hotspotKey);
                 signals.setHotspotKeyText(hotspotKey);
+                generateWifiQRCode(hotspotSSID, hotspotKey).then((data) => {
+                    signals.setHotspotQRData(data);
+                }).catch((error) => {
+                    console.log("Error generating hotspot QR code");
+                    console.log(error);
+                });
             }
         }
     }
     runButtonGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 150);
     runButtonGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
+}
+
+function generateWifiQRCode(hotspotSSID, hotspotKey) {
+    return qrcode.generateWifiQRCode({
+        ssid: hotspotSSID,
+        password: hotspotKey,
+        encryption: 'WPA2',
+        hiddenSSID: false,
+        outputFormat: { type: 'image/png' }
+    });
 }
 
 function isConnectionError(signals) {
@@ -223,8 +241,7 @@ export const WebSetupPage = (props) => {
                             <div class="data-value">{signals.hotspotKeyText}</div>
                         </div>
                         <div class='flex-row'>
-                            <div class="data-label">{label("continue-via-browser")}</div>
-                            <div class="data-value">{signals.deviceSetupURLText}</div>
+                            <img class="hotspot-qr" src={signals.hotspotQRData} alt='Hotspot QR Code' />
                         </div>
                         <Show when={isConnectionError(signals)}>
                             <div class='flex-row'>
