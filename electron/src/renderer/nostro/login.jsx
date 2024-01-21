@@ -1,4 +1,4 @@
-import { Show, createSignal } from "solid-js";
+import { Show, createSignal, onCleanup } from "solid-js";
 import { callbackName } from "./callback";
 import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices } from "./ipc";
 import { toCanvas } from 'qrcode';

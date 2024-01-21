@@ -73,8 +73,6 @@ function updateSignals(signals, data) {
                 signals.setHotspotKey(hotspotKey);
                 signals.setHotspotKeyText(hotspotKey);
                 generateHotspotQRCode(hotspotSSID, hotspotKey).then((data) => {
-                    console.log("Hotspot QR code generated");
-                    console.log(data);
                     signals.setHotspotQRData(data);
                 }).catch((error) => {
                     console.log("Error generating hotspot QR code");
