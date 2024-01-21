@@ -4,9 +4,11 @@ import { hashIntegration, Router, Routes, Route } from "@solidjs/router";
 import { initializeIPC } from './ipc';
 import { WebSetupPage } from "./webSetup";
 import { HomePage } from "./homePage";
+import { LoginPage } from './login';
+
 
 const AppScreen = (props) => 
-  <WebSetupPage element={props.element}/>
+  <WebSetupPage element={<LoginPage element={props.element} />}/>
 
 const App = () => {
   let ipcIntervals = initializeIPC();
