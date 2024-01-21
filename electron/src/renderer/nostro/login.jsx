@@ -3,6 +3,7 @@ import { callbackName } from "./callback";
 import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices } from "./ipc";
 import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addServiceDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
+import { Loading } from "./loading";
 
 class Signals {
     constructor() {
@@ -10,6 +11,7 @@ class Signals {
         [this.loginURL, this.setLoginURL] = createSignal("");
         [this.qrCodeURL, this.setQrCodeURL] = createSignal("");
         [this.hasAccessCode, this.setHasAccessCode] = createSignal(false);
+        [this.hasDeviceUUID, this.setHasDeviceUUID] = createSignal(false);
     }
 }
 
@@ -92,8 +94,14 @@ export function LoginPage(props) {
     const plainText = textMaker("pairing");
 
     return <>
-        <Show when={signals.hasAccessCode()}>
+        <Show when={signals.hasAccessCode() && signals.hasDeviceUUID()}>
             {props.element}
+        </Show>
+        <Show when={signals.hasAccessCode() && !signals.hasDeviceUUID()}>
+            <div class="flex-column flex-grow">
+                <div>Waiting for subscription activation</div>
+                <Loading />
+            </div>
         </Show>
         <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>
             <div class="flex-column flex-grow">
