@@ -2,8 +2,9 @@ import { Show, createSignal, onCleanup } from "solid-js";
 import { callbackName } from "./callback";
 import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices } from "./ipc";
 import { toCanvas } from 'qrcode';
-import { addPairingCreateCallback, addPairingGetCallback, addServiceDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
+import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 import { Loading } from "./loading";
+import { labelMaker, textMaker } from "./label";
 
 class Signals {
     constructor() {
@@ -17,14 +18,19 @@ class Signals {
 
 function onDataUpdate(data, signals) {
     const dataState = data["service_data_state"];
+    if (!dataState) {
+        return;
+    }
     const hasAccessCode = dataState["has_access_token"];
+    const deviceUUID = dataState["my_device_uuid"];
+    signals.setHasDeviceUUID(deviceUUID.length > 0);
     signals.setHasAccessCode(hasAccessCode);
 }
 
 export function LoginPage(props) {
     const signals = new Signals();
     const cbName = callbackName("LoginPage");
-    addServiceDataCallback(cbName, (data) => onDataUpdate(data, signals));
+    addDataCallback(cbName, (data) => onDataUpdate(data, signals));
     var pairingGetInterval = null;
     var pairingQrCodeCanvas = null;
     function onClickLogin() {
@@ -47,9 +53,9 @@ export function LoginPage(props) {
         }, 300);
     });
     addPairingGetCallback(cbName, (data) => {
-        const pairingCode = data["code"];
-        if (pairingCode.length > 0) {
-            signals.setPairingCode(pairingCode);
+        const userCode = data["code"];
+        if (userCode.length > 0) {
+            signals.setUserCode(userCode);
         }
         const loginURL = data["url"];
         if (loginURL.length > 0) {
@@ -69,8 +75,8 @@ export function LoginPage(props) {
             }
         }
         // Pairing is complete if we've got a code and the state is now none.
-        if (data["status"] == "none" && signals.pairingCode().length > 0) {
-            signals.setPairingCode("");
+        if (data["status"] == "none" && signals.userCode().length > 0) {
+            signals.setUserCode("");
             if (pairingGetInterval != null) {
                 clearInterval(pairingGetInterval);
             }
@@ -105,12 +111,16 @@ export function LoginPage(props) {
         </Show>
         <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>
             <div class="flex-column flex-grow">
-                <div class="pairing-title flex-grow">{label("title")}</div>
-                <button onClick={onClickLogin}>{plainText("link-account")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
+                <div class="flex-grow flex-row">
+                    <div class="pairing-title">{label("title")}</div>
+                </div>
+                <div class="flex-grow flex-row">
+                    <button class="action-button crt-box flex-grow" onClick={onClickLogin}>{plainText("link-account")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
+                </div>
             </div>
         </Show>
         <Show when={!signals.hasAccessCode() && isLoginStarted(signals)}>
-        <div class="flex-column flex-grow">
+            <div class="flex-column flex-grow">
                 <div class='flex-row'>
                     <div class="data-label">{label("in-your-browser")}</div>
                     <div class="data-value">{signals.loginURL}</div>
