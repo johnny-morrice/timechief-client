@@ -119,6 +119,10 @@ export function sendReboot() {
     window.api.send("reboot");
 }
 
+export function sendRefreshMyDevices() {
+    window.api.send("refreshMyDevices");
+}
+
 export function sendSetupBegin() {
     window.api.send("setupBegin");
 }

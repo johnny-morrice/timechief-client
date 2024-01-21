@@ -290,6 +290,18 @@ class LauncherClient {
     });
   }
 
+  postRefreshMyDevices() {
+    let cfg = {
+      url: this.baseURL + '/api/data/mydevice/refresh',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 204) {
+        return {};
+      }
+    });
+  }
+
   getDeviceData() {
     let cfg = {
       url: this.baseURL + '/api/data/device',
@@ -337,6 +349,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   });
 }
 
+handleIPCAPICall("refreshMyDevices", "refreshMyDevicesResult", () => client.postRefreshMyDevices());
 handleIPCAPICall("loggedIn", "loggedInResult", () => client.postLoggedIn());
 handleIPCAPICall("logOut", "logOutResult", () => client.postLogOut());
 handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.createPairing());

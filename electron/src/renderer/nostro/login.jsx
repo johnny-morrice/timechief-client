@@ -1,6 +1,6 @@
 import { Show, createSignal } from "solid-js";
 import { callbackName } from "./callback";
-import { sendPairingCreateRequest, sendPairingGetRequest } from "./ipc";
+import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices } from "./ipc";
 import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addServiceDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 
@@ -27,6 +27,7 @@ export function LoginPage(props) {
     var pairingQrCodeCanvas = null;
     function onClickLogin() {
         sendPairingCreateRequest();
+        sendRefreshMyDevices();
     }
     onCleanup(() => {
         if (pairingGetInterval != null) {

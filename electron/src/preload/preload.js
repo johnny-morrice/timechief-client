@@ -3,7 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld(
     "api", {
         send: (channel, ...args) => {
-            let validChannels = ["getClockData", "pairingCreate", "pairingGet", "reboot", "shutdown", "setupBegin", "setupCancel", "setupRestart", "loggedIn", "logOut"];
+            let validChannels = ["getClockData", "pairingCreate", "pairingGet", "reboot", "shutdown", "setupBegin", "setupCancel", "setupRestart", "loggedIn", "logOut", "refreshMyDevices"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, ...args);
             }
