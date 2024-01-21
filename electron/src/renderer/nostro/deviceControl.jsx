@@ -122,7 +122,7 @@ export const DeviceControl = () => {
                 <button class='action-button crt-box flex-grow' onClick={onClickSetup}>{plainText("setup-wifi")} &nbsp;&nbsp; <i class="fa-solid fa-gear"></i></button>
             </div>
             <div class="flex-grow flex-row">
-                <button class='action-button crt-box flex-grow' onClick={onClickLogout}>{plainText("logout")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
+                <button class='action-button crt-box flex-grow' onClick={onClickLogout}>{plainText("logout")} &nbsp;&nbsp; <i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
             <Show when={hasDeviceStatus(signals)}>
                 <div class="flex-row flex-grow">
