@@ -46,7 +46,7 @@ on_chroot << EOF
 cat > /etc/systemd/system/timechief-launcher.service << CATEND
 [Unit]
 Description=TimeChief Launcher Service
-After=network.target
+After=network.target timechief-launcher-sound.service
 
 [Service]
 User=$FIRST_USER_NAME

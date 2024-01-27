@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
@@ -226,7 +228,19 @@ func Daemon(ctx *cli.Context) error {
 	for _, pkg := range packages {
 		pkg.AddRoutes(mux)
 	}
+	onInitialiseComplete(soundService)
 	return http.ListenAndServe(addr, mux)
+}
+
+func onInitialiseComplete(soundService sound.Service) {
+	go func() {
+		// Let's fudge it and wait a bit for the system to settle
+		time.Sleep(5 * time.Second)
+		err := soundService.PlayStartup()
+		if err != nil {
+			log.Printf("Failed to play startup sound: %v", err)
+		}
+	}()
 }
 
 type apiPackage interface {
