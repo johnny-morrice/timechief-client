@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -36,7 +37,7 @@ func (svc Service) isMuted() (bool, error) {
 }
 
 func (svc Service) isInUnmuteRange() (bool, error) {
-	timeNow := time.Now()
+	// unmuteRange is startHour,endHour
 	unmuteRange, err := svc.kv.Get("unmute-range")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, err
@@ -44,21 +45,22 @@ func (svc Service) isInUnmuteRange() (bool, error) {
 	if unmuteRange == "" {
 		return false, nil
 	}
-	rangeTimesText := strings.Split(unmuteRange, ",")
-	if len(rangeTimesText) != 2 {
-		return false, fmt.Errorf("unmute-range is invalid")
+	unmuteRangeParts := strings.Split(unmuteRange, "-")
+	if len(unmuteRangeParts) != 2 {
+		return false, fmt.Errorf("invalid unmute range %v", unmuteRange)
 	}
-	rangeTimes := make([]time.Time, 2)
-	for i, rangeTimeText := range rangeTimesText {
-		rangeTime, err := time.Parse(time.RFC3339, rangeTimeText)
+	unmuteHours := [2]int{}
+	for i, part := range unmuteRangeParts {
+		unmuteHour, err := strconv.ParseInt(part, 10, 32)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("invalid unmute range %v", unmuteRange)
 		}
-		rangeTimes[i] = rangeTime
+		unmuteHours[i] = int(unmuteHour)
 	}
-	unmuteStartTime := rangeTimes[0]
-	unmuteEndTime := rangeTimes[1]
-	isInRange := timeNow.After(unmuteStartTime) && timeNow.Before(unmuteEndTime)
+	startHour := unmuteHours[0]
+	endHour := unmuteHours[1]
+	currentTime := time.Now()
+	isInRange := currentTime.Hour() >= startHour && currentTime.Hour() < endHour
 	return isInRange, nil
 }
 

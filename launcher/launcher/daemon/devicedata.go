@@ -67,7 +67,19 @@ func (dd DeviceData) doTick(ctx *cli.Context) error {
 		return err
 	}
 	return nil
+}
 
+func (dd DeviceData) SetTestSoundSettings() error {
+	log.Println("setting test sound settings")
+	err := dd.keyValueStore.Set("mute", "false")
+	if err != nil {
+		return err
+	}
+	err = dd.keyValueStore.Set("unmute-range", "9-21")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 var DeviceDataErrorState = "device-data-error"
