@@ -56,11 +56,16 @@ func Daemon(ctx *cli.Context) error {
 
 	cfgStore := store.ConfigStore{DB: db}
 
-	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
-	soundService := sound.NewSoundService(soundClient)
 	launchTargetStore := store.LaunchTargetStore{DB: db}
 
 	keyValueStore := store.KeyValueStore{DB: db}
+
+	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
+	soundService, err := sound.NewSoundService(soundClient, keyValueStore)
+	if err != nil {
+		return err
+	}
+
 	timechiefClient, err := clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).Build()
 	if err != nil {
 		return err

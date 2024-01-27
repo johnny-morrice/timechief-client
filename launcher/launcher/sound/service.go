@@ -3,6 +3,7 @@ package sound
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -67,6 +68,7 @@ func (svc Service) playSound(songName string) error {
 		return err
 	}
 	if muted {
+		log.Printf("sound is muted, not playing %v", songName)
 		return nil
 	}
 	inRange, err := svc.isInUnmuteRange()
@@ -74,6 +76,7 @@ func (svc Service) playSound(songName string) error {
 		return err
 	}
 	if !inRange {
+		log.Printf("sound is not in unmute range, not playing %v", songName)
 		return nil
 	}
 	req := daemonclient.PlaySoundRequest{
