@@ -42,8 +42,11 @@ func (svc Service) isInUnmuteRange() (bool, error) {
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, err
 	}
+	// If not set, then always in range.
+	// This means you get a startup sound if the device is uninitialised.
+	// The setup daemon should set a reasonable unmute range.
 	if unmuteRange == "" {
-		return false, nil
+		return true, nil
 	}
 	unmuteRangeParts := strings.Split(unmuteRange, "-")
 	if len(unmuteRangeParts) != 2 {
