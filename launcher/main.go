@@ -43,6 +43,16 @@ func getCLIApp() *cli.App {
 			},
 		},
 		{
+			Name:   "console-boostrap",
+			Action: cmd.Bootstrap,
+			Flags: []cli.Flag{
+				&cli.DurationFlag{
+					Name:  "timeout",
+					Value: 5 * time.Second,
+				},
+			},
+		},
+		{
 			Name:   "daemon-sound",
 			Action: cmd.Sound,
 			Flags: []cli.Flag{
