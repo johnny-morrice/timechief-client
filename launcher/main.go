@@ -43,7 +43,7 @@ func getCLIApp() *cli.App {
 			},
 		},
 		{
-			Name:   "console-boostrap",
+			Name:   "console-bootstrap",
 			Action: cmd.Bootstrap,
 			Flags: []cli.Flag{
 				&cli.DurationFlag{
