@@ -22,8 +22,8 @@ func ConsoleBootstrap(opts Options) error {
 		timer: timer.NewWithInterval(opts.Timeout, time.Second/10),
 		keymap: keymap{
 			quit: key.NewBinding(
-				key.WithKeys("escape"),
-				key.WithHelp("escape", "skip timeout"),
+				key.WithKeys("esc"),
+				key.WithHelp("esc", "skip"),
 			),
 		},
 		help: help.New(),
@@ -78,8 +78,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) helpView() string {
-	return "\n" + m.help.ShortHelpView([]key.Binding{
-		m.keymap.quit,
+	return "\n" + m.help.FullHelpView([][]key.Binding{
+		{m.keymap.quit},
 	})
 }
 
@@ -89,13 +89,15 @@ func (m model) View() string {
 	// entirely.
 	s := m.timer.View()
 
-	if m.timer.Timedout() {
-		s = "All done!"
+	if m.timer.Timedout() || m.quitting {
+		s = "Welcome to Timechief"
 	}
+
 	s += "\n"
 	if !m.quitting {
-		s = "Exiting in " + s
+		s = "Launching Timechief in " + s + "\n"
 		s += m.helpView()
 	}
+
 	return s
 }
