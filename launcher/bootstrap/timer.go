@@ -57,7 +57,10 @@ func (m timerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m timerModel) helpView() string {
 	return "\n" + m.help.FullHelpView([][]key.Binding{
-		{m.timerKeymap.quit},
+		{
+			m.timerKeymap.menu,
+			m.timerKeymap.quit,
+		},
 	})
 }
 
