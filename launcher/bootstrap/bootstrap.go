@@ -11,93 +11,62 @@ import (
 )
 
 type Options struct {
-	Timeout time.Duration
+	Timeout              time.Duration
+	FactoryResetCallback func() error
 }
 
 func ConsoleBootstrap(opts Options) error {
 	if opts.Timeout == 0 {
 		return errors.New("timeout cannot be 0")
 	}
-	m := model{
+	m := timerModel{
 		timer: timer.NewWithInterval(opts.Timeout, time.Second/10),
-		keymap: keymap{
+		timerKeymap: timerKeymap{
 			quit: key.NewBinding(
 				key.WithKeys("esc"),
-				key.WithHelp("esc", "skip"),
+				key.WithHelp("esc", "Continue boot"),
+			),
+			menu: key.NewBinding(
+				key.WithKeys("m"),
+				key.WithHelp("m", "Menu"),
 			),
 		},
 		help: help.New(),
+		menuModel: menuModel{
+			keymap: menuKeymap{
+				up: key.NewBinding(
+					key.WithKeys("up"),
+					key.WithHelp("up", "up"),
+				),
+				down: key.NewBinding(
+					key.WithKeys("down"),
+					key.WithHelp("down", "down"),
+				),
+				enter: key.NewBinding(
+					key.WithKeys("enter", "space"),
+					key.WithHelp("enter/space", "select"),
+				),
+			},
+			choices: []menuOption{
+				{
+					label:    "Factory reset",
+					callback: opts.FactoryResetCallback,
+				},
+				{
+					label:    "Continue boot",
+					callback: func() error { return nil },
+				},
+			},
+		},
 	}
 
-	_, err := tea.NewProgram(m).Run()
-	return err
-}
-
-type model struct {
-	timer    timer.Model
-	keymap   keymap
-	help     help.Model
-	quitting bool
-}
-
-type keymap struct {
-	quit key.Binding
-}
-
-func (m model) Init() tea.Cmd {
-	return m.timer.Init()
-}
-
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case timer.TickMsg:
-		var cmd tea.Cmd
-		m.timer, cmd = m.timer.Update(msg)
-		return m, cmd
-
-	case timer.StartStopMsg:
-		var cmd tea.Cmd
-		m.timer, cmd = m.timer.Update(msg)
-		// m.keymap.stop.SetEnabled(m.timer.Running())
-		// m.keymap.start.SetEnabled(!m.timer.Running())
-		return m, cmd
-
-	case timer.TimeoutMsg:
-		m.quitting = true
-		return m, tea.Quit
-
-	case tea.KeyMsg:
-		switch {
-		case key.Matches(msg, m.keymap.quit):
-			m.quitting = true
-			return m, tea.Quit
-		}
+	model, err := tea.NewProgram(m).Run()
+	if err != nil {
+		return err
 	}
-
-	return m, nil
-}
-
-func (m model) helpView() string {
-	return "\n" + m.help.FullHelpView([][]key.Binding{
-		{m.keymap.quit},
-	})
-}
-
-func (m model) View() string {
-	// For a more detailed timer view you could read m.timer.Timeout to get
-	// the remaining time as a time.Duration and skip calling m.timer.View()
-	// entirely.
-	s := m.timer.View()
-
-	if m.timer.Timedout() || m.quitting {
-		s = "Welcome to Timechief"
+	menu, isMenu := model.(menuModel)
+	if isMenu {
+		return menu.choices[menu.cursor].callback()
 	}
-
-	s += "\n"
-	if !m.quitting {
-		s = "Launching Timechief in " + s + "\n"
-		s += m.helpView()
-	}
-
-	return s
+	return nil
 }
