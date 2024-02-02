@@ -36,13 +36,14 @@ type DeviceDataStore interface {
 }
 
 type LauncherState struct {
-	ActiveTargetVersion string       `json:"active_target_version"`
-	SetupState          string       `json:"setup_state"`
-	WebURL              string       `json:"web_url"`
-	WifiState           WifiState    `json:"wifi_state"`
-	NetworkState        NetworkState `json:"network_state"`
-	FirstTimeSetupDone  bool         `json:"first_time_setup_done"`
-	Flags               []string     `json:"flags"`
+	ActiveTargetVersion string        `json:"active_target_version"`
+	SetupState          string        `json:"setup_state"`
+	WebURL              string        `json:"web_url"`
+	WifiState           WifiState     `json:"wifi_state"`
+	NetworkState        NetworkState  `json:"network_state"`
+	FirstTimeSetupDone  bool          `json:"first_time_setup_done"`
+	Flags               []string      `json:"flags"`
+	FirewallState       FirewallState `json:"firewall_state"`
 }
 
 type FirewallState struct {
