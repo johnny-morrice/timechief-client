@@ -1,15 +1,18 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
@@ -228,8 +231,28 @@ func Daemon(ctx *cli.Context) error {
 	for _, pkg := range packages {
 		pkg.AddRoutes(mux)
 	}
+	err = regenerateAppAPIKey(keyValueStore)
+	if err != nil {
+		return err
+	}
+	authedHandler, err := middleware.NewAuthMiddleware(keyValueStore, mux)
+	if err != nil {
+		return err
+	}
 	onInitialiseComplete(soundService)
-	return http.ListenAndServe(addr, mux)
+	return http.ListenAndServe(addr, authedHandler)
+}
+
+func regenerateAppAPIKey(kvStore store.KeyValueStore) error {
+	apiKey, err := crypt.GenerateRandomAPIKey()
+	if err != nil {
+		return fmt.Errorf("failed to generate app API key: %v", err)
+	}
+	err = kvStore.Set(store.APIAppAuthKey, apiKey)
+	if err != nil {
+		return fmt.Errorf("failed to set app API key: %v", err)
+	}
+	return nil
 }
 
 func onInitialiseComplete(soundService sound.Service) {

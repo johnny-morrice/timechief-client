@@ -2,6 +2,7 @@ package system
 
 import (
 	"errors"
+	"log"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
@@ -12,6 +13,18 @@ type Service struct {
 	StateFlagStore   store.StateFlagStore
 	KeyValueStore    store.KeyValueStore
 	WifiNetworkStore store.WifiNetworkStore
+}
+
+func (svc Service) FirewallSSHSetState(enabled bool) error {
+	// TODO: Implement SetSSHFirewallState
+	log.Printf("TODO SetSSHFirewallState: %v", enabled)
+	return nil
+}
+
+func (svc Service) FirewallAPISetState(enabled bool) error {
+	// TODO: Implement SetAPIFirewallState
+	log.Printf("TODO SetAPIFirewallState: %v", enabled)
+	return nil
 }
 
 func (svc Service) Reboot() error {

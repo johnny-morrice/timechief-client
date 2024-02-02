@@ -39,6 +39,20 @@ func (dc DaemonClient) GetConfig() (store.Config, error) {
 	return result, nil
 }
 
+func (dc DaemonClient) GetTargetEnv() (launcher.TargetEnv, error) {
+	resp, err := http.Get(dc.makeURL("/api/launcher/target/env"))
+	if err != nil {
+		return launcher.TargetEnv{}, err
+	}
+	defer resp.Body.Close()
+	result := launcher.TargetEnv{}
+	err = unmarsalJSON(resp, &result)
+	if err != nil {
+		return launcher.TargetEnv{}, err
+	}
+	return result, nil
+}
+
 func (dc DaemonClient) GetTarget() (service.LaunchTarget, error) {
 	resp, err := http.Get(dc.makeURL("/api/launcher/target"))
 	if err != nil {

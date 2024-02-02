@@ -45,6 +45,11 @@ type LauncherState struct {
 	Flags               []string     `json:"flags"`
 }
 
+type FirewallState struct {
+	SSHEnabled bool `json:"ssh_enabled"`
+	APIEnabled bool `json:"api_enabled"`
+}
+
 type NetworkState struct {
 	IPAddress string `json:"ip_address"`
 }

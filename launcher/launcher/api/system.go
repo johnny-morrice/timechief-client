@@ -20,6 +20,8 @@ func (api System) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/system/wifi/load-interfaces", api.HandleWifiLoadInterfaces)
 	mux.HandleFunc("/api/system/wifi/network", api.HandleWifiSetActiveNetwork)
 	mux.HandleFunc("/api/system/wifi/scan", api.HandleWifiScan)
+	mux.HandleFunc("/api/system/firewall/ssh", api.HandleFirewallSSHSetState)
+	mux.HandleFunc("/api/system/firewall/api", api.HandleFirewallAPISetState)
 }
 
 type SystemService interface {
@@ -31,6 +33,8 @@ type SystemService interface {
 	WifiScan() error
 	WifiSetActiveNetwork(ssid, key string) error
 	WifiSetSelectedReadiness(ready bool) error
+	FirewallSSHSetState(enabled bool) error
+	FirewallAPISetState(enabled bool) error
 }
 
 type WifiActivationRequest struct {
@@ -48,6 +52,52 @@ func (req WifiActivationRequest) validate() error {
 		return errors.New("key must be at least 8 chars")
 	}
 	return nil
+}
+
+func (api System) HandleFirewallSSHSetState(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	req := struct {
+		State bool `json:"state"`
+	}{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		log.Printf("failed to decode firewall ssh state request: %v", err)
+		return
+	}
+	err = api.Service.FirewallSSHSetState(req.State)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to handle firewall ssh state: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (api System) HandleFirewallAPISetState(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	req := struct {
+		State bool `json:"state"`
+	}{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		log.Printf("failed to decode firewall api state request: %v", err)
+		return
+	}
+	err = api.Service.FirewallAPISetState(req.State)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to handle firewall api state: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (api System) HandleWifiSetActiveNetwork(w http.ResponseWriter, r *http.Request) {
