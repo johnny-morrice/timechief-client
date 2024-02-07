@@ -39,6 +39,8 @@ export const clockDataReceiver = new APIResultReceiver("clockDataResult");
 export const rebootReceiver = new APIResultReceiver("rebootResult");
 export const shutdownReceiver = new APIResultReceiver("shutdownResult");
 export const setupBeginReceiver = new APIResultReceiver("setupBeginResult");
+export const sshPasswordRegenReceiver = new APIResultReceiver("sshPasswordRegenResult");
+export const apiKeyRegenReceiver = new APIResultReceiver("apiKeyRegenResult");
 
 const deviceCallbacks = {};
 function receiveDeviceStatus() {
@@ -97,6 +99,22 @@ export function addPairingGetCallback(name, cb) {
 
 export function removePairingGetCallback(name) {
     pairingGetReceiver.removeCallback(name);
+}
+
+export function sendSSHRegenPassword() {
+    window.api.send("sshPasswordRegen");
+}
+
+export function sendSetSSHEnabled(isEnabled) {
+    window.api.send("setSSHEnabled", {"isEnabled": isEnabled});
+}
+
+export function sendAPIRegenKey() {
+    window.api.send("apiKeyRegen");
+}
+
+export function sendSetAPIEnabled(isEnabled) {
+    window.api.send("setAPIEnabled", {"isEnabled": isEnabled});
 }
 
 export function sendDeviceHeartbeat() {
