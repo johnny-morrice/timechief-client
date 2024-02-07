@@ -15,6 +15,7 @@ import { callbackName } from "./callback";
 import { Forecast } from './forecast';
 import { EventCalendar } from './eventCalendar';
 import { fadeTransition } from './fadeTransition';
+import { SSHSecurity } from './sshSecurity';
 
 class Signals {
   constructor() {
@@ -246,6 +247,7 @@ export const HomePage = () => {
           { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
           { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl /> },
           { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo /> },
+          { icon: () => <i class="fa-brands fa-linux"></i>, element: () => <SSHSecurity /> },
           { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
           { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
           { icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },

@@ -64,6 +64,14 @@ export const Text = {
         "continue-via-browser": "Continue setup via your browser",
         "connection-error": "Error connecting to network, please run through setup again"
     },
-
-
+    "ssh-security": {
+        "title": "SSH Security",
+        "regen-password": "Regenerate Password",
+        "username": "SSH Username",
+        "password": "SSH Password",
+        "enable": "Enable SSH",
+        "disable": "Disable SSH",
+        "is-enabled": "SSH Enabled",
+        "is-disabled": "SSH Disabled",
+    },
 };
