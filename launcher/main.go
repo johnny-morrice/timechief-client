@@ -43,6 +43,16 @@ func getCLIApp() *cli.App {
 			},
 		},
 		{
+			Name:   "console-bootstrap",
+			Action: cmd.Bootstrap,
+			Flags: []cli.Flag{
+				&cli.DurationFlag{
+					Name:  "timeout",
+					Value: 5 * time.Second,
+				},
+			},
+		},
+		{
 			Name:   "daemon-sound",
 			Action: cmd.Sound,
 			Flags: []cli.Flag{
@@ -52,7 +62,7 @@ func getCLIApp() *cli.App {
 				},
 				&cli.BoolFlag{
 					Name:  "startup-sound",
-					Value: true,
+					Value: false,
 				},
 				&cli.IntFlag{
 					Name:  "pwm-pin",
@@ -85,6 +95,12 @@ func getCLIApp() *cli.App {
 				&cli.BoolFlag{
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
+				},
+				&cli.StringFlag{
+					Name:    "test-app-api-key",
+					Hidden:  true,
+					EnvVars: []string{"TEST_APP_API_KEY"},
+					Usage:   "INSECURE: API key for the timechief app.  This is intended for testing.  This is used to authenticate the timechief app to the daemon. In normal usage, allow to be empty to get a secure random key every boot.",
 				},
 				&cli.StringFlag{
 					Name:  "listen-addr",

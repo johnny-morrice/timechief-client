@@ -2,7 +2,10 @@ package system
 
 import (
 	"errors"
+	"fmt"
+	"log"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 )
@@ -12,6 +15,38 @@ type Service struct {
 	StateFlagStore   store.StateFlagStore
 	KeyValueStore    store.KeyValueStore
 	WifiNetworkStore store.WifiNetworkStore
+}
+
+type SSHCredentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (svc Service) RegenerateSSHPassword() (SSHCredentials, error) {
+	// TODO: Implement RegenerateSSHKey
+	log.Printf("TODO RegenerateSSHKey")
+	pass, err := crypt.GenerateSSHPassword()
+	if err != nil {
+		return SSHCredentials{}, fmt.Errorf("failed to generate SSH password: %w", err)
+	}
+	const username = "timechief"
+	result := SSHCredentials{
+		Username: username,
+		Password: pass,
+	}
+	return result, nil
+}
+
+func (svc Service) FirewallSSHSetState(enabled bool) error {
+	// TODO: Implement SetSSHFirewallState
+	log.Printf("TODO SetSSHFirewallState: %v", enabled)
+	return nil
+}
+
+func (svc Service) FirewallAPISetState(enabled bool) error {
+	// TODO: Implement SetAPIFirewallState
+	log.Printf("TODO SetAPIFirewallState: %v", enabled)
+	return nil
 }
 
 func (svc Service) Reboot() error {

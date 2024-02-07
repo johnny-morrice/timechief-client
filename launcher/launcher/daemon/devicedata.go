@@ -67,7 +67,6 @@ func (dd DeviceData) doTick(ctx *cli.Context) error {
 		return err
 	}
 	return nil
-
 }
 
 var DeviceDataErrorState = "device-data-error"

@@ -1,6 +1,9 @@
 package launcher
 
 import (
+	"fmt"
+
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 )
@@ -19,6 +22,40 @@ type SoundService interface {
 
 type TargetStatus struct {
 	Ready bool
+}
+
+type LauncherAPIKey struct {
+	Key string `json:"key"`
+}
+
+type TargetEnv struct {
+	Env map[string]string `json:"env"`
+}
+
+func (svc Service) GetTargetEnv() (TargetEnv, error) {
+	key, err := svc.KeyValueStore.Get(store.APIAppAuthKey)
+	if err != nil {
+		return TargetEnv{}, fmt.Errorf("failed to get API key: %w", err)
+	}
+	if key == "" {
+		return TargetEnv{}, fmt.Errorf("no API key")
+	}
+	env := map[string]string{
+		"API_KEY": key,
+	}
+	return TargetEnv{Env: env}, nil
+}
+
+func (svc Service) RegenerateUserAPIKey() (LauncherAPIKey, error) {
+	theKey, err := crypt.GenerateRandomAPIKey()
+	if err != nil {
+		return LauncherAPIKey{}, fmt.Errorf("failed to generate API key: %w", err)
+	}
+	err = svc.KeyValueStore.Set(store.APIUserAuthKey, theKey)
+	if err != nil {
+		return LauncherAPIKey{}, fmt.Errorf("failed to save API key: %w", err)
+	}
+	return LauncherAPIKey{Key: theKey}, nil
 }
 
 func (svc Service) OnLogin() error {

@@ -1,13 +1,18 @@
 package cmd
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
@@ -56,11 +61,16 @@ func Daemon(ctx *cli.Context) error {
 
 	cfgStore := store.ConfigStore{DB: db}
 
-	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
-	soundService := sound.NewSoundService(soundClient)
 	launchTargetStore := store.LaunchTargetStore{DB: db}
 
 	keyValueStore := store.KeyValueStore{DB: db}
+
+	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
+	soundService, err := sound.NewSoundService(soundClient, keyValueStore)
+	if err != nil {
+		return err
+	}
+
 	timechiefClient, err := clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).Build()
 	if err != nil {
 		return err
@@ -221,7 +231,49 @@ func Daemon(ctx *cli.Context) error {
 	for _, pkg := range packages {
 		pkg.AddRoutes(mux)
 	}
-	return http.ListenAndServe(addr, mux)
+	err = regenerateAppAPIKey(ctx, keyValueStore)
+	if err != nil {
+		return err
+	}
+	authedHandler, err := middleware.NewAuthMiddleware(keyValueStore, mux)
+	if err != nil {
+		return err
+	}
+	onInitialiseComplete(soundService)
+	return http.ListenAndServe(addr, authedHandler)
+}
+
+func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {
+	ctxApiKey := ctx.String("app-api-key")
+	if ctxApiKey != "" {
+		err := kvStore.Set(store.APIAppAuthKey, ctxApiKey)
+		if err != nil {
+			return fmt.Errorf("failed to set app API key from command line parameter: %v", err)
+		}
+		log.Println("INSECURE: using app API key from command line")
+		return nil
+	}
+
+	apiKey, err := crypt.GenerateRandomAPIKey()
+	if err != nil {
+		return fmt.Errorf("failed to generate app API key: %v", err)
+	}
+	err = kvStore.Set(store.APIAppAuthKey, apiKey)
+	if err != nil {
+		return fmt.Errorf("failed to set app API key: %v", err)
+	}
+	return nil
+}
+
+func onInitialiseComplete(soundService sound.Service) {
+	go func() {
+		// Let's fudge it and wait a bit for the system to settle
+		time.Sleep(5 * time.Second)
+		err := soundService.PlayStartup()
+		if err != nil {
+			log.Printf("Failed to play startup sound: %v", err)
+		}
+	}()
 }
 
 type apiPackage interface {

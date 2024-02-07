@@ -120,9 +120,25 @@ func (daemon Setup) doTick(ctx *cli.Context) error {
 	}
 }
 
+func (daemon Setup) setInitialSoundState() error {
+	err := daemon.KeyValueStore.Set("mute", "false")
+	if err != nil {
+		return err
+	}
+	err = daemon.KeyValueStore.Set("unmute-range", "9-21")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (daemon Setup) handleBegin() error {
+	err := daemon.setInitialSoundState()
+	if err != nil {
+		return err
+	}
 	// Wipe all setup data.
-	err := daemon.WifiNetworkStore.MarkNotReady()
+	err = daemon.WifiNetworkStore.MarkNotReady()
 	if err != nil {
 		return err
 	}

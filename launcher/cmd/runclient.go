@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
@@ -25,8 +26,26 @@ func RunClient(ctx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("error getting target: %w", err)
 	}
+	targetEnv, err := dc.GetTargetEnv()
+	if err != nil {
+		return fmt.Errorf("error getting target env: %w", err)
+	}
+	err = exportTargetEnv(targetEnv.Env)
+	if err != nil {
+		return fmt.Errorf("error exporting target env: %w", err)
+	}
 
 	return target.Run(cfg)
+}
+
+func exportTargetEnv(targetEnv map[string]string) error {
+	for k, v := range targetEnv {
+		err := os.Setenv(k, v)
+		if err != nil {
+			return fmt.Errorf("error setting env: %w", err)
+		}
+	}
+	return nil
 }
 
 func recoverClient(dc daemonclient.DaemonClient) error {
