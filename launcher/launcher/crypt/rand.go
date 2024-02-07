@@ -6,8 +6,23 @@ import (
 
 // GenerateRandomAPIKey generates a secure random API key using the golang crypto/rand package.
 func GenerateRandomAPIKey() (string, error) {
-	const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
-	const length = 16
+	const chars = "abcdefghijkmnopqrstuvwxyz0123456789"
+	const length = 12
+	bytes, err := generateRandomBytes(length)
+	if err != nil {
+		return "", err
+	}
+	out := make([]byte, length)
+	for i, b := range bytes {
+		out[i] = chars[b%byte(len(chars))]
+	}
+	return string(out), nil
+}
+
+// GenerateSSHPassword generates a secure random password for the SSH user.
+func GenerateSSHPassword() (string, error) {
+	const chars = "abcdefghijkmnopqrstuvwxyz0123456789"
+	const length = 12
 	bytes, err := generateRandomBytes(length)
 	if err != nil {
 		return "", err
