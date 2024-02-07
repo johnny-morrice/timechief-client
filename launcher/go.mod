@@ -1,6 +1,6 @@
 module github.com/johnny-morrice/timechief-client/launcher
 
-go 1.19
+go 1.22
 
 require (
 	github.com/glebarez/sqlite v1.7.0
