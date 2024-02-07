@@ -315,6 +315,10 @@ class LauncherClient {
   }
 
   postSSHEnabled(isEnabled) {
+    if (typeof isEnabled !== 'boolean') {
+      console.log("isEnabled must be a boolean but was: " + JSON.stringify(isEnabled));
+      return Promise.reject("isEnabled must be a boolean");
+    }
     let cfg = {
       url: this.baseURL + '/api/system/firewall/ssh',
       method: 'post',
@@ -421,24 +425,24 @@ handleIPCAPICall("setupRestart", "setupRestartResult", () => client.postSetupBeg
 handleIPCAPICall("sshPasswordRegen", "sshPasswordRegenResult", () => client.postSSHRegenPassword());
 handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKey());
 
-ipcMain.on("sshEnabled", (event, args) => {
+ipcMain.on("setSSHEnabled", (event, args) => {
   client.postSSHEnabled(args["state"])
     .then(json => {
-      mainWindow.webContents.send("sshEnabledResult", json)
+      mainWindow.webContents.send("setSSHEnabledResult", json)
     })
     .catch(error => {
       logger.error(`error calling sshEnabled API: ${error}`)
-      mainWindow.webContents.send("sshEnabledResult", {"APIError": "error calling API"});
+      mainWindow.webContents.send("setSSHEnabledResult", {"APIError": "error calling API"});
     });
 });
-ipcMain.on("apiEnabled", (event, args) => {
+ipcMain.on("setAPIEnabled", (event, args) => {
   client.postAPIEnabled(args["state"])
     .then(json => {
-      mainWindow.webContents.send("apiEnabledResult", json)
+      mainWindow.webContents.send("setAPIEnabledResult", json)
     })
     .catch(error => {
       logger.error(`error calling apiEnabled API: ${error}`)
-      mainWindow.webContents.send("apiEnabledResult", {"APIError": "error calling API"});
+      mainWindow.webContents.send("setAPIEnabledResult", {"APIError": "error calling API"});
     });
 });
 ipcMain.on("deviceCommand", (event, command) => {
