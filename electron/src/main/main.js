@@ -317,7 +317,9 @@ class LauncherClient {
 
 const axiosAPI = axios.create({
     timeout: 10 * 1000,
+    
 });
+axiosAPI.defaults.headers.common['Authorization'] = `Bearer ${process.env.API_KEY}`;
 require('axios-debug-log').addLogger(axiosAPI, logger.debug);
 
 var client = new LauncherClient(axiosAPI);
