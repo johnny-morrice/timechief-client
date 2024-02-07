@@ -231,7 +231,7 @@ func Daemon(ctx *cli.Context) error {
 	for _, pkg := range packages {
 		pkg.AddRoutes(mux)
 	}
-	err = regenerateAppAPIKey(keyValueStore)
+	err = regenerateAppAPIKey(ctx, keyValueStore)
 	if err != nil {
 		return err
 	}
@@ -243,7 +243,17 @@ func Daemon(ctx *cli.Context) error {
 	return http.ListenAndServe(addr, authedHandler)
 }
 
-func regenerateAppAPIKey(kvStore store.KeyValueStore) error {
+func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {
+	ctxApiKey := ctx.String("app-api-key")
+	if ctxApiKey != "" {
+		err := kvStore.Set(store.APIAppAuthKey, ctxApiKey)
+		if err != nil {
+			return fmt.Errorf("failed to set app API key from command line parameter: %v", err)
+		}
+		log.Println("INSECURE: using app API key from command line")
+		return nil
+	}
+
 	apiKey, err := crypt.GenerateRandomAPIKey()
 	if err != nil {
 		return fmt.Errorf("failed to generate app API key: %v", err)

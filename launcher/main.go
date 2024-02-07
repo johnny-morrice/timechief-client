@@ -97,6 +97,11 @@ func getCLIApp() *cli.App {
 					Value: defaultInstallDaemon,
 				},
 				&cli.StringFlag{
+					Name:   "app-api-key",
+					Hidden: true,
+					Usage:  "INSECURE: API key for the timechief app.  This is intended for testing.  This is used to authenticate the timechief app to the daemon. In normal usage, allow to be empty to get a secure random key every boot.",
+				},
+				&cli.StringFlag{
 					Name:  "listen-addr",
 					Value: "0.0.0.0:8080",
 				},
