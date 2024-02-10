@@ -21,7 +21,7 @@ function updateSignalsOnData(signals, data) {
         if ("firewall_state" in launcherState) {
             let firewallState = launcherState["firewall_state"];
             if ("ssh_enabled" in firewallState) {
-                signals.setAPIEnabled(firewallState["ssh_enabled"]);
+                signals.setSSHEnabled(firewallState["ssh_enabled"]);
             }
         }
     }

@@ -75,7 +75,7 @@ export const Text = {
     },
     "api-security": {
         "regen-key": "Regenerate Key",
-        "key": "Authorization Header",
+        "key": "Bearer Token",
         "enable": "Enable API",
         "disable": "Disable API",
         "is-enabled": "API Enabled",
