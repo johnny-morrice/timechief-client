@@ -1,6 +1,6 @@
 import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "./callback"
-import { addServiceDataCallback, removeDataCallback, addAPIRegenKeyCallback, removeAPIRegenKeyCallback, sendAPIRegenKey, sendSetAPIEnabled } from "./ipc";
+import { addDataCallback, removeDataCallback, addAPIRegenKeyCallback, removeAPIRegenKeyCallback, sendAPIRegenKey, sendSetAPIEnabled } from "./ipc";
 import { textTransitionSignal } from "./textGlitch";
 import { labelMaker } from "./label";
 
@@ -14,6 +14,15 @@ class Signals {
 
 function updateSignalsOnData(signals, data) {
     signals.setLoaded(true);
+    if ("launcher_state" in data) {
+        let launcherState = data["launcher_state"];
+        if ("firewall_state" in launcherState) {
+            let firewallState = launcherState["firewall_state"];
+            if ("api_enabled" in firewallState) {
+                signals.setAPIEnabled(firewallState["api_enabled"]);
+            }
+        }
+    }
 }
 
 function updateSignalsOnAPIKeyRegen(signals, data) {
@@ -26,7 +35,7 @@ function updateSignalsOnAPIKeyRegen(signals, data) {
 export const APISecurity = () => {
     const signals = new Signals();
     const cbName = callbackName("APISecurity");
-    addServiceDataCallback(cbName, (data) => {
+    addDataCallback(cbName, (data) => {
         updateSignalsOnData(signals, data);
     });
 

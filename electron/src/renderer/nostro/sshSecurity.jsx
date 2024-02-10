@@ -1,6 +1,6 @@
 import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "./callback"
-import { addServiceDataCallback, removeDataCallback, addSSHPasswordRegenCallback, removeSSHPasswordRegenCallback, sendSSHRegenPassword, sendSetSSHEnabled } from "./ipc";
+import { addDataCallback, removeDataCallback, addSSHPasswordRegenCallback, removeSSHPasswordRegenCallback, sendSSHRegenPassword, sendSetSSHEnabled } from "./ipc";
 import { textTransitionSignal } from "./textGlitch";
 import { labelMaker } from "./label";
 
@@ -15,6 +15,16 @@ class Signals {
 
 function updateSignalsOnData(signals, data) {
     signals.setLoaded(true);
+    signals.setLoaded(true);
+    if ("launcher_state" in data) {
+        let launcherState = data["launcher_state"];
+        if ("firewall_state" in launcherState) {
+            let firewallState = launcherState["firewall_state"];
+            if ("ssh_enabled" in firewallState) {
+                signals.setAPIEnabled(firewallState["ssh_enabled"]);
+            }
+        }
+    }
 }
 
 function updateSignalsOnSSHPasswordRegen(signals, data) {
@@ -28,7 +38,7 @@ function updateSignalsOnSSHPasswordRegen(signals, data) {
 export const SSHSecurity = () => {
     const signals = new Signals();
     const cbName = callbackName("SSHSecurity");
-    addServiceDataCallback(cbName, (data) => {
+    addDataCallback(cbName, (data) => {
         updateSignalsOnData(signals, data);
     });
 
