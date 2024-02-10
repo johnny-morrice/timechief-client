@@ -63,25 +63,24 @@ export const SSHSecurity = () => {
             <Loading />
         </Show>
         <Show when={signals.isLoaded()}>
-            <div class="ssh-security-title flex-row">{label("title")}</div>
             <Show when={signals.isSshEnabled()}>
-                <div class="ssh-security-enabled flex-row">{label("is-enabled")}</div>
+                <div class="ssh-security-enabled flex-row data-label">{label("is-enabled")}</div>
                 <div class="ssh-security-enable-button-wrapper">
                     <button class='action-button crt-box' onClick={onClickDisableSSH}>{label("disable")}</button>
                 </div>
             </Show>
             <Show when={!signals.isSshEnabled()}>
-                <div class="ssh-security-disabled flex-row">{label("is-disabled")}</div>
+                <div class="ssh-security-disabled flex-row data-label">{label("is-disabled")}</div>
                 <div class="ssh-security-enable-button-wrapper">
                     <button class='action-button crt-box' onClick={onClickEnableSSH}>{label("enable")}</button>
                 </div>
             </Show>
             <div class="ssh-security-user flex-row flex-grow">
-                <div class="ssh-security-label flex-row">{label("username")}</div>
+                <div class="ssh-security-label flex-row data-label">{label("username")}</div>
                 <div class="ssh-security-value flex-row">{signals.sshUser}</div>
             </div>
             <div class="ssh-security-password flex-row flex-grow">
-                <div class="ssh-security-label flex-row">{label("password")}</div>
+                <div class="ssh-security-label flex-row data-label">{label("password")}</div>
                 <div class="ssh-security-value flex-row">{signals.sshPassword}</div>
             </div>
             <div class="ssh-security-regen">

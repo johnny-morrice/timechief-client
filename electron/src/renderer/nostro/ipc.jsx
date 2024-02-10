@@ -201,6 +201,8 @@ export function initializeIPC() {
     rebootReceiver.receive();
     shutdownReceiver.receive();
     setupBeginReceiver.receive();
+    sshPasswordRegenReceiver.receive();
+    apiKeyRegenReceiver.receive();
     sendLoggedIn();
     return [deviceInterval, apiInterval];
 }

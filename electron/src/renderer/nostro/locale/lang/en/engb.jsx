@@ -65,7 +65,6 @@ export const Text = {
         "connection-error": "Error connecting to network, please run through setup again"
     },
     "ssh-security": {
-        "title": "SSH Security",
         "regen-password": "Regenerate Password",
         "username": "SSH Username",
         "password": "SSH Password",
@@ -73,5 +72,13 @@ export const Text = {
         "disable": "Disable SSH",
         "is-enabled": "SSH Enabled",
         "is-disabled": "SSH Disabled",
+    },
+    "api-security": {
+        "regen-key": "Regenerate Key",
+        "key": "Authorization Header",
+        "enable": "Enable API",
+        "disable": "Disable API",
+        "is-enabled": "API Enabled",
+        "is-disabled": "API Disabled",
     },
 };
