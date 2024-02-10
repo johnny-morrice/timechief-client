@@ -313,11 +313,73 @@ class LauncherClient {
       }
     });
   }
+
+  postSSHEnabled(isEnabled) {
+    if (typeof isEnabled !== 'boolean') {
+      console.log("isEnabled must be a boolean but was: " + JSON.stringify(isEnabled));
+      return Promise.reject("isEnabled must be a boolean");
+    }
+    let cfg = {
+      url: this.baseURL + '/api/system/firewall/ssh',
+      method: 'post',
+      data: {
+        "state": isEnabled
+      }
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return {};
+      }
+    });
+  }
+
+  postAPIEnabled(isEnabled) {
+    let cfg = {
+      url: this.baseURL + '/api/system/firewall/api',
+      method: 'post',
+      data: {
+        "state": isEnabled
+      }
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return {};
+      }
+    });
+  }
+
+  postSSHRegenPassword() {
+    let cfg = {
+      url: this.baseURL + '/api/system/ssh/regenerate',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return resp.data;
+      }
+    });
+  }
+
+  postAPIRegenKey() {
+    let cfg = {
+      url: this.baseURL + '/api/launcher/api-key/user',
+      method: 'post'
+    };
+    return this.axios(cfg).then(resp => {
+      if (resp.status == 200) {
+        return resp.data;
+      }
+    });
+  }
+
+
 }
 
 const axiosAPI = axios.create({
     timeout: 10 * 1000,
+    
 });
+axiosAPI.defaults.headers.common['Authorization'] = `Bearer ${process.env.API_KEY}`;
 require('axios-debug-log').addLogger(axiosAPI, logger.debug);
 
 var client = new LauncherClient(axiosAPI);
@@ -360,7 +422,29 @@ handleIPCAPICall("shutdown", "shutdownResult", () => client.shutdown());
 handleIPCAPICall("setupBegin", "setupBeginResult", () => client.postSetupBeginState());
 handleIPCAPICall("setupCancel", "setupCancelResult", () => client.postSetupInternetConnectedState().then(() => client.postWifiMarkReady()).then(() => client.postWifiConnect()));
 handleIPCAPICall("setupRestart", "setupRestartResult", () => client.postSetupBeginState().then(() => client.postWifiMarkNotReady()));
+handleIPCAPICall("sshPasswordRegen", "sshPasswordRegenResult", () => client.postSSHRegenPassword());
+handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKey());
 
+ipcMain.on("setSSHEnabled", (event, args) => {
+  client.postSSHEnabled(args["state"])
+    .then(json => {
+      mainWindow.webContents.send("setSSHEnabledResult", json)
+    })
+    .catch(error => {
+      logger.error(`error calling sshEnabled API: ${error}`)
+      mainWindow.webContents.send("setSSHEnabledResult", {"APIError": "error calling API"});
+    });
+});
+ipcMain.on("setAPIEnabled", (event, args) => {
+  client.postAPIEnabled(args["state"])
+    .then(json => {
+      mainWindow.webContents.send("setAPIEnabledResult", json)
+    })
+    .catch(error => {
+      logger.error(`error calling apiEnabled API: ${error}`)
+      mainWindow.webContents.send("setAPIEnabledResult", {"APIError": "error calling API"});
+    });
+});
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {
     case "heartbeat":

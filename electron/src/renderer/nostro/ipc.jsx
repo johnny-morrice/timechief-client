@@ -39,6 +39,8 @@ export const clockDataReceiver = new APIResultReceiver("clockDataResult");
 export const rebootReceiver = new APIResultReceiver("rebootResult");
 export const shutdownReceiver = new APIResultReceiver("shutdownResult");
 export const setupBeginReceiver = new APIResultReceiver("setupBeginResult");
+export const sshPasswordRegenReceiver = new APIResultReceiver("sshPasswordRegenResult");
+export const apiKeyRegenReceiver = new APIResultReceiver("apiKeyRegenResult");
 
 const deviceCallbacks = {};
 function receiveDeviceStatus() {
@@ -67,13 +69,29 @@ export function addServiceDataCallback(name, cb) {
 
 function isEmpty(obj) {
     for (const prop in obj) {
-      if (Object.hasOwn(obj, prop)) {
-        return false;
-      }
+        if (Object.hasOwn(obj, prop)) {
+            return false;
+        }
     }
-  
+
     return true;
-  }
+}
+
+export function addSSHPasswordRegenCallback(name, cb) {
+    sshPasswordRegenReceiver.addCallback(name, cb);
+}
+
+export function removeSSHPasswordRegenCallback(name) {
+    sshPasswordRegenReceiver.removeCallback(name);
+}
+
+export function addAPIRegenKeyCallback(name, cb) {
+    apiKeyRegenReceiver.addCallback(name, cb);
+}
+
+export function removeAPIRegenKeyCallback(name) {
+    apiKeyRegenReceiver.removeCallback(name);
+}
 
 export function addDataCallback(name, cb) {
     clockDataReceiver.addCallback(name, cb);
@@ -99,8 +117,24 @@ export function removePairingGetCallback(name) {
     pairingGetReceiver.removeCallback(name);
 }
 
+export function sendSSHRegenPassword() {
+    window.api.send("sshPasswordRegen");
+}
+
+export function sendSetSSHEnabled(isEnabled) {
+    window.api.send("setSSHEnabled", { "state": isEnabled });
+}
+
+export function sendAPIRegenKey() {
+    window.api.send("apiKeyRegen");
+}
+
+export function sendSetAPIEnabled(isEnabled) {
+    window.api.send("setAPIEnabled", { "state": isEnabled });
+}
+
 export function sendDeviceHeartbeat() {
-    window.device.send("deviceCommand", {'command': 'heartbeat'});
+    window.device.send("deviceCommand", { 'command': 'heartbeat' });
 }
 
 export function sendClockDataRequest() {
@@ -167,6 +201,8 @@ export function initializeIPC() {
     rebootReceiver.receive();
     shutdownReceiver.receive();
     setupBeginReceiver.receive();
+    sshPasswordRegenReceiver.receive();
+    apiKeyRegenReceiver.receive();
     sendLoggedIn();
     return [deviceInterval, apiInterval];
 }
