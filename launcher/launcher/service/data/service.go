@@ -75,6 +75,11 @@ type DeviceData struct {
 	LauncherState    LauncherState    `json:"launcher_state"`
 	ServiceData      v2.Data          `json:"service_data"`
 	ServiceDataState ServiceDataState `json:"service_data_state"`
+	ThemeCSS         string           `json:"theme_css"`
+}
+
+type Theme struct {
+	ThemeCSS string `json:"theme_css"`
 }
 
 type ServiceDataState struct {
@@ -270,7 +275,14 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, fmt.Errorf("failed to get access token: %w", err)
 	}
 
+	// TODO delete theme testing.
+	deviceData.Theme = randomTheme()
+	themeCss, err := renderCss(deviceData.Theme)
+	if err != nil {
+		return DeviceData{}, err
+	}
 	result := DeviceData{
+		ThemeCSS:    themeCss,
 		ServiceData: deviceData,
 		ServiceDataState: ServiceDataState{
 			MyDeviceUUID:   myDeviceUUID,

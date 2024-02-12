@@ -978,6 +978,26 @@ components:
       scheme: bearer
       bearerFormat: Access token
   schemas:
+    Theme:
+      type: object
+      properties:
+        uuid:
+          type: string
+        foreground_color:
+          type: string
+        background_color:
+          type: string
+        box_background_color:
+          type: string
+        box_border_radius:
+          type: string
+        box_border_width:
+          type: string
+        main_font:
+          type: string
+        time_font:
+          type: string
+
     GeocodeResult:
       type: object
       properties:
@@ -1301,6 +1321,8 @@ components:
           $ref: "#/components/schemas/CalendarDatum"
         google_profile:
           $ref: "#/components/schemas/GoogleProfileDatum"
+        theme:
+          $ref: "#/components/schemas/Theme"
         dt:
           type: integer
 
