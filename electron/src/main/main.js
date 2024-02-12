@@ -1,10 +1,11 @@
 // Modules to control application life and create native browser window
-const {ipcMain } = require('electron');
+const { ipcMain } = require('electron');
 const axios = require('axios');
 const winston = require('winston');
 const { baseDeviceStatus } = require('./status.js');
 const { startTimechiefApp, getMainWindow } = require('./window.js');
 const { LauncherClient } = require('./launcherclient.js');
+const { Themer } = require('./themer.js');
 
 const logger = winston.createLogger({
   level: 'debug',
@@ -32,27 +33,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 startTimechiefApp(logger);
 
-// var lastCSSKey = null;
-// function randomColor() {
-//   let colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'white'];
-//   return colors[Math.floor(Math.random() * colors.length)];
-// }
-// function testCssInjection() {
-//   setInterval(() => {
-//     if (lastCSSKey) {
-//       getMainWindow().webContents.removeInsertedCSS(lastCSSKey);
-//     }
-//     let color = randomColor();
-//     getMainWindow().webContents.insertCSS(`body { color: ${color}; }`).then(key => {
-//       lastCSSKey = key;
-//     });
-//   }, 5000);
-// }
-
-
 const axiosAPI = axios.create({
-    timeout: 10 * 1000,
-    
+  timeout: 10 * 1000,
+
 });
 axiosAPI.defaults.headers.common['Authorization'] = `Bearer ${process.env.API_KEY}`;
 require('axios-debug-log').addLogger(axiosAPI, logger.debug);
@@ -68,8 +51,17 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
       })
       .catch(error => {
         logger.error(`error calling ${sendChan} API: ${error}`)
-        getMainWindow().webContents.send(receiveChan, {"APIError": "error calling API"});
+        getMainWindow().webContents.send(receiveChan, { "APIError": "error calling API" });
       });
+  });
+}
+
+const themer = new Themer();
+
+function handleDataRequest() {
+  return client.getDeviceData().then(data => {
+    themer.setThemeFromData(data);
+    return data;
   });
 }
 
@@ -78,7 +70,7 @@ handleIPCAPICall("loggedIn", "loggedInResult", () => client.postLoggedIn());
 handleIPCAPICall("logOut", "logOutResult", () => client.postLogOut());
 handleIPCAPICall("pairingCreate", "pairingCreateResult", () => client.createPairing());
 handleIPCAPICall("pairingGet", "pairingGetResult", () => client.getPairing());
-handleIPCAPICall("getClockData", "clockDataResult", () => client.getDeviceData());
+handleIPCAPICall("getClockData", "clockDataResult", () => handleDataRequest());
 handleIPCAPICall("reboot", "rebootResult", () => client.reboot());
 handleIPCAPICall("shutdown", "shutdownResult", () => client.shutdown());
 handleIPCAPICall("setupBegin", "setupBeginResult", () => client.postSetupBeginState());
@@ -94,7 +86,7 @@ ipcMain.on("setSSHEnabled", (event, args) => {
     })
     .catch(error => {
       logger.error(`error calling sshEnabled API: ${error}`)
-      getMainWindow().webContents.send("setSSHEnabledResult", {"APIError": "error calling API"});
+      getMainWindow().webContents.send("setSSHEnabledResult", { "APIError": "error calling API" });
     });
 });
 ipcMain.on("setAPIEnabled", (event, args) => {
@@ -104,7 +96,7 @@ ipcMain.on("setAPIEnabled", (event, args) => {
     })
     .catch(error => {
       logger.error(`error calling apiEnabled API: ${error}`)
-      getMainWindow().webContents.send("setAPIEnabledResult", {"APIError": "error calling API"});
+      getMainWindow().webContents.send("setAPIEnabledResult", { "APIError": "error calling API" });
     });
 });
 ipcMain.on("deviceCommand", (event, command) => {
