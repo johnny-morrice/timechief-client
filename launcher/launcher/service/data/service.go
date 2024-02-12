@@ -270,6 +270,9 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, fmt.Errorf("failed to get access token: %w", err)
 	}
 
+	// TODO delete theme testing.
+	deviceData.Theme = randomTheme()
+
 	result := DeviceData{
 		ServiceData: deviceData,
 		ServiceDataState: ServiceDataState{
