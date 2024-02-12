@@ -34,7 +34,7 @@ body {
     /* background-color: black; */
     margin: 0;
     border: 0;
-    font-family: 'Titillium Web', sans-serif;
+    /* font-family: 'Titillium Web', sans-serif; */
     font-size: 16pt;
     font-weight: 400;
     user-select: none;
@@ -50,8 +50,8 @@ div.home-screen {
 }
 
 div.border {
-    /* padding: 1em;
-    border: 1px solid green; */
+    padding: 1em;
+    /* border: 1px solid green; */
 }
 
 div.home-time-wrapper {
@@ -139,7 +139,7 @@ button:focus {
 }
 
 button.action-button {
-    border: 1px solid green;
+    /* border: 1px solid green; */
     background-color: black;
     color: green;
     font-size: 18pt
@@ -188,7 +188,7 @@ table.forecast-weather-table td.weather-icon {
 }
 
 button.forecast-control-button {
-    border: 1px solid green;
+    /* border: 1px solid green; */
     background-color: black;
     color: green;
     font-size: 16pt
@@ -224,7 +224,7 @@ div.event-calendar-day-controls {
 }
 
 button.event-calendar-control-button {
-    border: 1px solid green;
+    /* border: 1px solid green; */
     background-color: black;
     color: green;
     font-size: 16pt
