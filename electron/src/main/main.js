@@ -1,51 +1,10 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain } = require('electron')
-const path = require('path')
+const {ipcMain } = require('electron');
 const axios = require('axios');
 const winston = require('winston');
-const { networkInterfaces } = require('os');
-
-function getIpAddress() {
-  const nets = networkInterfaces();
-  
-  for (const name of Object.keys(nets)) {
-      for (const net of nets[name]) {
-          // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-          // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
-          // Just return the first IP address
-          const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
-          if (net.family === familyV4Value && !net.internal) {
-              return net.address;
-          }
-      }
-  }
-
-  return "unknown";
-}
-
-function getWwwBaseURL() {
-  return process.env.wwwBaseURL;
-}
-
-function isShowDevTools() {
-  return process.env.showDevTools == 'true';
-}
-
-function getAPIBaseURL() {
-  return process.env.clockAPIBaseURL;
-}
-
-function getWidth() {
-  return parseInt(process.env.timechief_width);
-}
-
-function getHeight() {
-  return parseInt(process.env.timechief_height);
-}
-
-function isFullScreen() {
-  return process.env.timechief_fullscreen == 'true';
-}
+const { baseDeviceStatus } = require('./status.js');
+const { startTimechiefApp, getMainWindow } = require('./window.js');
+const { LauncherClient } = require('./launcherclient.js');
 
 const logger = winston.createLogger({
   level: 'debug',
@@ -71,309 +30,25 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-let isDevMode = process.env.devMode == 'true';
+startTimechiefApp(logger);
 
-let mainWindow;
-logger.info(`Starting in ${isDevMode ? 'dev' : 'prod'} mode`);
-logger.info(`Width: ${getWidth()} Height: ${getHeight()}`);
-logger.info(`Fullscreen: ${isFullScreen()}`);
-function createWindow() {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: getWidth(),
-    height: getHeight(),
-    webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'),
-    },
-    autoHideMenuBar: true,
-    fullscreen: isFullScreen(),
-    backgroundColor: '#000000',
-    show: false,
-  })
+// var lastCSSKey = null;
+// function randomColor() {
+//   let colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'white'];
+//   return colors[Math.floor(Math.random() * colors.length)];
+// }
+// function testCssInjection() {
+//   setInterval(() => {
+//     if (lastCSSKey) {
+//       getMainWindow().webContents.removeInsertedCSS(lastCSSKey);
+//     }
+//     let color = randomColor();
+//     getMainWindow().webContents.insertCSS(`body { color: ${color}; }`).then(key => {
+//       lastCSSKey = key;
+//     });
+//   }, 5000);
+// }
 
-  // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, '../../frontend-dist/index.html'));
-
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
-    if (isShowDevTools()) {
-      mainWindow.webContents.openDevTools();
-    }
-  })
-}
-
-var refreshInterval = null;
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  createWindow();
-  logger.info("GPU status: ", app.getGPUFeatureStatus());
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-  // const refreshIntervalDuration = 30 * 1000; // 30 seconds for testing
-  const refreshIntervalDuration = 60 * 60 * 18 * 1000; // 18 hours
-  
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
-  }
-  refreshInterval= setInterval(() => {
-    logger.info("Refreshing page");
-    mainWindow.webContents.reloadIgnoringCache();
-  }, refreshIntervalDuration);
-})
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
-})
-
-class LauncherClient {
-  constructor(axios) {
-    this.axios = axios;
-    this.baseURL = getAPIBaseURL();
-  }
-
-  reboot() {
-    let cfg = {
-      url: this.baseURL + '/api/system/reboot',
-      method: 'post'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status != 204) {
-        logger.error(`reboot failed: ${resp.status}`);
-        return {
-          "APIError": "reboot failed"
-        }
-      }
-      return {};
-    });
-  }
-
-  shutdown() {
-    let cfg = {
-      url: this.baseURL + '/api/system/shutdown',
-      method: 'post'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status != 204) {
-        logger.error(`shutdown failed: ${resp.status}`);
-        return {
-          "APIError": "shutdown failed"
-        }
-      }
-      return {};
-    });
-  }
-
-  postLoggedIn() {
-    let cfg = {
-      url: this.baseURL + '/api/launcher/on-login',
-      method: 'post'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 204) {
-        return {};
-      }
-    });
-  }
-
-  createPairing() {
-    let cfg = {
-      url: this.baseURL + '/api/data/pairing',
-      method: 'post'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 204) {
-        return {};
-      }
-    });
-  }
-
-  getPairing() {
-    let cfg = {
-      url: this.baseURL + '/api/data/pairing',
-      method: 'get'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return resp.data;
-      }
-    });
-  }
-  postSetupBeginState() {
-    let cfg = {
-      url: this.baseURL + '/api/launcher/setup',
-      method: 'post',
-      data: {
-        "State": "Begin"
-      }
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return {};
-      }
-    });
-  }
-
-  postSetupInternetConnectedState() {
-    let cfg = {
-      url: this.baseURL + '/api/launcher/setup',
-      method: 'post',
-      data: {
-        "State": "InternetConnected"
-      }
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return {};
-      }
-    });
-  }
-
-  postWifiConnect() {
-    let cfg = {
-      url: this.baseURL + '/api/system/wifi/connect',
-      method: 'post',
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return {};
-      }
-    });
-  }
-
-  postWifiMarkReady() {
-    let cfg = {
-      url: this.baseURL + '/api/system/wifi/state',
-      method: 'post',
-      data: {
-        "Ready": true
-      }
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return {};
-      }
-    });
-  }
-
-  postLogOut() {
-    let cfg = {
-      url: this.baseURL + '/api/data/logout',
-      method: 'post'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 204) {
-        return {};
-      }
-    });
-  }
-
-  postWifiMarkNotReady() {
-    let cfg = {
-      url: this.baseURL + '/api/system/wifi/state',
-      method: 'post',
-      data: {
-        "Ready": false
-      }
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return {};
-      }
-    });
-  }
-
-  postRefreshMyDevices() {
-    let cfg = {
-      url: this.baseURL + '/api/data/mydevice/refresh',
-      method: 'post'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 204) {
-        return {};
-      }
-    });
-  }
-
-  getDeviceData() {
-    let cfg = {
-      url: this.baseURL + '/api/data/device',
-      method: 'get'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return resp.data;
-      }
-    });
-  }
-
-  postSSHEnabled(isEnabled) {
-    if (typeof isEnabled !== 'boolean') {
-      console.log("isEnabled must be a boolean but was: " + JSON.stringify(isEnabled));
-      return Promise.reject("isEnabled must be a boolean");
-    }
-    let cfg = {
-      url: this.baseURL + '/api/system/firewall/ssh',
-      method: 'post',
-      data: {
-        "state": isEnabled
-      }
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return {};
-      }
-    });
-  }
-
-  postAPIEnabled(isEnabled) {
-    let cfg = {
-      url: this.baseURL + '/api/system/firewall/api',
-      method: 'post',
-      data: {
-        "state": isEnabled
-      }
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return {};
-      }
-    });
-  }
-
-  postSSHRegenPassword() {
-    let cfg = {
-      url: this.baseURL + '/api/system/ssh/regenerate',
-      method: 'post'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return resp.data;
-      }
-    });
-  }
-
-  postAPIRegenKey() {
-    let cfg = {
-      url: this.baseURL + '/api/launcher/api-key/user',
-      method: 'post'
-    };
-    return this.axios(cfg).then(resp => {
-      if (resp.status == 200) {
-        return resp.data;
-      }
-    });
-  }
-
-
-}
 
 const axiosAPI = axios.create({
     timeout: 10 * 1000,
@@ -384,29 +59,16 @@ require('axios-debug-log').addLogger(axiosAPI, logger.debug);
 
 var client = new LauncherClient(axiosAPI);
 
-function getClientVersion() {
-  return process.env.clientVersion;
-}
-
-function baseDeviceStatus() {
-  return {
-    "status": "ok",
-    "ip_address": getIpAddress(),
-    "www_base_url": getWwwBaseURL(),
-    "client_version": getClientVersion()
-  }
-}
-
 function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   ipcMain.on(sendChan, (event, args) => {
     apiCall(args)
       .then(json => {
         logger.info(`returning results to channel: ${receiveChan}`);
-        mainWindow.webContents.send(receiveChan, json)
+        getMainWindow().webContents.send(receiveChan, json)
       })
       .catch(error => {
         logger.error(`error calling ${sendChan} API: ${error}`)
-        mainWindow.webContents.send(receiveChan, {"APIError": "error calling API"});
+        getMainWindow().webContents.send(receiveChan, {"APIError": "error calling API"});
       });
   });
 }
@@ -428,34 +90,34 @@ handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKe
 ipcMain.on("setSSHEnabled", (event, args) => {
   client.postSSHEnabled(args["state"])
     .then(json => {
-      mainWindow.webContents.send("setSSHEnabledResult", json)
+      getMainWindow().webContents.send("setSSHEnabledResult", json)
     })
     .catch(error => {
       logger.error(`error calling sshEnabled API: ${error}`)
-      mainWindow.webContents.send("setSSHEnabledResult", {"APIError": "error calling API"});
+      getMainWindow().webContents.send("setSSHEnabledResult", {"APIError": "error calling API"});
     });
 });
 ipcMain.on("setAPIEnabled", (event, args) => {
   client.postAPIEnabled(args["state"])
     .then(json => {
-      mainWindow.webContents.send("setAPIEnabledResult", json)
+      getMainWindow().webContents.send("setAPIEnabledResult", json)
     })
     .catch(error => {
       logger.error(`error calling apiEnabled API: ${error}`)
-      mainWindow.webContents.send("setAPIEnabledResult", {"APIError": "error calling API"});
+      getMainWindow().webContents.send("setAPIEnabledResult", {"APIError": "error calling API"});
     });
 });
 ipcMain.on("deviceCommand", (event, command) => {
   switch (command["command"]) {
     case "heartbeat":
       logger.debug("handling device heartbeat")
-      mainWindow.webContents.send("deviceStatus", baseDeviceStatus());
+      getMainWindow().webContents.send("deviceStatus", baseDeviceStatus());
       break;
     default:
       logger.error(`unknown device command: ${command["command"]}`)
       const deviceStatus = baseDeviceStatus();
       deviceStatus["status"] = "command failed";
-      mainWindow.webContents.send("deviceStatus", deviceStatus);
+      getMainWindow().webContents.send("deviceStatus", deviceStatus);
       break;
   }
 });
