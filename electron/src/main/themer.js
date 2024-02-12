@@ -1,4 +1,4 @@
-import { getMainWindow } from "./window";
+const { getMainWindow } = require("./window");
 
 class Themer {
     constructor() {
@@ -51,3 +51,5 @@ div.border {
     border-color: green;
 }`;
 }
+
+exports.Themer = Themer;
