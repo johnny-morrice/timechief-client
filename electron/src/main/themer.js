@@ -3,6 +3,7 @@ import { getMainWindow } from "./window";
 class Themer {
     constructor() {
         this.lastThemeCssKey = null;
+        this.lastThemeCSS = getDefaultThemeCSS();
     }
 
     setThemeFromData(data) {
@@ -16,12 +17,15 @@ class Themer {
     }
 
     setTheme(theme) {
-        if (this.lastThemeCssKey) {
-            getMainWindow().webContents.removeInsertedCSS(this.lastThemeCssKey);
+        if (theme !== this.lastThemeCSS) {
+            this.lastThemeCSS = theme;
+            if (this.lastThemeCssKey) {
+                getMainWindow().webContents.removeInsertedCSS(this.lastThemeCssKey);
+            }
+            getMainWindow().webContents.insertCSS(theme).then(key => {
+                this.lastThemeCssKey = key;
+            });
         }
-        getMainWindow().webContents.insertCSS(theme).then(key => {
-            this.lastThemeCssKey = key;
-        });
     }
 
 }
