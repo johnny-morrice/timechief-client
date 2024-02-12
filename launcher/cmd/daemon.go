@@ -244,7 +244,7 @@ func Daemon(ctx *cli.Context) error {
 }
 
 func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {
-	ctxApiKey := ctx.String("app-api-key")
+	ctxApiKey := ctx.String("test-app-api-key")
 	if ctxApiKey != "" {
 		err := kvStore.Set(store.APIAppAuthKey, ctxApiKey)
 		if err != nil {

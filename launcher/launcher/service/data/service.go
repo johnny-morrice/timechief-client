@@ -295,6 +295,11 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			NetworkState: NetworkState{
 				IPAddress: ipAddress,
 			},
+			// TODO: read the firewall state from OS somehow.
+			FirewallState: FirewallState{
+				SSHEnabled: true,
+				APIEnabled: true,
+			},
 		},
 	}
 
