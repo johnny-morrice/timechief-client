@@ -1,24 +1,16 @@
-/* 		ForegroundColor:    &fg,
-		BackgroundColor:    &bg,
-		BoxBackgroundColor: &boxBg,
-		BoxBorderRadius:    &radius,
-		BoxBorderWidth:     &borderWidth,
-		TimeFont:           &timeFont,
-		MainFont:           &mainFont, */
-
 body {
-    color: {{ForegroundColor}};
-    background-color: {{BackgroundColor}};
-    font-family: {{MainFont}};
+    color: {{.ForegroundColor}};
+    background-color: {{.BackgroundColor}};
+    font-family: {{.MainFont}};
 }
 
 div.home-time {
-    font-family: {{TimeFont}};
+    font-family: {{.TimeFont}};
 }
 
 ui-box {
-    background-color: {{BoxBackgroundColor}};
-    border-radius: {{BoxBorderRadius}};
-    border-width: {{BoxBorderWidth}};
-    border-color: {{ForegroundColor}};
+    background-color: {{.BoxBackgroundColor}};
+    border-radius: {{.BoxBorderRadius}};
+    border-width: {{.BoxBorderWidth}};
+    border-color: {{.ForegroundColor}};
 }
