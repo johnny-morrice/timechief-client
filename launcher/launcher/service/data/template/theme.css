@@ -10,6 +10,9 @@ div.home-time {
 
 ui-box {
     background-color: {{.BoxBackgroundColor}};
+}
+
+div.border {
     border-radius: {{.BoxBorderRadius}};
     border-width: {{.BoxBorderWidth}};
     border-color: {{.ForegroundColor}};
