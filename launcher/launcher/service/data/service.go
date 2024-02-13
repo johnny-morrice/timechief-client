@@ -277,9 +277,12 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	}
 
 	// TODO delete theme testing.
-	deviceData.Theme.Value = randomTheme()
 	nowDt := int(time.Now().Unix())
-	deviceData.Theme.Dt = &nowDt
+	deviceData.Theme = &v2.ThemeDatum{
+		Dt:    &nowDt,
+		Value: randomTheme(),
+	}
+
 	themeCss, err := renderCss(deviceData.Theme.Value)
 	if err != nil {
 		return DeviceData{}, err
