@@ -242,7 +242,7 @@ export const HomePage = () => {
 
 
   return <div class="home-screen flex-row">
-    <div class="home-lhs-column flex-column flex-grow border crt-box">
+    <div class="home-lhs-column flex-column flex-grow border crt-box home-box">
       <SwitcherWidget widgets={
         [
           { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
@@ -263,7 +263,7 @@ export const HomePage = () => {
         <div class="home-date">{signals.myDate}</div>
       </div>
 
-      <div class="home-action-center flex-grow border crt-box">
+      <div class="home-action-center flex-grow border crt-box home-box">
         <div id="home-action-center-content" class="flex-row flex-grow">
           <Show when={hasNextEvent(signals)}>
             <div class='next-event-summary flex-column flex-grow'>

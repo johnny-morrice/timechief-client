@@ -140,8 +140,8 @@ button:focus {
 
 button.action-button {
     /* border: 1px solid green; */
-    background-color: black;
-    color: green;
+    /* background-color: black; */
+    /* color: green; */
     font-size: 18pt
 }
 
@@ -189,8 +189,8 @@ table.forecast-weather-table td.weather-icon {
 
 button.forecast-control-button {
     /* border: 1px solid green; */
-    background-color: black;
-    color: green;
+    /* background-color: black; */
+    /* color: green; */
     font-size: 16pt
 }
 
@@ -225,14 +225,14 @@ div.event-calendar-day-controls {
 
 button.event-calendar-control-button {
     /* border: 1px solid green; */
-    background-color: black;
-    color: green;
+    /* background-color: black; */
+    /* color: green; */
     font-size: 16pt
 }
 
 div.inverted-color, span.inverted-color {
-    color: black;
-    background-color: green;
+    /* color: black;
+    background-color: green; */
 }
 
 div.fortune-text {
