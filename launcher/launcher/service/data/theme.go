@@ -11,19 +11,21 @@ func randomTheme() *v2.Theme {
 	i := randomColorIndex()
 	bg := backgroundColor(i)
 	boxBg := boxBackgroundColor(i)
+	buttonBg := buttonBackgroundColor(i)
 	fg := foregroundColor(i)
 	radius := randomBoxRadius()
 	borderWidth := boxBorderWidth()
 	timeFont := "Seven Segment"
 	mainFont := randomFont()
 	return &v2.Theme{
-		ForegroundColor:    &fg,
-		BackgroundColor:    &bg,
-		BoxBackgroundColor: &boxBg,
-		BoxBorderRadius:    &radius,
-		BoxBorderWidth:     &borderWidth,
-		TimeFont:           &timeFont,
-		MainFont:           &mainFont,
+		ForegroundColor:       &fg,
+		BackgroundColor:       &bg,
+		BoxBackgroundColor:    &boxBg,
+		ButtonBackgroundColor: &buttonBg,
+		BoxBorderRadius:       &radius,
+		BoxBorderWidth:        &borderWidth,
+		TimeFont:              &timeFont,
+		MainFont:              &mainFont,
 	}
 }
 
@@ -60,6 +62,10 @@ func backgroundColor(i int) string {
 }
 
 func boxBackgroundColor(i int) string {
+	return colorThemes[i][1]
+}
+
+func buttonBackgroundColor(i int) string {
 	return colorThemes[i][1]
 }
 

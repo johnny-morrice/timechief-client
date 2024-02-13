@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
@@ -276,8 +277,10 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	}
 
 	// TODO delete theme testing.
-	deviceData.Theme = randomTheme()
-	themeCss, err := renderCss(deviceData.Theme)
+	deviceData.Theme.Value = randomTheme()
+	nowDt := int(time.Now().Unix())
+	deviceData.Theme.Dt = &nowDt
+	themeCss, err := renderCss(deviceData.Theme.Value)
 	if err != nil {
 		return DeviceData{}, err
 	}

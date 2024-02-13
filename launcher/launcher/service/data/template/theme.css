@@ -22,16 +22,19 @@ button.action-button {
     border-radius: {{.BoxBorderRadius}};
     border-width: {{.BoxBorderWidth}};
     border-color: {{.ForegroundColor}};
+    background-color: {{.ButtonBackgroundColor}};
 }
 
 button.forecast-control-button {
     border-radius: {{.BoxBorderRadius}};
     border-width: {{.BoxBorderWidth}};
     border-color: {{.ForegroundColor}};
+    background-color: {{.ButtonBackgroundColor}};
 }
 
 button.event-calendar-control-button {
     border-radius: {{.BoxBorderRadius}};
     border-width: {{.BoxBorderWidth}};
     border-color: {{.ForegroundColor}};
+    background-color: {{.ButtonBackgroundColor}};
 }
