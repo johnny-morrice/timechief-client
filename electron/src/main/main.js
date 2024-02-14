@@ -31,7 +31,11 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-startTimechiefApp(logger);
+const themer = new Themer();
+startTimechiefApp(logger, () => {
+  console.log("app ready, setting default theme");
+  themer.setDefaultTheme();
+});
 
 const axiosAPI = axios.create({
   timeout: 10 * 1000,
@@ -56,7 +60,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   });
 }
 
-const themer = new Themer();
+
 
 function handleDataRequest() {
   return client.getDeviceData().then(data => {

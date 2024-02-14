@@ -51,6 +51,7 @@ div.home-screen {
 
 div.border {
     padding: 1em;
+    border-style: solid;
     /* border: 1px solid green; */
 }
 
@@ -142,6 +143,7 @@ button.action-button {
     /* border: 1px solid green; */
     /* background-color: black; */
     /* color: green; */
+    border-style: solid;
     font-size: 18pt
 }
 
@@ -191,6 +193,7 @@ button.forecast-control-button {
     /* border: 1px solid green; */
     /* background-color: black; */
     /* color: green; */
+    border-style: solid;
     font-size: 16pt
 }
 
@@ -227,6 +230,7 @@ button.event-calendar-control-button {
     /* border: 1px solid green; */
     /* background-color: black; */
     /* color: green; */
+    border-style: solid;
     font-size: 16pt
 }
 

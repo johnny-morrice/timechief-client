@@ -24,7 +24,7 @@ function getMainWindow() {
     return mainWindow;
 }
 
-function createWindow() {
+function createWindow(callback) {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: getWidth(),
@@ -46,17 +46,18 @@ function createWindow() {
         if (isShowDevTools()) {
             mainWindow.webContents.openDevTools();
         }
+        callback();
     })
 }
 
-function startTimechiefApp(logger) {
+function startTimechiefApp(logger, callback) {
     var refreshInterval = null;
 
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
     app.whenReady().then(() => {
-        createWindow();
+        createWindow(callback);
         logger.info("GPU status: ", app.getGPUFeatureStatus());
         app.on('activate', function () {
             // On macOS it's common to re-create a window in the app when the
