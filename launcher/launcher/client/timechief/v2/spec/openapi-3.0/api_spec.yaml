@@ -978,26 +978,6 @@ components:
       scheme: bearer
       bearerFormat: Access token
   schemas:
-    Theme:
-      type: object
-      properties:
-        uuid:
-          type: string
-        foreground_color:
-          type: string
-        background_color:
-          type: string
-        box_background_color:
-          type: string
-        box_border_radius:
-          type: string
-        box_border_width:
-          type: string
-        main_font:
-          type: string
-        time_font:
-          type: string
-
     GeocodeResult:
       type: object
       properties:
@@ -1239,6 +1219,36 @@ components:
         google_profile:
           type: boolean
 
+    Theme:
+      type: object
+      properties:
+        uuid:
+          type: string
+        foreground_color:
+          type: string
+        background_color:
+          type: string
+        box_background_color:
+          type: string
+        box_border_radius:
+          type: string
+        box_border_width:
+          type: string
+        main_font:
+          type: string
+        time_font:
+          type: string
+        button_background_color:
+          type: string
+
+    ThemeDatum:
+      type: object
+      properties:
+        value:
+          $ref: "#/components/schemas/Theme"
+        dt:
+          type: integer
+
     OWMDataDatum:
       type: object
       properties:
@@ -1322,7 +1332,7 @@ components:
         google_profile:
           $ref: "#/components/schemas/GoogleProfileDatum"
         theme:
-          $ref: "#/components/schemas/Theme"
+          $ref: "#/components/schemas/ThemeDatum"
         dt:
           type: integer
 

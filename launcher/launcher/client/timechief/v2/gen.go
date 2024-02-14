@@ -93,7 +93,7 @@ type Data struct {
 	GoogleCalendar *CalendarDatum      `json:"google_calendar,omitempty"`
 	GoogleProfile  *GoogleProfileDatum `json:"google_profile,omitempty"`
 	Owm            *OWMDataDatum       `json:"owm,omitempty"`
-	Theme          *Theme              `json:"theme,omitempty"`
+	Theme          *ThemeDatum         `json:"theme,omitempty"`
 }
 
 // Device defines model for Device.
@@ -228,14 +228,21 @@ type PrincipalGoogleAccount struct {
 
 // Theme defines model for Theme.
 type Theme struct {
-	BackgroundColor    *string `json:"background_color,omitempty"`
-	BoxBackgroundColor *string `json:"box_background_color,omitempty"`
-	BoxBorderRadius    *string `json:"box_border_radius,omitempty"`
-	BoxBorderWidth     *string `json:"box_border_width,omitempty"`
-	ForegroundColor    *string `json:"foreground_color,omitempty"`
-	MainFont           *string `json:"main_font,omitempty"`
-	TimeFont           *string `json:"time_font,omitempty"`
-	Uuid               *string `json:"uuid,omitempty"`
+	BackgroundColor       *string `json:"background_color,omitempty"`
+	BoxBackgroundColor    *string `json:"box_background_color,omitempty"`
+	BoxBorderRadius       *string `json:"box_border_radius,omitempty"`
+	BoxBorderWidth        *string `json:"box_border_width,omitempty"`
+	ButtonBackgroundColor *string `json:"button_background_color,omitempty"`
+	ForegroundColor       *string `json:"foreground_color,omitempty"`
+	MainFont              *string `json:"main_font,omitempty"`
+	TimeFont              *string `json:"time_font,omitempty"`
+	Uuid                  *string `json:"uuid,omitempty"`
+}
+
+// ThemeDatum defines model for ThemeDatum.
+type ThemeDatum struct {
+	Dt    *int   `json:"dt,omitempty"`
+	Value *Theme `json:"value,omitempty"`
 }
 
 // Version defines model for Version.

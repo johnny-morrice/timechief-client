@@ -8,7 +8,7 @@ div.home-time {
     font-family: {{.TimeFont}};
 }
 
-ui-box {
+div.home-box {
     background-color: {{.BoxBackgroundColor}};
 }
 
@@ -22,16 +22,27 @@ button.action-button {
     border-radius: {{.BoxBorderRadius}};
     border-width: {{.BoxBorderWidth}};
     border-color: {{.ForegroundColor}};
+    background-color: {{.ButtonBackgroundColor}};
+    color: {{.ForegroundColor}};
 }
 
 button.forecast-control-button {
     border-radius: {{.BoxBorderRadius}};
     border-width: {{.BoxBorderWidth}};
     border-color: {{.ForegroundColor}};
+    background-color: {{.ButtonBackgroundColor}};
+    color: {{.ForegroundColor}};
 }
 
 button.event-calendar-control-button {
     border-radius: {{.BoxBorderRadius}};
     border-width: {{.BoxBorderWidth}};
     border-color: {{.ForegroundColor}};
+    background-color: {{.ButtonBackgroundColor}};
+    color: {{.ForegroundColor}};
+}
+
+div.inverted-color, span.inverted-color {
+    color: {{.BoxBackgroundColor}};
+    background-color: {{.ForegroundColor}};
 }
