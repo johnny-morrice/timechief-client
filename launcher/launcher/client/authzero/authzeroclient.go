@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -38,7 +39,7 @@ func (clnt AuthZeroClient) GetDeviceCode(ctx context.Context, clientID, audience
 	//   --data 'client_id=xxxxx' \
 	//   --data audience=https://timechief-dev.onrender.com
 	url := clnt.BaseURL + "/oauth/device/code"
-	payload := strings.NewReader("client_id=" + clientID + "&audience=" + audience)
+	payload := strings.NewReader("client_id=" + clientID + "&audience=" + audience + "&scope=offline_access")
 	req, err := http.NewRequest("POST", url, payload)
 	if err != nil {
 		return DeviceCodeResp{}, err
@@ -91,8 +92,12 @@ func (clnt AuthZeroClient) RefreshAccessToken(ctx context.Context, clientID, ref
 	if err != nil {
 		return AccessTokenResp{}, err
 	}
-	// If refresh token refreshing is configured on Auth0 this will break things.
-	result.RefreshToken = refreshToken
+	// Hack around no new refresh token.
+	if result.RefreshToken == "" {
+		log.Println("no refresh token in response, using original")
+		result.RefreshToken = refreshToken
+	}
+
 	return result, nil
 }
 
