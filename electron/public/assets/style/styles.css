@@ -43,6 +43,25 @@ body {
     overflow: hidden;
 }
 
+div.background-video-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: black;
+}
+
+#background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
 div.home-screen {
     height: 100vh;
     padding: 1em;
@@ -234,7 +253,8 @@ button.event-calendar-control-button {
     font-size: 16pt
 }
 
-div.inverted-color, span.inverted-color {
+div.inverted-color,
+span.inverted-color {
     /* color: black;
     background-color: green; */
 }
@@ -269,9 +289,16 @@ div.loading-line {
 }
 
 @keyframes loading-fade {
-    0%,100% { opacity: 1 }
-    50% { opacity: 0.7 }
-  }
+
+    0%,
+    100% {
+        opacity: 1
+    }
+
+    50% {
+        opacity: 0.7
+    }
+}
 
 div.fade-in {
     opacity: 0;
@@ -284,13 +311,23 @@ div.fade-out {
 }
 
 @keyframes fade-in {
-    0% { opacity: 0 }
-    100% { opacity: 1 }
+    0% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
 }
 
 @keyframes fade-out {
-    0% { opacity: 1 }
-    100% { opacity: 0 }
+    0% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
 }
 
 div.status-note {
@@ -302,39 +339,51 @@ div.status-note {
     div.home-time {
         font-size: 110pt;
     }
+
     div.home-date {
         font-size: 38pt;
     }
+
     div.current-weather {
         font-size: 24pt
     }
+
     body {
         font-size: 18pt;
     }
+
     button.forecast-control-button {
         font-size: 18pt
     }
+
     button.action-button {
         font-size: 20pt
     }
+
     div.setup-title {
         font-size: 24pt;
     }
+
     div.astro {
         font-size: 18pt;
     }
+
     div.weather-data {
         font-size: 36pt;
     }
+
     div.current-weather-icon {
         font-size: 30pt;
     }
+
     div.forecast-weather-icon {
         font-size: 34pt;
     }
+
     div.calendar-day-date {
         font-size: 22pt;
     }
+
     div.fortune-text {
         font-size: 16pt;
     }
@@ -344,39 +393,51 @@ div.status-note {
     div.home-time {
         font-size: 120pt;
     }
+
     div.home-date {
         font-size: 40pt;
     }
+
     div.current-weather {
         font-size: 28pt
     }
+
     body {
         font-size: 22pt;
     }
+
     button.forecast-control-button {
         font-size: 20pt
     }
+
     button.action-button {
         font-size: 22pt
     }
+
     div.setup-title {
         font-size: 28pt;
     }
+
     div.astro {
         font-size: 20pt;
     }
+
     div.weather-data {
         font-size: 38pt;
     }
+
     div.current-weather-icon {
         font-size: 32pt;
     }
+
     div.forecast-weather-icon {
         font-size: 36pt;
     }
+
     div.calendar-day-date {
         font-size: 24pt;
     }
+
     div.fortune-text {
         font-size: 18pt;
     }

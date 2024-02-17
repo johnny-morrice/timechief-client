@@ -1,4 +1,4 @@
-import { onCleanup } from "solid-js";
+import { onCleanup, onMount } from "solid-js";
 
 export function Video(props) {
     if (props.timeout < 1) {
@@ -14,13 +14,20 @@ export function Video(props) {
         console.log(`video ${props.videoSrc} ended`);
         props.setEnded(true);
     }
-    function onLoad() {
-        const video = document.getElementById('video');
-        video.onended = onEnded;
+    function setEndedCallback() {
+        const video = document.getElementById('background-video');
+        if (video) {
+            console.log(`setting video ${props.videoSrc} ended callback`);
+            video.onended = onEnded;
+        }
     }
+    onMount(setEndedCallback);
     const timeout = setTimeout(onEnded, props.timeout);
     onCleanup(() => clearTimeout(timeout));
-    return <>
-        <video id="video" src={props.videoSrc} autoPlay muted onLoad={onLoad} />
-    </>
+    return <div class='background-video-wrapper'>
+        <video id="background-video" autoplay muted>
+            <source src={props.videoSrc} type="video/mp4" />
+            Video playback error.
+        </video>
+    </div>
 }
