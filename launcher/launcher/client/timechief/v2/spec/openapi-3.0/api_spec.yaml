@@ -1234,9 +1234,21 @@ components:
           type: string
         box_border_width:
           type: string
+        box_border_color:
+          type: string
         main_font:
           type: string
         time_font:
+          type: string
+        time_color:
+          type: string
+        button_border_radius:
+          type: string
+        button_border_width:
+          type: string
+        button_border_color:
+          type: string
+        button_foreground_color:
           type: string
         button_background_color:
           type: string

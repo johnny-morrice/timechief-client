@@ -230,11 +230,17 @@ type PrincipalGoogleAccount struct {
 type Theme struct {
 	BackgroundColor       *string `json:"background_color,omitempty"`
 	BoxBackgroundColor    *string `json:"box_background_color,omitempty"`
+	BoxBorderColor        *string `json:"box_border_color,omitempty"`
 	BoxBorderRadius       *string `json:"box_border_radius,omitempty"`
 	BoxBorderWidth        *string `json:"box_border_width,omitempty"`
 	ButtonBackgroundColor *string `json:"button_background_color,omitempty"`
+	ButtonBorderColor     *string `json:"button_border_color,omitempty"`
+	ButtonBorderRadius    *string `json:"button_border_radius,omitempty"`
+	ButtonBorderWidth     *string `json:"button_border_width,omitempty"`
+	ButtonForegroundColor *string `json:"button_foreground_color,omitempty"`
 	ForegroundColor       *string `json:"foreground_color,omitempty"`
 	MainFont              *string `json:"main_font,omitempty"`
+	TimeColor             *string `json:"time_color,omitempty"`
 	TimeFont              *string `json:"time_font,omitempty"`
 	Uuid                  *string `json:"uuid,omitempty"`
 }
