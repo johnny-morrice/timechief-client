@@ -6,6 +6,7 @@ body {
 
 div.home-time {
     font-family: {{.TimeFont}};
+    color: {{.TimeColor}};
 }
 
 div.home-box {
@@ -15,31 +16,31 @@ div.home-box {
 div.border {
     border-radius: {{.BoxBorderRadius}};
     border-width: {{.BoxBorderWidth}};
-    border-color: {{.ForegroundColor}};
+    border-color: {{.BoxBorderColor}};
 }
 
 button.action-button {
-    border-radius: {{.BoxBorderRadius}};
-    border-width: {{.BoxBorderWidth}};
-    border-color: {{.ForegroundColor}};
+    border-radius: {{.ButtonBorderRadius}};
+    border-width: {{.ButtonBorderWidth}};
+    border-color: {{.ButtonBorderColor}};
     background-color: {{.ButtonBackgroundColor}};
-    color: {{.ForegroundColor}};
+    color: {{.ButtonForegroundColor}};
 }
 
 button.forecast-control-button {
-    border-radius: {{.BoxBorderRadius}};
-    border-width: {{.BoxBorderWidth}};
-    border-color: {{.ForegroundColor}};
+    border-radius: {{.ButtonBorderRadius}};
+    border-width: {{.ButtonBorderWidth}};
+    border-color: {{.ButtonBorderColor}};
     background-color: {{.ButtonBackgroundColor}};
-    color: {{.ForegroundColor}};
+    color: {{.ButtonForegroundColor}};
 }
 
 button.event-calendar-control-button {
-    border-radius: {{.BoxBorderRadius}};
-    border-width: {{.BoxBorderWidth}};
-    border-color: {{.ForegroundColor}};
+    border-radius: {{.ButtonBorderRadius}};
+    border-width: {{.ButtonBorderWidth}};
+    border-color: {{.ButtonBorderColor}};
     background-color: {{.ButtonBackgroundColor}};
-    color: {{.ForegroundColor}};
+    color: {{.ButtonForegroundColor}};
 }
 
 div.inverted-color, span.inverted-color {

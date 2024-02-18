@@ -24,7 +24,13 @@ func randomTheme() *v2.Theme {
 		ButtonBackgroundColor: &buttonBg,
 		BoxBorderRadius:       &radius,
 		BoxBorderWidth:        &borderWidth,
+		BoxBorderColor:        &fg,
+		ButtonBorderRadius:    &radius,
+		ButtonBorderWidth:     &borderWidth,
+		ButtonBorderColor:     &fg,
+		ButtonForegroundColor: &fg,
 		TimeFont:              &timeFont,
+		TimeColor:             &fg,
 		MainFont:              &mainFont,
 	}
 }
