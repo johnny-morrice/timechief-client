@@ -5,10 +5,11 @@ import { initializeIPC } from './ipc';
 import { WebSetupPage } from "./webSetup";
 import { HomePage } from "./homePage";
 import { LoginPage } from './login';
+import { IntroVideo } from './introVideo';
 
 
 const AppScreen = (props) => 
-  <WebSetupPage element={<LoginPage element={props.element} />}/>
+  <IntroVideo element={<WebSetupPage element={<LoginPage element={props.element} />}/>} />;
 
 const App = () => {
   let ipcIntervals = initializeIPC();
