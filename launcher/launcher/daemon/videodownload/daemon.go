@@ -1,9 +1,13 @@
 package videodownload
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
+	"math/rand"
+	"net/http"
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
@@ -16,6 +20,7 @@ type Daemon struct {
 	tickInterval  time.Duration
 	client        VideoDownloadClient
 	keyValueStore KeyValueStore
+	blobStore     BlobStore
 }
 
 type KeyValueStore interface {
@@ -23,7 +28,11 @@ type KeyValueStore interface {
 	Set(key, value string) error
 }
 
-func NewDaemon(tickInterval time.Duration, client VideoDownloadClient, keyValueStore KeyValueStore) (Daemon, error) {
+type BlobStore interface {
+	Put(key string, data []byte) error
+}
+
+func NewDaemon(tickInterval time.Duration, client VideoDownloadClient, keyValueStore KeyValueStore, blobStore BlobStore) (Daemon, error) {
 	if tickInterval <= 0 {
 		return Daemon{}, errors.New("refreshInterval must be positive")
 	}
@@ -33,11 +42,15 @@ func NewDaemon(tickInterval time.Duration, client VideoDownloadClient, keyValueS
 	if keyValueStore == nil {
 		return Daemon{}, errors.New("keyValueStore must not be nil")
 	}
+	if blobStore == nil {
+		return Daemon{}, errors.New("blobStore must not be nil")
+	}
 
 	result := Daemon{
 		tickInterval:  tickInterval,
 		client:        client,
 		keyValueStore: keyValueStore,
+		blobStore:     blobStore,
 	}
 	return result, nil
 }
@@ -62,6 +75,7 @@ func (d Daemon) Start(ctx *cli.Context) {
 	}
 }
 
+const defaultLastVideoUUID = "00000000-0000-0000-0000-000000000000"
 const defaultContentHourRange = "21-04"
 const defaultContentFrequency = time.Hour * 17
 const defaultContentEnabled = "false"
@@ -75,6 +89,7 @@ func (d Daemon) init() error {
 		store.VideoContentLastUpdateKey: defaultContentLastUpdate,
 		store.VideoContentFrequencyKey:  fmt.Sprint(defaultContentFrequency),
 		store.VideoContentLastViewedKey: defaultVideoViewed,
+		store.VideoContentUUIDKey:       defaultLastVideoUUID,
 	}
 	for key, value := range defaults {
 		err := d.initKey(key, value)
@@ -120,7 +135,66 @@ func (d Daemon) doTick() error {
 }
 
 func (d Daemon) downloadVideoContent() error {
-	panic("not implemented")
+	videos, err := d.client.ListVideos()
+	if err != nil {
+		return fmt.Errorf("failed to list videos: %w", err)
+	}
+	if len(videos) == 0 {
+		return errors.New("no videos available")
+	}
+	lastUUID, err := d.keyValueStore.Get(store.VideoContentUUIDKey)
+	if err != nil {
+		return fmt.Errorf("failed to get last video UUID: %w", err)
+	}
+	// Remove last video from list.
+	choices := make([]VideoSource, 0, len(videos))
+	for _, video := range videos {
+		if video.UUID != lastUUID {
+			choices = append(choices, video)
+		}
+	}
+	if len(choices) == 0 {
+		return errors.New("no new videos available")
+	}
+	// Choose a random video.
+	index := rand.Intn(len(choices))
+	video := choices[index]
+	err = d.keyValueStore.Set(store.VideoContentUUIDKey, video.UUID)
+	if err != nil {
+		return fmt.Errorf("failed to set last video UUID: %w", err)
+	}
+	data, err := downloadURLData(video.URL)
+	if err != nil {
+		return fmt.Errorf("failed to download video content: %w", err)
+	}
+	err = d.blobStore.Put("video-content", data)
+	if err != nil {
+		return fmt.Errorf("failed to store video content: %w", err)
+	}
+	return nil
+}
+
+func downloadURLData(url string) ([]byte, error) {
+	const timeout = time.Minute * 10
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create video content request: %w", err)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to download video content: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to download video content: status code %d", resp.StatusCode)
+	}
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read video content: %w", err)
+	}
+	return data, nil
 }
 
 func (d Daemon) shouldUpdateVideoContent() (bool, error) {

@@ -42,6 +42,7 @@ const VideoContentHourRangeKey = "video-content-hour-range"
 const VideoContentEnabledKey = "video-content-enabled"
 const VideoContentLastUpdateKey = "video-content-last-update"
 const VideoContentLastViewedKey = "video-content-last-viewed"
+const VideoContentUUIDKey = "video-content-uuid"
 
 // Set a key-value pair in the store.
 func (store KeyValueStore) Set(key string, value string) error {
