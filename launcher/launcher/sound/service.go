@@ -4,11 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/util"
 	"gorm.io/gorm"
 )
 
@@ -48,23 +46,7 @@ func (svc Service) isInUnmuteRange() (bool, error) {
 	if unmuteRange == "" {
 		return true, nil
 	}
-	unmuteRangeParts := strings.Split(unmuteRange, "-")
-	if len(unmuteRangeParts) != 2 {
-		return false, fmt.Errorf("invalid unmute range %v", unmuteRange)
-	}
-	unmuteHours := [2]int{}
-	for i, part := range unmuteRangeParts {
-		unmuteHour, err := strconv.ParseInt(part, 10, 32)
-		if err != nil {
-			return false, fmt.Errorf("invalid unmute range %v", unmuteRange)
-		}
-		unmuteHours[i] = int(unmuteHour)
-	}
-	startHour := unmuteHours[0]
-	endHour := unmuteHours[1]
-	currentTime := time.Now()
-	isInRange := currentTime.Hour() >= startHour && currentTime.Hour() < endHour
-	return isInRange, nil
+	return util.IsInHourRange(unmuteRange)
 }
 
 func (svc Service) playSound(songName string) error {
