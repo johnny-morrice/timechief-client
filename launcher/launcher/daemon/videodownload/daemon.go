@@ -2,9 +2,11 @@ package videodownload
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"time"
@@ -19,7 +21,7 @@ type Daemon struct {
 	tickInterval  time.Duration
 	source        VideoSource
 	keyValueStore KeyValueStore
-	blobStore     BlobStore
+	filesystem    VideoFilesystem
 	opts          Options
 }
 
@@ -28,15 +30,15 @@ type KeyValueStore interface {
 	Set(key, value string) error
 }
 
-type BlobStore interface {
-	Put(key string, data []byte) error
+type VideoFilesystem interface {
+	WriteFile(fileName string, data []byte, mode fs.FileMode) error
 }
 
 type Options struct {
 	ForceDownload bool
 }
 
-func NewDaemon(tickInterval time.Duration, source VideoSource, keyValueStore KeyValueStore, blobStore BlobStore, opts Options) (Daemon, error) {
+func NewDaemon(tickInterval time.Duration, source VideoSource, keyValueStore KeyValueStore, blobStore VideoFilesystem, opts Options) (Daemon, error) {
 	if tickInterval <= 0 {
 		return Daemon{}, errors.New("refreshInterval must be positive")
 	}
@@ -54,7 +56,7 @@ func NewDaemon(tickInterval time.Duration, source VideoSource, keyValueStore Key
 		tickInterval:  tickInterval,
 		source:        source,
 		keyValueStore: keyValueStore,
-		blobStore:     blobStore,
+		filesystem:    blobStore,
 		opts:          opts,
 	}
 	return result, nil
@@ -80,21 +82,21 @@ func (d Daemon) Start(ctx *cli.Context) {
 	}
 }
 
-const defaultLastVideoUUID = "00000000-0000-0000-0000-000000000000"
+const defaultLastVideoDescriptor = "{}"
 const defaultContentHourRange = "21-04"
 const defaultContentFrequency = time.Hour * 17
 const defaultContentEnabled = "false"
 const defaultContentLastUpdate = "2006-01-02T15:04:05Z07:00"
-const defaultVideoViewed = "2006-01-02T15:04:05Z07:00"
 
 func (d Daemon) init() error {
+	defaultVideoViewed := time.Now().Format(time.RFC3339)
 	defaults := map[string]string{
 		store.VideoContentEnabledKey:    defaultContentEnabled,
 		store.VideoContentHourRangeKey:  defaultContentHourRange,
 		store.VideoContentLastUpdateKey: defaultContentLastUpdate,
 		store.VideoContentFrequencyKey:  fmt.Sprint(defaultContentFrequency),
 		store.VideoContentLastViewedKey: defaultVideoViewed,
-		store.VideoContentUUIDKey:       defaultLastVideoUUID,
+		store.VideoDescriptorKey:        defaultLastVideoDescriptor,
 	}
 	for key, value := range defaults {
 		err := d.initKey(key, value)
@@ -141,15 +143,21 @@ func (d Daemon) doTick() error {
 }
 
 func (d Daemon) downloadVideoContent() error {
+	// TODO we need to validate the video descriptor.
 	video, err := d.source.GetVideo()
 	if err != nil {
 		return fmt.Errorf("failed to get video: %w", err)
 	}
-	currentUUID, err := d.keyValueStore.Get(store.VideoContentUUIDKey)
+	lastVideoText, err := d.keyValueStore.Get(store.VideoDescriptorKey)
 	if err != nil {
 		return fmt.Errorf("failed to get last video UUID: %w", err)
 	}
-	if currentUUID == video.UUID {
+	lastVideo := VideoDescriptor{}
+	err = json.Unmarshal([]byte(lastVideoText), &lastVideo)
+	if err != nil {
+		return fmt.Errorf("failed to parse stored video descriptor: %w", err)
+	}
+	if lastVideo.UUID == video.UUID {
 		log.Println("video content is up to date")
 		return nil
 	}
@@ -159,13 +167,17 @@ func (d Daemon) downloadVideoContent() error {
 		return fmt.Errorf("failed to download video content: %w", err)
 	}
 	log.Printf("downloaded video %s %s", video.UUID, video.URL)
-	err = d.blobStore.Put("video-content", data)
+	err = d.filesystem.WriteFile(video.Filename, data, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to store video content: %w", err)
 	}
-	err = d.keyValueStore.Set(store.VideoContentUUIDKey, video.UUID)
+	videoDescriptorText, err := json.Marshal(video)
 	if err != nil {
-		return fmt.Errorf("failed to set last video UUID: %w", err)
+		return fmt.Errorf("failed to marshal video descriptor: %w", err)
+	}
+	err = d.keyValueStore.Set(store.VideoDescriptorKey, string(videoDescriptorText))
+	if err != nil {
+		return fmt.Errorf("failed to store video descriptor: %w", err)
 	}
 	return nil
 }
