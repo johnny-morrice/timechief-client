@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/rand"
 	"net/http"
 	"time"
 
@@ -18,9 +17,10 @@ import (
 
 type Daemon struct {
 	tickInterval  time.Duration
-	client        VideoDownloadClient
+	source        VideoSource
 	keyValueStore KeyValueStore
 	blobStore     BlobStore
+	opts          Options
 }
 
 type KeyValueStore interface {
@@ -32,12 +32,16 @@ type BlobStore interface {
 	Put(key string, data []byte) error
 }
 
-func NewDaemon(tickInterval time.Duration, client VideoDownloadClient, keyValueStore KeyValueStore, blobStore BlobStore) (Daemon, error) {
+type Options struct {
+	ForceDownload bool
+}
+
+func NewDaemon(tickInterval time.Duration, source VideoSource, keyValueStore KeyValueStore, blobStore BlobStore, opts Options) (Daemon, error) {
 	if tickInterval <= 0 {
 		return Daemon{}, errors.New("refreshInterval must be positive")
 	}
-	if client == nil {
-		return Daemon{}, errors.New("client must not be nil")
+	if source == nil {
+		return Daemon{}, errors.New("source must not be nil")
 	}
 	if keyValueStore == nil {
 		return Daemon{}, errors.New("keyValueStore must not be nil")
@@ -48,7 +52,7 @@ func NewDaemon(tickInterval time.Duration, client VideoDownloadClient, keyValueS
 
 	result := Daemon{
 		tickInterval:  tickInterval,
-		client:        client,
+		source:        source,
 		keyValueStore: keyValueStore,
 		blobStore:     blobStore,
 	}
@@ -135,41 +139,31 @@ func (d Daemon) doTick() error {
 }
 
 func (d Daemon) downloadVideoContent() error {
-	videos, err := d.client.ListVideos()
+	video, err := d.source.GetVideo()
 	if err != nil {
-		return fmt.Errorf("failed to list videos: %w", err)
+		return fmt.Errorf("failed to get video: %w", err)
 	}
-	if len(videos) == 0 {
-		return errors.New("no videos available")
-	}
-	lastUUID, err := d.keyValueStore.Get(store.VideoContentUUIDKey)
+	currentUUID, err := d.keyValueStore.Get(store.VideoContentUUIDKey)
 	if err != nil {
 		return fmt.Errorf("failed to get last video UUID: %w", err)
 	}
-	// Remove last video from list.
-	choices := make([]VideoSource, 0, len(videos))
-	for _, video := range videos {
-		if video.UUID != lastUUID {
-			choices = append(choices, video)
-		}
+	if currentUUID == video.UUID {
+		log.Println("video content is up to date")
+		return nil
 	}
-	if len(choices) == 0 {
-		return errors.New("no new videos available")
-	}
-	// Choose a random video.
-	index := rand.Intn(len(choices))
-	video := choices[index]
-	err = d.keyValueStore.Set(store.VideoContentUUIDKey, video.UUID)
-	if err != nil {
-		return fmt.Errorf("failed to set last video UUID: %w", err)
-	}
+	log.Printf("downloading video %s %s", video.UUID, video.URL)
 	data, err := downloadURLData(video.URL)
 	if err != nil {
 		return fmt.Errorf("failed to download video content: %w", err)
 	}
+	log.Printf("downloaded video %s %s", video.UUID, video.URL)
 	err = d.blobStore.Put("video-content", data)
 	if err != nil {
 		return fmt.Errorf("failed to store video content: %w", err)
+	}
+	err = d.keyValueStore.Set(store.VideoContentUUIDKey, video.UUID)
+	if err != nil {
+		return fmt.Errorf("failed to set last video UUID: %w", err)
 	}
 	return nil
 }
@@ -198,6 +192,10 @@ func downloadURLData(url string) ([]byte, error) {
 }
 
 func (d Daemon) shouldUpdateVideoContent() (bool, error) {
+	if d.opts.ForceDownload {
+		return true, nil
+	}
+
 	// If video content is not enabled, do nothing.
 	enabled, err := d.keyValueStore.Get(store.VideoContentEnabledKey)
 	if err != nil {

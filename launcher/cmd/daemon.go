@@ -8,6 +8,7 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/blob/memblob"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
@@ -16,6 +17,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/videodownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
@@ -161,6 +163,14 @@ func Daemon(ctx *cli.Context) error {
 	internetCheck := daemon.InternetCheck{
 		System: system,
 	}
+	const videoDownloadInterval = 53 * time.Minute
+	// TODO make this configurable
+	videoSource := videodownload.NewStaticVideoSource(videodownload.MakeTestVideo())
+	blobStore := memblob.NewBlobStore()
+	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, blobStore, videodownload.Options{ForceDownload: true})
+	if err != nil {
+		return err
+	}
 
 	timeSync := daemon.TimeSync{
 		Syncer: system,
@@ -204,6 +214,7 @@ func Daemon(ctx *cli.Context) error {
 	go myDevices.Start(ctx)
 	go licenseDaemon.Start(ctx)
 	go refreshTokenDaemon.Start(ctx)
+	go videoDownload.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
