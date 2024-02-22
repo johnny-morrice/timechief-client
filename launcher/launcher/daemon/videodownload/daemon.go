@@ -55,6 +55,7 @@ func NewDaemon(tickInterval time.Duration, source VideoSource, keyValueStore Key
 		source:        source,
 		keyValueStore: keyValueStore,
 		blobStore:     blobStore,
+		opts:          opts,
 	}
 	return result, nil
 }
@@ -104,7 +105,7 @@ func (d Daemon) init() error {
 	return nil
 }
 
-func (d Daemon) initKey(key string, value string) error {
+func (d Daemon) initKey(key, value string) error {
 	_, err := d.keyValueStore.Get(key)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -112,6 +113,7 @@ func (d Daemon) initKey(key string, value string) error {
 			if err != nil {
 				return fmt.Errorf("failed to set default video content key %s: %w", key, err)
 			}
+			return nil
 		}
 
 		return fmt.Errorf("failed to get default video content key %s: %w", key, err)
