@@ -5,9 +5,9 @@ import { addDataCallback, removeDataCallback } from "./ipc";
 
 class Signals {
     constructor() {
-        [this.videoSrc, setVideoSrc] = createSignal('');
-        [this.showVideo, setShowVideo] = createSignal(false);
-        [this.timeout, setTimeout] = createSignal(0);
+        [this.videoSrc, this.setVideoSrc] = createSignal('');
+        [this.showVideo, this.setShowVideo] = createSignal(false);
+        [this.timeout, this.setTimeout] = createSignal(0);
     }
 }
 
@@ -26,7 +26,7 @@ export function MediaVideo(props) {
     const delay = 53 * 1000 * 60;
     const chance = 1.0 / 53.0;
     const signals = new Signals();
-    const forceVideo = false;
+    const forceVideo = true;
     if (forceVideo) {
         signals.setShowVideo(true);
     }
@@ -49,13 +49,13 @@ export function MediaVideo(props) {
         signals.setShowVideo(false);
     }
     function videoReady() {
-        return signals.videoSrc() !== '' && signals.timeout() > 0;
+        return signals.videoSrc() !== '' && signals.timeout() > 0 && signals.showVideo();
     }
     return <>
-        <Show when={videoReady() && signals.showVideo()}>
+        <Show when={videoReady()}>
             <Video videoSrc={signals.videoSrc()} timeout={signals.timeout()} setEnded={setEnded} />
         </Show>
-        <Show when={!showVideo()}>
+        <Show when={!videoReady()}>
             {props.element}
         </Show>
     </>
