@@ -1,4 +1,4 @@
-package videodownload
+package video
 
 import (
 	"time"
