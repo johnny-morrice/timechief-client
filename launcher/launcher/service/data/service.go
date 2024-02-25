@@ -8,11 +8,13 @@ import (
 
 	"github.com/google/uuid"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"gorm.io/gorm"
 )
 
 type Service struct {
+	videoService       VideoService
 	deviceDataStore    DeviceDataStore
 	launchTargetStore  store.LaunchTargetStore
 	stateFlagStore     store.StateFlagStore
@@ -21,8 +23,9 @@ type Service struct {
 	wifiNetworkStore   store.WifiNetworkStore
 }
 
-func MakeService(deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
+func MakeService(videoService VideoService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
 	return Service{
+		videoService:       videoService,
 		deviceDataStore:    deviceDataStore,
 		launchTargetStore:  launchTargetStore,
 		stateFlagStore:     stateFlagStore,
@@ -30,6 +33,10 @@ func MakeService(deviceDataStore DeviceDataStore, launchTargetStore store.Launch
 		wifiInterfaceStore: wifiInterfaceStore,
 		wifiNetworkStore:   wifiNetworkStore,
 	}
+}
+
+type VideoService interface {
+	ListVideos() ([]video.VideoMetadata, error)
 }
 
 type DeviceDataStore interface {
@@ -76,7 +83,12 @@ type DeviceData struct {
 	LauncherState    LauncherState    `json:"launcher_state"`
 	ServiceData      v2.Data          `json:"service_data"`
 	ServiceDataState ServiceDataState `json:"service_data_state"`
-	ThemeCSS         string           `json:"theme_css"`
+	Media            Media            `json:"media"`
+}
+
+type Media struct {
+	ThemeCSS string                `json:"theme_css"`
+	Videos   []video.VideoMetadata `json:"videos"`
 }
 
 type Theme struct {
@@ -287,8 +299,19 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	if err != nil {
 		return DeviceData{}, err
 	}
+
+	videos, err := svc.videoService.ListVideos()
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return DeviceData{}, err
+		}
+	}
+
 	result := DeviceData{
-		ThemeCSS:    themeCss,
+		Media: Media{
+			ThemeCSS: themeCss,
+			Videos:   videos,
+		},
 		ServiceData: deviceData,
 		ServiceDataState: ServiceDataState{
 			MyDeviceUUID:   myDeviceUUID,

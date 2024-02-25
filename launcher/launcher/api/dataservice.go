@@ -33,7 +33,6 @@ func (api Data) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/data/logout", api.HandleLogout)
 	mux.HandleFunc("/api/data/mydevice", api.HandlePostMyDevice)
 	mux.HandleFunc("/api/data/mydevice/refresh", api.RefreshMyDevices)
-
 }
 
 func (api Data) HandleLogout(w http.ResponseWriter, r *http.Request) {

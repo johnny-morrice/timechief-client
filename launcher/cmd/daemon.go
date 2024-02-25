@@ -230,6 +230,8 @@ func Daemon(ctx *cli.Context) error {
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
 
+	dataService := data.MakeService(videoService, deviceDataStore, launchTargetStore, flagStore, keyValueStore, wifiInterfaceStore, wifiNetworkStore)
+
 	packages := []apiPackage{
 		api.System{
 			Service: syssvc.Service{
@@ -239,7 +241,7 @@ func Daemon(ctx *cli.Context) error {
 				WifiNetworkStore: wifiNetworkStore,
 			},
 		},
-		api.MakeDataAPI(data.MakeService(deviceDataStore, launchTargetStore, flagStore, keyValueStore, wifiInterfaceStore, wifiNetworkStore)),
+		api.MakeDataAPI(dataService),
 		api.Launcher{
 			Service: launcher.Service{
 				LaunchTargetStore: launchTargetStore,
