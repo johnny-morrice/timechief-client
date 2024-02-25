@@ -7,8 +7,8 @@ class Themer {
     }
 
     setThemeFromData(data) {
-        if (data && data.theme_css) {
-            this.setTheme(data.theme_css);
+        if (data && data.media && data.media.theme_css) {
+            this.setTheme(data.media.theme_css);
         }
     }
 
