@@ -81,8 +81,10 @@ func (svc Service) GetVideoPreferences() (Settings, error) {
 	if err != nil {
 		return Settings{}, fmt.Errorf("failed to parse hour range: %w", err)
 	}
+	// TODO remove forceEnabled
+	const forceEnabled = true
 	settings := Settings{
-		Enabled:          enabled == "true",
+		Enabled:          forceEnabled || enabled == "true",
 		EnabledHourStart: hours[0],
 		EnabledHourEnd:   hours[1],
 	}
