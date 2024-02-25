@@ -8,7 +8,7 @@ export function IntroVideo(props) {
     const [ended, setEnded] = createSignal(false);
     return <>
         <Show when={!ended()}>
-            <Video videoSrc="assets/video/timechief-intro.mp4" timeout={50000} setEnded={setEnded} />
+            <Video videoSrc="assets/video/timechief-intro.mp4" timeout={5000} setEnded={setEnded} />
         </Show>
         <Show when={ended()}>
             {props.element}
