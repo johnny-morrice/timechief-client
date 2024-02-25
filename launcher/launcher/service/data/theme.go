@@ -35,6 +35,32 @@ func randomTheme() *v2.Theme {
 	}
 }
 
+func defaultTheme() *v2.Theme {
+	fgColor := "#008000"
+	bgColor := "#000000"
+	borderRadius := "0px"
+	timeFont := "Seven Segment"
+	mainFont := "'Titillium Web'"
+	borderWidth := "1px"
+	return &v2.Theme{
+		ForegroundColor:       &fgColor,
+		BackgroundColor:       &bgColor,
+		BoxBackgroundColor:    &bgColor,
+		ButtonBackgroundColor: &bgColor,
+		BoxBorderRadius:       &borderRadius,
+		BoxBorderWidth:        &borderWidth,
+		BoxBorderColor:        &fgColor,
+		ButtonBorderRadius:    &borderRadius,
+		ButtonBorderWidth:     &borderWidth,
+		ButtonBorderColor:     &fgColor,
+		ButtonForegroundColor: &fgColor,
+		TimeFont:              &timeFont,
+		TimeColor:             &fgColor,
+		MainFont:              &mainFont,
+	}
+
+}
+
 func randomFont() string {
 	return randomChoice("Titillium Web", "sans-serif", "serif", "monospace", "cursive")
 

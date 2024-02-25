@@ -280,7 +280,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	nowDt := int(time.Now().Unix())
 	deviceData.Theme = &v2.ThemeDatum{
 		Dt:    &nowDt,
-		Value: randomTheme(),
+		Value: defaultTheme(),
 	}
 
 	themeCss, err := renderCss(deviceData.Theme.Value)
