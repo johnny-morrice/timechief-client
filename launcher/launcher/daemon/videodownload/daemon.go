@@ -6,11 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"log"
 	"net/http"
 	"time"
 
+	videosvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/util"
 	"github.com/urfave/cli/v2"
@@ -19,9 +19,9 @@ import (
 
 type Daemon struct {
 	tickInterval  time.Duration
-	source        VideoSource
+	source        videosvc.VideoSource
 	keyValueStore KeyValueStore
-	filesystem    VideoFilesystem
+	videoService  VideoService
 	opts          Options
 }
 
@@ -30,15 +30,16 @@ type KeyValueStore interface {
 	Set(key, value string) error
 }
 
-type VideoFilesystem interface {
-	WriteFile(fileName string, data []byte, mode fs.FileMode) error
+type VideoService interface {
+	GetFS() videosvc.FS
+	HasVideoWithFilename(fileName string) (bool, error)
 }
 
 type Options struct {
 	ForceDownload bool
 }
 
-func NewDaemon(tickInterval time.Duration, source VideoSource, keyValueStore KeyValueStore, blobStore VideoFilesystem, opts Options) (Daemon, error) {
+func NewDaemon(tickInterval time.Duration, source videosvc.VideoSource, keyValueStore KeyValueStore, videoService VideoService, opts Options) (Daemon, error) {
 	if tickInterval <= 0 {
 		return Daemon{}, errors.New("refreshInterval must be positive")
 	}
@@ -48,15 +49,15 @@ func NewDaemon(tickInterval time.Duration, source VideoSource, keyValueStore Key
 	if keyValueStore == nil {
 		return Daemon{}, errors.New("keyValueStore must not be nil")
 	}
-	if blobStore == nil {
-		return Daemon{}, errors.New("blobStore must not be nil")
+	if videoService == nil {
+		return Daemon{}, errors.New("videoService must not be nil")
 	}
 
 	result := Daemon{
 		tickInterval:  tickInterval,
 		source:        source,
 		keyValueStore: keyValueStore,
-		filesystem:    blobStore,
+		videoService:  videoService,
 		opts:          opts,
 	}
 	return result, nil
@@ -152,14 +153,20 @@ func (d Daemon) downloadVideoContent() error {
 	if err != nil {
 		return fmt.Errorf("failed to get last video UUID: %w", err)
 	}
-	lastVideo := VideoDescriptor{}
+	lastVideo := videosvc.VideoDescriptor{}
 	err = json.Unmarshal([]byte(lastVideoText), &lastVideo)
 	if err != nil {
 		return fmt.Errorf("failed to parse stored video descriptor: %w", err)
 	}
-	if lastVideo.UUID == video.UUID {
-		log.Println("video content is up to date")
-		return nil
+	if lastVideo.UUID == video.UUID && !d.opts.ForceDownload {
+		hasVideo, err := d.videoService.HasVideoWithFilename(video.Filename)
+		if err != nil {
+			return fmt.Errorf("failed to check if video exists: %w", err)
+		}
+		if hasVideo {
+			log.Println("video UUID is up to date")
+			return nil
+		}
 	}
 	log.Printf("downloading video %s %s", video.UUID, video.URL)
 	data, err := downloadURLData(video.URL)
@@ -167,7 +174,7 @@ func (d Daemon) downloadVideoContent() error {
 		return fmt.Errorf("failed to download video content: %w", err)
 	}
 	log.Printf("downloaded video %s %s", video.UUID, video.URL)
-	err = d.filesystem.WriteFile(video.Filename, data, 0644)
+	err = d.videoService.GetFS().WriteFile(video.Filename, data, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to store video content: %w", err)
 	}

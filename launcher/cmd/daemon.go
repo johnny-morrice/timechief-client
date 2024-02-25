@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
-	videoapi "github.com/johnny-morrice/timechief-client/launcher/launcher/api/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
@@ -167,9 +167,13 @@ func Daemon(ctx *cli.Context) error {
 	}
 	const videoDownloadInterval = 53 * time.Minute
 	// TODO make this configurable
-	videoSource := videodownload.NewStaticVideoSource(videodownload.MakeTestVideo())
+	videoSource := video.NewStaticVideoSource(video.MakeTestVideo())
 	videoFilesystem := memoryfs.New()
-	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, videoFilesystem, videodownload.Options{ForceDownload: true})
+	videoService, err := video.MakeService(keyValueStore, videoFilesystem)
+	if err != nil {
+		return err
+	}
+	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, videoService, videodownload.Options{ForceDownload: true})
 	if err != nil {
 		return err
 	}
@@ -202,11 +206,7 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	videoService, err := video.MakeService(keyValueStore, videoFilesystem)
-	if err != nil {
-		return err
-	}
-	videoApi, err := videoapi.NewVideoAPI(videoService)
+	videoApi, err := media.NewVideoAPI(videoService)
 	if err != nil {
 		return err
 	}
@@ -228,11 +228,13 @@ func Daemon(ctx *cli.Context) error {
 	go videoDownload.Start(ctx)
 
 	addr := ctx.String("listen-addr")
-	mux := http.NewServeMux()
+	rootMux := http.NewServeMux()
+	secureMux := http.NewServeMux()
+	mediaMux := http.NewServeMux()
 
 	dataService := data.MakeService(videoService, deviceDataStore, launchTargetStore, flagStore, keyValueStore, wifiInterfaceStore, wifiNetworkStore)
 
-	packages := []apiPackage{
+	securePackages := []apiPackage{
 		api.System{
 			Service: syssvc.Service{
 				System:           system,
@@ -252,21 +254,28 @@ func Daemon(ctx *cli.Context) error {
 			},
 		},
 		fileserver.NewStaticFileHandler(),
+	}
+	for _, pkg := range securePackages {
+		pkg.AddRoutes(secureMux)
+	}
+	mediaPackages := []apiPackage{
 		videoApi,
 	}
-	for _, pkg := range packages {
-		pkg.AddRoutes(mux)
+	for _, pkg := range mediaPackages {
+		pkg.AddRoutes(mediaMux)
 	}
 	err = regenerateAppAPIKey(ctx, keyValueStore)
 	if err != nil {
 		return err
 	}
-	authedHandler, err := middleware.NewAuthMiddleware(keyValueStore, mux)
+	authedHandler, err := middleware.NewAuthMiddleware(keyValueStore, secureMux)
 	if err != nil {
 		return err
 	}
+	rootMux.Handle("/api/", authedHandler)
+	rootMux.Handle("/media/", mediaMux)
 	onInitialiseComplete(soundService)
-	return http.ListenAndServe(addr, authedHandler)
+	return http.ListenAndServe(addr, rootMux)
 }
 
 func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {

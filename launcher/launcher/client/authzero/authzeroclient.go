@@ -70,7 +70,7 @@ func (clnt AuthZeroClient) RefreshAccessToken(ctx context.Context, clientID, ref
 	tokenURL := clnt.BaseURL + "/oauth/token"
 
 	refreshToken = url.QueryEscape(refreshToken)
-	payload := strings.NewReader("grant_type=refresh_token" + "&client_id=" + clientID + "&refreshToken=" + refreshToken)
+	payload := strings.NewReader("grant_type=refresh_token" + "&client_id=" + clientID + "&refresh_token=" + refreshToken)
 
 	req, err := http.NewRequest("POST", tokenURL, payload)
 
@@ -91,6 +91,9 @@ func (clnt AuthZeroClient) RefreshAccessToken(ctx context.Context, clientID, ref
 	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
 		return AccessTokenResp{}, err
+	}
+	if result.Error != "" {
+		return result, fmt.Errorf("error refreshing token: %s %s", result.Error, result.ErrorDescription)
 	}
 	// Hack around no new refresh token.
 	if result.RefreshToken == "" {

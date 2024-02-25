@@ -1,25 +1,22 @@
-package video
+package media
 
 import (
-	"encoding/json"
 	"errors"
-	"io/fs"
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 )
 
-type VideoService interface {
-	ListVideos() ([]video.VideoMetadata, error)
+type MediaService interface {
 	HasVideoWithFilename(fileName string) (bool, error)
-	GetFS() fs.FS
+	GetFS() video.FS
 }
 
 type Video struct {
-	service VideoService
+	service MediaService
 }
 
-func NewVideoAPI(service VideoService) (Video, error) {
+func NewVideoAPI(service MediaService) (Video, error) {
 	if service == nil {
 		return Video{}, errors.New("service must not be nil")
 	}
@@ -28,30 +25,7 @@ func NewVideoAPI(service VideoService) (Video, error) {
 }
 
 func (api Video) AddRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/api/video/list", api.HandleListVideos)
-	mux.HandleFunc("/api/video/{fileName}", api.HandleGetVideo)
-}
-
-func (api Video) HandleListVideos(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	videos, err := api.service.ListVideos()
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	videoJSON, err := json.Marshal(videos)
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(videoJSON)
+	mux.HandleFunc("GET /media/video/{fileName}", api.HandleGetVideo)
 }
 
 func (api Video) HandleGetVideo(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +34,7 @@ func (api Video) HandleGetVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileName := r.URL.Query().Get("fileName")
+	fileName := r.PathValue("fileName")
 	if fileName == "" {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return

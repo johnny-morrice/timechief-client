@@ -37,6 +37,7 @@ func MakeService(videoService VideoService, deviceDataStore DeviceDataStore, lau
 
 type VideoService interface {
 	ListVideos() ([]video.VideoMetadata, error)
+	GetVideoPreferences() (video.Settings, error)
 }
 
 type DeviceDataStore interface {
@@ -87,7 +88,12 @@ type DeviceData struct {
 }
 
 type Media struct {
-	ThemeCSS string                `json:"theme_css"`
+	ThemeCSS   string     `json:"theme_css"`
+	VideoMedia VideoMedia `json:"video"`
+}
+
+type VideoMedia struct {
+	Settings video.Settings        `json:"settings"`
 	Videos   []video.VideoMetadata `json:"videos"`
 }
 
@@ -306,11 +312,20 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			return DeviceData{}, err
 		}
 	}
+	videoSettings, err := svc.videoService.GetVideoPreferences()
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return DeviceData{}, err
+		}
+	}
 
 	result := DeviceData{
 		Media: Media{
 			ThemeCSS: themeCss,
-			Videos:   videos,
+			VideoMedia: VideoMedia{
+				Settings: videoSettings,
+				Videos:   videos,
+			},
 		},
 		ServiceData: deviceData,
 		ServiceDataState: ServiceDataState{
