@@ -2,13 +2,14 @@ package media
 
 import (
 	"errors"
-	"io/fs"
 	"net/http"
+
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 )
 
 type MediaService interface {
 	HasVideoWithFilename(fileName string) (bool, error)
-	GetFS() fs.FS
+	GetFS() video.FS
 }
 
 type Video struct {

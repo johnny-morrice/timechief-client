@@ -167,9 +167,13 @@ func Daemon(ctx *cli.Context) error {
 	}
 	const videoDownloadInterval = 53 * time.Minute
 	// TODO make this configurable
-	videoSource := videodownload.NewStaticVideoSource(videodownload.MakeTestVideo())
+	videoSource := video.NewStaticVideoSource(video.MakeTestVideo())
 	videoFilesystem := memoryfs.New()
-	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, videoFilesystem, videodownload.Options{ForceDownload: true})
+	videoService, err := video.MakeService(keyValueStore, videoFilesystem)
+	if err != nil {
+		return err
+	}
+	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, videoService, videodownload.Options{ForceDownload: true})
 	if err != nil {
 		return err
 	}
@@ -202,10 +206,6 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	videoService, err := video.MakeService(keyValueStore, videoFilesystem)
-	if err != nil {
-		return err
-	}
 	videoApi, err := media.NewVideoAPI(videoService)
 	if err != nil {
 		return err
