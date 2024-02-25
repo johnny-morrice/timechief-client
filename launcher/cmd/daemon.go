@@ -8,6 +8,7 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
+	videoapi "github.com/johnny-morrice/timechief-client/launcher/launcher/api/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
@@ -16,16 +17,19 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/videodownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/task"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
+	"github.com/liamg/memoryfs"
 	"github.com/urfave/cli/v2"
 )
 
@@ -161,6 +165,14 @@ func Daemon(ctx *cli.Context) error {
 	internetCheck := daemon.InternetCheck{
 		System: system,
 	}
+	const videoDownloadInterval = 53 * time.Minute
+	// TODO make this configurable
+	videoSource := videodownload.NewStaticVideoSource(videodownload.MakeTestVideo())
+	videoFilesystem := memoryfs.New()
+	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, videoFilesystem, videodownload.Options{ForceDownload: true})
+	if err != nil {
+		return err
+	}
 
 	timeSync := daemon.TimeSync{
 		Syncer: system,
@@ -190,6 +202,15 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
+	videoService, err := video.MakeService(keyValueStore, videoFilesystem)
+	if err != nil {
+		return err
+	}
+	videoApi, err := videoapi.NewVideoAPI(videoService)
+	if err != nil {
+		return err
+	}
+
 	go timeSync.Start(ctx)
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
@@ -204,9 +225,11 @@ func Daemon(ctx *cli.Context) error {
 	go myDevices.Start(ctx)
 	go licenseDaemon.Start(ctx)
 	go refreshTokenDaemon.Start(ctx)
+	go videoDownload.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	mux := http.NewServeMux()
+
 	packages := []apiPackage{
 		api.System{
 			Service: syssvc.Service{
@@ -227,6 +250,7 @@ func Daemon(ctx *cli.Context) error {
 			},
 		},
 		fileserver.NewStaticFileHandler(),
+		videoApi,
 	}
 	for _, pkg := range packages {
 		pkg.AddRoutes(mux)

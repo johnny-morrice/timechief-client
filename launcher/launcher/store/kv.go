@@ -37,6 +37,12 @@ const InterfaceModeKey = "interface-mode"
 const LastInternetCheckKey = "last-internet-check"
 const APIUserAuthKey = "api-user-auth"
 const APIAppAuthKey = "app-user-auth"
+const VideoContentFrequencyKey = "video-content-frequency"
+const VideoContentHourRangeKey = "video-content-hour-range"
+const VideoContentEnabledKey = "video-content-enabled"
+const VideoContentLastUpdateKey = "video-content-last-update"
+const VideoContentLastViewedKey = "video-content-last-viewed"
+const VideoDescriptorKey = "video-descriptor"
 
 // Set a key-value pair in the store.
 func (store KeyValueStore) Set(key string, value string) error {
