@@ -10,7 +10,7 @@ export class MediaDecorator {
     decorateData(data) {
         if (data && data.media && data.media.videos) {
             const myVideos = data.media.videos.map(video => {
-                video['path'] = this.makeVideoPath(video['filename']);
+                video['url'] = this.makeVideoPath(video['filename']);
             });
             data['videos'] = myVideos;
         }
