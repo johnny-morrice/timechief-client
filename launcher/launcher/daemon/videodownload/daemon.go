@@ -157,8 +157,8 @@ func (d Daemon) downloadVideoContent() error {
 	if err != nil {
 		return fmt.Errorf("failed to parse stored video descriptor: %w", err)
 	}
-	if lastVideo.UUID == video.UUID {
-		log.Println("video content is up to date")
+	if lastVideo.UUID == video.UUID && !d.opts.ForceDownload {
+		log.Println("video UUID is up to date")
 		return nil
 	}
 	log.Printf("downloading video %s %s", video.UUID, video.URL)
