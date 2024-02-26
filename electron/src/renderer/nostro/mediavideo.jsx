@@ -12,8 +12,9 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
-    if (data && data.media && data.media.videos && data.media.videos.length > 0) {
-        const firstVideo = data.media.videos[0];
+    if (data && data.media && data.media.video && data.media.video.videos && data.media.video.videos.length > 0) {
+        const firstVideo = data.media.video.videos[0];
+        console.log(JSON.stringify(firstVideo));
         signals.setVideoSrc(firstVideo.url);
         signals.setTimeout(firstVideo.duration * 1000);
     }
@@ -49,7 +50,7 @@ export function MediaVideo(props) {
         signals.setShowVideo(false);
     }
     function videoReady() {
-        return signals.videoSrc() !== '' && signals.timeout() > 0 && signals.showVideo();
+        return signals.videoSrc() && signals.videoSrc().length > 0 && signals.timeout() > 0 && signals.showVideo();
     }
     return <>
         <Show when={videoReady()}>

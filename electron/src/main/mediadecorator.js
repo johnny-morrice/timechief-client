@@ -3,16 +3,17 @@ class MediaDecorator {
         this.mediaRoot = `${process.env.clockAPIBaseURL}/media`;
     }
 
-    makeVideoPath(fileName) {
+    makeVideoURL(fileName) {
         return `${this.mediaRoot}/video/${fileName}`;
     }
 
     decorateData(data) {
-        if (data && data.media && data.media.videos) {
-            const myVideos = data.media.videos.map(video => {
-                video['url'] = this.makeVideoPath(video['filename']);
+        if (data && data.media && data.media.video && data.media.video.videos) {
+            const myVideos = data.media.video.videos.map(video => {
+                video.url = this.makeVideoURL(video.filename);
+                return video;
             });
-            data['videos'] = myVideos;
+            data.media.video.videos = myVideos;
         }
         return data;
     }
