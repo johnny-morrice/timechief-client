@@ -29,7 +29,6 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/task"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/update"
-	"github.com/liamg/memoryfs"
 	"github.com/urfave/cli/v2"
 )
 
@@ -168,7 +167,10 @@ func Daemon(ctx *cli.Context) error {
 	const videoDownloadInterval = 53 * time.Minute
 	// TODO make this configurable
 	videoSource := video.NewStaticVideoSource(video.MakeTestVideo())
-	videoFilesystem := memoryfs.New()
+	videoFilesystem, err := video.MakeMediaFS(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to make video filesystem: %v", err)
+	}
 	videoService, err := video.MakeService(keyValueStore, videoFilesystem)
 	if err != nil {
 		return err
