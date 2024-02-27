@@ -158,7 +158,7 @@ func (d Daemon) downloadVideoContent() error {
 	if err != nil {
 		return fmt.Errorf("failed to parse stored video descriptor: %w", err)
 	}
-	if lastVideo.UUID == video.UUID && !d.opts.ForceDownload {
+	if lastVideo.UUID == video.UUID {
 		err := d.videoService.CheckSHA256(video.Filename, video.SHA256)
 		if err != nil {
 			log.Printf("video sha check failed: %s", err.Error())
