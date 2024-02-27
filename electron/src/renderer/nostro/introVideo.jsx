@@ -6,9 +6,12 @@ export function IntroVideo(props) {
         throw new Error('element must be defined');
     }
     const [ended, setEnded] = createSignal(false);
+    function onEnded() {
+        setEnded(true);
+    }
     return <>
         <Show when={!ended()}>
-            <Video videoSrc="assets/video/timechief-intro.mp4" timeout={5000} setEnded={setEnded} />
+            <Video videoSrc="assets/video/timechief-intro.mp4" timeout={5000} onEnded={onEnded} />
         </Show>
         <Show when={ended()}>
             {props.element}
