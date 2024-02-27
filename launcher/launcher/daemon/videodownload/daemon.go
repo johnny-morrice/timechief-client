@@ -32,7 +32,7 @@ type KeyValueStore interface {
 
 type VideoService interface {
 	GetFS() videosvc.FS
-	HasVideoWithFilename(fileName string) (bool, error)
+	CheckSHA256(filename string, sha256 []byte) error
 }
 
 type Options struct {
@@ -159,12 +159,11 @@ func (d Daemon) downloadVideoContent() error {
 		return fmt.Errorf("failed to parse stored video descriptor: %w", err)
 	}
 	if lastVideo.UUID == video.UUID && !d.opts.ForceDownload {
-		hasVideo, err := d.videoService.HasVideoWithFilename(video.Filename)
+		err := d.videoService.CheckSHA256(video.Filename, video.SHA256)
 		if err != nil {
-			return fmt.Errorf("failed to check if video exists: %w", err)
-		}
-		if hasVideo {
-			log.Println("video UUID is up to date")
+			log.Printf("video sha check failed: %s", err.Error())
+		} else {
+			log.Printf("video %s is already downloaded", video.UUID)
 			return nil
 		}
 	}

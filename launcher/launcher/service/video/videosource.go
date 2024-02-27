@@ -13,6 +13,7 @@ type VideoDescriptor struct {
 	Filename string        `json:"filename"`
 	Duration time.Duration `json:"duration"`
 	URL      string        `json:"url"`
+	SHA256   []byte        `json:"sha256"`
 }
 
 type StaticVideoSource struct {

@@ -1,9 +1,12 @@
 package video
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 
@@ -38,6 +41,29 @@ type VideoMetadata struct {
 	UUID            string `json:"uuid"`
 	Filename        string `json:"filename"`
 	DurationSeconds int    `json:"duration"`
+}
+
+func (svc Service) CheckSHA256(filename string, expected []byte) error {
+	file, err := svc.filesystem.Open(filename)
+	if err != nil {
+		return fmt.Errorf("failed to open file: %w", err)
+	}
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			log.Printf("failed to close file: %v", err)
+		}
+	}()
+	hasher := sha256.New()
+	_, err = io.Copy(hasher, file)
+	if err != nil {
+		return fmt.Errorf("failed to hash file: %w", err)
+	}
+	actual := hasher.Sum(nil)
+	if !bytes.Equal(actual, expected) {
+		return fmt.Errorf("file '%v' has incorrect hash, expected %x but was %x", filename, expected, actual)
+	}
+	return nil
 }
 
 func (svc Service) ListVideos() ([]VideoMetadata, error) {
