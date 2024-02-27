@@ -12,6 +12,7 @@ import (
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/util"
+	"gorm.io/gorm"
 )
 
 type Service struct {
@@ -69,7 +70,13 @@ func (svc Service) CheckSHA256(filename string, expected []byte) error {
 func (svc Service) ListVideos() ([]VideoMetadata, error) {
 	videoText, err := svc.keyValueStore.Get(store.VideoDescriptorKey)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("failed to get video descriptor: %w", err)
+	}
+	if videoText == "" {
+		return nil, nil
 	}
 	video := VideoDescriptor{}
 	err = json.Unmarshal([]byte(videoText), &video)

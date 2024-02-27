@@ -177,6 +177,10 @@ func (d Daemon) downloadVideoContent() error {
 	if err != nil {
 		return fmt.Errorf("failed to store video content: %w", err)
 	}
+	err = d.videoService.CheckSHA256(video.Filename, video.SHA256)
+	if err != nil {
+		return fmt.Errorf("failed to validate video content: %w", err)
+	}
 	videoDescriptorText, err := json.Marshal(video)
 	if err != nil {
 		return fmt.Errorf("failed to marshal video descriptor: %w", err)
