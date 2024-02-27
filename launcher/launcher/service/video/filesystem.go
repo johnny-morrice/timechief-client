@@ -1,8 +1,10 @@
 package video
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
+	"strings"
 )
 
 func MakeMediaFS(cfg Config) (FS, error) {
@@ -25,7 +27,21 @@ func (m mediaFS) Open(name string) (fs.File, error) {
 }
 
 func (m mediaFS) WriteFile(name string, data []byte, mode fs.FileMode) error {
+	err := validateFilename(name)
+	if err != nil {
+		return err
+	}
 	return os.WriteFile(m.root+"/"+name, data, mode)
+}
+
+func validateFilename(name string) error {
+	whitelist := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
+	for _, c := range name {
+		if !strings.ContainsRune(whitelist, c) {
+			return fmt.Errorf("invalid character in filename: %c", c)
+		}
+	}
+	return nil
 }
 
 type Config interface {
