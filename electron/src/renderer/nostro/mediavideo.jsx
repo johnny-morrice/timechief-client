@@ -27,7 +27,7 @@ export function MediaVideo(props) {
     const delay = 53 * 1000 * 60;
     const chance = 1.0 / 53.0;
     const signals = new Signals();
-    const forceVideo = true;
+    const forceVideo = false;
     if (forceVideo) {
         signals.setShowVideo(true);
     }
