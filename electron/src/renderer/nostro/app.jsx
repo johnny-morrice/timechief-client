@@ -6,10 +6,11 @@ import { WebSetupPage } from "./webSetup";
 import { HomePage } from "./homePage";
 import { LoginPage } from './login';
 import { IntroVideo } from './introVideo';
+import { MediaVideo } from './mediavideo';
 
 
 const AppScreen = (props) => 
-  <IntroVideo element={<WebSetupPage element={<LoginPage element={props.element} />}/>} />;
+  <IntroVideo element={<WebSetupPage element={<LoginPage element={<MediaVideo element={props.element} />} />}/>} />;
 
 const App = () => {
   let ipcIntervals = initializeIPC();
