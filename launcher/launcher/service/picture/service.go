@@ -29,7 +29,7 @@ func MakeService(keyValueStore KeyValueStore, filesystem FS) (Service, error) {
 		return Service{}, errors.New("keyValueStore must not be nil")
 	}
 	if filesystem == nil {
-		return Service{}, errors.New("blobStore must not be nil")
+		return Service{}, errors.New("filesystem must not be nil")
 	}
 	svc := Service{
 		keyValueStore: keyValueStore,
@@ -38,10 +38,10 @@ func MakeService(keyValueStore KeyValueStore, filesystem FS) (Service, error) {
 	return svc, nil
 }
 
-type VideoMetadata struct {
-	UUID            string `json:"uuid"`
-	Filename        string `json:"filename"`
-	DurationSeconds int    `json:"duration"`
+type PictureMetadata struct {
+	UUID     string `json:"uuid"`
+	Filename string `json:"filename"`
+	Format   string `json:"format"`
 }
 
 func (svc Service) CheckSHA256(filename string, expected []byte) error {
@@ -67,7 +67,7 @@ func (svc Service) CheckSHA256(filename string, expected []byte) error {
 	return nil
 }
 
-func (svc Service) List() ([]VideoMetadata, error) {
+func (svc Service) List() ([]PictureMetadata, error) {
 	videoText, err := svc.keyValueStore.Get(store.VideoDescriptorKey)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -83,11 +83,10 @@ func (svc Service) List() ([]VideoMetadata, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal video descriptor: %w", err)
 	}
-	result := []VideoMetadata{
+	result := []PictureMetadata{
 		{
-			UUID:            video.UUID,
-			Filename:        video.Filename,
-			DurationSeconds: int(video.Duration.Seconds()),
+			UUID:     video.UUID,
+			Filename: video.Filename,
 		},
 	}
 	return result, nil

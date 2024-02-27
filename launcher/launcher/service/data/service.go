@@ -36,7 +36,7 @@ func MakeService(videoService VideoService, deviceDataStore DeviceDataStore, lau
 }
 
 type VideoService interface {
-	ListVideos() ([]video.VideoMetadata, error)
+	List() ([]video.VideoMetadata, error)
 	GetVideoPreferences() (video.Settings, error)
 }
 
@@ -306,7 +306,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, err
 	}
 
-	videos, err := svc.videoService.ListVideos()
+	videos, err := svc.videoService.List()
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return DeviceData{}, err

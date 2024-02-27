@@ -1,4 +1,4 @@
-package video
+package media
 
 import (
 	"fmt"
@@ -7,26 +7,26 @@ import (
 	"strings"
 )
 
-func MakeMediaFS(cfg Config) (FS, error) {
+func MakeMediaFS(cfg Config) (MediaFS, error) {
 	mediaDir := cfg.GetInstallRoot() + "/media"
 	fs := os.DirFS(mediaDir)
-	mFS := mediaFS{
+	mFS := MediaFS{
 		root: mediaDir,
 		fs:   fs,
 	}
 	return mFS, nil
 }
 
-type mediaFS struct {
+type MediaFS struct {
 	root string
 	fs   fs.FS
 }
 
-func (m mediaFS) Open(name string) (fs.File, error) {
+func (m MediaFS) Open(name string) (fs.File, error) {
 	return m.fs.Open(name)
 }
 
-func (m mediaFS) WriteFile(name string, data []byte, mode fs.FileMode) error {
+func (m MediaFS) WriteFile(name string, data []byte, mode fs.FileMode) error {
 	err := validateFilename(name)
 	if err != nil {
 		return err
