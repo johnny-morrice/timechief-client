@@ -1,13 +1,17 @@
 package media
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"fmt"
+	"io"
 	"io/fs"
+	"log"
 	"os"
 	"strings"
 )
 
-func MakeMediaFS(cfg Config) (MediaFS, error) {
+func MakeMediaFS(cfg Config) (FS, error) {
 	mediaDir := cfg.GetInstallRoot() + "/media"
 	fs := os.DirFS(mediaDir)
 	mFS := MediaFS{
@@ -34,6 +38,29 @@ func (m MediaFS) WriteFile(name string, data []byte, mode fs.FileMode) error {
 	return os.WriteFile(m.root+"/"+name, data, mode)
 }
 
+func (m MediaFS) CheckSHA256(filename string, expected []byte) error {
+	file, err := m.Open(filename)
+	if err != nil {
+		return fmt.Errorf("failed to open file: %w", err)
+	}
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			log.Printf("failed to close file: %v", err)
+		}
+	}()
+	hasher := sha256.New()
+	_, err = io.Copy(hasher, file)
+	if err != nil {
+		return fmt.Errorf("failed to hash file: %w", err)
+	}
+	actual := hasher.Sum(nil)
+	if !bytes.Equal(actual, expected) {
+		return fmt.Errorf("file '%v' has incorrect hash, expected %x but was %x", filename, expected, actual)
+	}
+	return nil
+}
+
 func validateFilename(name string) error {
 	whitelist := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
 	for _, c := range name {
@@ -46,4 +73,10 @@ func validateFilename(name string) error {
 
 type Config interface {
 	GetInstallRoot() string
+}
+
+type FS interface {
+	fs.FS
+	WriteFile(filename string, data []byte, perm fs.FileMode) error
+	CheckSHA256(filename string, expected []byte) error
 }

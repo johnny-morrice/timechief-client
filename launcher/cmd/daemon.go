@@ -22,6 +22,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
@@ -168,14 +169,15 @@ func Daemon(ctx *cli.Context) error {
 	const videoDownloadInterval = 53 * time.Minute
 	// TODO make this configurable
 	videoSource := video.NewStaticVideoSource(video.MakeTestVideo())
-	videoFilesystem, err := media.MakeMediaFS(cfg)
+	mediaFilesystem, err := media.MakeMediaFS(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to make video filesystem: %v", err)
 	}
-	videoService, err := video.MakeService(keyValueStore, videoFilesystem)
+	videoService, err := video.MakeService(keyValueStore, mediaFilesystem)
 	if err != nil {
 		return err
 	}
+	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem)
 	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, videoService, videodownload.Options{ForceDownload: true})
 	if err != nil {
 		return err
@@ -209,7 +211,7 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	videoApi, err := mediaapi.NewVideoAPI(videoService)
+	videoApi, err := mediaapi.NewMediaAPI(videoService, pictureService)
 	if err != nil {
 		return err
 	}

@@ -1,15 +1,12 @@
 package video
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"io/fs"
 	"log"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/util"
 	"gorm.io/gorm"
@@ -17,14 +14,14 @@ import (
 
 type Service struct {
 	keyValueStore KeyValueStore
-	filesystem    FS
+	filesystem    media.FS
 }
 
 type KeyValueStore interface {
 	Get(key string) (string, error)
 }
 
-func MakeService(keyValueStore KeyValueStore, filesystem FS) (Service, error) {
+func MakeService(keyValueStore KeyValueStore, filesystem media.FS) (Service, error) {
 	if keyValueStore == nil {
 		return Service{}, errors.New("keyValueStore must not be nil")
 	}
@@ -45,26 +42,7 @@ type VideoMetadata struct {
 }
 
 func (svc Service) CheckSHA256(filename string, expected []byte) error {
-	file, err := svc.filesystem.Open(filename)
-	if err != nil {
-		return fmt.Errorf("failed to open file: %w", err)
-	}
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			log.Printf("failed to close file: %v", err)
-		}
-	}()
-	hasher := sha256.New()
-	_, err = io.Copy(hasher, file)
-	if err != nil {
-		return fmt.Errorf("failed to hash file: %w", err)
-	}
-	actual := hasher.Sum(nil)
-	if !bytes.Equal(actual, expected) {
-		return fmt.Errorf("file '%v' has incorrect hash, expected %x but was %x", filename, expected, actual)
-	}
-	return nil
+	return svc.filesystem.CheckSHA256(filename, expected)
 }
 
 func (svc Service) List() ([]VideoMetadata, error) {
@@ -124,7 +102,7 @@ func (svc Service) GetVideoPreferences() (Settings, error) {
 	return settings, nil
 }
 
-func (svc Service) HasVideoWithFilename(filename string) (bool, error) {
+func (svc Service) Exists(filename string) (bool, error) {
 	videos, err := svc.List()
 	if err != nil {
 		return false, fmt.Errorf("failed to list videos: %w", err)
@@ -152,11 +130,6 @@ func (svc Service) HasVideoWithFilename(filename string) (bool, error) {
 	return false, nil
 }
 
-type FS interface {
-	fs.FS
-	WriteFile(filename string, data []byte, perm fs.FileMode) error
-}
-
-func (svc Service) GetFS() FS {
+func (svc Service) GetFS() media.FS {
 	return svc.filesystem
 }

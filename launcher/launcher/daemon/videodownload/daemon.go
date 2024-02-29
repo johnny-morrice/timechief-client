@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 	videosvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/util"
@@ -31,7 +32,7 @@ type KeyValueStore interface {
 }
 
 type VideoService interface {
-	GetFS() videosvc.FS
+	GetFS() media.FS
 	CheckSHA256(filename string, sha256 []byte) error
 }
 

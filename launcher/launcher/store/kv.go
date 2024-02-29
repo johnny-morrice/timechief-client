@@ -43,6 +43,7 @@ const VideoContentEnabledKey = "video-content-enabled"
 const VideoContentLastUpdateKey = "video-content-last-update"
 const VideoContentLastViewedKey = "video-content-last-viewed"
 const VideoDescriptorKey = "video-descriptor"
+const BackgroundPictureDescriptor = "background-picture-descriptor"
 
 // Set a key-value pair in the store.
 func (store KeyValueStore) Set(key string, value string) error {
