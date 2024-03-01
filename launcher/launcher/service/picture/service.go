@@ -116,7 +116,7 @@ func (svc Service) GetPreferences() (Settings, error) {
 	const forceDisabled = false
 	settings := Settings{
 		Enabled:     !forceDisabled && descriptor != "",
-		PictureMode: "fill",
+		PictureMode: "cover",
 	}
 	return settings, nil
 }

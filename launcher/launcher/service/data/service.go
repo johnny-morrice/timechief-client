@@ -107,8 +107,9 @@ type VideoMedia struct {
 }
 
 type PictureMedia struct {
-	Settings picture.Settings          `json:"settings"`
-	Pictures []picture.PictureMetadata `json:"pictures"`
+	Settings             picture.Settings          `json:"settings"`
+	Pictures             []picture.PictureMetadata `json:"pictures"`
+	BackgroundPictureCSS string                    `json:"background_picture_css"`
 }
 
 type Theme struct {
@@ -315,7 +316,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		Value: defaultTheme(),
 	}
 
-	themeCss, err := renderCss(deviceData.Theme.Value)
+	themeCSS, err := renderThemeCSS(deviceData.Theme.Value)
 	if err != nil {
 		return DeviceData{}, err
 	}
@@ -344,17 +345,25 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			return DeviceData{}, err
 		}
 	}
+	pictureCSS, err := renderBackgroundImageCSS(backgroundImageCSSParams{
+		Settings: pictureSettings,
+		Pictures: pictures,
+	})
+	if err != nil {
+		return DeviceData{}, err
+	}
 
 	result := DeviceData{
 		Media: Media{
-			ThemeCSS: themeCss,
+			ThemeCSS: themeCSS,
 			VideoMedia: VideoMedia{
 				Settings: videoSettings,
 				Videos:   videos,
 			},
 			BackgroundPictureMedia: PictureMedia{
-				Settings: pictureSettings,
-				Pictures: pictures,
+				Settings:             pictureSettings,
+				Pictures:             pictures,
+				BackgroundPictureCSS: pictureCSS,
 			},
 		},
 		ServiceData: deviceData,

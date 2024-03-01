@@ -1,0 +1,6 @@
+body {
+    background-image: url("__BACKGROUND_IMAGE_URL__");
+    background-size: {{.BackgroundSize}};
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
