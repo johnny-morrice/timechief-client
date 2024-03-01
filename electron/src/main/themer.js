@@ -37,8 +37,8 @@ class BackgroundImageThemer {
     }
 
     setThemeFromData(data) {
-        if (data && data.media && data.media.picture && data.media.picture.background_picture_css && data.media.picture.background_picture_css.length > 0) {
-            this.setTheme(data.media.picture.background_picture_css);
+        if (data && data.media && data.media.background_picture && data.media.background_picture.background_picture_css && data.media.background_picture.background_picture_css.length > 0) {
+            this.setTheme(data.media.background_picture.background_picture_css);
         } else {
             this.setTheme("");
         }
@@ -110,3 +110,4 @@ function getDefaultThemeCSS() {
 }
 
 exports.Themer = Themer;
+exports.BackgroundImageThemer = BackgroundImageThemer;

@@ -5,8 +5,7 @@ const winston = require('winston');
 const { baseDeviceStatus } = require('./status.js');
 const { startTimechiefApp, getMainWindow } = require('./window.js');
 const { LauncherClient } = require('./launcherclient.js');
-const { Themer } = require('./themer.js');
-const { BackgroundImageThemer } = require('./backgroundimagethemer.js');
+const { Themer, BackgroundImageThemer } = require('./themer.js');
 const { MediaDecorator } = require('./mediadecorator.js');
 
 const logger = winston.createLogger({

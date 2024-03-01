@@ -20,17 +20,19 @@ class MediaDecorator {
                 });
                 data.media.video.videos = myVideos;
             }
-            if (data.media.picture && data.media.picture.pictures) {
-                const myPictures = data.media.picture.pictures.map(picture => {
+            if (data.media.background_picture && data.media.background_picture.pictures) {
+                const myPictures = data.media.background_picture.pictures.map(picture => {
                     picture.url = this.makePictureURL(picture.filename);
                     return picture;
                 });
-                data.media.picture.pictures = myPictures;
+                data.media.background_picture.pictures = myPictures;
                 if (myPictures.length > 0) {
                     const firstURL = myPictures[0].url;
-                    if (data.media.picture.background_picture_css) {
-                        let updatedCSS = data.media.picture.background_picture_css.replace(/__BACKGROUND_IMAGE_URL__/, firstURL);
-                        data.media.picture.background_picture_css = updatedCSS;
+                    // console.log(`setting background picture to ${myPictures[0].url}`)
+                    if (data.media.background_picture.background_picture_css) {
+                        let updatedCSS = data.media.background_picture.background_picture_css.replace(/__BACKGROUND_IMAGE_URL__/, firstURL);
+                        data.media.background_picture.background_picture_css = updatedCSS;
+                        // console.log(`updated background picture CSS: ${updatedCSS}`);
                     }
                 }
             }
