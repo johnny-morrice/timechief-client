@@ -71,7 +71,6 @@ func (svc Service) initKey(key, value string) error {
 type PictureMetadata struct {
 	UUID     string `json:"uuid"`
 	Filename string `json:"filename"`
-	Format   string `json:"format"`
 }
 
 func (svc Service) CheckSHA256(filename string, expected []byte) error {
