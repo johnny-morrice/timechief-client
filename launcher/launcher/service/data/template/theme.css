@@ -15,7 +15,6 @@ div.home-date {
 
 div.home-box {
     background-color: {{.BoxBackgroundColor}};
-    opacity: {{.BoxOpacity}};
 }
 
 div.border {

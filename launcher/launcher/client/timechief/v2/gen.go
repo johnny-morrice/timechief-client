@@ -231,10 +231,8 @@ type Theme struct {
 	BackgroundColor       *string `json:"background_color,omitempty"`
 	BoxBackgroundColor    *string `json:"box_background_color,omitempty"`
 	BoxBorderColor        *string `json:"box_border_color,omitempty"`
-	BoxBorderOpacity      *string `json:"box_border_opacity,omitempty"`
 	BoxBorderRadius       *string `json:"box_border_radius,omitempty"`
 	BoxBorderWidth        *string `json:"box_border_width,omitempty"`
-	BoxOpacity            *string `json:"box_opacity,omitempty"`
 	ButtonBackgroundColor *string `json:"button_background_color,omitempty"`
 	ButtonBorderColor     *string `json:"button_border_color,omitempty"`
 	ButtonBorderRadius    *string `json:"button_border_radius,omitempty"`

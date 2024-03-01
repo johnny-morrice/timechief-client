@@ -38,13 +38,12 @@ func randomTheme() *v2.Theme {
 func synthwaveDemoTheme() *v2.Theme {
 	fgColor := "#fd49c7"
 	bgColor := "#000000"
-	boxBgColor := "#3d2153"
+	boxBgColor := "#3d215355"
 	borderRadius := "5px"
-	timeColor := "#fffb83"
+	timeColor := "#ffff84"
 	timeFont := "Seven Segment"
 	mainFont := "'Titillium Web'"
 	borderWidth := "1px"
-	boxOpacity := "50%"
 	return &v2.Theme{
 		ForegroundColor:       &fgColor,
 		BackgroundColor:       &bgColor,
@@ -53,7 +52,6 @@ func synthwaveDemoTheme() *v2.Theme {
 		BoxBorderRadius:       &borderRadius,
 		BoxBorderWidth:        &borderWidth,
 		BoxBorderColor:        &boxBgColor,
-		BoxOpacity:            &boxOpacity,
 		ButtonBorderRadius:    &borderRadius,
 		ButtonBorderWidth:     &borderWidth,
 		ButtonBorderColor:     &boxBgColor,
@@ -71,7 +69,6 @@ func defaultTheme() *v2.Theme {
 	timeFont := "Seven Segment"
 	mainFont := "'Titillium Web'"
 	borderWidth := "1px"
-	boxOpacity := "100%"
 	return &v2.Theme{
 		ForegroundColor:       &fgColor,
 		BackgroundColor:       &bgColor,
@@ -80,7 +77,6 @@ func defaultTheme() *v2.Theme {
 		BoxBorderRadius:       &borderRadius,
 		BoxBorderWidth:        &borderWidth,
 		BoxBorderColor:        &fgColor,
-		BoxOpacity:            &boxOpacity,
 		ButtonBorderRadius:    &borderRadius,
 		ButtonBorderWidth:     &borderWidth,
 		ButtonBorderColor:     &fgColor,
