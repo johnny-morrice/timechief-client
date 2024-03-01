@@ -5,7 +5,7 @@ const winston = require('winston');
 const { baseDeviceStatus } = require('./status.js');
 const { startTimechiefApp, getMainWindow } = require('./window.js');
 const { LauncherClient } = require('./launcherclient.js');
-const { Themer } = require('./themer.js');
+const { Themer, BackgroundImageThemer } = require('./themer.js');
 const { MediaDecorator } = require('./mediadecorator.js');
 
 const logger = winston.createLogger({
@@ -62,11 +62,14 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
 }
 
 const mediaDecorator = new MediaDecorator();
+const backgroundImageThemer = new BackgroundImageThemer();
 
 function handleDataRequest() {
   return client.getDeviceData().then(data => {
-    themer.setThemeFromData(data);
-    return mediaDecorator.decorateData(data);
+    let myData = mediaDecorator.decorateData(data);
+    themer.setThemeFromData(myData);
+    backgroundImageThemer.setThemeFromData(myData);
+    return myData
   });
 }
 

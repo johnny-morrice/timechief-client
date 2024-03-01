@@ -28,7 +28,34 @@ class Themer {
             });
         }
     }
+}
 
+class BackgroundImageThemer {
+    constructor() {
+        this.lastThemeCssKey = null;
+        this.lastThemeCSS = null;
+    }
+
+    setThemeFromData(data) {
+        if (data && data.media && data.media.background_picture && data.media.background_picture.background_picture_css && data.media.background_picture.background_picture_css.length > 0) {
+            this.setTheme(data.media.background_picture.background_picture_css);
+        } else {
+            this.setTheme("");
+        }
+    }
+
+    setTheme(theme) {
+        if (theme !== this.lastThemeCSS) {
+            console.log("changing background image CSS");
+            this.lastThemeCSS = theme;
+            if (this.lastThemeCssKey) {
+                getMainWindow().webContents.removeInsertedCSS(this.lastThemeCssKey);
+            }
+            getMainWindow().webContents.insertCSS(theme).then(key => {
+                this.lastThemeCssKey = key;
+            });
+        }
+    }
 }
 
 function getDefaultThemeCSS() {
@@ -83,3 +110,4 @@ function getDefaultThemeCSS() {
 }
 
 exports.Themer = Themer;
+exports.BackgroundImageThemer = BackgroundImageThemer;
