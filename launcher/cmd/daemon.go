@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/media"
+	mediaapi "github.com/johnny-morrice/timechief-client/launcher/launcher/api/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
@@ -16,11 +16,14 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/picturedownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/videodownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
@@ -164,18 +167,33 @@ func Daemon(ctx *cli.Context) error {
 	internetCheck := daemon.InternetCheck{
 		System: system,
 	}
-	const videoDownloadInterval = 53 * time.Minute
 	// TODO make this configurable
+	const videoDownloadInterval = 53 * time.Minute
 	videoSource := video.NewStaticVideoSource(video.MakeTestVideo())
-	videoFilesystem, err := video.MakeMediaFS(cfg)
+	mediaFilesystem, err := media.MakeMediaFS(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to make video filesystem: %v", err)
 	}
-	videoService, err := video.MakeService(keyValueStore, videoFilesystem)
+	// TODO make downloader duration configurable.
+	downloader, err := media.MakeMediaDownloader(time.Minute * 10)
 	if err != nil {
 		return err
 	}
-	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, videoService, videodownload.Options{})
+	const pictureInterval = time.Minute
+	pictureSource := picture.NewStaticPictureSource(picture.MakeTestPicture())
+	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem, downloader)
+	if err != nil {
+		return err
+	}
+	pictureDownloader, err := picturedownload.MakeDaemon(pictureInterval, pictureSource, pictureService)
+	if err != nil {
+		return err
+	}
+	videoService, err := video.MakeService(keyValueStore, mediaFilesystem, downloader)
+	if err != nil {
+		return err
+	}
+	videoDownload, err := videodownload.MakeDaemon(videoDownloadInterval, videoSource, videoService, videodownload.Options{ForceDownload: true})
 	if err != nil {
 		return err
 	}
@@ -208,7 +226,7 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	videoApi, err := media.NewVideoAPI(videoService)
+	videoApi, err := mediaapi.NewMediaAPI(videoService, pictureService)
 	if err != nil {
 		return err
 	}
@@ -228,13 +246,22 @@ func Daemon(ctx *cli.Context) error {
 	go licenseDaemon.Start(ctx)
 	go refreshTokenDaemon.Start(ctx)
 	go videoDownload.Start(ctx)
+	go pictureDownloader.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	rootMux := http.NewServeMux()
 	secureMux := http.NewServeMux()
 	mediaMux := http.NewServeMux()
 
-	dataService := data.MakeService(videoService, deviceDataStore, launchTargetStore, flagStore, keyValueStore, wifiInterfaceStore, wifiNetworkStore)
+	dataService := data.MakeService(videoService,
+		pictureService,
+		deviceDataStore,
+		launchTargetStore,
+		flagStore,
+		keyValueStore,
+		wifiInterfaceStore,
+		wifiNetworkStore,
+	)
 
 	securePackages := []apiPackage{
 		api.System{

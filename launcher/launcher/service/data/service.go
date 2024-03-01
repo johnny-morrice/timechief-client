@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"gorm.io/gorm"
@@ -15,6 +16,7 @@ import (
 
 type Service struct {
 	videoService       VideoService
+	pictureService     PictureService
 	deviceDataStore    DeviceDataStore
 	launchTargetStore  store.LaunchTargetStore
 	stateFlagStore     store.StateFlagStore
@@ -23,9 +25,10 @@ type Service struct {
 	wifiNetworkStore   store.WifiNetworkStore
 }
 
-func MakeService(videoService VideoService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
+func MakeService(videoService VideoService, pictureService PictureService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
 	return Service{
 		videoService:       videoService,
+		pictureService:     pictureService,
 		deviceDataStore:    deviceDataStore,
 		launchTargetStore:  launchTargetStore,
 		stateFlagStore:     stateFlagStore,
@@ -36,8 +39,13 @@ func MakeService(videoService VideoService, deviceDataStore DeviceDataStore, lau
 }
 
 type VideoService interface {
-	ListVideos() ([]video.VideoMetadata, error)
-	GetVideoPreferences() (video.Settings, error)
+	List() ([]video.VideoMetadata, error)
+	GetPreferences() (video.Settings, error)
+}
+
+type PictureService interface {
+	List() ([]picture.PictureMetadata, error)
+	GetPreferences() (picture.Settings, error)
 }
 
 type DeviceDataStore interface {
@@ -88,13 +96,19 @@ type DeviceData struct {
 }
 
 type Media struct {
-	ThemeCSS   string     `json:"theme_css"`
-	VideoMedia VideoMedia `json:"video"`
+	ThemeCSS               string       `json:"theme_css"`
+	VideoMedia             VideoMedia   `json:"video"`
+	BackgroundPictureMedia PictureMedia `json:"background_picture"`
 }
 
 type VideoMedia struct {
 	Settings video.Settings        `json:"settings"`
 	Videos   []video.VideoMetadata `json:"videos"`
+}
+
+type PictureMedia struct {
+	Settings picture.Settings          `json:"settings"`
+	Pictures []picture.PictureMetadata `json:"pictures"`
 }
 
 type Theme struct {
@@ -306,13 +320,25 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, err
 	}
 
-	videos, err := svc.videoService.ListVideos()
+	videos, err := svc.videoService.List()
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return DeviceData{}, err
 		}
 	}
-	videoSettings, err := svc.videoService.GetVideoPreferences()
+	videoSettings, err := svc.videoService.GetPreferences()
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return DeviceData{}, err
+		}
+	}
+	pictures, err := svc.pictureService.List()
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return DeviceData{}, err
+		}
+	}
+	pictureSettings, err := svc.pictureService.GetPreferences()
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return DeviceData{}, err
@@ -325,6 +351,10 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			VideoMedia: VideoMedia{
 				Settings: videoSettings,
 				Videos:   videos,
+			},
+			BackgroundPictureMedia: PictureMedia{
+				Settings: pictureSettings,
+				Pictures: pictures,
 			},
 		},
 		ServiceData: deviceData,

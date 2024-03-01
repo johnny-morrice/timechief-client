@@ -15,7 +15,13 @@ func IsInHourRange(timeRange string) (bool, error) {
 	startHour := unmuteHours[0]
 	endHour := unmuteHours[1]
 	currentTime := time.Now()
-	isInRange := currentTime.Hour() >= startHour && currentTime.Hour() < endHour
+	isInRange := false
+	if startHour < endHour {
+		isInRange = currentTime.Hour() >= startHour && currentTime.Hour() < endHour
+	} else {
+		isInRange = currentTime.Hour() >= startHour || currentTime.Hour() < endHour
+	}
+
 	return isInRange, nil
 }
 

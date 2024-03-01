@@ -4,31 +4,39 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 )
 
 type MediaService interface {
-	HasVideoWithFilename(fileName string) (bool, error)
-	GetFS() video.FS
+	Exists(fileName string) (bool, error)
+	GetFS() media.FS
 }
 
-type Video struct {
-	service MediaService
+type Media struct {
+	videoService   MediaService
+	pictureService MediaService
 }
 
-func NewVideoAPI(service MediaService) (Video, error) {
-	if service == nil {
-		return Video{}, errors.New("service must not be nil")
+func NewMediaAPI(videoService, pictureService MediaService) (Media, error) {
+	if videoService == nil {
+		return Media{}, errors.New("videoService must not be nil")
 	}
-	api := Video{service: service}
+	if pictureService == nil {
+		return Media{}, errors.New("pictureService must not be nil")
+	}
+	api := Media{
+		videoService:   videoService,
+		pictureService: pictureService,
+	}
 	return api, nil
 }
 
-func (api Video) AddRoutes(mux *http.ServeMux) {
+func (api Media) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /media/video/{fileName}", api.HandleGetVideo)
+	mux.HandleFunc("GET /media/picture/{fileName}", api.HandleGetPicture)
 }
 
-func (api Video) HandleGetVideo(w http.ResponseWriter, r *http.Request) {
+func (api Media) HandleGetPicture(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -40,7 +48,34 @@ func (api Video) HandleGetVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hasVideo, err := api.service.HasVideoWithFilename(fileName)
+	hasPicture, err := api.pictureService.Exists(fileName)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if !hasPicture {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
+
+	pictureFS := api.pictureService.GetFS()
+	http.ServeFileFS(w, r, pictureFS, fileName)
+}
+
+func (api Media) HandleGetVideo(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	fileName := r.PathValue("fileName")
+	if fileName == "" {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	hasVideo, err := api.videoService.Exists(fileName)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -51,6 +86,6 @@ func (api Video) HandleGetVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	videoFS := api.service.GetFS()
+	videoFS := api.videoService.GetFS()
 	http.ServeFileFS(w, r, videoFS, fileName)
 }
