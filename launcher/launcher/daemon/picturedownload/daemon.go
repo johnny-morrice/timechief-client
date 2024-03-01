@@ -66,14 +66,14 @@ func (d Daemon) init() error {
 }
 
 func (d Daemon) doTick() error {
-	err := d.downloadVideoContent()
+	err := d.downloadPicture()
 	if err != nil {
 		return fmt.Errorf("failed to download picture content: %w", err)
 	}
 	return nil
 }
 
-func (d Daemon) downloadVideoContent() error {
+func (d Daemon) downloadPicture() error {
 	// TODO we need to validate the picture descriptor.
 	picture, err := d.source.GetPicture()
 	if err != nil {

@@ -25,9 +25,10 @@ type Service struct {
 	wifiNetworkStore   store.WifiNetworkStore
 }
 
-func MakeService(videoService VideoService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
+func MakeService(videoService VideoService, pictureService PictureService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
 	return Service{
 		videoService:       videoService,
+		pictureService:     pictureService,
 		deviceDataStore:    deviceDataStore,
 		launchTargetStore:  launchTargetStore,
 		stateFlagStore:     stateFlagStore,
@@ -39,12 +40,12 @@ func MakeService(videoService VideoService, deviceDataStore DeviceDataStore, lau
 
 type VideoService interface {
 	List() ([]video.VideoMetadata, error)
-	GetVideoPreferences() (video.Settings, error)
+	GetPreferences() (video.Settings, error)
 }
 
 type PictureService interface {
 	List() ([]picture.PictureMetadata, error)
-	GetPicturePreferences() (picture.Settings, error)
+	GetPreferences() (picture.Settings, error)
 }
 
 type DeviceDataStore interface {
@@ -325,7 +326,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			return DeviceData{}, err
 		}
 	}
-	videoSettings, err := svc.videoService.GetVideoPreferences()
+	videoSettings, err := svc.videoService.GetPreferences()
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return DeviceData{}, err
@@ -337,7 +338,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			return DeviceData{}, err
 		}
 	}
-	pictureSettings, err := svc.pictureService.GetPicturePreferences()
+	pictureSettings, err := svc.pictureService.GetPreferences()
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return DeviceData{}, err

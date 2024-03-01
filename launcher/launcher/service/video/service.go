@@ -178,7 +178,7 @@ type Settings struct {
 	EnabledHourEnd   int  `json:"enabled_hour_end"`
 }
 
-func (svc Service) GetVideoPreferences() (Settings, error) {
+func (svc Service) GetPreferences() (Settings, error) {
 	// If video content is not enabled, do nothing.
 	enabled, err := svc.keyValueStore.Get(store.VideoContentEnabledKey)
 	if err != nil {

@@ -253,7 +253,15 @@ func Daemon(ctx *cli.Context) error {
 	secureMux := http.NewServeMux()
 	mediaMux := http.NewServeMux()
 
-	dataService := data.MakeService(videoService, deviceDataStore, launchTargetStore, flagStore, keyValueStore, wifiInterfaceStore, wifiNetworkStore)
+	dataService := data.MakeService(videoService,
+		pictureService,
+		deviceDataStore,
+		launchTargetStore,
+		flagStore,
+		keyValueStore,
+		wifiInterfaceStore,
+		wifiNetworkStore,
+	)
 
 	securePackages := []apiPackage{
 		api.System{

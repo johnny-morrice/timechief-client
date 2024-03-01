@@ -29,7 +29,7 @@ func (s StaticVideoSource) GetPicture() (PictureDescriptor, error) {
 
 func MakeTestPicture() PictureDescriptor {
 	// shaText is output of fmt.Printf("%x", theBytes)
-	const shaText = ""
+	const shaText = "09578a98db3a92fe1c57a25c07985ffb196795bde02662d151e94cffa093ca63"
 	sha256, err := hex.DecodeString(shaText)
 	if err != nil {
 		panic(err)
