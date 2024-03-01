@@ -173,12 +173,20 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to make video filesystem: %v", err)
 	}
-	videoService, err := video.MakeService(keyValueStore, mediaFilesystem)
+	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem)
 	if err != nil {
 		return err
 	}
-	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem)
-	videoDownload, err := videodownload.NewDaemon(videoDownloadInterval, videoSource, keyValueStore, videoService, videodownload.Options{ForceDownload: true})
+	// TODO make downloader duration configurable.
+	downloader, err := media.MakeMediaDownloader(time.Minute * 10)
+	if err != nil {
+		return err
+	}
+	videoService, err := video.MakeService(keyValueStore, mediaFilesystem, downloader)
+	if err != nil {
+		return err
+	}
+	videoDownload, err := videodownload.MakeDaemon(videoDownloadInterval, videoSource, videoService, videodownload.Options{ForceDownload: true})
 	if err != nil {
 		return err
 	}

@@ -1,65 +1,51 @@
 package videodownload
 
 import (
-	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 	videosvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/util"
 	"github.com/urfave/cli/v2"
-	"gorm.io/gorm"
 )
 
 type Daemon struct {
-	tickInterval  time.Duration
-	source        videosvc.VideoSource
-	keyValueStore KeyValueStore
-	videoService  VideoService
-	opts          Options
-}
-
-type KeyValueStore interface {
-	Get(key string) (string, error)
-	Set(key, value string) error
+	tickInterval time.Duration
+	source       videosvc.VideoSource
+	videoService VideoService
+	opts         Options
 }
 
 type VideoService interface {
 	GetFS() media.FS
+	ReadyForUpdate() (bool, error)
 	CheckSHA256(filename string, sha256 []byte) error
+	Download(video videosvc.VideoDescriptor) error
+	Initialise() error
 }
 
 type Options struct {
 	ForceDownload bool
 }
 
-func NewDaemon(tickInterval time.Duration, source videosvc.VideoSource, keyValueStore KeyValueStore, videoService VideoService, opts Options) (Daemon, error) {
+func MakeDaemon(tickInterval time.Duration, source videosvc.VideoSource, videoService VideoService, opts Options) (Daemon, error) {
 	if tickInterval <= 0 {
 		return Daemon{}, errors.New("refreshInterval must be positive")
 	}
 	if source == nil {
 		return Daemon{}, errors.New("source must not be nil")
 	}
-	if keyValueStore == nil {
-		return Daemon{}, errors.New("keyValueStore must not be nil")
-	}
 	if videoService == nil {
 		return Daemon{}, errors.New("videoService must not be nil")
 	}
 
 	result := Daemon{
-		tickInterval:  tickInterval,
-		source:        source,
-		keyValueStore: keyValueStore,
-		videoService:  videoService,
-		opts:          opts,
+		tickInterval: tickInterval,
+		source:       source,
+		videoService: videoService,
+		opts:         opts,
 	}
 	return result, nil
 }
@@ -91,38 +77,7 @@ const defaultContentEnabled = "false"
 const defaultContentLastUpdate = "2006-01-02T15:04:05Z07:00"
 
 func (d Daemon) init() error {
-	defaultVideoViewed := time.Now().Format(time.RFC3339)
-	defaults := map[string]string{
-		store.VideoContentEnabledKey:    defaultContentEnabled,
-		store.VideoContentHourRangeKey:  defaultContentHourRange,
-		store.VideoContentLastUpdateKey: defaultContentLastUpdate,
-		store.VideoContentFrequencyKey:  fmt.Sprint(defaultContentFrequency),
-		store.VideoContentLastViewedKey: defaultVideoViewed,
-		store.VideoDescriptorKey:        defaultLastVideoDescriptor,
-	}
-	for key, value := range defaults {
-		err := d.initKey(key, value)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (d Daemon) initKey(key, value string) error {
-	_, err := d.keyValueStore.Get(key)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = d.keyValueStore.Set(key, value)
-			if err != nil {
-				return fmt.Errorf("failed to set default video content key %s: %w", key, err)
-			}
-			return nil
-		}
-
-		return fmt.Errorf("failed to get default video content key %s: %w", key, err)
-	}
-	return nil
+	return d.videoService.Initialise()
 }
 
 func (d Daemon) doTick() error {
@@ -137,10 +92,6 @@ func (d Daemon) doTick() error {
 	if err != nil {
 		return fmt.Errorf("failed to download video content: %w", err)
 	}
-	err = d.keyValueStore.Set(store.VideoContentLastUpdateKey, time.Now().Format(time.RFC3339))
-	if err != nil {
-		return fmt.Errorf("failed to update video content last update: %w", err)
-	}
 	return nil
 }
 
@@ -150,70 +101,7 @@ func (d Daemon) downloadVideoContent() error {
 	if err != nil {
 		return fmt.Errorf("failed to get video: %w", err)
 	}
-	lastVideoText, err := d.keyValueStore.Get(store.VideoDescriptorKey)
-	if err != nil {
-		return fmt.Errorf("failed to get last video UUID: %w", err)
-	}
-	lastVideo := videosvc.VideoDescriptor{}
-	err = json.Unmarshal([]byte(lastVideoText), &lastVideo)
-	if err != nil {
-		return fmt.Errorf("failed to parse stored video descriptor: %w", err)
-	}
-	if lastVideo.UUID == video.UUID {
-		err := d.videoService.CheckSHA256(video.Filename, video.SHA256)
-		if err != nil {
-			log.Printf("video sha check failed: %s", err.Error())
-		} else {
-			log.Printf("video %s is already downloaded", video.UUID)
-			return nil
-		}
-	}
-	log.Printf("downloading video %s %s", video.UUID, video.URL)
-	data, err := downloadURLData(video.URL)
-	if err != nil {
-		return fmt.Errorf("failed to download video content: %w", err)
-	}
-	log.Printf("downloaded video %s %s", video.UUID, video.URL)
-	err = d.videoService.GetFS().WriteFile(video.Filename, data, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to store video content: %w", err)
-	}
-	err = d.videoService.CheckSHA256(video.Filename, video.SHA256)
-	if err != nil {
-		return fmt.Errorf("failed to validate video content: %w", err)
-	}
-	videoDescriptorText, err := json.Marshal(video)
-	if err != nil {
-		return fmt.Errorf("failed to marshal video descriptor: %w", err)
-	}
-	err = d.keyValueStore.Set(store.VideoDescriptorKey, string(videoDescriptorText))
-	if err != nil {
-		return fmt.Errorf("failed to store video descriptor: %w", err)
-	}
-	return nil
-}
-
-func downloadURLData(url string) ([]byte, error) {
-	const timeout = time.Minute * 10
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create video content request: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to download video content: %w", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to download video content: status code %d", resp.StatusCode)
-	}
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read video content: %w", err)
-	}
-	return data, nil
+	return d.videoService.Download(video)
 }
 
 func (d Daemon) shouldUpdateVideoContent() (bool, error) {
@@ -221,48 +109,5 @@ func (d Daemon) shouldUpdateVideoContent() (bool, error) {
 		return true, nil
 	}
 
-	// If video content is not enabled, do nothing.
-	enabled, err := d.keyValueStore.Get(store.VideoContentEnabledKey)
-	if err != nil {
-		return false, fmt.Errorf("failed to get video content enabled: %w", err)
-	}
-	if enabled != "true" {
-		log.Println("video content is not enabled")
-		return false, nil
-	}
-	// If we are not in the correct hour range for video content, do nothing.
-	timeRange, err := d.keyValueStore.Get(store.VideoContentHourRangeKey)
-	if err != nil {
-		return false, fmt.Errorf("failed to get video content hour range: %w", err)
-	}
-	inRange, err := util.IsInHourRange(timeRange)
-	if err != nil {
-		return false, fmt.Errorf("failed to check if in video content hour range: %w", err)
-	}
-	if !inRange {
-		log.Println("video content is not in permitted range")
-		return false, nil
-	}
-	// If we have downloaded video content within the frequency, do nothing.
-	frequencyStr, err := d.keyValueStore.Get(store.VideoContentFrequencyKey)
-	if err != nil {
-		return false, fmt.Errorf("failed to get video content frequency: %w", err)
-	}
-	frequency, err := time.ParseDuration(frequencyStr)
-	if err != nil {
-		return false, fmt.Errorf("failed to parse video content frequency: %w", err)
-	}
-	lastUpdateStr, err := d.keyValueStore.Get(store.VideoContentLastUpdateKey)
-	if err != nil {
-		return false, fmt.Errorf("failed to get video content last update: %w", err)
-	}
-	lastUpdate, err := time.Parse(time.RFC3339, lastUpdateStr)
-	if err != nil {
-		return false, fmt.Errorf("failed to parse video content last update: %w", err)
-	}
-	if time.Since(lastUpdate) < frequency {
-		log.Println("video content is up to date")
-		return false, nil
-	}
-	return true, nil
+	return d.videoService.ReadyForUpdate()
 }

@@ -39,6 +39,10 @@ func (m MediaFS) WriteFile(name string, data []byte, mode fs.FileMode) error {
 }
 
 func (m MediaFS) CheckSHA256(filename string, expected []byte) error {
+	err := validateFilename(filename)
+	if err != nil {
+		return err
+	}
 	file, err := m.Open(filename)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
@@ -49,14 +53,19 @@ func (m MediaFS) CheckSHA256(filename string, expected []byte) error {
 			log.Printf("failed to close file: %v", err)
 		}
 	}()
+
+	return nil
+}
+
+func doSHA256(r io.Reader, expected []byte) error {
 	hasher := sha256.New()
-	_, err = io.Copy(hasher, file)
+	_, err := io.Copy(hasher, r)
 	if err != nil {
 		return fmt.Errorf("failed to hash file: %w", err)
 	}
 	actual := hasher.Sum(nil)
 	if !bytes.Equal(actual, expected) {
-		return fmt.Errorf("file '%v' has incorrect hash, expected %x but was %x", filename, expected, actual)
+		return fmt.Errorf("incorrect hash, expected %x but was %x", expected, actual)
 	}
 	return nil
 }
