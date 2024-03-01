@@ -26,6 +26,13 @@ class MediaDecorator {
                     return picture;
                 });
                 data.media.picture.pictures = myPictures;
+                if (myPictures.length > 0) {
+                    const firstURL = myPictures[0].url;
+                    if (data.media.picture.background_picture_css) {
+                        let updatedCSS = data.media.picture.background_picture_css.replace(/__BACKGROUND_IMAGE_URL__/, firstURL);
+                        data.media.picture.background_picture_css = updatedCSS;
+                    }
+                }
             }
         }
         return data;
