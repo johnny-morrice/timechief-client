@@ -16,6 +16,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/picturedownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/videodownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
@@ -166,8 +167,8 @@ func Daemon(ctx *cli.Context) error {
 	internetCheck := daemon.InternetCheck{
 		System: system,
 	}
-	const videoDownloadInterval = 53 * time.Minute
 	// TODO make this configurable
+	const videoDownloadInterval = 53 * time.Minute
 	videoSource := video.NewStaticVideoSource(video.MakeTestVideo())
 	mediaFilesystem, err := media.MakeMediaFS(cfg)
 	if err != nil {
@@ -178,7 +179,13 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	const pictureInterval = time.Minute
+	pictureSource := picture.NewStaticPictureSource(picture.MakeTestPicture())
 	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem, downloader)
+	if err != nil {
+		return err
+	}
+	pictureDownloader, err := picturedownload.MakeDaemon(pictureInterval, pictureSource, pictureService)
 	if err != nil {
 		return err
 	}
@@ -239,6 +246,7 @@ func Daemon(ctx *cli.Context) error {
 	go licenseDaemon.Start(ctx)
 	go refreshTokenDaemon.Start(ctx)
 	go videoDownload.Start(ctx)
+	go pictureDownloader.Start(ctx)
 
 	addr := ctx.String("listen-addr")
 	rootMux := http.NewServeMux()

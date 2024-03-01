@@ -6,23 +6,21 @@ import (
 	"log"
 	"time"
 
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
-	videosvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"github.com/urfave/cli/v2"
 )
 
 type Daemon struct {
 	tickInterval time.Duration
-	source       videosvc.VideoSource
+	source       video.VideoSource
 	videoService VideoService
 	opts         Options
 }
 
 type VideoService interface {
-	GetFS() media.FS
 	ReadyForUpdate() (bool, error)
 	CheckSHA256(filename string, sha256 []byte) error
-	Download(video videosvc.VideoDescriptor) error
+	Download(video video.VideoDescriptor) error
 	Initialise() error
 }
 
@@ -30,7 +28,7 @@ type Options struct {
 	ForceDownload bool
 }
 
-func MakeDaemon(tickInterval time.Duration, source videosvc.VideoSource, videoService VideoService, opts Options) (Daemon, error) {
+func MakeDaemon(tickInterval time.Duration, source video.VideoSource, videoService VideoService, opts Options) (Daemon, error) {
 	if tickInterval <= 0 {
 		return Daemon{}, errors.New("refreshInterval must be positive")
 	}

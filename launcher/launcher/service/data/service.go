@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"gorm.io/gorm"
@@ -15,6 +16,7 @@ import (
 
 type Service struct {
 	videoService       VideoService
+	pictureService     PictureService
 	deviceDataStore    DeviceDataStore
 	launchTargetStore  store.LaunchTargetStore
 	stateFlagStore     store.StateFlagStore
@@ -38,6 +40,11 @@ func MakeService(videoService VideoService, deviceDataStore DeviceDataStore, lau
 type VideoService interface {
 	List() ([]video.VideoMetadata, error)
 	GetVideoPreferences() (video.Settings, error)
+}
+
+type PictureService interface {
+	List() ([]picture.PictureMetadata, error)
+	GetPicturePreferences() (picture.Settings, error)
 }
 
 type DeviceDataStore interface {
@@ -88,13 +95,19 @@ type DeviceData struct {
 }
 
 type Media struct {
-	ThemeCSS   string     `json:"theme_css"`
-	VideoMedia VideoMedia `json:"video"`
+	ThemeCSS               string       `json:"theme_css"`
+	VideoMedia             VideoMedia   `json:"video"`
+	BackgroundPictureMedia PictureMedia `json:"background_picture"`
 }
 
 type VideoMedia struct {
 	Settings video.Settings        `json:"settings"`
 	Videos   []video.VideoMetadata `json:"videos"`
+}
+
+type PictureMedia struct {
+	Settings picture.Settings          `json:"settings"`
+	Pictures []picture.PictureMetadata `json:"pictures"`
 }
 
 type Theme struct {
@@ -318,6 +331,18 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			return DeviceData{}, err
 		}
 	}
+	pictures, err := svc.pictureService.List()
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return DeviceData{}, err
+		}
+	}
+	pictureSettings, err := svc.pictureService.GetPicturePreferences()
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return DeviceData{}, err
+		}
+	}
 
 	result := DeviceData{
 		Media: Media{
@@ -325,6 +350,10 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			VideoMedia: VideoMedia{
 				Settings: videoSettings,
 				Videos:   videos,
+			},
+			BackgroundPictureMedia: PictureMedia{
+				Settings: pictureSettings,
+				Pictures: pictures,
 			},
 		},
 		ServiceData: deviceData,
