@@ -1230,11 +1230,15 @@ components:
           type: string
         box_background_color:
           type: string
+        box_opacity:
+          type: string
         box_border_radius:
           type: string
         box_border_width:
           type: string
         box_border_color:
+          type: string
+        box_border_opacity:
           type: string
         main_font:
           type: string

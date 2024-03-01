@@ -313,7 +313,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	nowDt := int(time.Now().Unix())
 	deviceData.Theme = &v2.ThemeDatum{
 		Dt:    &nowDt,
-		Value: defaultTheme(),
+		Value: synthwaveDemoTheme(),
 	}
 
 	themeCSS, err := renderThemeCSS(deviceData.Theme.Value)
