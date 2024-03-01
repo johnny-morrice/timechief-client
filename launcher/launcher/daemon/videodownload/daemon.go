@@ -70,12 +70,6 @@ func (d Daemon) Start(ctx *cli.Context) {
 	}
 }
 
-const defaultLastVideoDescriptor = "{}"
-const defaultContentHourRange = "21-04"
-const defaultContentFrequency = time.Hour * 17
-const defaultContentEnabled = "false"
-const defaultContentLastUpdate = "2006-01-02T15:04:05Z07:00"
-
 func (d Daemon) init() error {
 	return d.videoService.Initialise()
 }

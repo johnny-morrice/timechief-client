@@ -73,6 +73,22 @@ func (svc Service) Initialise() error {
 	return nil
 }
 
+func (svc Service) initKey(key, value string) error {
+	_, err := svc.keyValueStore.Get(key)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = svc.keyValueStore.Set(key, value)
+			if err != nil {
+				return fmt.Errorf("failed to set default video content key %s: %w", key, err)
+			}
+			return nil
+		}
+
+		return fmt.Errorf("failed to get default video content key %s: %w", key, err)
+	}
+	return nil
+}
+
 func (svc Service) ReadyForUpdate() (bool, error) {
 	// If video content is not enabled, do nothing.
 	enabled, err := svc.keyValueStore.Get(store.VideoContentEnabledKey)
@@ -118,22 +134,6 @@ func (svc Service) ReadyForUpdate() (bool, error) {
 		return false, nil
 	}
 	return true, nil
-}
-
-func (svc Service) initKey(key, value string) error {
-	_, err := svc.keyValueStore.Get(key)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = svc.keyValueStore.Set(key, value)
-			if err != nil {
-				return fmt.Errorf("failed to set default video content key %s: %w", key, err)
-			}
-			return nil
-		}
-
-		return fmt.Errorf("failed to get default video content key %s: %w", key, err)
-	}
-	return nil
 }
 
 type VideoMetadata struct {
