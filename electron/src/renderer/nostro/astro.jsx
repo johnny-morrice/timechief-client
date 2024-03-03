@@ -21,14 +21,18 @@ function hasAstro(signals) {
 }
 
 function updateAstroPageSignals(signals, data) {
-    if (!data["weather"]) {
+    let weatherDatum = data["owm"];
+    if (!weatherDatum) {
         return;
     }
-    let weather = data["weather"];
-    if (!weather["daily"]) {
+    let weather = weatherDatum["value"];
+    if (!weather) {
         return;
     }
     let daily = weather["daily"];
+    if (!daily) {
+        return;
+    }
     if (daily.length > 0) {
         let today = daily[0];
         let sunriseUnix = today["sunrise"];

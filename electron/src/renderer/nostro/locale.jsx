@@ -16,10 +16,11 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
-    let deviceProfile = data["device_profile"];
-    if (!deviceProfile) {
+    let deviceProfileDatum = data["device_profile"];
+    if (!deviceProfileDatum) {
         return;
     }
+    let deviceProfile = deviceProfileDatum["value"];
     let location = deviceProfile["location"];
     let latitude = deviceProfile["latitude"];
     let longitude = deviceProfile["longitude"];

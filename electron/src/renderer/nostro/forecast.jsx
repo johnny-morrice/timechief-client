@@ -40,14 +40,17 @@ class DaySignals {
 function updateSignals(signals, data) {
     var locale = "en-GB";
     if ("device_profile" in data) {
-        const deviceProfile = data["device_profile"];
+        const deviceProfileDatum = data["device_profile"];
+        const deviceProfile = deviceProfileDatum["value"];
         if ("locale" in deviceProfile && deviceProfile["locale"] !== "") {
             locale = deviceProfile["locale"];
         }
     }
-    if ("weather" in data) {
-        if ("haily" in data["weather"]) {
-            let daily = data["weather"]["daily"];
+    if ("owm" in data) {
+        let weatherDatum = data["owm"];
+        let weather = weatherDatum["value"];
+        if ("daily" in weather) {
+            let daily = weather["daily"];
             var dayCount = daily.length;
             if (dayCount > dayForecastCount) {
                 dayCount = dayForecastCount;
@@ -56,7 +59,7 @@ function updateSignals(signals, data) {
             for (var i = 0; i < dayCount; i++) {
                 let forecast = daily[i];
                 let daySignals = signals.days[i];
-                let dt = forecast["Dt"];
+                let dt = forecast["dt"];
                 let date = parseUnixDate(dt);
                 let dateText = renderLongDateText(locale, date);
                 let shortText = renderShortDateText(locale, date);
