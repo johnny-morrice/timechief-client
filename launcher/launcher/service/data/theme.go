@@ -35,6 +35,33 @@ func randomTheme() *v2.Theme {
 	}
 }
 
+func synthwaveDemoTheme() *v2.Theme {
+	fgColor := "#fd49c7"
+	bgColor := "#000000"
+	boxBgColor := "#3d215355"
+	borderRadius := "5px"
+	timeColor := "#ffff84"
+	timeFont := "Seven Segment"
+	mainFont := "'Titillium Web'"
+	borderWidth := "1px"
+	return &v2.Theme{
+		ForegroundColor:       &fgColor,
+		BackgroundColor:       &bgColor,
+		BoxBackgroundColor:    &boxBgColor,
+		ButtonBackgroundColor: &boxBgColor,
+		BoxBorderRadius:       &borderRadius,
+		BoxBorderWidth:        &borderWidth,
+		BoxBorderColor:        &boxBgColor,
+		ButtonBorderRadius:    &borderRadius,
+		ButtonBorderWidth:     &borderWidth,
+		ButtonBorderColor:     &boxBgColor,
+		ButtonForegroundColor: &fgColor,
+		TimeFont:              &timeFont,
+		TimeColor:             &timeColor,
+		MainFont:              &mainFont,
+	}
+}
+
 func defaultTheme() *v2.Theme {
 	fgColor := "#008000"
 	bgColor := "#000000"

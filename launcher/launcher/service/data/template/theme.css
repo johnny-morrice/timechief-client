@@ -9,6 +9,10 @@ div.home-time {
     color: {{.TimeColor}};
 }
 
+div.home-date {
+    color: {{.TimeColor}};
+}
+
 div.home-box {
     background-color: {{.BoxBackgroundColor}};
 }

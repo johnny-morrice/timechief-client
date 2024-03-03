@@ -103,8 +103,8 @@ func (svc Service) List() ([]PictureMetadata, error) {
 }
 
 type Settings struct {
-	Enabled     bool   `json:"enabled"`
-	PictureMode string `json:"mode"`
+	Enabled        bool   `json:"enabled"`
+	BackgroundSize string `json:"bacground_size"`
 }
 
 func (svc Service) GetPreferences() (Settings, error) {
@@ -115,8 +115,8 @@ func (svc Service) GetPreferences() (Settings, error) {
 	// TODO remove forceDisabled
 	const forceDisabled = false
 	settings := Settings{
-		Enabled:     !forceDisabled && descriptor != "",
-		PictureMode: "fill",
+		Enabled:        !forceDisabled && descriptor != "",
+		BackgroundSize: "cover",
 	}
 	return settings, nil
 }
