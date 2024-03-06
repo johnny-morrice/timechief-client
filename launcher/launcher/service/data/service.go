@@ -192,7 +192,7 @@ func webURL(ip string) string {
 	if ip == "" {
 		return ""
 	}
-	return fmt.Sprintf("http://%s/", ip)
+	return fmt.Sprintf("https://%s/", ip)
 }
 
 func (svc Service) RefreshMyDevices() error {
