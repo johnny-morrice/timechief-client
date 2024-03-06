@@ -18,14 +18,25 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
-  let deviceProfile = data["device_profile"];
+  let deviceProfileDatum = data["device_profile"];
+  if (!deviceProfileDatum) {
+    return;
+  }
+  let deviceProfile = deviceProfileDatum["value"];
+  if (!deviceProfile) {
+    return;
+  }
   signals.setLocale(deviceProfile["locale"]);
   const tz = deviceProfile["timezone"]
   signals.setTimeZone(tz);
   signals.setLoaded(true);
-  let calendarResp = data["calendar"];
-  if ("calendar" in calendarResp && calendarResp["calendar"] != null) {
-    let calendar = calendarResp["google_calendar"];
+  let calendarDatum = data["google_calendar"];
+  if (!calendarDatum) {
+    return;
+  }
+  let googleCalendar = calendarDatum["value"];
+  if ("calendar" in googleCalendar && googleCalendar["calendar"] != null) {
+    let calendar = googleCalendar["google_calendar"];
     if ("events" in calendar) {
       let dataEvents = calendar["events"];
       if (dataEvents) {
