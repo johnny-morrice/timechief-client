@@ -241,6 +241,10 @@ export const WebSetupPage = (props) => {
                             <div class="data-value">{signals.hotspotKeyText}</div>
                         </div>
                         <div class='flex-row'>
+                            <div class="data-label">{label("continue-via-browser")}</div>
+                            <div class="data-value">{signals.deviceSetupURLText}</div>
+                        </div>
+                        <div class='flex-row'>
                             <img class="hotspot-qr" src={signals.hotspotQRData()} alt='Hotspot QR Code' />
                         </div>
                         <Show when={isConnectionError(signals)}>
