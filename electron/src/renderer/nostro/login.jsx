@@ -68,7 +68,7 @@ export function LoginPage(props) {
 
         if (pairingQrCodeCanvas == null) {
             let canvasWrapper = document.getElementById("pairing-qrcode-canvas-wrapper");
-            if (canvasWrapper) {
+            if (canvasWrapper && canvasWrapper.childElementCount == 0) {
                 pairingQrCodeCanvas = <canvas id="pairing-qrcode-canvas"></canvas>;
                 canvasWrapper.appendChild(pairingQrCodeCanvas);
                 toCanvas(pairingQrCodeCanvas, signals.qrCodeURL());
