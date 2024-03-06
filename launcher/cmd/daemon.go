@@ -282,7 +282,6 @@ func Daemon(ctx *cli.Context) error {
 				SoundService:      soundService,
 			},
 		},
-		fileserver.NewStaticFileHandler(),
 	}
 	for _, pkg := range securePackages {
 		pkg.AddRoutes(secureMux)
@@ -301,8 +300,13 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	fileServer := fileserver.NewStaticFileHandler()
+	webMux := http.NewServeMux()
+	fileServer.AddRoutes(webMux)
 	rootMux.Handle("/api/", authedHandler)
 	rootMux.Handle("/media/", mediaMux)
+	rootMux.Handle("/", webMux)
+
 	onInitialiseComplete(soundService)
 	return http.ListenAndServe(addr, rootMux)
 }
