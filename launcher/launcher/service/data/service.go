@@ -312,8 +312,9 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	// TODO delete theme testing.
 	nowDt := int(time.Now().Unix())
 	deviceData.Theme = &v2.ThemeDatum{
-		Dt:    &nowDt,
-		Value: synthwaveDemoTheme(),
+		Dt: &nowDt,
+		// Value: synthwaveDemoTheme(),
+		Value: defaultTheme(),
 	}
 
 	themeCSS, err := renderThemeCSS(deviceData.Theme.Value)
@@ -346,7 +347,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		}
 	}
 	pictureCSS, err := renderBackgroundImageCSS(backgroundImageCSSParams{
-		Settings: pictureSettings,
+		// Settings: pictureSettings,
 		Pictures: pictures,
 	})
 	if err != nil {

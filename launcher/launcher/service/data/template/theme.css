@@ -9,6 +9,10 @@ div.home-time {
     color: {{.TimeColor}};
 }
 
+.exposed {
+    color: {{.TimeColor}};
+}
+
 div.home-date {
     color: {{.TimeColor}};
 }
