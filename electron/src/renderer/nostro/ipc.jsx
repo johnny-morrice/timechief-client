@@ -157,6 +157,10 @@ export function sendRefreshMyDevices() {
     window.api.send("refreshMyDevices");
 }
 
+export function sendSelectMyDevice(uuid) {
+    window.api.send("selectMyDevice", { "uuid": uuid });
+}
+
 export function sendSetupBegin() {
     window.api.send("setupBegin");
 }

@@ -1,6 +1,6 @@
-import { Show, createSignal, onCleanup } from "solid-js";
+import { For, Show, createSignal, onCleanup } from "solid-js";
 import { callbackName } from "./callback";
-import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices } from "./ipc";
+import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, sendSelectMyDevice } from "./ipc";
 import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 import { Loading } from "./loading";
@@ -13,6 +13,7 @@ class Signals {
         [this.qrCodeURL, this.setQrCodeURL] = createSignal("");
         [this.hasAccessCode, this.setHasAccessCode] = createSignal(false);
         [this.hasDeviceUUID, this.setHasDeviceUUID] = createSignal(false);
+        [this.devices, this.setDevices] = createSignal([]);
     }
 }
 
@@ -23,8 +24,10 @@ function onDataUpdate(data, signals) {
     }
     const hasAccessCode = dataState["has_access_token"];
     const deviceUUID = dataState["my_device_uuid"];
+    const devices = dataState["my_devices"];
     signals.setHasDeviceUUID(deviceUUID.length > 0);
     signals.setHasAccessCode(hasAccessCode);
+    signals.setDevices(devices);
 }
 
 export function LoginPage(props) {
@@ -99,6 +102,20 @@ export function LoginPage(props) {
     function isLoggedIn(signals) {
         return signals.hasAccessCode() && signals.hasDeviceUUID();
     }
+    function hasDevices(signals) {
+        return signals.devices().length > 0;
+    }
+    function isWaitingForSubscription(signals) {
+        return signals.hasAccessCode() && !signals.hasDeviceUUID() && !hasDevices(signals);
+    }
+    function isSelectingDevice(signals) {
+        return signals.hasAccessCode() && !signals.hasDeviceUUID() && hasDevices(signals);
+    }
+    function formatDevice(device) {
+        // TODO cope with missing nickname.
+        return device.nickname ? `${device.nickname} - ${device.location}` : device.location;
+    }
+
     const label = labelMaker("login");
     const plainText = textMaker("login");
 
@@ -108,10 +125,18 @@ export function LoginPage(props) {
         </Show>
         <Show when={!isLoggedIn(signals)}>
             <div class="login-screen exposed">
-                <Show when={signals.hasAccessCode() && !signals.hasDeviceUUID()}>
+                <Show when={isWaitingForSubscription(signals)}>
                     <div class="login-box">
                         <div>Waiting for subscription activation</div>
                         <Loading />
+                    </div>
+                </Show>
+                <Show when={isSelectingDevice(signals)}>
+                    <div class="login-box">
+                        <div class="pairing-title">{label("select-device")}</div>
+                        <For each={signals.devices()}>{(device) => {
+                            return <button class="action-button crt-box flex-grow" onClick={() => sendSelectMyDevice(device.uuid)}>{formatDevice(device)}</button>;
+                        }}</For>
                     </div>
                 </Show>
                 <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>

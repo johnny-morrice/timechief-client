@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld(
             "setSSHEnabled",
             "apiKeyRegen",
             "setAPIEnabled",
+            "selectMyDevice",
         ];
         if (validChannels.includes(channel)) {
             ipcRenderer.send(channel, ...args);
