@@ -45,13 +45,14 @@ export const Text = {
         "coordinates": "Coords",
 
     },
-    "pairing": {
-        "title": "Account Pairing",
+    "login": {
+        "title": "Login to Timechief",
         "change-linked-account": "Change linked account",
-        "link-account": "Link account",
+        "login-button-text": "Tap to log in",
         "in-your-browser": "In your browser",
         "enter-code": "Enter your pairing code",
         "scan-qr": "Or scan the QR code",
+        "select-device": "Select a device",
     },
     "web-setup": {
         "welcome": "Welcome to Timechief",

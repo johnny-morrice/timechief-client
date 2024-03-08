@@ -86,6 +86,7 @@ handleIPCAPICall("setupCancel", "setupCancelResult", () => client.postSetupInter
 handleIPCAPICall("setupRestart", "setupRestartResult", () => client.postSetupBeginState().then(() => client.postWifiMarkNotReady()));
 handleIPCAPICall("sshPasswordRegen", "sshPasswordRegenResult", () => client.postSSHRegenPassword());
 handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKey());
+handleIPCAPICall("selectMyDevice", "selectMyDeviceResult", (args) => client.postSelectMyDevice(args["uuid"]));
 
 ipcMain.on("setSSHEnabled", (event, args) => {
   client.postSSHEnabled(args["state"])

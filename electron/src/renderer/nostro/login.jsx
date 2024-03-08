@@ -1,6 +1,6 @@
-import { Show, createSignal, onCleanup } from "solid-js";
+import { For, Show, createSignal, onCleanup } from "solid-js";
 import { callbackName } from "./callback";
-import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices } from "./ipc";
+import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, sendSelectMyDevice } from "./ipc";
 import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 import { Loading } from "./loading";
@@ -13,6 +13,7 @@ class Signals {
         [this.qrCodeURL, this.setQrCodeURL] = createSignal("");
         [this.hasAccessCode, this.setHasAccessCode] = createSignal(false);
         [this.hasDeviceUUID, this.setHasDeviceUUID] = createSignal(false);
+        [this.devices, this.setDevices] = createSignal([]);
     }
 }
 
@@ -23,8 +24,10 @@ function onDataUpdate(data, signals) {
     }
     const hasAccessCode = dataState["has_access_token"];
     const deviceUUID = dataState["my_device_uuid"];
+    const devices = dataState["my_devices"];
     signals.setHasDeviceUUID(deviceUUID.length > 0);
     signals.setHasAccessCode(hasAccessCode);
+    signals.setDevices(devices);
 }
 
 export function LoginPage(props) {
@@ -96,41 +99,66 @@ export function LoginPage(props) {
     function isLoginStarted(signals) {
         return signals.userCode().length > 0;
     }
-    const label = labelMaker("pairing");
-    const plainText = textMaker("pairing");
+    function isLoggedIn(signals) {
+        return signals.hasAccessCode() && signals.hasDeviceUUID();
+    }
+    function hasDevices(signals) {
+        return signals.devices().length > 0;
+    }
+    function isWaitingForSubscription(signals) {
+        return signals.hasAccessCode() && !signals.hasDeviceUUID() && !hasDevices(signals);
+    }
+    function isSelectingDevice(signals) {
+        return signals.hasAccessCode() && !signals.hasDeviceUUID() && hasDevices(signals);
+    }
+    function formatDevice(device) {
+        // TODO cope with missing nickname.
+        return device.nickname ? `${device.nickname} - ${device.location}` : device.location;
+    }
+
+    const label = labelMaker("login");
+    const plainText = textMaker("login");
 
     return <>
-        <Show when={signals.hasAccessCode() && signals.hasDeviceUUID()}>
+        <Show when={isLoggedIn(signals)}>
             {props.element}
         </Show>
-        <Show when={signals.hasAccessCode() && !signals.hasDeviceUUID()}>
-            <div class="flex-column flex-grow">
-                <div>Waiting for subscription activation</div>
-                <Loading />
-            </div>
-        </Show>
-        <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>
-            <div class="flex-column flex-grow">
-                <div class="flex-grow flex-row">
-                    <div class="pairing-title">{label("title")}</div>
-                </div>
-                <div class="flex-grow flex-row">
-                    <button class="action-button crt-box flex-grow" onClick={onClickLogin}>{plainText("link-account")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
-                </div>
-            </div>
-        </Show>
-        <Show when={!signals.hasAccessCode() && isLoginStarted(signals)}>
-            <div class="flex-column flex-grow">
-                <div class='flex-row'>
-                    <div class="data-label">{label("in-your-browser")}</div>
-                    <div class="data-value">{signals.loginURL}</div>
-                </div>
-                <div class='flex-row'>
-                    <div class="data-label">{label("enter-code")}</div>
-                    <div class="data-value">{signals.userCode}</div>
-                </div>
-                <div class="data-label">{label("scan-qr")}</div>
-                <div id="pairing-qrcode-canvas-wrapper"></div>
+        <Show when={!isLoggedIn(signals)}>
+            <div class="login-screen exposed">
+                <Show when={isWaitingForSubscription(signals)}>
+                    <div class="login-box">
+                        <div>Waiting for subscription activation</div>
+                        <Loading />
+                    </div>
+                </Show>
+                <Show when={isSelectingDevice(signals)}>
+                    <div class="login-box">
+                        <div class="pairing-title">{label("select-device")}</div>
+                        <For each={signals.devices()}>{(device) => {
+                            return <button class="action-button crt-box flex-grow" onClick={() => sendSelectMyDevice(device.uuid)}>{formatDevice(device)}</button>;
+                        }}</For>
+                    </div>
+                </Show>
+                <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>
+                    <div class="login-box begin-login">
+                        <div class="pairing-title">{label("title")}</div>
+                        <button class="action-button crt-box flex-grow" onClick={onClickLogin}>{plainText("login-button-text")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
+                    </div>
+                </Show>
+                <Show when={!signals.hasAccessCode() && isLoginStarted(signals)}>
+                    <div class="login-box">
+                        <div class='flex-row'>
+                            <div class="data-label">{label("in-your-browser")}</div>
+                            <div class="data-value">{signals.loginURL}</div>
+                        </div>
+                        <div class='flex-row'>
+                            <div class="data-label">{label("enter-code")}</div>
+                            <div class="data-value">{signals.userCode}</div>
+                        </div>
+                        <div class="data-label">{label("scan-qr")}</div>
+                        <div id="pairing-qrcode-canvas-wrapper"></div>
+                    </div>
+                </Show>
             </div>
         </Show>
     </>;

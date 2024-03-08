@@ -231,7 +231,7 @@ export const WebSetupPage = (props) => {
                             </div>
                         </Show>
                     </div>
-                    <div class="setup-instructions flex-column">
+                    <div class="setup-instructions flex-column exposed">
                         <div class='flex-row'>
                             <div class="data-label">{label("connect-wifi")}</div>
                             <div class="data-value">{signals.hotspotSSIDText}</div>
@@ -279,7 +279,7 @@ export const WebSetupPage = (props) => {
                             </div>
                         </Show>
                     </div>
-                    <div class="flex-column flex-grow">
+                    <div class="flex-column flex-grow exposed">
                         <Loading />
                     </div>
                 </div>

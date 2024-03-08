@@ -168,6 +168,21 @@ class LauncherClient {
         });
     }
 
+    postSelectMyDevice(uuid) {
+        let cfg = {
+            url: this.baseURL + '/api/data/mydevice',
+            method: 'post',
+            data: {
+                "UUID": uuid
+            }
+        };
+        return this.axios(cfg).then(resp => {
+            if (resp.status == 204) {
+                return {};
+            }
+        });
+    }
+
     getDeviceData() {
         let cfg = {
             url: this.baseURL + '/api/data/device',
