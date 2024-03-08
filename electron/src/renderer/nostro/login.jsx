@@ -96,41 +96,44 @@ export function LoginPage(props) {
     function isLoginStarted(signals) {
         return signals.userCode().length > 0;
     }
-    const label = labelMaker("pairing");
-    const plainText = textMaker("pairing");
+    function isLoggedIn(signals) {
+        return signals.hasAccessCode() && signals.hasDeviceUUID();
+    }
+    const label = labelMaker("login");
+    const plainText = textMaker("login");
 
     return <>
-        <Show when={signals.hasAccessCode() && signals.hasDeviceUUID()}>
+        <Show when={isLoggedIn(signals)}>
             {props.element}
         </Show>
-        <Show when={signals.hasAccessCode() && !signals.hasDeviceUUID()}>
-            <div class="flex-column flex-grow">
-                <div>Waiting for subscription activation</div>
-                <Loading />
-            </div>
-        </Show>
-        <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>
-            <div class="flex-column flex-grow">
-                <div class="flex-grow flex-row">
-                    <div class="pairing-title">{label("title")}</div>
-                </div>
-                <div class="flex-grow flex-row">
-                    <button class="action-button crt-box flex-grow" onClick={onClickLogin}>{plainText("link-account")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
-                </div>
-            </div>
-        </Show>
-        <Show when={!signals.hasAccessCode() && isLoginStarted(signals)}>
-            <div class="flex-column flex-grow">
-                <div class='flex-row'>
-                    <div class="data-label">{label("in-your-browser")}</div>
-                    <div class="data-value">{signals.loginURL}</div>
-                </div>
-                <div class='flex-row'>
-                    <div class="data-label">{label("enter-code")}</div>
-                    <div class="data-value">{signals.userCode}</div>
-                </div>
-                <div class="data-label">{label("scan-qr")}</div>
-                <div id="pairing-qrcode-canvas-wrapper"></div>
+        <Show when={!isLoggedIn(signals)}>
+            <div class="login-screen exposed">
+                <Show when={signals.hasAccessCode() && !signals.hasDeviceUUID()}>
+                    <div class="login-box">
+                        <div>Waiting for subscription activation</div>
+                        <Loading />
+                    </div>
+                </Show>
+                <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>
+                    <div class="login-box begin-login">
+                        <div class="pairing-title">{label("title")}</div>
+                        <button class="action-button crt-box flex-grow" onClick={onClickLogin}>{plainText("login-button-text")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
+                    </div>
+                </Show>
+                <Show when={!signals.hasAccessCode() && isLoginStarted(signals)}>
+                    <div class="login-box">
+                        <div class='flex-row'>
+                            <div class="data-label">{label("in-your-browser")}</div>
+                            <div class="data-value">{signals.loginURL}</div>
+                        </div>
+                        <div class='flex-row'>
+                            <div class="data-label">{label("enter-code")}</div>
+                            <div class="data-value">{signals.userCode}</div>
+                        </div>
+                        <div class="data-label">{label("scan-qr")}</div>
+                        <div id="pairing-qrcode-canvas-wrapper"></div>
+                    </div>
+                </Show>
             </div>
         </Show>
     </>;

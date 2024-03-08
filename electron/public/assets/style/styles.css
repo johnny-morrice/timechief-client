@@ -70,6 +70,15 @@ div.home-screen {
     box-sizing: border-box;
 }
 
+div.login-screen {
+    height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
 div.border {
     padding: 1em;
     border-style: solid;
@@ -102,6 +111,18 @@ div.home-lhs-column {
 
 div.home-rhs-column {
     flex-basis: 55%;
+}
+
+div.login-box {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin-bottom: 1em;
+}
+
+div.begin-login {
+    align-items: center;
+    justify-content: center;
 }
 
 div.flex-column {
