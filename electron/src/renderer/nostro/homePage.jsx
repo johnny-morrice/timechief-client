@@ -28,6 +28,7 @@ class Signals {
     [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
     [this.nextEventBuffer, this.setNextEventBuffer] = createSignal(null);
     [this.nextEvent, this.setNextEvent] = createSignal(null);
+    [this.actionCentreTransition, this.setActionCentreTransition] = createSignal("no-transition");
   }
 }
 
@@ -207,7 +208,7 @@ export const HomePage = () => {
   });
 
   const moveEventBufferToEvent = () => {
-    fadeTransition("home-action-center-content", () => {
+    fadeTransition(signals.setActionCentreTransition, () => {
       signals.setNextEvent(signals.nextEventBuffer());
     });
   };
@@ -264,7 +265,7 @@ export const HomePage = () => {
       </div>
 
       <div class="home-action-center flex-grow border crt-box home-box">
-        <div id="home-action-center-content" class="flex-row flex-grow">
+        <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
           <Show when={hasNextEvent(signals)}>
             <div class='next-event-summary flex-column flex-grow'>
               <div class='next-event-time flex-row'>

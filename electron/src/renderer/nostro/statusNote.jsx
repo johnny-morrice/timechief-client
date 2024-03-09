@@ -1,6 +1,6 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, removeDataCallback } from './ipc';
-import { apiErrorTimeout, second } from '../timing'
+import { second } from '../timing'
 import { callbackName } from "./callback";
 import { fadeTransition } from './fadeTransition';
 
@@ -15,6 +15,7 @@ class Signals {
         [this.isDeviceDataError, this.setDeviceDataError] = createSignal(false);
         [this.isIPCTimeoutBuffer, this.setIPCTimeoutBuffer] = createSignal(false);
         [this.isIPCTimeout, this.setIPCTimeout] = createSignal(false);
+        [this.statusNoteTransition, this.setStatusNoteTransition] = createSignal("no-transition");
     }
 }
 
@@ -46,10 +47,6 @@ function isDeviceDataError(signals) {
     return signals.isDeviceDataError() || signals.isIPCTimeout();
 }
 
-function fadeChange(action) {
-    fadeTransition("status-note-content", action);
-}
-
 export const StatusNote = () => {
     const signals = new Signals();
     const cbName = callbackName("StatusNote");
@@ -57,6 +54,9 @@ export const StatusNote = () => {
     const ipcCheckInterval = setInterval(() => {
         signals.setIPCTimeoutBuffer(isTimeout(signals.lastUpdateTime(), 6 * second));
     }, 3 * second);
+    function fadeChange(action) {
+        fadeTransition(signals.setStatusNoteTransition, action);
+    }
     onCleanup(() => {
         removeDataCallback(cbName);
         clearInterval(ipcCheckInterval);
@@ -76,7 +76,7 @@ export const StatusNote = () => {
         }
     });
 
-    return <div id="status-note-content" class="status-note flex-column">
+    return <div id="status-note-content" className={`status-note flex-column ${signals.statusNoteTransition()}`}>
             <Show when={signals.isCalendarError()}>
                 <div class="status-note-calendar-error-indicator">
                     <i class='fa-solid fa-calendar-xmark is-error api-error-indicator'></i>

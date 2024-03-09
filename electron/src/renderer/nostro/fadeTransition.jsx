@@ -1,13 +1,13 @@
 import { onCleanup } from "solid-js";
 
-export const fadeTransition = (contentID, doChange) => {
-    applyClassToElement("fade-out", contentID);
+export const fadeTransition = (onTransition, doChange) => {
+    onTransition("fade-out");
     const timerA = setTimeout(() => {
-        removeClassFromElement("fade-out", contentID);
-        applyClassToElement("fade-in", contentID);
+        onTransition("no-transition");
+        onTransition("fade-in");
         doChange();
         const timerB = setTimeout(() => {
-            removeClassFromElement("fade-in", contentID);
+            onTransition("fade-in");
         }, transitionDurationMs);
         onCleanup(() => {
             clearTimeout(timerB);
@@ -19,17 +19,3 @@ export const fadeTransition = (contentID, doChange) => {
 }
 
 const transitionDurationMs = 190;
-
-function applyClassToElement(cls, id) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.classList.add(cls);
-    }
-}
-
-function removeClassFromElement(cls, id) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.classList.remove(cls);
-    }
-}

@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
@@ -29,6 +29,7 @@ class Signals {
         [this.shutdownGlitch, this.setShutdownGlitch] = createSignal("Shutdown");
         [this.displayStateBuffer, this.setDisplayStateBuffer] = createSignal([true, false, false]);
         [this.displayState, this.setDisplayState] = createSignal([false, false, false]);
+        [this.crtRootTransition, this.setCrtRootTransition] = createSignal("no-transition");
     }
 }
 
@@ -160,7 +161,7 @@ export const WebSetupPage = (props) => {
         const displayStateBuffer = signals.displayStateBuffer();
         const displayState = signals.displayState();
         if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
-            fadeTransition("crt-root", () => signals.setDisplayState(displayStateBuffer));
+            fadeTransition(signals.setCrtRootTransition, () => signals.setDisplayState(displayStateBuffer));
         }
     });
 
@@ -208,7 +209,7 @@ export const WebSetupPage = (props) => {
 
     const label = labelMaker("web-setup");
     const plainText = textMaker("web-setup");
-    return <div id="crt-root" class="crt">
+    return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`}>
         <Show when={isDisplayStateHotspot(signals)}>
             <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>

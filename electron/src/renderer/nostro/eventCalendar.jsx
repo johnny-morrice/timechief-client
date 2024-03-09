@@ -14,6 +14,7 @@ class Signals {
     [this.locale, this.setLocale] = createSignal("en-GB");
     [this.timeZone, this.setTimeZone] = createSignal("Europe/London");
     [this.dayIndex, this.setDayIndex] = createSignal(0);
+    [this.calendarTransition, this.setCalendarTransition] = createSignal("no-transition");
   }
 }
 
@@ -218,7 +219,7 @@ export const EventCalendar = () => {
 
   function onClickPrev() {
     if (hasPrevDay()) {
-      fadeTransition("calendar-screen",
+      fadeTransition(signals.setCalendarTransition,
       () => {
         const dayIndex = signals.dayIndex();
         signals.setDayIndex(dayIndex - 1);
@@ -228,7 +229,7 @@ export const EventCalendar = () => {
 
   function onClickNext() {
     if (hasNextDay()) {
-      fadeTransition("calendar-screen",
+      fadeTransition(signals.setCalendarTransition,
       () => {
         const dayIndex = signals.dayIndex();
         signals.setDayIndex(dayIndex + 1);
@@ -260,7 +261,7 @@ export const EventCalendar = () => {
 
   const label = labelMaker("event-calendar");
   const plainText = textMaker("event-calendar");
-  return <div id="calendar-screen">
+  return <div id="calendar-screen" className={signals.calendarTransition()}>
     <Show when={!signals.loaded()}>
       <Loading />
     </Show>
