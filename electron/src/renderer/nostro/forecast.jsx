@@ -17,6 +17,7 @@ class Signals {
         }
         [this.dayCount, this.setDayCount] = createSignal(0);
         [this.dayIndex, this.setDayIndex] = createSignal(0);
+        [this.forecastTransition, this.setForecastTransition] = createSignal("no-transition");
     }
 }
 

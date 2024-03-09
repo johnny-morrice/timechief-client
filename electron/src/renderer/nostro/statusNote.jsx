@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, removeDataCallback } from './ipc';
 import { second } from '../timing'
 import { callbackName } from "./callback";
@@ -35,6 +35,18 @@ function updateSignals(signals, data) {
     signals.setCalendarErrorBuffer(hasStateFlag(data, "calendar-error"))
     signals.setDeviceDataErrorBuffer(hasStateFlag(data, "device-data-error"));
     signals.setUpdatingBuffer(hasStateFlag(data, "updating"));
+
+    if (signals.isCalendarErrorBuffer() !== signals.isCalendarError() || 
+            signals.isDeviceDataErrorBuffer() !== signals.isDeviceDataError() ||
+            signals.isUpdatingBuffer() !== signals.isUpdating() ||
+            signals.isIPCTimeoutBuffer() !== signals.isIPCTimeout()) {
+            fadeTransition(signals.setStatusNoteTransition, () => {
+                signals.setCalendarError(signals.isCalendarErrorBuffer());
+                signals.setDeviceDataError(signals.isDeviceDataErrorBuffer());
+                signals.setUpdating(signals.isUpdatingBuffer());
+                signals.setIPCTimeout(signals.isIPCTimeoutBuffer());
+            });
+        }
 }
 
 function isTimeout(lastTime, timeout) {
@@ -54,26 +66,9 @@ export const StatusNote = () => {
     const ipcCheckInterval = setInterval(() => {
         signals.setIPCTimeoutBuffer(isTimeout(signals.lastUpdateTime(), 6 * second));
     }, 3 * second);
-    function fadeChange(action) {
-        fadeTransition(signals.setStatusNoteTransition, action);
-    }
     onCleanup(() => {
         removeDataCallback(cbName);
         clearInterval(ipcCheckInterval);
-    });
-    // TODO this createEffect will be breaking the clock.
-    createEffect(() => {
-        if (signals.isCalendarErrorBuffer() !== signals.isCalendarError() || 
-            signals.isDeviceDataErrorBuffer() !== signals.isDeviceDataError() ||
-            signals.isUpdatingBuffer() !== signals.isUpdating() ||
-            signals.isIPCTimeoutBuffer() !== signals.isIPCTimeout()) {
-            fadeChange(() => {
-                signals.setCalendarError(signals.isCalendarErrorBuffer());
-                signals.setDeviceDataError(signals.isDeviceDataErrorBuffer());
-                signals.setUpdating(signals.isUpdatingBuffer());
-                signals.setIPCTimeout(signals.isIPCTimeoutBuffer());
-            });
-        }
     });
 
     return <div id="status-note-content" className={`status-note flex-column ${signals.statusNoteTransition()}`}>

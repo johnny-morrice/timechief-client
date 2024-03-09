@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
@@ -35,6 +35,18 @@ class Signals {
 
 function isUpdating(signals) {
     return signals.isUpdating();
+}
+
+function updateDisplayBuffer(signals) {
+    signals.setDisplayStateBuffer([isLoading(signals), isHotspotReady(signals), isInternetConnectedState(signals)]);
+}
+
+function applyDisplayBuffer(signals) {
+    const displayStateBuffer = signals.displayStateBuffer();
+    const displayState = signals.displayState();
+    if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
+        fadeTransition(signals.setCrtRootTransition, () => signals.setDisplayState(displayStateBuffer));
+    }
 }
 
 function updateSignals(signals, data) {
@@ -84,6 +96,8 @@ function updateSignals(signals, data) {
     }
     runButtonGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 150);
     runButtonGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
+    updateDisplayBuffer(signals);
+    applyDisplayBuffer(signals);
 }
 
 function generateHotspotQRCode(hotspotSSID, hotspotKey) {
@@ -152,17 +166,6 @@ export const WebSetupPage = (props) => {
     addDataCallback(cbName, (data) => updateSignals(signals, data));
     onCleanup(() => {
         removeDataCallback(cbName);
-    });
-
-    createEffect(() => {
-        signals.setDisplayStateBuffer([isLoading(signals), isHotspotReady(signals), isInternetConnectedState(signals)]);
-    });
-    createEffect(() => {
-        const displayStateBuffer = signals.displayStateBuffer();
-        const displayState = signals.displayState();
-        if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
-            fadeTransition(signals.setCrtRootTransition, () => signals.setDisplayState(displayStateBuffer));
-        }
     });
 
     const applyCRTJank = () => {

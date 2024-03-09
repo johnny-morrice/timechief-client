@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback } from './ipc';
 import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
@@ -59,6 +59,39 @@ function getDateText(locale) {
   let dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
   var dateText = new Date().toLocaleDateString(locale, dateOptions);
   return dateText.replace(',', '');
+}
+
+function moveEventBufferToEvent(signals) {
+  fadeTransition(signals.setActionCentreTransition, () => {
+    signals.setNextEvent(signals.nextEventBuffer());
+  });
+};
+
+function handleEventChange(signals) {
+  const nextEventBuf = signals.nextEventBuffer();
+  const nextEvent = signals.nextEvent();
+  // A change has occured if:
+  // One is null and the other is not null.
+  // One has a different time to the other.
+  // One has a different text to the other.
+  if ((nextEventBuf == null && nextEvent != null) ||
+    (nextEventBuf != null && nextEvent == null)) {
+    moveEventBufferToEvent();
+  }
+
+  // If either are null we stop here.
+  if (nextEventBuf == null || nextEvent == null) {
+    return;
+  }
+
+  const bufEventStartTime = nextEventBuf.formatStartTime(getLocale(signals), getTimeZone(signals));
+  const bufEventShortText = nextEventBuf.eventShortText();
+  const nextEventStartTime = nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
+  const nextEventShortText = nextEvent.eventShortText();
+  if (bufEventStartTime != nextEventStartTime ||
+    bufEventShortText != nextEventShortText) {
+    moveEventBufferToEvent();
+  }
 }
 
 function updateSignals(signals, data) {
@@ -206,41 +239,6 @@ export const HomePage = () => {
     clearInterval(dateInterval);
     removeDataCallback(cbName);
   });
-
-  const moveEventBufferToEvent = () => {
-    fadeTransition(signals.setActionCentreTransition, () => {
-      signals.setNextEvent(signals.nextEventBuffer());
-    });
-  };
-
-  createEffect(() => {
-    const nextEventBuf = signals.nextEventBuffer();
-    const nextEvent = signals.nextEvent();
-    // A change has occured if:
-    // One is null and the other is not null.
-    // One has a different time to the other.
-    // One has a different text to the other.
-    if ((nextEventBuf == null && nextEvent != null) ||
-      (nextEventBuf != null && nextEvent == null)) {
-      moveEventBufferToEvent();
-    }
-
-    // If either are null we stop here.
-    if (nextEventBuf == null || nextEvent == null) {
-      return;
-    }
-
-    const bufEventStartTime = nextEventBuf.formatStartTime(getLocale(signals), getTimeZone(signals));
-    const bufEventShortText = nextEventBuf.eventShortText();
-    const nextEventStartTime = nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
-    const nextEventShortText = nextEvent.eventShortText();
-    if (bufEventStartTime != nextEventStartTime ||
-      bufEventShortText != nextEventShortText) {
-      moveEventBufferToEvent();
-    }
-
-  });
-
 
   return <div class="home-screen flex-row">
     <div class="home-lhs-column flex-column flex-grow border crt-box home-box">
