@@ -30,11 +30,11 @@ function getNextWidget(widgets, currentIndex) {
 }
 
 function onClickNext(onTransition, widgets, currentIndex, setCurrentIndex) {
-    return changeSwitcherContent(nextIndex, widgets, currentIndex, setCurrentIndex);
+    return changeSwitcherContent(onTransition, nextIndex, widgets, currentIndex, setCurrentIndex);
 }
 
 function onClickPrev(onTransition, widgets, currentIndex, setCurrentIndex) {
-    return changeSwitcherContent(prevIndex, widgets, currentIndex, setCurrentIndex);
+    return changeSwitcherContent(onTransition, prevIndex, widgets, currentIndex, setCurrentIndex);
 }
 
 function changeSwitcherContent(onTransition, indexFunc, widgets, currentIndex, setCurrentIndex) {
@@ -50,7 +50,7 @@ export const SwitcherWidget = (props) => {
 
     return <div class="switcher-widget flex-column flex-grow">
         <Show when={hasWidget(widgets)}>
-            <div id="switcher-widget-content" className={switcherWidgetTransition}>
+            <div id="switcher-widget-content" className={switcherWidgetTransition()}>
                 {getCurrentWidget(widgets, currentIndex).element()}
             </div>
             <div class="switcher-widget-button-wrapper flex-row flex-grow">

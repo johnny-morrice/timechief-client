@@ -7,7 +7,7 @@ export const fadeTransition = (onTransition, doChange) => {
         onTransition("fade-in");
         doChange();
         const timerB = setTimeout(() => {
-            onTransition("fade-in");
+            onTransition("no-transition");
         }, transitionDurationMs);
         onCleanup(() => {
             clearTimeout(timerB);

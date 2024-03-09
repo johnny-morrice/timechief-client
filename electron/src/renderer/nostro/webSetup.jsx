@@ -1,4 +1,4 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
