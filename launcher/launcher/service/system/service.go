@@ -45,8 +45,7 @@ func (svc Service) FirewallSSHSetState(enabled bool) error {
 
 func (svc Service) FirewallAPISetState(enabled bool) error {
 	// TODO: Implement SetAPIFirewallState
-	log.Printf("TODO SetAPIFirewallState: %v", enabled)
-	return nil
+	return svc.KeyValueStore.Set(store.APIAccessEnabled, fmt.Sprintf("%v", enabled))
 }
 
 func (svc Service) Reboot() error {

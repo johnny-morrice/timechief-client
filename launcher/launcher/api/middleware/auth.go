@@ -1,13 +1,13 @@
 package middleware
 
 import (
+	"context"
 	"crypto/subtle"
 	"errors"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
-	"gorm.io/gorm"
 )
 
 type KeyValueStore interface {
@@ -34,34 +34,68 @@ func NewAuthMiddleware(kvStore KeyValueStore, next http.Handler) (http.Handler, 
 	return mid, nil
 }
 
-func (mid authMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	apiAuthKvKeys := []string{
-		store.APIAppAuthKey,
-		store.APIUserAuthKey,
-	}
-	validAPIKeys := []string{}
-	for _, key := range apiAuthKvKeys {
-		value, err := mid.kvStore.Get(key)
-		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Printf("error getting API key %s: %s", key, err)
-			continue
-		}
-		validAPIKeys = append(validAPIKeys, value)
-	}
+const AppAuthMode = "app"
+const APIAuthMode = "api"
+const WebSetupAuthMode = "web_setup"
+const NoAuthMode = "none"
 
-	authHeaderValue := r.Header.Get("Authorization")
-	if authHeaderValue == "" || len(authHeaderValue) < 7 || authHeaderValue[:7] != "Bearer " {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
+func (mid authMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	authMethods := []authMethod{
+		storedKeyAuthMethod(store.APIAppAuthKey, AppAuthMode, mid.kvStore),
+		storedKeyAuthMethod(store.APIUserAuthKey, APIAuthMode, mid.kvStore),
+		storedKeyAuthMethod(store.HotspotKey, WebSetupAuthMode, mid.kvStore),
 	}
-	// Strip "Bearer " prefix
-	token := authHeaderValue[7:]
-	for _, validKey := range validAPIKeys {
-		match := subtle.ConstantTimeCompare([]byte(token), []byte(validKey))
-		if match == 1 {
-			mid.next.ServeHTTP(w, r)
+	for _, am := range authMethods {
+		authRequest, err := am.validate(r)
+		if err == nil {
+			mid.next.ServeHTTP(w, authRequest)
 			return
 		}
 	}
 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }
+
+func storedKeyAuthMethod(key, authName string, kv KeyValueStore) authMethod {
+	return authMethod{
+		validator: func(r *http.Request) error {
+			storedToken, err := kv.Get(key)
+			if err != nil {
+				return err
+			}
+			if len(storedToken) == 0 {
+				return fmt.Errorf("no stored key for auth method: %s", authName)
+			}
+
+			authHeaderValue := r.Header.Get("Authorization")
+			if authHeaderValue == "" || len(authHeaderValue) < 7 || authHeaderValue[:7] != "Bearer " {
+				return errors.New("no Authorization header or invalid format")
+			}
+			// Strip "Bearer " prefix
+			token := authHeaderValue[7:]
+			match := subtle.ConstantTimeCompare([]byte(token), []byte(storedToken))
+			if match == 1 {
+				return nil
+			}
+			return errors.New("invalid token")
+		},
+		authName: authName,
+	}
+}
+
+type authMethod struct {
+	validator func(r *http.Request) error
+	authName  string
+}
+
+func (am authMethod) validate(r *http.Request) (*http.Request, error) {
+	err := am.validator(r)
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.WithValue(r.Context(), AuthMethodContextKey, am.authName)
+	return r.WithContext(ctx), nil
+}
+
+const AuthMethodContextKey = MiddlewareKey("auth_method")
+
+type MiddlewareKey string
