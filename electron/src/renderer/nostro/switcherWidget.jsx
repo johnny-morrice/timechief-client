@@ -29,38 +29,39 @@ function getNextWidget(widgets, currentIndex) {
     return widgets[index];
 }
 
-function onClickNext(widgets, currentIndex, setCurrentIndex) {
-    return changeSwitcherContent(nextIndex, widgets, currentIndex, setCurrentIndex);
+function onClickNext(onTransition, widgets, currentIndex, setCurrentIndex) {
+    return changeSwitcherContent(onTransition, nextIndex, widgets, currentIndex, setCurrentIndex);
 }
 
-function onClickPrev(widgets, currentIndex, setCurrentIndex) {
-    return changeSwitcherContent(prevIndex, widgets, currentIndex, setCurrentIndex);
+function onClickPrev(onTransition, widgets, currentIndex, setCurrentIndex) {
+    return changeSwitcherContent(onTransition, prevIndex, widgets, currentIndex, setCurrentIndex);
 }
 
-function changeSwitcherContent(func, widgets, currentIndex, setCurrentIndex) {
+function changeSwitcherContent(onTransition, indexFunc, widgets, currentIndex, setCurrentIndex) {
     return () => {
-        fadeTransition("switcher-widget-content", () => setCurrentIndex(func(currentIndex(), widgets)));
+        fadeTransition(onTransition, () => setCurrentIndex(indexFunc(currentIndex(), widgets)));
     }
 }
 
 export const SwitcherWidget = (props) => {
     const widgets = props.widgets;
+    const [switcherWidgetTransition, setSwitcherWidgetTransition] = createSignal("no-transition");
     const [currentIndex, setCurrentIndex] = createSignal(0);
 
     return <div class="switcher-widget flex-column flex-grow">
         <Show when={hasWidget(widgets)}>
-            <div id="switcher-widget-content">
+            <div id="switcher-widget-content" className={switcherWidgetTransition()}>
                 {getCurrentWidget(widgets, currentIndex).element()}
             </div>
             <div class="switcher-widget-button-wrapper flex-row flex-grow">
                 <div class="switcher-widget-button switcher-widget-prev-button">
-                    <button class="action-button crt-box" onClick={onClickPrev(widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-left"></i> &nbsp;&nbsp; {getPrevWidget(widgets, currentIndex).icon()}</button>
+                    <button class="action-button crt-box" onClick={onClickPrev(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-left"></i> &nbsp;&nbsp; {getPrevWidget(widgets, currentIndex).icon()}</button>
                 </div>
                 <div class="switcher-widget-button switcher-widget-current-icon">
                     {getCurrentWidget(widgets, currentIndex).icon()}
                 </div>
                 <div class="switcher-widget-button switcher-widget-next-button">
-                    <button class="action-button crt-box" onClick={onClickNext(widgets, currentIndex, setCurrentIndex)}>{getNextWidget(widgets, currentIndex).icon()} &nbsp;&nbsp; <i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="action-button crt-box" onClick={onClickNext(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>{getNextWidget(widgets, currentIndex).icon()} &nbsp;&nbsp; <i class="fa-solid fa-chevron-right"></i></button>
                 </div>
             </div>
         </Show>

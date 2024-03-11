@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { buttonGlitchStyle, runButtonGlitch } from './textGlitch';
@@ -29,11 +29,24 @@ class Signals {
         [this.shutdownGlitch, this.setShutdownGlitch] = createSignal("Shutdown");
         [this.displayStateBuffer, this.setDisplayStateBuffer] = createSignal([true, false, false]);
         [this.displayState, this.setDisplayState] = createSignal([false, false, false]);
+        [this.crtRootTransition, this.setCrtRootTransition] = createSignal("no-transition");
     }
 }
 
 function isUpdating(signals) {
     return signals.isUpdating();
+}
+
+function updateDisplayBuffer(signals) {
+    signals.setDisplayStateBuffer([isLoading(signals), isHotspotReady(signals), isInternetConnectedState(signals)]);
+}
+
+function applyDisplayBuffer(signals) {
+    const displayStateBuffer = signals.displayStateBuffer();
+    const displayState = signals.displayState();
+    if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
+        fadeTransition(signals.setCrtRootTransition, () => signals.setDisplayState(displayStateBuffer));
+    }
 }
 
 function updateSignals(signals, data) {
@@ -83,6 +96,8 @@ function updateSignals(signals, data) {
     }
     runButtonGlitch(() => isUpdating(signals), signals.setRebootGlitch, "Reboot", 150);
     runButtonGlitch(() => isUpdating(signals), signals.setShutdownGlitch, "Shutdown", 150);
+    updateDisplayBuffer(signals);
+    applyDisplayBuffer(signals);
 }
 
 function generateHotspotQRCode(hotspotSSID, hotspotKey) {
@@ -153,17 +168,6 @@ export const WebSetupPage = (props) => {
         removeDataCallback(cbName);
     });
 
-    createEffect(() => {
-        signals.setDisplayStateBuffer([isLoading(signals), isHotspotReady(signals), isInternetConnectedState(signals)]);
-    });
-    createEffect(() => {
-        const displayStateBuffer = signals.displayStateBuffer();
-        const displayState = signals.displayState();
-        if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
-            fadeTransition("crt-root", () => signals.setDisplayState(displayStateBuffer));
-        }
-    });
-
     const applyCRTJank = () => {
         // Get the crt-root element
         const crtRoot = document.getElementById("crt-root");
@@ -208,7 +212,7 @@ export const WebSetupPage = (props) => {
 
     const label = labelMaker("web-setup");
     const plainText = textMaker("web-setup");
-    return <div id="crt-root" class="crt">
+    return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`}>
         <Show when={isDisplayStateHotspot(signals)}>
             <div class="setup-wrapper flex-column flex-grow">
                 <div class="setup-title">Welcome to Timechief</div>

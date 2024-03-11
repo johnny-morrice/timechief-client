@@ -17,6 +17,7 @@ class Signals {
         }
         [this.dayCount, this.setDayCount] = createSignal(0);
         [this.dayIndex, this.setDayIndex] = createSignal(0);
+        [this.forecastTransition, this.setForecastTransition] = createSignal("no-transition");
     }
 }
 
@@ -34,6 +35,7 @@ class DaySignals {
         [this.eveFeelsLike, this.setEveFeelsLike] = textTransitionSignal("");
         [this.nightFeelsLike, this.setNightFeelsLike] = textTransitionSignal("");
         [this.weatherConditions, this.setWeatherConditions] = createSignal("");
+        [this.forecastTransition, this.setForecastTransition] = createSignal("no-transition");
     }
 }
 
@@ -146,7 +148,7 @@ export const Forecast = () => {
 
     function onClickPrev() {
         if (hasPrevDay()) {
-            fadeTransition("forecast-widget", () => {
+            fadeTransition(signals.setForecastTransition, () => {
                 const dayIndex = signals.dayIndex();
                 signals.setDayIndex(dayIndex - 1);
             });
@@ -155,7 +157,7 @@ export const Forecast = () => {
 
     function onClickNext() {
         if (hasNextDay()) {
-            fadeTransition("forecast-widget", () => {
+            fadeTransition(signals.setForecastTransition, () => {
                 const dayIndex = signals.dayIndex();
                 signals.setDayIndex(dayIndex + 1);
             });
@@ -184,7 +186,7 @@ export const Forecast = () => {
 
     const label = labelMaker("forecast");
 
-    return <div id="forecast-widget" class="forecast flex-column">
+    return <div id="forecast-widget" className={`forecast flex-column ${signals.forecastTransition()}`}>
         <Show when={!hasDay() || !hasDayLoaded()}>
             <Loading />
         </Show>

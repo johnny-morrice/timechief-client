@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback } from './ipc';
 import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
@@ -28,6 +28,7 @@ class Signals {
     [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
     [this.nextEventBuffer, this.setNextEventBuffer] = createSignal(null);
     [this.nextEvent, this.setNextEvent] = createSignal(null);
+    [this.actionCentreTransition, this.setActionCentreTransition] = createSignal("no-transition");
   }
 }
 
@@ -58,6 +59,39 @@ function getDateText(locale) {
   let dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
   var dateText = new Date().toLocaleDateString(locale, dateOptions);
   return dateText.replace(',', '');
+}
+
+function moveEventBufferToEvent(signals) {
+  fadeTransition(signals.setActionCentreTransition, () => {
+    signals.setNextEvent(signals.nextEventBuffer());
+  });
+};
+
+function handleEventChange(signals) {
+  const nextEventBuf = signals.nextEventBuffer();
+  const nextEvent = signals.nextEvent();
+  // A change has occured if:
+  // One is null and the other is not null.
+  // One has a different time to the other.
+  // One has a different text to the other.
+  if ((nextEventBuf == null && nextEvent != null) ||
+    (nextEventBuf != null && nextEvent == null)) {
+    moveEventBufferToEvent();
+  }
+
+  // If either are null we stop here.
+  if (nextEventBuf == null || nextEvent == null) {
+    return;
+  }
+
+  const bufEventStartTime = nextEventBuf.formatStartTime(getLocale(signals), getTimeZone(signals));
+  const bufEventShortText = nextEventBuf.eventShortText();
+  const nextEventStartTime = nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
+  const nextEventShortText = nextEvent.eventShortText();
+  if (bufEventStartTime != nextEventStartTime ||
+    bufEventShortText != nextEventShortText) {
+    moveEventBufferToEvent();
+  }
 }
 
 function updateSignals(signals, data) {
@@ -206,41 +240,6 @@ export const HomePage = () => {
     removeDataCallback(cbName);
   });
 
-  const moveEventBufferToEvent = () => {
-    fadeTransition("home-action-center-content", () => {
-      signals.setNextEvent(signals.nextEventBuffer());
-    });
-  };
-
-  createEffect(() => {
-    const nextEventBuf = signals.nextEventBuffer();
-    const nextEvent = signals.nextEvent();
-    // A change has occured if:
-    // One is null and the other is not null.
-    // One has a different time to the other.
-    // One has a different text to the other.
-    if ((nextEventBuf == null && nextEvent != null) ||
-      (nextEventBuf != null && nextEvent == null)) {
-      moveEventBufferToEvent();
-    }
-
-    // If either are null we stop here.
-    if (nextEventBuf == null || nextEvent == null) {
-      return;
-    }
-
-    const bufEventStartTime = nextEventBuf.formatStartTime(getLocale(signals), getTimeZone(signals));
-    const bufEventShortText = nextEventBuf.eventShortText();
-    const nextEventStartTime = nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
-    const nextEventShortText = nextEvent.eventShortText();
-    if (bufEventStartTime != nextEventStartTime ||
-      bufEventShortText != nextEventShortText) {
-      moveEventBufferToEvent();
-    }
-
-  });
-
-
   return <div class="home-screen flex-row">
     <div class="home-lhs-column flex-column flex-grow border crt-box home-box">
       <SwitcherWidget widgets={
@@ -264,7 +263,7 @@ export const HomePage = () => {
       </div>
 
       <div class="home-action-center flex-grow border crt-box home-box">
-        <div id="home-action-center-content" class="flex-row flex-grow">
+        <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
           <Show when={hasNextEvent(signals)}>
             <div class='next-event-summary flex-column flex-grow'>
               <div class='next-event-time flex-row'>
