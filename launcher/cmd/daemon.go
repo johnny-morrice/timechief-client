@@ -9,6 +9,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
 	mediaapi "github.com/johnny-morrice/timechief-client/launcher/launcher/api/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/websetup"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
@@ -27,6 +28,7 @@ import (
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
+	websetupservice "github.com/johnny-morrice/timechief-client/launcher/launcher/service/websetup"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
@@ -296,7 +298,7 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	apiModeHandler, err := middleware.MakeAPIEnabledModeMiddleware(keyValueStore, apiMux)
+	apiModeHandler, err := middleware.MakeAuthModeMiddleware(keyValueStore, apiMux, middleware.APIAuthMode)
 	if err != nil {
 		return err
 	}
@@ -309,19 +311,30 @@ func Daemon(ctx *cli.Context) error {
 	fileServer := fileserver.NewStaticFileHandler()
 	fileServer.AddRoutes(webMux)
 
-	webModeHandler, err := middleware.MakeWebSetupModeMiddleware(keyValueStore, webMux)
+	webSetupMux := http.NewServeMux()
+	webSetupService, err := websetupservice.MakeService(wifiNetworkStore)
 	if err != nil {
 		return err
 	}
-
-	webHandler, err := middleware.NewAuthMiddleware(keyValueStore, webModeHandler)
+	webSetupAPI, err := websetup.MakeWebSetupAPI(webSetupService)
+	if err != nil {
+		return err
+	}
+	webSetupAPI.AddRoutes(webSetupMux)
+	webSetupMode, err := middleware.MakeAuthModeMiddleware(keyValueStore, webSetupMux, middleware.WebSetupAuthMode)
+	if err != nil {
+		return err
+	}
+	webSetupHandler, err := middleware.NewAuthMiddleware(keyValueStore, webSetupMode)
 	if err != nil {
 		return err
 	}
 
 	rootMux.Handle("/api/", apiHandler)
+	rootMux.Handle("/web-setup/", webSetupHandler)
 	rootMux.Handle("/media/", mediaMux)
-	rootMux.Handle("/", webHandler)
+	rootMux.Handle("/web-setup/", webSetupHandler)
+	rootMux.Handle("/", webMux)
 
 	onInitialiseComplete(soundService)
 	return http.ListenAndServe(addr, rootMux)

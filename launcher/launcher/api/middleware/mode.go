@@ -11,21 +11,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func MakeWebSetupModeMiddleware(kvStore KeyValueStore, next http.Handler) (http.Handler, error) {
-	return makeModeMiddleware(WebSetupAuthMode, kvStore, next)
-}
-
-func MakeAPIEnabledModeMiddleware(kvStore KeyValueStore, next http.Handler) (http.Handler, error) {
-	return makeModeMiddleware(APIAuthMode, kvStore, next)
-}
-
 type modeMiddleware struct {
-	expectedMode string
-	kvStore      KeyValueStore
-	next         http.Handler
+	expectedModes []string
+	kvStore       KeyValueStore
+	next          http.Handler
 }
 
-func makeModeMiddleware(expectedMode string, kvStore KeyValueStore, next http.Handler) (http.Handler, error) {
+func MakeAuthModeMiddleware(kvStore KeyValueStore, next http.Handler, expectedModes ...string) (http.Handler, error) {
+	if len(expectedModes) == 0 {
+		return nil, errors.New("expectedModes cannot be empty")
+	}
 	if kvStore == nil {
 		return nil, errors.New("kvStore cannot be nil")
 	}
@@ -33,9 +28,9 @@ func makeModeMiddleware(expectedMode string, kvStore KeyValueStore, next http.Ha
 		return nil, errors.New("next cannot be nil")
 	}
 	mid := modeMiddleware{
-		expectedMode: expectedMode,
-		kvStore:      kvStore,
-		next:         next,
+		expectedModes: expectedModes,
+		kvStore:       kvStore,
+		next:          next,
 	}
 	return mid, nil
 }
@@ -53,7 +48,21 @@ func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("error getting device mode: %v", err)
 		return
 	}
-	if authMode != deviceMode && authMode != AppAuthMode {
+	modeMatch := false
+	for _, expectedMode := range mid.expectedModes {
+		if expectedMode == authMode {
+			modeMatch = true
+			break
+		}
+	}
+	// AuthMode Check is OK when
+	// The caller is the UI OR
+	// The user's auth mode matches the current device mode
+	// I.e. the user is using a web setup auth mode and the device is in web setup mode
+	// And when the API is using this middleware configured using the expected mode.
+	modeMatch = modeMatch && authMode == deviceMode
+	modeMatch = modeMatch || authMode == AppAuthMode
+	if !modeMatch {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		log.Printf("auth mode %s does not match device mode %s", authMode, deviceMode)
 		return
