@@ -250,7 +250,7 @@ func Daemon(ctx *cli.Context) error {
 
 	addr := ctx.String("listen-addr")
 	rootMux := http.NewServeMux()
-	secureMux := http.NewServeMux()
+	apiMux := http.NewServeMux()
 	mediaMux := http.NewServeMux()
 
 	dataService := data.MakeService(videoService,
@@ -284,7 +284,7 @@ func Daemon(ctx *cli.Context) error {
 		},
 	}
 	for _, pkg := range securePackages {
-		pkg.AddRoutes(secureMux)
+		pkg.AddRoutes(apiMux)
 	}
 	mediaPackages := []apiPackage{
 		videoApi,
@@ -296,22 +296,25 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	apiHandler, err := middleware.NewAuthMiddleware(keyValueStore, secureMux)
+	apiModeHandler, err := middleware.MakeAPIEnabledModeMiddleware(keyValueStore, apiMux)
 	if err != nil {
 		return err
 	}
-	apiHandler, err = middleware.MakeAPIEnabledModeMiddleware(keyValueStore, apiHandler)
+	apiHandler, err := middleware.NewAuthMiddleware(keyValueStore, apiModeHandler)
 	if err != nil {
 		return err
 	}
+
 	webMux := http.NewServeMux()
 	fileServer := fileserver.NewStaticFileHandler()
 	fileServer.AddRoutes(webMux)
-	webHandler, err := middleware.NewAuthMiddleware(keyValueStore, webMux)
+
+	webModeHandler, err := middleware.MakeWebSetupModeMiddleware(keyValueStore, webMux)
 	if err != nil {
 		return err
 	}
-	webHandler, err = middleware.MakeWebSetupModeMiddleware(keyValueStore, webHandler)
+
+	webHandler, err := middleware.NewAuthMiddleware(keyValueStore, webModeHandler)
 	if err != nil {
 		return err
 	}

@@ -41,7 +41,12 @@ func makeModeMiddleware(expectedMode string, kvStore KeyValueStore, next http.Ha
 }
 
 func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	authMode := r.Context().Value(AuthMethodContextKey).(string)
+	authMode, ok := r.Context().Value(AuthMethodContextKey).(string)
+	if !ok {
+		log.Println("no auth method in context")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 	deviceMode, err := mid.getDeviceMode()
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)

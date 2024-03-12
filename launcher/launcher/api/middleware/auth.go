@@ -5,6 +5,7 @@ import (
 	"crypto/subtle"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
@@ -48,10 +49,12 @@ func (mid authMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, am := range authMethods {
 		authRequest, err := am.validate(r)
 		if err == nil {
+			log.Printf("authorized request: %s", am.authName)
 			mid.next.ServeHTTP(w, authRequest)
 			return
 		}
 	}
+	log.Println("unauthorized request")
 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }
 
