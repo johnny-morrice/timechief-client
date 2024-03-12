@@ -87,10 +87,16 @@ export class CalendarEvent {
     }
 
     eventShortText() {
-        if (this.data.short_text.length > 30) {
-            return this.data.short_text.slice(0, 30) + "...";
+        // Truncate to 20 unicode characters.
+        // TODO use configured locale.
+        const segmenter = new Intl.Segmenter("en", {granularity: 'grapheme'});
+        const segItr = segmenter.segment(this.data.short_text);
+        const segArr = Array.from(segItr, ({segment}) => segment);
+        const maxLen = 12;
+        if (segArr.length <= maxLen) {
+            return this.data.short_text;
         }
-        return this.data.short_text;
+        return segArr.slice(0, maxLen).join('') + "...";
     }
 
     startTime() {
