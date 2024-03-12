@@ -296,16 +296,29 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	authedHandler, err := middleware.NewAuthMiddleware(keyValueStore, secureMux)
+	apiHandler, err := middleware.NewAuthMiddleware(keyValueStore, secureMux)
 	if err != nil {
 		return err
 	}
-	fileServer := fileserver.NewStaticFileHandler()
+	apiHandler, err = middleware.MakeAPIEnabledModeMiddleware(keyValueStore, apiHandler)
+	if err != nil {
+		return err
+	}
 	webMux := http.NewServeMux()
+	fileServer := fileserver.NewStaticFileHandler()
 	fileServer.AddRoutes(webMux)
-	rootMux.Handle("/api/", authedHandler)
+	webHandler, err := middleware.NewAuthMiddleware(keyValueStore, webMux)
+	if err != nil {
+		return err
+	}
+	webHandler, err = middleware.MakeWebSetupModeMiddleware(keyValueStore, webHandler)
+	if err != nil {
+		return err
+	}
+
+	rootMux.Handle("/api/", apiHandler)
 	rootMux.Handle("/media/", mediaMux)
-	rootMux.Handle("/", webMux)
+	rootMux.Handle("/", webHandler)
 
 	onInitialiseComplete(soundService)
 	return http.ListenAndServe(addr, rootMux)

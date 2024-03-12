@@ -130,7 +130,15 @@ type PairingStatus struct {
 }
 
 func (svc Service) Logout() error {
-	return svc.keyValueStore.Delete(store.AccessTokenKey)
+	err := svc.keyValueStore.Delete(store.AccessTokenKey)
+	if err != nil {
+		return fmt.Errorf("failed to delete access token: %w", err)
+	}
+	err = svc.keyValueStore.Delete(store.DeviceUUIDKey)
+	if err != nil {
+		return fmt.Errorf("failed to delete device UUID: %w", err)
+	}
+	return nil
 }
 
 func (svc Service) SetLicenseActivationCode(code string) error {
