@@ -76,7 +76,7 @@ function handleEventChange(signals) {
   // One has a different text to the other.
   if ((nextEventBuf == null && nextEvent != null) ||
     (nextEventBuf != null && nextEvent == null)) {
-    moveEventBufferToEvent();
+    moveEventBufferToEvent(signals);
   }
 
   // If either are null we stop here.
@@ -90,7 +90,7 @@ function handleEventChange(signals) {
   const nextEventShortText = nextEvent.eventShortText();
   if (bufEventStartTime != nextEventStartTime ||
     bufEventShortText != nextEventShortText) {
-    moveEventBufferToEvent();
+    moveEventBufferToEvent(signals);
   }
 }
 
@@ -110,6 +110,7 @@ function updateSignals(signals, data) {
     const nextEvent = findNextEvent(calendar.Calendar.Events);
     signals.setNextEventBuffer(nextEvent, timezone);
   }
+  handleEventChange(signals);
 }
 
 // setFakeEvent is a useful test utility
@@ -124,7 +125,7 @@ function setFakeEvent(signals) {
         // Start time is now + 3 hours in unix time.
         const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60) + (Math.random() * 1000 * 60 * 60);
         const event = new CalendarEvent({
-          "short_text": "Fake event",
+          "short_text": "Fake event 🤡🤡🤡🤡🤡🤡🤡🤡",
           "start": startTime,
           "end": 0,
           "all_day": true,
@@ -135,7 +136,7 @@ function setFakeEvent(signals) {
         const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60);
         const shortRandomText = Math.random().toString(36).substring(2, 15);
         const event = new CalendarEvent({
-          "short_text": "Fake event" + shortRandomText,
+          "short_text": "Fake event 🤡🤡🤡" + shortRandomText,
           "start": startTime,
           "end": 0,
           "all_day": true,
