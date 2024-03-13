@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/auth"
 	mediaapi "github.com/johnny-morrice/timechief-client/launcher/launcher/api/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/websetup"
@@ -330,10 +331,22 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
+	authMux := http.NewServeMux()
+	authAPI, err := auth.MakeAuthAPI()
+	if err != nil {
+		return err
+	}
+	authAPI.AddRoutes(authMux)
+	authHandler, err := middleware.NewAuthMiddleware(keyValueStore, authMux)
+	if err != nil {
+		return err
+	}
+
 	rootMux.Handle("/api/", apiHandler)
 	rootMux.Handle("/web-setup/", webSetupHandler)
 	rootMux.Handle("/media/", mediaMux)
 	rootMux.Handle("/web-setup/", webSetupHandler)
+	rootMux.Handle("/auth/", authHandler)
 	rootMux.Handle("/", webMux)
 
 	onInitialiseComplete(soundService)

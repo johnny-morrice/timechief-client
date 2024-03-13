@@ -35,10 +35,19 @@ func MakeAuthModeMiddleware(kvStore KeyValueStore, next http.Handler, expectedMo
 	return mid, nil
 }
 
-func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func GetAuthContext(r *http.Request) string {
 	authMode, ok := r.Context().Value(AuthMethodContextKey).(string)
 	if !ok {
-		log.Println("no auth method in context")
+		return NoAuthMode
+
+	}
+	return authMode
+}
+
+func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	authMode := GetAuthContext(r)
+	if authMode == NoAuthMode {
+		log.Println("no auth mode in mode middleware")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
