@@ -5,7 +5,7 @@ import { Navbar, Container } from 'solid-bootstrap';
 export function TCNavbar(props) {
     return <Navbar bg="primary" variant="dark" class="min-vh-2">
         <Container>
-            <Navbar.Brand href="/">Timechief</Navbar.Brand>
+            <Navbar.Brand href="/">Timechief Device</Navbar.Brand>
         </Container>
     </Navbar>
 }

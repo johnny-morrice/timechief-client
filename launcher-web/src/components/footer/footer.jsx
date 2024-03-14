@@ -6,16 +6,7 @@ export function Footer(props) {
         <Container>
             <Row>
                 <Col>
-                    <p>Customer support</p>
-                </Col>
-                <Col>
-                    <p>Privacy policy</p>
-                </Col>
-                <Col>
-                    <p>Terms of use</p>
-                </Col>
-                <Col>
-                    <p>About us</p>
+                    <p>This page is served by a Timechief device running on your local network.</p>
                 </Col>
             </Row>
             <Row>

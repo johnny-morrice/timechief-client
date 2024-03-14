@@ -14,7 +14,3 @@ body {
 .min-vh-2 {
     min-height: 2vh;
 }
-
-div#device-location-googlemaps {
-    height: 800px;
-}

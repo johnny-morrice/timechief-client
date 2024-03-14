@@ -7,7 +7,7 @@
     "build-dev": "vite build --mode dev && cp _redirects.dev dist/_redirects",
     "build-qa": "vite build --mode qa && cp _redirects.qa dist/_redirects",
     "gen-api-bindings": "npx openapi -i ../../api/v2/spec/openapi-3.0/api_spec.yaml -o ./src/api --client fetch --name TimechiefClient",
-    "serve": "vite"
+    "serve": "vite --host"
   },
   "browser": "src/web/index.js",
   "author": "GitHub",
