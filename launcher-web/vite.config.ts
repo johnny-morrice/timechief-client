@@ -37,11 +37,11 @@ export default ({ mode }) => {
     server: {
         proxy: {
             '/web-setup': {
-                target: 'http://localhost:8080',
+                target: 'http://192.168.0.24:8080',
                 changeOrigin: true,
               },
-              '/authn': {
-                target: 'http://localhost:8080',
+              '/auth': {
+                target: 'http://192.168.0.24:8080',
                 changeOrigin: true,
               }
         },

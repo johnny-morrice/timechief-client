@@ -1,7 +1,21 @@
-export async function getListNetworks() {
+export async function getMe(token) {
     const options = {
         method: 'GET',
         headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+        }
+    };
+    const url = `/auth/me`;
+    return await fetch(url, options).then(response => response.json());
+
+}
+
+export async function getListNetworks(token) {
+    const options = {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
         }
     };
@@ -9,10 +23,11 @@ export async function getListNetworks() {
     return await fetch(url, options).then(response => response.json());
 }
 
-export async function postNetworkSelect(ssid, key) {
+export async function postNetworkSelect(ssid, key, token) {
     const options = {
         method: 'POST',
         headers: {
+            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
