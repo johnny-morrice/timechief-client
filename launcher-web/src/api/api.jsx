@@ -7,8 +7,12 @@ export async function getMe(token) {
         }
     };
     const url = `/auth/me`;
-    return await fetch(url, options).then(response => response.json());
-
+    return await fetch(url, options).then(response => {
+        if (response.status !== 200) {
+            throw new Error('Not authorized');
+        }
+        return response.json();
+    });
 }
 
 export async function getListNetworks(token) {
