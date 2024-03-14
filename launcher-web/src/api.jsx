@@ -1,11 +1,11 @@
-export async function getDeviceData() {
+export async function getListNetworks() {
     const options = {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
         }
     };
-    const url = `/api/data/device`;
+    const url = `/web-setup/network`;
     return await fetch(url, options).then(response => response.json());
 }
 
@@ -17,10 +17,10 @@ export async function postNetworkSelect(ssid, key) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            "SSID": ssid,
-            "KEY": key,
+            "ssid": ssid,
+            "key": key,
         }),
     };
-    const url = `/api/system/wifi/network`;
+    const url = `/web-setup/network`;
     return await fetch(url, options);
 }
