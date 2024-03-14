@@ -1,0 +1,20 @@
+body {
+    margin: 0px;
+    padding: 0px;
+}
+
+.min-vh-93 {
+    min-height: 93vh;
+}
+
+.min-vh-5 {
+    min-height: 5vh;
+}
+
+.min-vh-2 {
+    min-height: 2vh;
+}
+
+div#device-location-googlemaps {
+    height: 800px;
+}
