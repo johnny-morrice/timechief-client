@@ -343,7 +343,6 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	rootMux.Handle("/api/", apiHandler)
-	rootMux.Handle("/web-setup/", webSetupHandler)
 	rootMux.Handle("/media/", mediaMux)
 	rootMux.Handle("/web-setup/", webSetupHandler)
 	rootMux.Handle("/auth/", authHandler)
