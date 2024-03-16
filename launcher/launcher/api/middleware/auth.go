@@ -49,7 +49,6 @@ func (mid authMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, am := range authMethods {
 		authRequest, err := am.validate(r)
 		if err == nil {
-			log.Printf("authorized request: %s", am.authName)
 			mid.next.ServeHTTP(w, authRequest)
 			return
 		}
