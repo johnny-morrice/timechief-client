@@ -27,7 +27,7 @@ function WebSetupLoginCard(props) {
                         <Form.Label>Hotspot Key</Form.Label>
                         <Show when={props.isError()}>
                             <Form.Control type="password" placeholder="Password" autocomplete="on" required isInvalid/>
-                            <Form.Control.Feedback type="invalid">Invalid password</Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">{props.errorMessage}</Form.Control.Feedback>
                         </Show>
                         <Show when={!props.isError()}>
                             <Form.Control type="password" placeholder="Password" autocomplete="on" required/>
@@ -45,19 +45,24 @@ function WebSetupLoginCard(props) {
 export function Authenticate(props) {
     const [isLoggedIn, setIsLoggedIn] = createSignal(false);
     const [isError, setError] = createSignal(false);
+    const [errorMessage, setErrorMessage] = createSignal("");
     function verifyLogin(token) {
         setError(false);
+        setErrorMessage("");
         getMe(token).then((response) => {
             // Check for this JSON:
             // {'auth_mode': 'web_setup'}
-            if (response.auth_mode === 'web_setup') {
+            if (response.auth_mode === 'web_setup' && response.device_mode === 'web_setup') {
                 props.onToken(token);
                 setError(false);
                 setIsLoggedIn(true);
+            } else {
+                setErrorMessage("Use the Timechief hotspot key and put the device into setup mode.");
+                setError(true);
             }
-            setError(true);
         }).catch(err => {
             console.log(`login error: ${err}`);
+            setErrorMessage("Bad password.  Please try again.");
             setError(true);
         });
     }
@@ -68,7 +73,7 @@ export function Authenticate(props) {
     }
     return <Centered>
         <Show when={!isLoggedIn()}>
-            <WebSetupLoginCard isError={isError} onClickLogin={onClickLogin} />
+            <WebSetupLoginCard isError={isError} errorMessage={errorMessage} onClickLogin={onClickLogin} />
         </Show>
         <Show when={isLoggedIn()}>
             {props.children}
