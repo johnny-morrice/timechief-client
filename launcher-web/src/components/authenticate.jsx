@@ -25,8 +25,14 @@ function WebSetupLoginCard(props) {
                 <Form onSubmit={onClickLogin}>
                     <Form.Group class="mb-3" controlId="hotspotKey">
                         <Form.Label>Hotspot Key</Form.Label>
-                        <Form.Control type="password" placeholder="Password" autocomplete="on"/>
-                        <Form.Text>The hotspot key should be displayed on your timechief when in web setup mode.</Form.Text>
+                        <Show when={props.isError()}>
+                            <Form.Control type="password" placeholder="Password" autocomplete="on" required isInvalid/>
+                            <Form.Control.Feedback type="invalid">Invalid password</Form.Control.Feedback>
+                        </Show>
+                        <Show when={!props.isError()}>
+                            <Form.Control type="password" placeholder="Password" autocomplete="on" required/>
+                        </Show>
+                        <Form.Text>The hotspot key is your password.  It should be displayed on your Timechief when in web setup mode.</Form.Text>
                     </Form.Group>
 
                     <Button variant="primary" type="submit">Log in</Button>
@@ -38,13 +44,21 @@ function WebSetupLoginCard(props) {
 
 export function Authenticate(props) {
     const [isLoggedIn, setIsLoggedIn] = createSignal(false);
+    const [isError, setError] = createSignal(false);
     function verifyLogin(token) {
+        setError(false);
         getMe(token).then((response) => {
             // Check for this JSON:
             // {'auth_mode': 'web_setup'}
             if (response.auth_mode === 'web_setup') {
+                props.onToken(token);
+                setError(false);
                 setIsLoggedIn(true);
             }
+            setError(true);
+        }).catch(err => {
+            console.log(`login error: ${err}`);
+            setError(true);
         });
     }
     function onClickLogin() {
@@ -54,7 +68,7 @@ export function Authenticate(props) {
     }
     return <Centered>
         <Show when={!isLoggedIn()}>
-            <WebSetupLoginCard onClickLogin={onClickLogin} />
+            <WebSetupLoginCard isError={isError} onClickLogin={onClickLogin} />
         </Show>
         <Show when={isLoggedIn()}>
             {props.children}

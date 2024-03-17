@@ -1,4 +1,7 @@
 export async function getMe(token) {
+    if (!token) {
+        throw new Error('no token');
+    }
     const options = {
         method: 'GET',
         headers: {
@@ -16,6 +19,9 @@ export async function getMe(token) {
 }
 
 export async function getListNetworks(token) {
+    if (!token) {
+        throw new Error('no token');
+    }
     const options = {
         method: 'GET',
         headers: {
@@ -23,11 +29,26 @@ export async function getListNetworks(token) {
             'Accept': 'application/json',
         }
     };
-    const url = `/web-setup/network`;
-    return await fetch(url, options).then(response => response.json());
+    const url = `/web-setup/wifi`;
+    return await fetch(url, options).then(response => {
+        if (response.status !== 200) {
+            throw new Error('Not authorized');
+        }
+        return response.json()
+    });
 }
 
-export async function postNetworkSelect(ssid, key, token) {
+export async function postNetworkSelect(token, ssid, key) {
+    if (!token) {
+        throw new Error('no token');
+    }
+    if (!ssid) {
+        throw new Error('no ssid');
+    }
+    if (!key) {
+        throw new Error('no key');
+    }
+
     const options = {
         method: 'POST',
         headers: {
@@ -40,6 +61,10 @@ export async function postNetworkSelect(ssid, key, token) {
             "key": key,
         }),
     };
-    const url = `/web-setup/network`;
-    return await fetch(url, options);
+    const url = `/web-setup/wifi`;
+    return await fetch(url, options).then(response => {
+        if (response.status !== 204) {
+            throw new Error('Not authorized');
+        }
+    });
 }
