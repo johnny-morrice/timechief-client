@@ -1,4 +1,4 @@
-import { Accordion, Col, Container, Row, Spinner } from "solid-bootstrap";
+import { Accordion, Card, Col, Container, Row, Spinner } from "solid-bootstrap";
 import { Authenticate } from "../authenticate";
 import { TCNavbar } from "../navbar/navbar";
 import { Footer } from "../footer/footer";
@@ -26,8 +26,7 @@ export function WebSetupDashboard(props) {
             <Container>
                 <Row>
                     <Col>
-                        <h1>Your Timechief is connecting to your home network</h1>
-                        <p>Follow instructions on your device to continue.</p>
+                        <ConnectingCard/>
                     </Col>
                 </Row>
             </Container>
@@ -59,6 +58,20 @@ export function WebSetupDashboard(props) {
         </Show>
         <Footer />
     </>
+}
+
+function ConnectingCard(props) {
+    return <Card>
+        <Card.Body>
+            <Card.Title>Your Timechief device is connecting</Card.Title>
+            <Card.Body>
+                <p>Your Timechief device is connecting to your home network.</p>
+                <p>Follow instructions on your device to continue.</p>
+                <p>If your device does not connect within 3 minutes, start setup again, and ensure you use a correct WiFi key.</p>
+                <Spinner animation="border" />
+            </Card.Body>
+        </Card.Body>
+    </Card>
 }
 
 export function WebSetupRoute(props) {

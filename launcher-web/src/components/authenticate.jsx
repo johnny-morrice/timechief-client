@@ -20,17 +20,17 @@ function WebSetupLoginCard(props) {
     }
     return <Card>
         <Card.Body>
-            <Card.Title>Log in</Card.Title>
+            <Card.Title>Log in to your Timechief device</Card.Title>
             <Card.Text>
                 <Form onSubmit={onClickLogin}>
                     <Form.Group class="mb-3" controlId="hotspotKey">
                         <Form.Label>Hotspot Key</Form.Label>
                         <Show when={props.isError()}>
-                            <Form.Control type="password" placeholder="Password" autocomplete="on" required isInvalid/>
+                            <Form.Control type="password" placeholder="Password" autocomplete="on" required isInvalid />
                             <Form.Control.Feedback type="invalid">{props.errorMessage}</Form.Control.Feedback>
                         </Show>
                         <Show when={!props.isError()}>
-                            <Form.Control type="password" placeholder="Password" autocomplete="on" required/>
+                            <Form.Control type="password" placeholder="Password" autocomplete="on" required />
                         </Show>
                         <Form.Text>The hotspot key is your password.  It should be displayed on your Timechief when in web setup mode.</Form.Text>
                     </Form.Group>
@@ -71,12 +71,15 @@ export function Authenticate(props) {
         const token = document.getElementById('hotspotKey').value;
         verifyLogin(token);
     }
-    return <Centered>
+    return <>
         <Show when={!isLoggedIn()}>
-            <WebSetupLoginCard isError={isError} errorMessage={errorMessage} onClickLogin={onClickLogin} />
+            <Centered>
+                <WebSetupLoginCard isError={isError} errorMessage={errorMessage} onClickLogin={onClickLogin} />
+            </Centered>
         </Show>
         <Show when={isLoggedIn()}>
             {props.children}
         </Show>
-    </Centered>
+    </>
+
 }

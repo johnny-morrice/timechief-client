@@ -11,6 +11,10 @@ export async function getMe(token) {
     };
     const url = `/auth/me`;
     return await fetch(url, options).then(response => {
+        if (response.status === 401) {
+            console.log("auth failed, reloading");
+            window.location.reload();
+        }
         if (response.status !== 200) {
             throw new Error('Not authorized');
         }
@@ -31,6 +35,10 @@ export async function getListNetworks(token) {
     };
     const url = `/web-setup/wifi`;
     return await fetch(url, options).then(response => {
+        if (response.status === 401) {
+            console.log("auth failed, reloading");
+            window.location.reload();
+        }
         if (response.status !== 200) {
             throw new Error('Not authorized');
         }
