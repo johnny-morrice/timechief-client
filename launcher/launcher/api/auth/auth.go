@@ -18,7 +18,8 @@ func (api AuthAPI) AddRoutes(mux *http.ServeMux) {
 }
 
 type Me struct {
-	AuthMode string `json:"auth_mode"`
+	AuthMode   string `json:"auth_mode"`
+	DeviceMode string `json:"device_mode"`
 }
 
 func (api AuthAPI) HandleGetMe(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +28,11 @@ func (api AuthAPI) HandleGetMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	authMode := middleware.GetAuthContext(r)
-	me := Me{AuthMode: authMode}
+	deviceMode := middleware.GetDeviceContext(r)
+	me := Me{
+		AuthMode:   authMode,
+		DeviceMode: deviceMode,
+	}
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(me)
 	if err != nil {

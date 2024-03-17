@@ -2,13 +2,8 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
-	"gorm.io/gorm"
 )
 
 type modeMiddleware struct {
@@ -44,6 +39,15 @@ func GetAuthContext(r *http.Request) string {
 	return authMode
 }
 
+func GetDeviceContext(r *http.Request) string {
+	authMode, ok := r.Context().Value(DeviceModeContextKey).(string)
+	if !ok {
+		return NoAuthMode
+
+	}
+	return authMode
+}
+
 func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	authMode := GetAuthContext(r)
 	if authMode == NoAuthMode {
@@ -51,10 +55,10 @@ func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	deviceMode, err := mid.getDeviceMode()
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		log.Printf("error getting device mode: %v", err)
+	deviceMode := GetDeviceContext(r)
+	if deviceMode == NoAuthMode {
+		log.Println("no auth mode in mode middleware")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	modeMatch := false
@@ -77,26 +81,4 @@ func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	mid.next.ServeHTTP(w, r)
-}
-
-func (mid modeMiddleware) getDeviceMode() (string, error) {
-	setupState, err := mid.kvStore.Get("setup")
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return "", fmt.Errorf("error getting setup state: %v", err)
-	}
-	if setupState == daemon.SetupFlagWaitUserSelectNetwork {
-		return WebSetupAuthMode, nil
-	}
-	apiAccess, err := mid.kvStore.Get(store.APIAccessEnabled)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", nil
-		}
-		return "", fmt.Errorf("error getting api access: %v", err)
-	}
-
-	if apiAccess == "true" {
-		return APIAuthMode, nil
-	}
-	return NoAuthMode, nil
 }

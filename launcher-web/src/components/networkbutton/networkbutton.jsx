@@ -11,6 +11,7 @@ export function NetworkButton(props) {
         const key = document.getElementById(inputID).value;
         postNetworkSelect(props.token(), props.ssid, key).then(() => {
             console.log("Connecting to network...");
+            props.onConnecting();
         }).catch(err => {
             console.log(`network connect error: ${err}`);
             setIsError(true);

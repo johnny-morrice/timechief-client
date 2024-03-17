@@ -8,7 +8,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
+	"gorm.io/gorm"
 )
 
 type KeyValueStore interface {
@@ -49,7 +51,14 @@ func (mid authMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, am := range authMethods {
 		authRequest, err := am.validate(r)
 		if err == nil {
-			mid.next.ServeHTTP(w, authRequest)
+			deviceRequest, err := mid.deviceModeRequest(authRequest)
+			if err != nil {
+				log.Printf("error getting device mode: %v", err)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			mid.next.ServeHTTP(w, deviceRequest)
 			return
 		}
 	}
@@ -84,6 +93,37 @@ func storedKeyAuthMethod(key, authName string, kv KeyValueStore) authMethod {
 	}
 }
 
+func (mid authMiddleware) deviceModeRequest(r *http.Request) (*http.Request, error) {
+	deviceMode, err := mid.getDeviceMode()
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.WithValue(r.Context(), DeviceModeContextKey, deviceMode)
+	return r.WithContext(ctx), nil
+}
+
+func (mid authMiddleware) getDeviceMode() (string, error) {
+	setupState, err := mid.kvStore.Get("setup")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return "", fmt.Errorf("error getting setup state: %v", err)
+	}
+	if setupState == daemon.SetupFlagWaitUserSelectNetwork {
+		return WebSetupAuthMode, nil
+	}
+	apiAccess, err := mid.kvStore.Get(store.APIAccessEnabled)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", nil
+		}
+		return "", fmt.Errorf("error getting api access: %v", err)
+	}
+
+	if apiAccess == "true" {
+		return APIAuthMode, nil
+	}
+	return NoAuthMode, nil
+}
+
 type authMethod struct {
 	validator func(r *http.Request) error
 	authName  string
@@ -99,5 +139,6 @@ func (am authMethod) validate(r *http.Request) (*http.Request, error) {
 }
 
 const AuthMethodContextKey = MiddlewareKey("auth_method")
+const DeviceModeContextKey = MiddlewareKey("device_mode")
 
 type MiddlewareKey string
