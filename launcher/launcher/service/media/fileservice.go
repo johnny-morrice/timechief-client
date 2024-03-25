@@ -9,6 +9,8 @@ import (
 	"os"
 	"sync"
 	"time"
+
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 )
 
 type FileService struct {
@@ -21,6 +23,11 @@ type fileLoader struct {
 	lastLoaded      time.Time
 	buf             bytes.Buffer
 	lock            sync.Mutex
+}
+
+type FileMedia struct {
+	Theme v2.Theme
+	Media Media
 }
 
 func (fl *fileLoader) reader() (io.Reader, error) {
@@ -73,10 +80,24 @@ func (svc FileService) GetMedia() (Media, error) {
 	if err != nil {
 		return Media{}, err
 	}
-	media := Media{}
-	err = json.NewDecoder(r).Decode(&media)
+	fileMedia := FileMedia{}
+	err = json.NewDecoder(r).Decode(&fileMedia)
 	if err != nil {
 		return Media{}, err
 	}
+	media := fileMedia.Media
+	themeCSS, err := renderThemeCSS(&fileMedia.Theme)
+	if err != nil {
+		return Media{}, err
+	}
+	media.ThemeCSS = themeCSS
+	backgroundPictureCSS, err := renderBackgroundImageCSS(backgroundImageCSSParams{
+		Settings: media.BackgroundPictureMedia.Settings,
+		Pictures: media.BackgroundPictureMedia.Pictures,
+	})
+	if err != nil {
+		return Media{}, err
+	}
+	media.BackgroundPictureMedia.BackgroundPictureCSS = backgroundPictureCSS
 	return media, nil
 }

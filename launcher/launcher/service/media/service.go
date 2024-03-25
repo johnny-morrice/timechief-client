@@ -63,7 +63,7 @@ func (svc Service) GetMedia() (Media, error) {
 		}
 	}
 	pictureCSS, err := renderBackgroundImageCSS(backgroundImageCSSParams{
-		// Settings: pictureSettings,
+		Settings: pictureSettings,
 		Pictures: pictures,
 	})
 	if err != nil {
