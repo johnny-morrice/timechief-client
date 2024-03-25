@@ -4,19 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/google/uuid"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"gorm.io/gorm"
 )
 
 type Service struct {
-	videoService       VideoService
-	pictureService     PictureService
+	mediaService       MediaService
 	deviceDataStore    DeviceDataStore
 	launchTargetStore  store.LaunchTargetStore
 	stateFlagStore     store.StateFlagStore
@@ -25,10 +22,9 @@ type Service struct {
 	wifiNetworkStore   store.WifiNetworkStore
 }
 
-func MakeService(videoService VideoService, pictureService PictureService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
+func MakeService(mediaService MediaService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
 	return Service{
-		videoService:       videoService,
-		pictureService:     pictureService,
+		mediaService:       mediaService,
 		deviceDataStore:    deviceDataStore,
 		launchTargetStore:  launchTargetStore,
 		stateFlagStore:     stateFlagStore,
@@ -38,14 +34,8 @@ func MakeService(videoService VideoService, pictureService PictureService, devic
 	}
 }
 
-type VideoService interface {
-	List() ([]video.VideoMetadata, error)
-	GetPreferences() (video.Settings, error)
-}
-
-type PictureService interface {
-	List() ([]picture.PictureMetadata, error)
-	GetPreferences() (picture.Settings, error)
+type MediaService interface {
+	GetMedia() (media.Media, error)
 }
 
 type DeviceDataStore interface {
@@ -92,24 +82,7 @@ type DeviceData struct {
 	LauncherState    LauncherState    `json:"launcher_state"`
 	ServiceData      v2.Data          `json:"service_data"`
 	ServiceDataState ServiceDataState `json:"service_data_state"`
-	Media            Media            `json:"media"`
-}
-
-type Media struct {
-	ThemeCSS               string       `json:"theme_css"`
-	VideoMedia             VideoMedia   `json:"video"`
-	BackgroundPictureMedia PictureMedia `json:"background_picture"`
-}
-
-type VideoMedia struct {
-	Settings video.Settings        `json:"settings"`
-	Videos   []video.VideoMetadata `json:"videos"`
-}
-
-type PictureMedia struct {
-	Settings             picture.Settings          `json:"settings"`
-	Pictures             []picture.PictureMetadata `json:"pictures"`
-	BackgroundPictureCSS string                    `json:"background_picture_css"`
+	Media            media.Media      `json:"media"`
 }
 
 type Theme struct {
@@ -317,64 +290,13 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, fmt.Errorf("failed to get access token: %w", err)
 	}
 
-	// TODO delete theme testing.
-	nowDt := int(time.Now().Unix())
-	deviceData.Theme = &v2.ThemeDatum{
-		Dt: &nowDt,
-		// Value: synthwaveDemoTheme(),
-		Value: defaultTheme(),
-	}
-
-	themeCSS, err := renderThemeCSS(deviceData.Theme.Value)
-	if err != nil {
-		return DeviceData{}, err
-	}
-
-	videos, err := svc.videoService.List()
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return DeviceData{}, err
-		}
-	}
-	videoSettings, err := svc.videoService.GetPreferences()
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return DeviceData{}, err
-		}
-	}
-	pictures, err := svc.pictureService.List()
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return DeviceData{}, err
-		}
-	}
-	pictureSettings, err := svc.pictureService.GetPreferences()
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return DeviceData{}, err
-		}
-	}
-	pictureCSS, err := renderBackgroundImageCSS(backgroundImageCSSParams{
-		// Settings: pictureSettings,
-		Pictures: pictures,
-	})
-	if err != nil {
+	media, err := svc.mediaService.GetMedia()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, err
 	}
 
 	result := DeviceData{
-		Media: Media{
-			ThemeCSS: themeCSS,
-			VideoMedia: VideoMedia{
-				Settings: videoSettings,
-				Videos:   videos,
-			},
-			BackgroundPictureMedia: PictureMedia{
-				Settings:             pictureSettings,
-				Pictures:             pictures,
-				BackgroundPictureCSS: pictureCSS,
-			},
-		},
+		Media:       media,
 		ServiceData: deviceData,
 		ServiceDataState: ServiceDataState{
 			MyDeviceUUID:   myDeviceUUID,

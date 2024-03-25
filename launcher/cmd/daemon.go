@@ -25,6 +25,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
+	mediasvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
@@ -256,8 +257,13 @@ func Daemon(ctx *cli.Context) error {
 	apiMux := http.NewServeMux()
 	mediaMux := http.NewServeMux()
 
-	dataService := data.MakeService(videoService,
-		pictureService,
+	mediaService, err := makeMediaService(ctx, videoService, pictureService)
+	if err != nil {
+		return err
+	}
+
+	dataService := data.MakeService(
+		mediaService,
 		deviceDataStore,
 		launchTargetStore,
 		flagStore,
@@ -350,6 +356,14 @@ func Daemon(ctx *cli.Context) error {
 
 	onInitialiseComplete(soundService)
 	return http.ListenAndServe(addr, rootMux)
+}
+
+func makeMediaService(ctx *cli.Context, videoService mediasvc.VideoService, pictureService mediasvc.PictureService) (data.MediaService, error) {
+	mediaFilePath := ctx.String("media-file")
+	if mediaFilePath == "" {
+		return mediasvc.MakeService(videoService, pictureService)
+	}
+	return mediasvc.MakeFileService(mediaFilePath, ctx.Duration("media-file-frequency"))
 }
 
 func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {

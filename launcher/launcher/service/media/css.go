@@ -1,4 +1,4 @@
-package data
+package media
 
 import (
 	"bytes"

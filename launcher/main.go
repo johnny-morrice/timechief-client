@@ -81,6 +81,15 @@ func getCLIApp() *cli.App {
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
 				&cli.StringFlag{
+					Name:  "media-file",
+					Usage: "load media settings from file",
+				},
+				&cli.DurationFlag{
+					Name:  "media-file-frequency",
+					Usage: "frequency to reload media settings from file",
+					Value: 10 * time.Second,
+				},
+				&cli.StringFlag{
 					Name:  "sound-daemon-base-url",
 					Value: "http://localhost:8081",
 				},
