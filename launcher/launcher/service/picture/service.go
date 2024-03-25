@@ -113,7 +113,7 @@ func (svc Service) GetPreferences() (Settings, error) {
 		return Settings{}, fmt.Errorf("failed to get background picture descriptor: %w", err)
 	}
 	// TODO remove forceDisabled
-	const forceDisabled = false
+	const forceDisabled = true
 	settings := Settings{
 		Enabled:        !forceDisabled && descriptor != "",
 		BackgroundSize: "cover",
