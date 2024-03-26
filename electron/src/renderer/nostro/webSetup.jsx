@@ -8,9 +8,11 @@ import { random } from './fakeRandom';
 import { labelMaker, textMaker } from './label';
 import { fadeTransition } from './fadeTransition';
 import { generateWifiQRCode } from 'wifi-qr-code-generator';
+import { NoConnection } from './noconnection';
 
 class Signals {
     constructor() {
+        [this.connectedToLocalService, this.setConnectedToLocalService] = createSignal(false);
         [this.setupState, this.setSetupState] = createSignal("");
         [this.deviceSetupURL, this.setDeviceSetupURL] = createSignal("");
         [this.hotspotSSID, this.setHotspotSSID] = createSignal("");
@@ -50,6 +52,7 @@ function applyDisplayBuffer(signals) {
 }
 
 function updateSignals(signals, data) {
+    signals.setConnectedToLocalService(true);
     if ("launcher_state" in data) {
         let launcherState = data["launcher_state"];
         if ("first_time_setup_done" in launcherState) {
@@ -213,84 +216,89 @@ export const WebSetupPage = (props) => {
     const label = labelMaker("web-setup");
     const plainText = textMaker("web-setup");
     return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`}>
-        <Show when={isDisplayStateHotspot(signals)}>
-            <div class="setup-wrapper flex-column flex-grow">
-                <div class="setup-title">Welcome to Timechief</div>
-                <div class="setup-content-wrapper flex-row">
-                    <div class="setup-button-box border flex-column crt-box home-box">
-                        <Show when={isUpdating(signals)}>
-                            <button class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
-                        </Show>
-                        <Show when={!isUpdating(signals)}>
-                            <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
-                        </Show>
-                        <Show when={isDisplayBackButton(signals)}>
-                            <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
-                        </Show>
-                        <Show when={isUpdating(signals)}>
-                            <div class="setup-button-box-isUpdating">
-                                <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
-                            </div>
-                        </Show>
-                    </div>
-                    <div class="setup-instructions flex-column exposed">
-                        <div class='flex-row'>
-                            <div class="data-label">{label("connect-wifi")}</div>
-                            <div class="data-value">{signals.hotspotSSIDText}</div>
+        <Show when={signals.connectedToLocalService()}>
+            <Show when={isDisplayStateHotspot(signals)}>
+                <div class="setup-wrapper flex-column flex-grow">
+                    <div class="setup-title">Welcome to Timechief</div>
+                    <div class="setup-content-wrapper flex-row">
+                        <div class="setup-button-box border flex-column crt-box home-box">
+                            <Show when={isUpdating(signals)}>
+                                <button class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
+                            <Show when={!isUpdating(signals)}>
+                                <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
+                            <Show when={isDisplayBackButton(signals)}>
+                                <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                            </Show>
+                            <Show when={isUpdating(signals)}>
+                                <div class="setup-button-box-isUpdating">
+                                    <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
+                                </div>
+                            </Show>
                         </div>
-                        <div class='flex-row'>
-                            <div class="data-label">{label("wifi-key")}</div>
-                            <div class="data-value">{signals.hotspotKeyText}</div>
-                        </div>
-                        <div class='flex-row'>
-                            <div class="data-label">{label("continue-via-browser")}</div>
-                            <div class="data-value">{signals.deviceSetupURLText}</div>
-                        </div>
-                        <div class='flex-row'>
-                            <img class="hotspot-qr" src={signals.hotspotQRData()} alt='Hotspot QR Code' />
-                        </div>
-                        <Show when={isConnectionError(signals)}>
+                        <div class="setup-instructions flex-column exposed">
                             <div class='flex-row'>
-                                <div class="hotspot-error">{label("connection-error")}</div>
+                                <div class="data-label">{label("connect-wifi")}</div>
+                                <div class="data-value">{signals.hotspotSSIDText}</div>
                             </div>
-                        </Show>
+                            <div class='flex-row'>
+                                <div class="data-label">{label("wifi-key")}</div>
+                                <div class="data-value">{signals.hotspotKeyText}</div>
+                            </div>
+                            <div class='flex-row'>
+                                <div class="data-label">{label("continue-via-browser")}</div>
+                                <div class="data-value">{signals.deviceSetupURLText}</div>
+                            </div>
+                            <div class='flex-row'>
+                                <img class="hotspot-qr" src={signals.hotspotQRData()} alt='Hotspot QR Code' />
+                            </div>
+                            <Show when={isConnectionError(signals)}>
+                                <div class='flex-row'>
+                                    <div class="hotspot-error">{label("connection-error")}</div>
+                                </div>
+                            </Show>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </Show>
-        <Show when={isDisplayStateLoading(signals)}>
-            <div class="setup-wrapper flex-column flex-grow">
-                <div class="setup-title">Welcome to Timechief</div>
-                <div class="setup-action-wrapper flex-row">
-                    <div class="setup-button-box border flex-column crt-box home-box">
-                        <Show when={isUpdating(signals)}>
-                            <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
-                        </Show>
-                        <Show when={!isUpdating(signals)}>
-                            <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
-                            <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
-                        </Show>
-                        <button class='action-button crt-box' onClick={onClickRestartSetup}>{plainText("restart-setup")} &nbsp;&nbsp; <i class='fa-solid <i class="fa-solid fa-backward"></i>'></i></button>
-                        <Show when={isDisplayBackButton(signals)}>
-                            <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
-                        </Show>
-                        <Show when={isUpdating(signals)}>
-                            <div class="setup-button-box-isUpdating">
-                                <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
-                            </div>
-                        </Show>
-                    </div>
-                    <div class="flex-column flex-grow exposed">
-                        <Loading />
+            </Show>
+            <Show when={isDisplayStateLoading(signals)}>
+                <div class="setup-wrapper flex-column flex-grow">
+                    <div class="setup-title">Welcome to Timechief</div>
+                    <div class="setup-action-wrapper flex-row">
+                        <div class="setup-button-box border flex-column crt-box home-box">
+                            <Show when={isUpdating(signals)}>
+                                <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                                <button disabled class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
+                            <Show when={!isUpdating(signals)}>
+                                <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
+                            <button class='action-button crt-box' onClick={onClickRestartSetup}>{plainText("restart-setup")} &nbsp;&nbsp; <i class='fa-solid <i class="fa-solid fa-backward"></i>'></i></button>
+                            <Show when={isDisplayBackButton(signals)}>
+                                <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                            </Show>
+                            <Show when={isUpdating(signals)}>
+                                <div class="setup-button-box-isUpdating">
+                                    <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
+                                </div>
+                            </Show>
+                        </div>
+                        <div class="flex-column flex-grow exposed">
+                            <Loading />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </Show>
+            <Show when={isDisplayStateInternet(signals)}>
+                {props.element}
+            </Show>
         </Show>
-        <Show when={isDisplayStateInternet(signals)}>
-            {props.element}
+        <Show when={!signals.connectedToLocalService()}>
+            <NoConnection />
         </Show>
     </div>;
 };

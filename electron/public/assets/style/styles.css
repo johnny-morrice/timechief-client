@@ -125,6 +125,15 @@ div.begin-login {
     justify-content: center;
 }
 
+div.no-connection {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+    padding: 1em;
+}
+
 div.flex-column {
     display: flex;
     flex-direction: column;
