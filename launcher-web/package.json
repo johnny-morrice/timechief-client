@@ -4,8 +4,8 @@
   "description": "Timechief smart clock web site",
   "scripts": {
     "build-local": "vite build",
-    "build-dev": "vite build --mode dev && cp _redirects.dev dist/_redirects",
-    "build-qa": "vite build --mode qa && cp _redirects.qa dist/_redirects",
+    "build-dev": "vite build --mode dev",
+    "build-qa": "vite build --mode qa",
     "gen-api-bindings": "npx openapi -i ../../api/v2/spec/openapi-3.0/api_spec.yaml -o ./src/api --client fetch --name TimechiefClient",
     "serve": "vite --host"
   },
