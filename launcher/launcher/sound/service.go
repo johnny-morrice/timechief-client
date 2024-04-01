@@ -17,6 +17,7 @@ type Service struct {
 
 type KeyValueStore interface {
 	Get(key string) (string, error)
+	Set(key, value string) error
 }
 
 func NewSoundService(dc daemonclient.DaemonClient, kv KeyValueStore) (Service, error) {
@@ -24,6 +25,47 @@ func NewSoundService(dc daemonclient.DaemonClient, kv KeyValueStore) (Service, e
 		return Service{}, fmt.Errorf("kv is nil")
 	}
 	return Service{dc: dc, kv: kv}, nil
+}
+
+type MuteOptions struct {
+	IsMute        bool
+	IsMuteRange   bool
+	MuteStartHour uint
+	MuteEndHour   uint
+}
+
+func (svc Service) SetMuteOptions(option MuteOptions) error {
+	var err error
+	if option.IsMute {
+		err = svc.kv.Set("mute", "true")
+	} else {
+		err = svc.kv.Set("mute", "false")
+	}
+	if err != nil {
+		return fmt.Errorf("set mute option: %w", err)
+	}
+	if option.IsMuteRange {
+		// Swap mute start and mute end hours.
+		err = svc.kv.Set("unmute-range", fmt.Sprintf("%d,%d", option.MuteEndHour, option.MuteStartHour))
+	} else {
+		err = svc.kv.Set("unmute-range", "")
+	}
+	if err != nil {
+		return fmt.Errorf("set mute range option: %w", err)
+	}
+	return nil
+}
+
+func (svc Service) PlayStartup() error {
+	return svc.playSound("startup")
+}
+
+func (svc Service) PlayShutdown() error {
+	return svc.playSound("shutdown")
+}
+
+func (svc Service) PlayLogin() error {
+	return svc.playSound("login")
 }
 
 func (svc Service) isMuted() (bool, error) {
@@ -70,16 +112,4 @@ func (svc Service) playSound(songName string) error {
 		SongName: songName,
 	}
 	return svc.dc.PostPlaySound(req)
-}
-
-func (svc Service) PlayStartup() error {
-	return svc.playSound("startup")
-}
-
-func (svc Service) PlayShutdown() error {
-	return svc.playSound("shutdown")
-}
-
-func (svc Service) PlayLogin() error {
-	return svc.playSound("login")
 }

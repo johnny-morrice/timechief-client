@@ -15,6 +15,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -22,21 +23,27 @@ import (
 type DeviceData struct {
 	client          v2.ClientInterface
 	deviceDataStore DeviceDataStore
+	soundService    SoundService
 	keyValueStore   store.KeyValueStore
 	stateFlagStore  store.StateFlagStore
 	requestTimeout  time.Duration
 	refreshInterval time.Duration
 }
 
-func MakeDeviceDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) DeviceData {
+func MakeDeviceDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) DeviceData {
 	return DeviceData{
 		client:          client,
 		deviceDataStore: deviceDataStore,
+		soundService:    soundService,
 		keyValueStore:   keyValueStore,
 		stateFlagStore:  stateFlagStore,
 		requestTimeout:  requestTimeout,
 		refreshInterval: refreshInterval,
 	}
+}
+
+type SoundService interface {
+	SetMuteOptions(options sound.MuteOptions) error
 }
 
 type DeviceDataStore interface {
@@ -129,7 +136,6 @@ func (dd DeviceData) doFetchLatest() (v2.Data, error) {
 		return v2.Data{}, fmt.Errorf("error decoding device data: %w", err)
 	}
 	return result, nil
-
 }
 
 func (dd DeviceData) getClockData(apiClient *apiclient.Client) (*viewmodel.ClockData, error) {
@@ -173,4 +179,38 @@ func (dd DeviceData) newClientContext() (context.Context, func()) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, dd.requestTimeout)
 	return ctx, cancel
+}
+
+func (dd DeviceData) setSoundOptions(data v2.Data) error {
+	if data.DeviceProfile == nil || data.DeviceProfile.Value == nil {
+		return errors.New("data.DeviceProfile is nil")
+	}
+	muteOptions, err := makeSoundOptions(*data.DeviceProfile.Value)
+	if err != nil {
+		return err
+	}
+	return dd.soundService.SetMuteOptions(muteOptions)
+}
+
+func makeSoundOptions(profile v2.DeviceProfile) (sound.MuteOptions, error) {
+	var muteOptions sound.MuteOptions
+	if profile.IsMuted == nil {
+		return muteOptions, errors.New("profile.IsMuted is nil")
+	}
+	muteOptions.IsMute = *profile.IsMuted
+	if profile.IsMuteRange == nil {
+		return muteOptions, errors.New("profile.IsMuteRange is nil")
+	}
+	muteOptions.IsMuteRange = *profile.IsMuteRange
+	if muteOptions.IsMuteRange {
+		if profile.MuteHourStart == nil {
+			return muteOptions, errors.New("profile.MuteHourStart is nil")
+		}
+		if profile.MuteHourEnd == nil {
+			return muteOptions, errors.New("profile.MuteHourEnd is nil")
+		}
+		muteOptions.MuteStartHour = uint(*profile.MuteHourStart)
+		muteOptions.MuteEndHour = uint(*profile.MuteHourEnd)
+	}
+	return muteOptions, nil
 }
