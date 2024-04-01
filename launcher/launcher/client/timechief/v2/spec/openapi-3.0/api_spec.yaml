@@ -1202,6 +1202,14 @@ components:
           type: string
         hour_cycle_option:
           type: string
+        is_muted:
+          type: boolean
+        is_mute_range:
+          type: boolean
+        mute_hour_start:
+          type: integer
+        mute_hour_end:
+          type: integer
         license_uuid:
           type: string
         features:
