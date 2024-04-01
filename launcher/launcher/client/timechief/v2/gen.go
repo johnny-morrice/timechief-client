@@ -117,11 +117,15 @@ type DeviceProfile struct {
 	DeviceUuid      *string   `json:"device_uuid,omitempty"`
 	Features        *Features `json:"features,omitempty"`
 	HourCycleOption *string   `json:"hour_cycle_option,omitempty"`
+	IsMuteRange     *bool     `json:"is_mute_range,omitempty"`
+	IsMuted         *bool     `json:"is_muted,omitempty"`
 	Latitude        *string   `json:"latitude,omitempty"`
 	LicenseUuid     *string   `json:"license_uuid,omitempty"`
 	Locale          *string   `json:"locale,omitempty"`
 	Location        *string   `json:"location,omitempty"`
 	Longitude       *string   `json:"longitude,omitempty"`
+	MuteHourEnd     *int      `json:"mute_hour_end,omitempty"`
+	MuteHourStart   *int      `json:"mute_hour_start,omitempty"`
 	PrincipalUuid   *string   `json:"principal_uuid,omitempty"`
 	ProfileCreateDt *int      `json:"profile_create_dt,omitempty"`
 	Timezone        *string   `json:"timezone,omitempty"`
