@@ -99,11 +99,15 @@ type Data struct {
 // Device defines model for Device.
 type Device struct {
 	HourCycleOption *DeviceHourCycleOption `json:"hour_cycle_option,omitempty"`
+	IsMuteRange     *bool                  `json:"is_mute_range,omitempty"`
+	IsMuted         *bool                  `json:"is_muted,omitempty"`
 	Latitude        *string                `json:"latitude,omitempty"`
 	LicenseUuid     *string                `json:"license_uuid,omitempty"`
 	Locale          *string                `json:"locale,omitempty"`
 	Location        *string                `json:"location,omitempty"`
 	Longitude       *string                `json:"longitude,omitempty"`
+	MuteHourEnd     *int                   `json:"mute_hour_end,omitempty"`
+	MuteHourStart   *int                   `json:"mute_hour_start,omitempty"`
 	Nickname        *string                `json:"nickname,omitempty"`
 	Timezone        *string                `json:"timezone,omitempty"`
 	Uuid            *string                `json:"uuid,omitempty"`
