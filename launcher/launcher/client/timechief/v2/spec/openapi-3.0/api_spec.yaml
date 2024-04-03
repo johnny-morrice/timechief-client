@@ -1042,6 +1042,14 @@ components:
             - "24h"
         license_uuid:
           type: "string"
+        is_muted:
+          type: boolean
+        is_mute_range:
+          type: boolean
+        mute_hour_start:
+          type: integer
+        mute_hour_end:
+          type: integer
 
     License:
       type: "object"
@@ -1284,7 +1292,7 @@ components:
           $ref: "#/components/schemas/DeviceProfile"
         dt:
           type: integer
-    
+
     GoogleProfileData:
       type: object
       properties:
@@ -1305,7 +1313,7 @@ components:
         events:
           type: array
           items:
-            $ref: '#/components/schemas/CalendarEvent'
+            $ref: "#/components/schemas/CalendarEvent"
         min_dt:
           type: integer
           format: int64
