@@ -101,7 +101,7 @@ func Daemon(ctx *cli.Context) error {
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
 	deviceDataStore := store.DeviceDataStore{DB: db}
-	deviceDataDaemon := daemon.MakeDeviceDataDaemon(timechiefClient, deviceDataStore, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
+	deviceDataDaemon := daemon.MakeDeviceDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
 	// pairingDaemon := daemon.Pairing{
 	// 	ConfigStore:          cfgStore,
 	// 	StateFlagStore:       flagStore,
