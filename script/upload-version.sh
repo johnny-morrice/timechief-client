@@ -30,47 +30,8 @@ pushd $BUILD_DIR
 # MY_UPLOAD_FILENAME should be the first .tar.gz file in the build dir
 MY_UPLOAD_FILENAME=$(ls *.tar.gz | head -n 1)
 
-SHA256=$(cat $MY_UPLOAD_FILENAME | openssl dgst -binary -sha256 | openssl base64 -A)
-URL="https://storage.googleapis.com/$BUCKET_NAME/$MY_UPLOAD_FILENAME"
+export FILENAME="$MY_UPLOAD_FILENAME"
+./script/doupload.sh
 
-# type Version struct {
-# 	UUID    string
-# 	Version string
-# 	Product string
-# 	Stream  string
-# 	URL     string
-# 	SHA256  string
-# 	Command string
-# }
-
-UUID=$(uuidgen)
-
-# Command is the command to run the client and is pretty much always the same for our purposes.
-COMMAND=timechief-client-bundle/timechief-launcher
-METADATA=$(cat <<EOF
-{
-  "uuid": "$UUID",
-  "version": "$VERSION",
-  "product": "$PRODUCT",
-  "stream": "$STREAM",
-  "command": "$COMMAND",
-  "bucket": "$BUCKET_NAME",
-  "object": "$MY_UPLOAD_FILENAME",
-  "sha256": "$SHA256"
-}
-EOF
-)
-
-# Create temporary file:
-METADATA_TMPFILE=$(mktemp /tmp/upload.XXXXXXXXXX)
-# Write metadata to temporary file:
-echo "$METADATA" > $METADATA_TMPFILE
-
-echo "Uploading file: $MY_UPLOAD_FILENAME"
-gcloud storage cp $MY_UPLOAD_FILENAME gs://$BUCKET_NAME/$MY_UPLOAD_FILENAME
-popd
-echo "Uploading metadata: $METADATA"
-
-./script/apicall.sh /version $METADATA_TMPFILE
 rm -rf $BUILD_DIR
 rm -f $METADATA_TMPFILE
