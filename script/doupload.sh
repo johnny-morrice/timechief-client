@@ -1,3 +1,7 @@
+#!/bin/bash
+set -e
+set -x
+
 # Parameters
 # BUCKET_NAME
 # VERSION
@@ -43,6 +47,7 @@ URL="https://storage.googleapis.com/$BUCKET_NAME/$FILENAME"
 # }
 
 UUID=$(uuidgen)
+SIZE=$(stat -c %s $FILENAME)
 
 # Command is the command to run the client and is pretty much always the same for our purposes.
 COMMAND=timechief-client-bundle/timechief-launcher
@@ -55,7 +60,9 @@ METADATA=$(cat <<EOF
   "command": "$COMMAND",
   "bucket": "$BUCKET_NAME",
   "object": "$FILENAME",
-  "sha256": "$SHA256"
+  "sha256": "$SHA256",
+  "filename": "$FILENAME",
+  "size": "$SIZE"
 }
 EOF
 )
