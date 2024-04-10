@@ -63,7 +63,7 @@ METADATA=$(cat <<EOF
   "object": "$FILENAME",
   "sha256": "$SHA256",
   "filename": "$FILENAME",
-  "size": "$SIZE"
+  "size": $SIZE
 }
 EOF
 )
