@@ -28,6 +28,7 @@ pushd $BUILD_DIR
 git clone https://github.com/johnny-morrice/timechief-client.git
 cd timechief-client
 git checkout $VERSION
+sudo apt update
 pushd image
 ./init.sh
 sudo ./build.sh
