@@ -3,13 +3,14 @@ set -e
 set -x
 
 # Parameters
+# FILEPATH
 # BUCKET_NAME
 # VERSION
 # PRODUCT
 # STREAM
 # FILENAME
 
-if [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$FILENAME" ] ; then
+if [ -z "$FILEPATH" ] || [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STREAM" ] || [ -z "$FILENAME" ] ; then
   echo "missing parameters"
   echo "BUCKET_NAME: $BUCKET_NAME"
   echo "VERSION: $VERSION"
@@ -20,8 +21,8 @@ if [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PRODUCT" ] || [ -z "$STR
 fi
 
 # Check if file exists.
-if [ ! -f "$FILENAME" ]; then
-  echo "File not found: $FILENAME"
+if [ ! -f "$FILEPATH" ]; then
+  echo "File not found: $FILEPATH"
   exit 1
 fi
 
@@ -33,7 +34,7 @@ if [[ ! $FILENAME =~ ^$ALLOWED_CHARS+$ ]]; then
   exit 1
 fi
 
-SHA256=$(cat $FILENAME | openssl dgst -binary -sha256 | openssl base64 -A)
+SHA256=$(cat $FILEPATH | openssl dgst -binary -sha256 | openssl base64 -A)
 URL="https://storage.googleapis.com/$BUCKET_NAME/$FILENAME"
 
 # type Version struct {
@@ -47,7 +48,7 @@ URL="https://storage.googleapis.com/$BUCKET_NAME/$FILENAME"
 # }
 
 UUID=$(uuidgen)
-SIZE=$(stat -c %s $FILENAME)
+SIZE=$(stat -c %s $FILEPATH)
 
 # Command is the command to run the client and is pretty much always the same for our purposes.
 COMMAND=timechief-client-bundle/timechief-launcher
@@ -73,8 +74,7 @@ METADATA_TMPFILE=$(mktemp /tmp/upload.XXXXXXXXXX)
 echo "$METADATA" > $METADATA_TMPFILE
 
 echo "Uploading file: $FILENAME"
-gcloud storage cp $FILENAME gs://$BUCKET_NAME/$FILENAME
-popd
+gcloud storage cp $FILEPATH gs://$BUCKET_NAME/$FILENAME
 echo "Uploading metadata: $METADATA"
 
 ./script/apicall.sh /version $METADATA_TMPFILE

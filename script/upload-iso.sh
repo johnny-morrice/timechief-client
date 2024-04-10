@@ -13,4 +13,6 @@ pushd $IMAGE_OUTPUT
 ISO_FILE=$(ls *.iso | head -n 1)
 
 export FILENAME="$ISO_FILE"
+export FILEPATH="$IMAGE_OUTPUT/$ISO_FILE"
+popd
 ./script/doupload.sh

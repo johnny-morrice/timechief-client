@@ -29,9 +29,11 @@ cp $UPLOAD_FILENAME $BUILD_DIR
 pushd $BUILD_DIR
 # MY_UPLOAD_FILENAME should be the first .tar.gz file in the build dir
 MY_UPLOAD_FILENAME=$(ls *.tar.gz | head -n 1)
-
+export FILEPATH="$BUILD_DIR/$MY_UPLOAD_FILENAME"
 export FILENAME="$MY_UPLOAD_FILENAME"
+popd
 ./script/doupload.sh
+
 
 rm -rf $BUILD_DIR
 rm -f $METADATA_TMPFILE
