@@ -5,7 +5,7 @@ xserver-xorg-video-fbturbo
 fonts-noto-color-emoji
 feh
 gjs
-gnome-themes-standard
+gnome-themes-extra
 gir1.2-webkit2-4.0
 xdotool
 vim
