@@ -35,7 +35,10 @@ sudo ./build.sh
 
 # Get file name of deploy image
 DEPLOY_IMAGE=$(ls deploy/*.img | head -n 1)
-echo "Deploy image: $DEPLOY_IMAGE"
+echo "Found image: $DEPLOY_IMAGE"
 # Copy the file to the output location
-cp $DEPLOY_IMAGE $IMAGE_OUTPUT
+rm -rf $IMAGE_OUTPUT
+mkdir -p $IMAGE_OUTPUT
+cp $DEPLOY_IMAGE $IMAGE_OUTPUT/Timechief-$VERSION.img
+echo "Copied image to $IMAGE_OUTPUT/Timechief-$VERSION.img"
 popd
