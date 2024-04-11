@@ -17,6 +17,7 @@ if [ -z "$FILEPATH" ] || [ -z "$BUCKET_NAME" ] || [ -z "$VERSION" ] || [ -z "$PR
   echo "PRODUCT: $PRODUCT"
   echo "STREAM: $STREAM"
   echo "FILENAME: $FILENAME"
+  echo "FILEPATH: $FILEPATH"
   exit 1
 fi
 
