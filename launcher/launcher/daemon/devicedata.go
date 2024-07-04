@@ -194,23 +194,23 @@ func (dd DeviceData) setSoundOptions(data v2.Data) error {
 
 func makeSoundOptions(profile v2.DeviceProfile) (sound.MuteOptions, error) {
 	var muteOptions sound.MuteOptions
-	if profile.IsMuted == nil {
+	if profile.Device.IsMuted == nil {
 		return muteOptions, errors.New("profile.IsMuted is nil")
 	}
-	muteOptions.IsMute = *profile.IsMuted
-	if profile.IsMuteRange == nil {
+	muteOptions.IsMute = *profile.Device.IsMuted
+	if profile.Device.IsMuteRange == nil {
 		return muteOptions, errors.New("profile.IsMuteRange is nil")
 	}
-	muteOptions.IsMuteRange = *profile.IsMuteRange
+	muteOptions.IsMuteRange = *profile.Device.IsMuteRange
 	if muteOptions.IsMuteRange {
-		if profile.MuteHourStart == nil {
+		if profile.Device.MuteHourStart == nil {
 			return muteOptions, errors.New("profile.MuteHourStart is nil")
 		}
-		if profile.MuteHourEnd == nil {
+		if profile.Device.MuteHourEnd == nil {
 			return muteOptions, errors.New("profile.MuteHourEnd is nil")
 		}
-		muteOptions.MuteStartHour = uint(*profile.MuteHourStart)
-		muteOptions.MuteEndHour = uint(*profile.MuteHourEnd)
+		muteOptions.MuteStartHour = uint(*profile.Device.MuteHourStart)
+		muteOptions.MuteEndHour = uint(*profile.Device.MuteHourEnd)
 	}
 	return muteOptions, nil
 }

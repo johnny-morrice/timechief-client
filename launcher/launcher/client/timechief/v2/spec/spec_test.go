@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	"github.com/getkin/kin-openapi/openapi3"
-
-	_ "embed"
 )
 
 //go:embed openapi-3.0/openapi.yaml
