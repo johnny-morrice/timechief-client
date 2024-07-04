@@ -971,6 +971,172 @@ paths:
         "500":
           description: Internal server error
 
+  /theme:
+    post:
+      summary: "Create a new theme"
+      operationId: "createTheme"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Theme"
+      responses:
+        "200":
+          description: "Theme created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    put:
+      summary: "Update a theme"
+      operationId: "updateTheme"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Theme"
+      responses:
+        "204":
+          description: "Theme updated successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    get:
+      summary: "Get a list of themes"
+      operationId: "listThemes"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of themes to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results (optional)"
+          required: false
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of themes retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+  /theme/{id}:
+    get:
+      summary: "Get a theme by ID"
+      operationId: "getThemeById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the theme to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Theme retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+  /bucketfile:
+    get:
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: tag
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BucketFile'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+  /bucketfile/{uuid}:
+    get:
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+  /bucketfile/{uuid}/download:
+    get:
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFileDownload'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1040,6 +1206,11 @@ components:
           enum:
             - "12h"
             - "24h"
+        temperature_option:
+          type: "string"
+          enum:
+            - "c"
+            - "f"
         license_uuid:
           type: "string"
         is_muted:
@@ -1050,6 +1221,8 @@ components:
           type: integer
         mute_hour_end:
           type: integer
+        theme_uuid:
+          type: "string"
 
     License:
       type: "object"
@@ -1110,6 +1283,10 @@ components:
           type: "string"
         command:
           type: "string"
+        filename:
+          type: "string"
+        size:
+          type: "integer"
 
     VersionDownload:
       type: "object"
@@ -1128,6 +1305,10 @@ components:
           type: "string"
         download_url:
           type: "string"
+        filename:
+          type: "string"
+        size:
+          type: "integer"
 
     WeatherCondition:
       type: object
@@ -1191,35 +1372,47 @@ components:
           items:
             $ref: "#/components/schemas/DailyWeather"
 
+    BucketFileLinks:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/BucketFileLink"
+
+    BucketFileLink:
+      type: object
+      properties:
+        uuid:
+          type: string
+        sha256:
+          type: string
+        size:
+          type: integer
+        filename:
+          type: string
+        mimetype:
+          type: string
+        url:
+          type: string
+
+    BucketFilesDatum:
+      type: object
+      properties:
+        value:
+          $ref: "#/components/schemas/BucketFileLinks"
+        dt:
+          type: integer
+
     DeviceProfile:
       type: object
       properties:
-        device_uuid:
-          type: string
         principal_uuid:
           type: string
-        latitude:
-          type: string
-        longitude:
-          type: string
-        timezone:
-          type: string
-        location:
-          type: string
-        locale:
-          type: string
-        hour_cycle_option:
-          type: string
-        is_muted:
-          type: boolean
-        is_mute_range:
-          type: boolean
-        mute_hour_start:
-          type: integer
-        mute_hour_end:
-          type: integer
-        license_uuid:
-          type: string
+        device:
+          $ref: "#/components/schemas/Device"
+        theme:
+          $ref: "#/components/schemas/Theme"
         features:
           $ref: "#/components/schemas/Features"
         profile_create_dt:
@@ -1268,14 +1461,12 @@ components:
           type: string
         button_background_color:
           type: string
-
-    ThemeDatum:
-      type: object
-      properties:
-        value:
-          $ref: "#/components/schemas/Theme"
-        dt:
-          type: integer
+        image_fit:
+          type: string
+        image_uuids:
+          type: array
+          items:
+            type: string
 
     OWMDataDatum:
       type: object
@@ -1348,6 +1539,20 @@ components:
         dt:
           type: integer
 
+    SpookyCampaign:
+      type: object
+      properties:
+        video_uuid:
+          type: string
+
+    SpookyCampaignDatum:
+      type: object
+      properties:
+        value:
+          $ref: "#/components/schemas/SpookyCampaign"
+        dt:
+          type: integer
+
     Data:
       type: object
       properties:
@@ -1359,8 +1564,10 @@ components:
           $ref: "#/components/schemas/CalendarDatum"
         google_profile:
           $ref: "#/components/schemas/GoogleProfileDatum"
-        theme:
-          $ref: "#/components/schemas/ThemeDatum"
+        spooky_campaign:
+          $ref: "#/components/schemas/SpookyCampaignDatum"
+        bucket_files:
+          $ref: "#/components/schemas/BucketFilesDatum"
         dt:
           type: integer
 
@@ -1394,3 +1601,43 @@ components:
       properties:
         code:
           type: string
+
+    BucketFile:
+      type: object
+      properties:
+        UUID:
+          type: string
+          format: uuid
+        Bucket:
+          type: string
+        Object:
+          type: string
+        SHA256:
+          type: string
+          format: sha256
+        Size:
+          type: integer
+          format: int64
+        Filename:
+          type: string
+        MimeType:
+          type: string
+        Tag:
+          type: string
+      required:
+        - UUID
+        - Bucket
+        - Object
+        - SHA256
+        - Size
+        - Filename
+        - MimeType
+        - Tag
+
+    BucketFileDownload:
+      allOf:
+        - $ref: '#/components/schemas/BucketFile'
+        - type: object
+          properties:
+            DownloadURL:
+              type: string
