@@ -94,20 +94,18 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		log.Printf("error clearing device data error state: %s", myErr)
 	}
 
-	if clockData.GoogleCalendar != nil && clockData.GoogleCalendar.Value != nil && clockData.GoogleCalendar.Value.Dt != nil {
-		const calendarErrorTimeout = 30 * time.Minute
-		lastUpdated := time.Unix(*clockData.GoogleCalendar.Value.Dt, 0)
-		now := time.Now()
-		if now.Sub(lastUpdated) > calendarErrorTimeout {
-			myErr := dd.stateFlagStore.CreateIfNotExists(CalendarErrorState)
-			if myErr != nil {
-				log.Printf("error setting calendar error state: %s", myErr)
-			}
-		} else {
-			myErr := dd.stateFlagStore.Delete(CalendarErrorState)
-			if myErr != nil {
-				log.Printf("error clearing calendar error state: %s", myErr)
-			}
+	const calendarErrorTimeout = 30 * time.Minute
+	lastUpdated := time.Unix(clockData.GoogleCalendar.Value.Dt, 0)
+	now := time.Now()
+	if now.Sub(lastUpdated) > calendarErrorTimeout {
+		myErr := dd.stateFlagStore.CreateIfNotExists(CalendarErrorState)
+		if myErr != nil {
+			log.Printf("error setting calendar error state: %s", myErr)
+		}
+	} else {
+		myErr := dd.stateFlagStore.Delete(CalendarErrorState)
+		if myErr != nil {
+			log.Printf("error clearing calendar error state: %s", myErr)
 		}
 	}
 
@@ -182,10 +180,7 @@ func (dd DeviceData) newClientContext() (context.Context, func()) {
 }
 
 func (dd DeviceData) setSoundOptions(data v2.Data) error {
-	if data.DeviceProfile == nil || data.DeviceProfile.Value == nil {
-		return errors.New("data.DeviceProfile is nil")
-	}
-	muteOptions, err := makeSoundOptions(*data.DeviceProfile.Value)
+	muteOptions, err := makeSoundOptions(data.DeviceProfile.Value)
 	if err != nil {
 		return err
 	}
@@ -194,23 +189,11 @@ func (dd DeviceData) setSoundOptions(data v2.Data) error {
 
 func makeSoundOptions(profile v2.DeviceProfile) (sound.MuteOptions, error) {
 	var muteOptions sound.MuteOptions
-	if profile.Device.IsMuted == nil {
-		return muteOptions, errors.New("profile.IsMuted is nil")
-	}
-	muteOptions.IsMute = *profile.Device.IsMuted
-	if profile.Device.IsMuteRange == nil {
-		return muteOptions, errors.New("profile.IsMuteRange is nil")
-	}
-	muteOptions.IsMuteRange = *profile.Device.IsMuteRange
+	muteOptions.IsMute = profile.Device.IsMuted
+	muteOptions.IsMuteRange = profile.Device.IsMuteRange
 	if muteOptions.IsMuteRange {
-		if profile.Device.MuteHourStart == nil {
-			return muteOptions, errors.New("profile.MuteHourStart is nil")
-		}
-		if profile.Device.MuteHourEnd == nil {
-			return muteOptions, errors.New("profile.MuteHourEnd is nil")
-		}
-		muteOptions.MuteStartHour = uint(*profile.Device.MuteHourStart)
-		muteOptions.MuteEndHour = uint(*profile.Device.MuteHourEnd)
+		muteOptions.MuteStartHour = uint(profile.Device.MuteHourStart)
+		muteOptions.MuteEndHour = uint(profile.Device.MuteHourEnd)
 	}
 	return muteOptions, nil
 }

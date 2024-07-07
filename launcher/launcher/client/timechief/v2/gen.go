@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/oapi-codegen/runtime"
-	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 const (
@@ -35,138 +34,139 @@ const (
 
 // APIKey defines model for APIKey.
 type APIKey struct {
-	IsAdmin       *bool     `json:"is_admin,omitempty"`
-	Name          *string   `json:"name,omitempty"`
-	PrincipalUuid *string   `json:"principal_uuid,omitempty"`
-	Scopes        *[]string `json:"scopes,omitempty"`
-	Uuid          *string   `json:"uuid,omitempty"`
+	IsAdmin       bool     `json:"is_admin"`
+	Name          string   `json:"name"`
+	PrincipalUuid string   `json:"principal_uuid"`
+	Scopes        []string `json:"scopes"`
+	Uuid          string   `json:"uuid"`
 }
 
 // BucketFile defines model for BucketFile.
 type BucketFile struct {
-	Bucket   string             `json:"Bucket"`
-	Filename string             `json:"Filename"`
-	MimeType string             `json:"MimeType"`
-	Object   string             `json:"Object"`
-	SHA256   string             `json:"SHA256"`
-	Size     int64              `json:"Size"`
-	Tag      string             `json:"Tag"`
-	UUID     openapi_types.UUID `json:"UUID"`
+	Bucket   string  `json:"bucket"`
+	Filename string  `json:"filename"`
+	Mimetype *string `json:"mimetype,omitempty"`
+	Object   string  `json:"object"`
+	Sha256   string  `json:"sha256"`
+	Size     int64   `json:"size"`
+	Tag      string  `json:"tag"`
+	Uuid     string  `json:"uuid"`
 }
 
 // BucketFileDownload defines model for BucketFileDownload.
 type BucketFileDownload struct {
-	Bucket      string             `json:"Bucket"`
-	DownloadURL *string            `json:"DownloadURL,omitempty"`
-	Filename    string             `json:"Filename"`
-	MimeType    string             `json:"MimeType"`
-	Object      string             `json:"Object"`
-	SHA256      string             `json:"SHA256"`
-	Size        int64              `json:"Size"`
-	Tag         string             `json:"Tag"`
-	UUID        openapi_types.UUID `json:"UUID"`
+	Bucket      string  `json:"bucket"`
+	DownloadUrl string  `json:"download_url"`
+	Filename    string  `json:"filename"`
+	Mimetype    *string `json:"mimetype,omitempty"`
+	Object      string  `json:"object"`
+	Sha256      string  `json:"sha256"`
+	Size        int64   `json:"size"`
+	Tag         string  `json:"tag"`
+	Url         string  `json:"url"`
+	Uuid        string  `json:"uuid"`
 }
 
 // BucketFileLink defines model for BucketFileLink.
 type BucketFileLink struct {
-	Filename *string `json:"filename,omitempty"`
-	Mimetype *string `json:"mimetype,omitempty"`
-	Sha256   *string `json:"sha256,omitempty"`
-	Size     *int    `json:"size,omitempty"`
-	Url      *string `json:"url,omitempty"`
-	Uuid     *string `json:"uuid,omitempty"`
+	Filename string `json:"filename"`
+	Mimetype string `json:"mimetype"`
+	Sha256   string `json:"sha256"`
+	Size     int    `json:"size"`
+	Url      string `json:"url"`
+	Uuid     string `json:"uuid"`
 }
 
 // BucketFileLinks defines model for BucketFileLinks.
 type BucketFileLinks struct {
-	Files *[]BucketFileLink `json:"files,omitempty"`
+	Files []BucketFileLink `json:"files"`
 }
 
 // BucketFilesDatum defines model for BucketFilesDatum.
 type BucketFilesDatum struct {
-	Dt    *int             `json:"dt,omitempty"`
-	Value *BucketFileLinks `json:"value,omitempty"`
+	Dt    int             `json:"dt"`
+	Value BucketFileLinks `json:"value"`
 }
 
 // Calendar defines model for Calendar.
 type Calendar struct {
-	Dt     *int64           `json:"dt,omitempty"`
-	Events *[]CalendarEvent `json:"events,omitempty"`
-	MaxDt  *int64           `json:"max_dt,omitempty"`
-	MinDt  *int64           `json:"min_dt,omitempty"`
+	Dt     int64           `json:"dt"`
+	Events []CalendarEvent `json:"events"`
+	MaxDt  int64           `json:"max_dt"`
+	MinDt  int64           `json:"min_dt"`
 }
 
 // CalendarDatum defines model for CalendarDatum.
 type CalendarDatum struct {
-	Dt    *int      `json:"dt,omitempty"`
-	Value *Calendar `json:"value,omitempty"`
+	Dt    int      `json:"dt"`
+	Value Calendar `json:"value"`
 }
 
 // CalendarEvent defines model for CalendarEvent.
 type CalendarEvent struct {
-	AllDay    *bool   `json:"all_day,omitempty"`
-	End       *int64  `json:"end,omitempty"`
-	Id        *string `json:"id,omitempty"`
-	ShortText *string `json:"short_text,omitempty"`
-	Start     *int64  `json:"start,omitempty"`
+	AllDay    bool   `json:"all_day"`
+	End       int64  `json:"end"`
+	Id        string `json:"id"`
+	ShortText string `json:"short_text"`
+	Start     int64  `json:"start"`
 }
 
 // CurrentWeather defines model for CurrentWeather.
 type CurrentWeather struct {
-	FeelsLike         *string           `json:"feels_like,omitempty"`
-	Temp              *string           `json:"temp,omitempty"`
-	WeatherConditions *WeatherCondition `json:"weather_conditions,omitempty"`
+	FeelsLike         string           `json:"feels_like"`
+	Temp              string           `json:"temp"`
+	WeatherConditions WeatherCondition `json:"weather_conditions"`
 }
 
 // DailyTemperature defines model for DailyTemperature.
 type DailyTemperature struct {
-	Day   *string `json:"day,omitempty"`
-	Eve   *string `json:"eve,omitempty"`
-	Morn  *string `json:"morn,omitempty"`
-	Night *string `json:"night,omitempty"`
+	Day   string `json:"day"`
+	Eve   string `json:"eve"`
+	Morn  string `json:"morn"`
+	Night string `json:"night"`
 }
 
 // DailyWeather defines model for DailyWeather.
 type DailyWeather struct {
-	Dt                *int              `json:"dt,omitempty"`
-	FeelsLike         *DailyTemperature `json:"feels_like,omitempty"`
-	MoonPhase         *string           `json:"moon_phase,omitempty"`
-	Moonrise          *int              `json:"moonrise,omitempty"`
-	Moonset           *int              `json:"moonset,omitempty"`
-	Sunrise           *int              `json:"sunrise,omitempty"`
-	Sunset            *int              `json:"sunset,omitempty"`
-	Temp              *DailyTemperature `json:"temp,omitempty"`
-	WeatherConditions *WeatherCondition `json:"weather_conditions,omitempty"`
+	Dt                int              `json:"dt"`
+	FeelsLike         DailyTemperature `json:"feels_like"`
+	MoonPhase         string           `json:"moon_phase"`
+	Moonrise          int              `json:"moonrise"`
+	Moonset           int              `json:"moonset"`
+	Sunrise           int              `json:"sunrise"`
+	Sunset            int              `json:"sunset"`
+	Temp              DailyTemperature `json:"temp"`
+	WeatherConditions WeatherCondition `json:"weather_conditions"`
 }
 
 // Data defines model for Data.
 type Data struct {
-	BucketFiles    *BucketFilesDatum    `json:"bucket_files,omitempty"`
-	DeviceProfile  *DeviceProfileDatum  `json:"device_profile,omitempty"`
-	Dt             *int                 `json:"dt,omitempty"`
-	GoogleCalendar *CalendarDatum       `json:"google_calendar,omitempty"`
-	GoogleProfile  *GoogleProfileDatum  `json:"google_profile,omitempty"`
-	Owm            *OWMDataDatum        `json:"owm,omitempty"`
-	SpookyCampaign *SpookyCampaignDatum `json:"spooky_campaign,omitempty"`
+	BucketFiles    BucketFilesDatum    `json:"bucket_files"`
+	DeviceProfile  DeviceProfileDatum  `json:"device_profile"`
+	Dt             int                 `json:"dt"`
+	GoogleCalendar CalendarDatum       `json:"google_calendar"`
+	GoogleProfile  GoogleProfileDatum  `json:"google_profile"`
+	Owm            OWMDataDatum        `json:"owm"`
+	SpookyCampaign SpookyCampaignDatum `json:"spooky_campaign"`
 }
 
 // Device defines model for Device.
 type Device struct {
-	HourCycleOption   *DeviceHourCycleOption   `json:"hour_cycle_option,omitempty"`
-	IsMuteRange       *bool                    `json:"is_mute_range,omitempty"`
-	IsMuted           *bool                    `json:"is_muted,omitempty"`
-	Latitude          *string                  `json:"latitude,omitempty"`
-	LicenseUuid       *string                  `json:"license_uuid,omitempty"`
-	Locale            *string                  `json:"locale,omitempty"`
-	Location          *string                  `json:"location,omitempty"`
-	Longitude         *string                  `json:"longitude,omitempty"`
-	MuteHourEnd       *int                     `json:"mute_hour_end,omitempty"`
-	MuteHourStart     *int                     `json:"mute_hour_start,omitempty"`
-	Nickname          *string                  `json:"nickname,omitempty"`
-	TemperatureOption *DeviceTemperatureOption `json:"temperature_option,omitempty"`
-	ThemeUuid         *string                  `json:"theme_uuid,omitempty"`
-	Timezone          *string                  `json:"timezone,omitempty"`
-	Uuid              *string                  `json:"uuid,omitempty"`
+	HourCycleOption   DeviceHourCycleOption   `json:"hour_cycle_option"`
+	IsMuteRange       bool                    `json:"is_mute_range"`
+	IsMuted           bool                    `json:"is_muted"`
+	Latitude          string                  `json:"latitude"`
+	LicenseUuid       string                  `json:"license_uuid"`
+	Locale            string                  `json:"locale"`
+	Location          string                  `json:"location"`
+	Longitude         string                  `json:"longitude"`
+	MuteHourEnd       int                     `json:"mute_hour_end"`
+	MuteHourStart     int                     `json:"mute_hour_start"`
+	Nickname          string                  `json:"nickname"`
+	TemperatureOption DeviceTemperatureOption `json:"temperature_option"`
+	ThemeUuid         string                  `json:"theme_uuid"`
+	Timezone          string                  `json:"timezone"`
+	Uuid              string                  `json:"uuid"`
 }
 
 // DeviceHourCycleOption defines model for Device.HourCycleOption.
@@ -177,46 +177,46 @@ type DeviceTemperatureOption string
 
 // DeviceProfile defines model for DeviceProfile.
 type DeviceProfile struct {
-	Device          *Device   `json:"device,omitempty"`
-	Features        *Features `json:"features,omitempty"`
-	PrincipalUuid   *string   `json:"principal_uuid,omitempty"`
-	ProfileCreateDt *int      `json:"profile_create_dt,omitempty"`
-	Theme           *Theme    `json:"theme,omitempty"`
+	Device          Device   `json:"device"`
+	Features        Features `json:"features"`
+	PrincipalUuid   string   `json:"principal_uuid"`
+	ProfileCreateDt *int     `json:"profile_create_dt,omitempty"`
+	Theme           Theme    `json:"theme"`
 }
 
 // DeviceProfileDatum defines model for DeviceProfileDatum.
 type DeviceProfileDatum struct {
-	Dt    *int           `json:"dt,omitempty"`
-	Value *DeviceProfile `json:"value,omitempty"`
+	Dt    int           `json:"dt"`
+	Value DeviceProfile `json:"value"`
 }
 
 // Features defines model for Features.
 type Features struct {
-	GoogleCalendar *bool `json:"google_calendar,omitempty"`
-	GoogleProfile  *bool `json:"google_profile,omitempty"`
-	OpenWeatherMap *bool `json:"open_weather_map,omitempty"`
+	GoogleCalendar bool `json:"google_calendar"`
+	GoogleProfile  bool `json:"google_profile"`
+	OpenWeatherMap bool `json:"open_weather_map"`
 }
 
 // GeocodeResult defines model for GeocodeResult.
 type GeocodeResult struct {
-	Address *string `json:"address,omitempty"`
-	Culture *struct {
-		CountryCode              *string `json:"country_code,omitempty"`
-		DefaultHourCycleOption   *string `json:"default_hour_cycle_option,omitempty"`
-		DefaultLocale            *string `json:"default_locale,omitempty"`
-		DefaultTemperatureOption *string `json:"default_temperature_option,omitempty"`
-	} `json:"culture,omitempty"`
-	Lat      *string `json:"lat,omitempty"`
-	Lng      *string `json:"lng,omitempty"`
-	Location *string `json:"location,omitempty"`
-	Timezone *string `json:"timezone,omitempty"`
+	Address string `json:"address"`
+	Culture struct {
+		CountryCode              string `json:"country_code"`
+		DefaultHourCycleOption   string `json:"default_hour_cycle_option"`
+		DefaultLocale            string `json:"default_locale"`
+		DefaultTemperatureOption string `json:"default_temperature_option"`
+	} `json:"culture"`
+	Lat      string `json:"lat"`
+	Lng      string `json:"lng"`
+	Location string `json:"location"`
+	Timezone string `json:"timezone"`
 }
 
 // GoogleProfile defines model for GoogleProfile.
 type GoogleProfile struct {
-	Dt           *int    `json:"dt,omitempty"`
-	EmailAddress *string `json:"email_address,omitempty"`
-	Uuid         *string `json:"uuid,omitempty"`
+	Dt           int    `json:"dt"`
+	EmailAddress string `json:"email_address"`
+	Uuid         string `json:"uuid"`
 }
 
 // GoogleProfileData defines model for GoogleProfileData.
@@ -226,126 +226,126 @@ type GoogleProfileData struct {
 
 // GoogleProfileDatum defines model for GoogleProfileDatum.
 type GoogleProfileDatum struct {
-	Dt    *int               `json:"dt,omitempty"`
-	Value *GoogleProfileData `json:"value,omitempty"`
+	Dt    int               `json:"dt"`
+	Value GoogleProfileData `json:"value"`
 }
 
 // License defines model for License.
 type License struct {
-	Premium       *bool   `json:"premium,omitempty"`
-	PrincipalUuid *string `json:"principal_uuid,omitempty"`
-	Uuid          *string `json:"uuid,omitempty"`
-	ValidUntil    *int    `json:"valid_until,omitempty"`
+	Premium       bool   `json:"premium"`
+	PrincipalUuid string `json:"principal_uuid"`
+	Uuid          string `json:"uuid"`
+	ValidUntil    int    `json:"valid_until"`
 }
 
 // OWMData defines model for OWMData.
 type OWMData struct {
-	Current *CurrentWeather `json:"current,omitempty"`
-	Daily   *[]DailyWeather `json:"daily,omitempty"`
+	Current CurrentWeather `json:"current"`
+	Daily   []DailyWeather `json:"daily"`
 }
 
 // OWMDataDatum defines model for OWMDataDatum.
 type OWMDataDatum struct {
-	Dt    *int     `json:"dt,omitempty"`
-	Value *OWMData `json:"value,omitempty"`
+	Dt    int     `json:"dt"`
+	Value OWMData `json:"value"`
 }
 
 // Order defines model for Order.
 type Order struct {
-	ActivationCode     *string `json:"activation_code,omitempty"`
-	CustomerIdentifier *string `json:"customer_identifier,omitempty"`
-	IncomingSheetId    *int    `json:"incoming_sheet_id,omitempty"`
-	Info               *struct {
-		LicenseCount *int `json:"license_count,omitempty"`
+	ActivationCode     string `json:"activation_code"`
+	CustomerIdentifier string `json:"customer_identifier"`
+	IncomingSheetId    int    `json:"incoming_sheet_id"`
+	Info               struct {
+		LicenseCount int  `json:"license_count"`
 		ValidUntil   *int `json:"valid_until,omitempty"`
-	} `json:"info,omitempty"`
-	OrderSystemUuid *string `json:"order_system_uuid,omitempty"`
-	OrderedAt       *int    `json:"ordered_at,omitempty"`
-	ProductName     *string `json:"product_name,omitempty"`
-	Uuid            *string `json:"uuid,omitempty"`
+	} `json:"info"`
+	OrderSystemUuid string `json:"order_system_uuid"`
+	OrderedAt       int    `json:"ordered_at"`
+	ProductName     string `json:"product_name"`
+	Uuid            string `json:"uuid"`
 }
 
 // OrderActivation defines model for OrderActivation.
 type OrderActivation struct {
-	Code *string `json:"code,omitempty"`
+	Code string `json:"code"`
 }
 
 // Principal defines model for Principal.
 type Principal struct {
-	AuthZeroSub *string `json:"auth_zero_sub,omitempty"`
-	Uuid        *string `json:"uuid,omitempty"`
+	AuthZeroSub string `json:"auth_zero_sub"`
+	Uuid        string `json:"uuid"`
 }
 
 // PrincipalGoogleAccount defines model for PrincipalGoogleAccount.
 type PrincipalGoogleAccount struct {
-	PrincipalUuid *string `json:"principal_uuid,omitempty"`
-	Token         *string `json:"token,omitempty"`
-	Uuid          *string `json:"uuid,omitempty"`
+	PrincipalUuid string `json:"principal_uuid"`
+	Token         string `json:"token"`
+	Uuid          string `json:"uuid"`
 }
 
 // SpookyCampaign defines model for SpookyCampaign.
 type SpookyCampaign struct {
-	VideoUuid *string `json:"video_uuid,omitempty"`
+	VideoUuid string `json:"video_uuid"`
 }
 
 // SpookyCampaignDatum defines model for SpookyCampaignDatum.
 type SpookyCampaignDatum struct {
-	Dt    *int            `json:"dt,omitempty"`
-	Value *SpookyCampaign `json:"value,omitempty"`
+	Dt    int            `json:"dt"`
+	Value SpookyCampaign `json:"value"`
 }
 
 // Theme defines model for Theme.
 type Theme struct {
-	BackgroundColor       *string   `json:"background_color,omitempty"`
-	BoxBackgroundColor    *string   `json:"box_background_color,omitempty"`
-	BoxBorderColor        *string   `json:"box_border_color,omitempty"`
-	BoxBorderRadius       *string   `json:"box_border_radius,omitempty"`
-	BoxBorderWidth        *string   `json:"box_border_width,omitempty"`
-	ButtonBackgroundColor *string   `json:"button_background_color,omitempty"`
-	ButtonBorderColor     *string   `json:"button_border_color,omitempty"`
-	ButtonBorderRadius    *string   `json:"button_border_radius,omitempty"`
-	ButtonBorderWidth     *string   `json:"button_border_width,omitempty"`
-	ButtonForegroundColor *string   `json:"button_foreground_color,omitempty"`
-	ForegroundColor       *string   `json:"foreground_color,omitempty"`
-	ImageFit              *string   `json:"image_fit,omitempty"`
-	ImageUuids            *[]string `json:"image_uuids,omitempty"`
-	MainFont              *string   `json:"main_font,omitempty"`
-	TimeColor             *string   `json:"time_color,omitempty"`
-	TimeFont              *string   `json:"time_font,omitempty"`
-	Uuid                  *string   `json:"uuid,omitempty"`
+	BackgroundColor       string   `json:"background_color"`
+	BoxBackgroundColor    string   `json:"box_background_color"`
+	BoxBorderColor        string   `json:"box_border_color"`
+	BoxBorderRadius       string   `json:"box_border_radius"`
+	BoxBorderWidth        string   `json:"box_border_width"`
+	ButtonBackgroundColor string   `json:"button_background_color"`
+	ButtonBorderColor     string   `json:"button_border_color"`
+	ButtonBorderRadius    string   `json:"button_border_radius"`
+	ButtonBorderWidth     string   `json:"button_border_width"`
+	ButtonForegroundColor string   `json:"button_foreground_color"`
+	ForegroundColor       string   `json:"foreground_color"`
+	ImageFit              string   `json:"image_fit"`
+	ImageUuids            []string `json:"image_uuids"`
+	MainFont              string   `json:"main_font"`
+	TimeColor             string   `json:"time_color"`
+	TimeFont              string   `json:"time_font"`
+	Uuid                  string   `json:"uuid"`
 }
 
 // Version defines model for Version.
 type Version struct {
-	Bucket   *string `json:"bucket,omitempty"`
-	Command  *string `json:"command,omitempty"`
-	Filename *string `json:"filename,omitempty"`
-	Object   *string `json:"object,omitempty"`
-	Product  *string `json:"product,omitempty"`
-	Sha256   *string `json:"sha256,omitempty"`
-	Size     *int    `json:"size,omitempty"`
-	Stream   *string `json:"stream,omitempty"`
-	Uuid     *string `json:"uuid,omitempty"`
-	Version  *string `json:"version,omitempty"`
+	Bucket   string `json:"bucket"`
+	Command  string `json:"command"`
+	Filename string `json:"filename"`
+	Object   string `json:"object"`
+	Product  string `json:"product"`
+	Sha256   string `json:"sha256"`
+	Size     int    `json:"size"`
+	Stream   string `json:"stream"`
+	Uuid     string `json:"uuid"`
+	Version  string `json:"version"`
 }
 
 // VersionDownload defines model for VersionDownload.
 type VersionDownload struct {
-	Command     *string `json:"command,omitempty"`
-	DownloadUrl *string `json:"download_url,omitempty"`
-	Filename    *string `json:"filename,omitempty"`
-	Product     *string `json:"product,omitempty"`
-	Sha256      *string `json:"sha256,omitempty"`
-	Size        *int    `json:"size,omitempty"`
-	Stream      *string `json:"stream,omitempty"`
-	Uuid        *string `json:"uuid,omitempty"`
-	Version     *string `json:"version,omitempty"`
+	Command     string `json:"command"`
+	DownloadUrl string `json:"download_url"`
+	Filename    string `json:"filename"`
+	Product     string `json:"product"`
+	Sha256      string `json:"sha256"`
+	Size        int    `json:"size"`
+	Stream      string `json:"stream"`
+	Uuid        string `json:"uuid"`
+	Version     string `json:"version"`
 }
 
 // WeatherCondition defines model for WeatherCondition.
 type WeatherCondition struct {
-	ConditionCode *string `json:"condition_code,omitempty"`
-	Warning       *bool   `json:"warning,omitempty"`
+	ConditionCode string `json:"condition_code"`
+	Warning       bool   `json:"warning"`
 }
 
 // ListAPIKeysParams defines parameters for ListAPIKeys.
@@ -353,15 +353,15 @@ type ListAPIKeysParams struct {
 	// Limit Number of API keys to return
 	Limit int `form:"limit" json:"limit"`
 
-	// Offset Offset for paginated results (optional)
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	// Offset Offset for paginated results
+	Offset int `form:"offset" json:"offset"`
 }
 
 // GetBucketfileParams defines parameters for GetBucketfile.
 type GetBucketfileParams struct {
-	Offset int     `form:"offset" json:"offset"`
-	Limit  int     `form:"limit" json:"limit"`
-	Tag    *string `form:"tag,omitempty" json:"tag,omitempty"`
+	Offset int    `form:"offset" json:"offset"`
+	Limit  int    `form:"limit" json:"limit"`
+	Tag    string `form:"tag" json:"tag"`
 }
 
 // ListDevicesParams defines parameters for ListDevices.
@@ -369,8 +369,8 @@ type ListDevicesParams struct {
 	// Limit Number of devices to return
 	Limit int `form:"limit" json:"limit"`
 
-	// Offset Offset for paginated results (optional)
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	// Offset Offset for paginated results
+	Offset int `form:"offset" json:"offset"`
 }
 
 // ListPrincipalGoogleAccountsParams defines parameters for ListPrincipalGoogleAccounts.
@@ -378,8 +378,8 @@ type ListPrincipalGoogleAccountsParams struct {
 	// Limit Number of principal google accounts to return
 	Limit int `form:"limit" json:"limit"`
 
-	// Offset Offset for paginated results (optional)
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	// Offset Offset for paginated results
+	Offset int `form:"offset" json:"offset"`
 }
 
 // GoogleOAuth2CallbackParams defines parameters for GoogleOAuth2Callback.
@@ -396,8 +396,8 @@ type ListLicensesParams struct {
 	// Limit Number of licenses to return
 	Limit int `form:"limit" json:"limit"`
 
-	// Offset Offset for paginated results (optional)
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	// Offset Offset for paginated results
+	Offset int `form:"offset" json:"offset"`
 }
 
 // ListOrdersParams defines parameters for ListOrders.
@@ -405,8 +405,8 @@ type ListOrdersParams struct {
 	// Limit Number of orders to return
 	Limit int `form:"limit" json:"limit"`
 
-	// Offset Offset for paginated results (optional)
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	// Offset Offset for paginated results
+	Offset int `form:"offset" json:"offset"`
 }
 
 // ListPrincipalsParams defines parameters for ListPrincipals.
@@ -414,8 +414,8 @@ type ListPrincipalsParams struct {
 	// Limit Number of principals to return
 	Limit int `form:"limit" json:"limit"`
 
-	// Offset Offset for paginated results (optional)
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	// Offset Offset for paginated results
+	Offset int `form:"offset" json:"offset"`
 }
 
 // ListThemesParams defines parameters for ListThemes.
@@ -424,7 +424,7 @@ type ListThemesParams struct {
 	Limit int `form:"limit" json:"limit"`
 
 	// Offset Offset for paginated results (optional)
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	Offset int `form:"offset" json:"offset"`
 }
 
 // ListVersionsParams defines parameters for ListVersions.
@@ -432,15 +432,15 @@ type ListVersionsParams struct {
 	// Limit Number of versions to return
 	Limit int `form:"limit" json:"limit"`
 
-	// Offset Offset for paginated results (optional)
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	// Offset Offset for paginated results
+	Offset int `form:"offset" json:"offset"`
 }
 
 // GeocodeParams defines parameters for Geocode.
 type GeocodeParams struct {
-	Lat  *string `form:"lat,omitempty" json:"lat,omitempty"`
-	Lng  *string `form:"lng,omitempty" json:"lng,omitempty"`
-	Term *string `form:"term,omitempty" json:"term,omitempty"`
+	Lat  string `form:"lat" json:"lat"`
+	Lng  string `form:"lng" json:"lng"`
+	Term string `form:"term" json:"term"`
 }
 
 // CreateAPIKeyJSONRequestBody defines body for CreateAPIKey for application/json ContentType.
@@ -1511,20 +1511,16 @@ func NewListAPIKeysRequest(server string, params *ListAPIKeysParams) (*http.Requ
 			}
 		}
 
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -1658,20 +1654,16 @@ func NewGetBucketfileRequest(server string, params *GetBucketfileParams) (*http.
 			}
 		}
 
-		if params.Tag != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "tag", runtime.ParamLocationQuery, *params.Tag); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "tag", runtime.ParamLocationQuery, params.Tag); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -1861,20 +1853,16 @@ func NewListDevicesRequest(server string, params *ListDevicesParams) (*http.Requ
 			}
 		}
 
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -2036,20 +2024,16 @@ func NewListPrincipalGoogleAccountsRequest(server string, params *ListPrincipalG
 			}
 		}
 
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -2438,20 +2422,16 @@ func NewListLicensesRequest(server string, params *ListLicensesParams) (*http.Re
 			}
 		}
 
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -2613,20 +2593,16 @@ func NewListOrdersRequest(server string, params *ListOrdersParams) (*http.Reques
 			}
 		}
 
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -2828,20 +2804,16 @@ func NewListPrincipalsRequest(server string, params *ListPrincipalsParams) (*htt
 			}
 		}
 
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -3030,20 +3002,16 @@ func NewListThemesRequest(server string, params *ListThemesParams) (*http.Reques
 			}
 		}
 
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -3205,20 +3173,16 @@ func NewListVersionsRequest(server string, params *ListVersionsParams) (*http.Re
 			}
 		}
 
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
@@ -3403,52 +3367,40 @@ func NewGeocodeRequest(server string, params *GeocodeParams) (*http.Request, err
 	if params != nil {
 		queryValues := queryURL.Query()
 
-		if params.Lat != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lat", runtime.ParamLocationQuery, *params.Lat); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lat", runtime.ParamLocationQuery, params.Lat); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
-		if params.Lng != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lng", runtime.ParamLocationQuery, *params.Lng); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lng", runtime.ParamLocationQuery, params.Lng); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
-		if params.Term != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "term", runtime.ParamLocationQuery, *params.Term); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "term", runtime.ParamLocationQuery, params.Term); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()

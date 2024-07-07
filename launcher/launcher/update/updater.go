@@ -190,18 +190,18 @@ func (up *Updater) SyncAPIVersions(ctx *cli.Context) error {
 	for _, version := range versions {
 		// Decode base64 encoded SHA256
 		// TODO nil checks
-		shaBytes, err := base64.StdEncoding.DecodeString(*version.Sha256)
+		shaBytes, err := base64.StdEncoding.DecodeString(version.Sha256)
 		if err != nil {
 			return err
 		}
 
 		storeVersion := store.Version{
-			UUID:    *version.Uuid,
-			Version: *version.Version,
-			Product: *version.Product,
-			Stream:  *version.Stream,
+			UUID:    version.Uuid,
+			Version: version.Version,
+			Product: version.Product,
+			Stream:  version.Stream,
 			SHA256:  shaBytes,
-			Command: *version.Command,
+			Command: version.Command,
 		}
 
 		err = up.versionStore.CreateIfNotExists(&storeVersion)

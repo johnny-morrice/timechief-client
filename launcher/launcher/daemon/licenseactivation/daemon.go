@@ -95,7 +95,7 @@ func (d Daemon) activateOrder(activationCode string) error {
 	ctx, cancel := context.WithTimeout(ctx, d.requestTimeout)
 	defer cancel()
 	resp, err := d.client.ActivateOrder(ctx, v2.OrderActivation{
-		Code: &activationCode,
+		Code: activationCode,
 	})
 	if err != nil {
 		return err

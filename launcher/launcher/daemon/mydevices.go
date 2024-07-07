@@ -60,7 +60,7 @@ func (md MyDevices) doTick(ctx *cli.Context) error {
 		return err
 	}
 	if len(devices) == 1 {
-		err = md.keyValueStore.Set(store.DeviceUUIDKey, *devices[0].Uuid)
+		err = md.keyValueStore.Set(store.DeviceUUIDKey, devices[0].Uuid)
 		if err != nil {
 			return err
 		}

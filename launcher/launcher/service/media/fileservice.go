@@ -86,7 +86,7 @@ func (svc FileService) GetMedia() (Media, error) {
 		return Media{}, err
 	}
 	media := fileMedia.Media
-	themeCSS, err := renderThemeCSS(&fileMedia.Theme)
+	themeCSS, err := renderThemeCSS(fileMedia.Theme)
 	if err != nil {
 		return Media{}, err
 	}
