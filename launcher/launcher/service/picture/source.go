@@ -1,7 +1,9 @@
 package picture
 
 import (
-	"encoding/hex"
+	"errors"
+
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 )
 
 type PictureSource interface {
@@ -15,29 +17,57 @@ type PictureDescriptor struct {
 	SHA256   []byte `json:"sha256"`
 }
 
-type StaticVideoSource struct {
-	picture PictureDescriptor
+type DevicePictureSource struct {
+	deviceDataStore DeviceDataStore
 }
 
-func NewStaticPictureSource(picture PictureDescriptor) StaticVideoSource {
-	return StaticVideoSource{picture: picture}
+func MakeDevicePictureSource(deviceDataStore DeviceDataStore) (DevicePictureSource, error) {
+	if deviceDataStore == nil {
+		return DevicePictureSource{}, errors.New("deviceDataStore is nil")
+	}
+	return DevicePictureSource{
+		deviceDataStore: deviceDataStore,
+	}, nil
 }
 
-func (s StaticVideoSource) GetPicture() (PictureDescriptor, error) {
-	return s.picture, nil
+type DeviceDataStore interface {
+	GetDeviceData() (v2.Data, error)
 }
 
-func MakeTestPicture() PictureDescriptor {
-	// shaText is output of fmt.Printf("%x", theBytes)
-	const shaText = "09578a98db3a92fe1c57a25c07985ffb196795bde02662d151e94cffa093ca63"
-	sha256, err := hex.DecodeString(shaText)
+func (src DevicePictureSource) GetPicture() (PictureDescriptor, error) {
+	deviceData, err := src.deviceDataStore.GetDeviceData()
 	if err != nil {
-		panic(err)
+		return PictureDescriptor{}, err
+	}
+	// TODO support more than one picture eventually.
+	if len(deviceData.DeviceProfile.Value.Theme.ImageUuids) == 0 {
+		return PictureDescriptor{}, nil
+	}
+	// TODO where do we support these options?
+	if deviceData.DeviceProfile.Value.Theme.ImageFit != "cover" {
+		return PictureDescriptor{}, errors.New("unsupported image fit")
+	}
+	pictureUUID := deviceData.DeviceProfile.Value.Theme.ImageUuids[0]
+	if pictureUUID == "" {
+		return PictureDescriptor{}, nil
+	}
+	bf, err := getBucketFile(pictureUUID, deviceData)
+	if err != nil {
+		return PictureDescriptor{}, err
 	}
 	return PictureDescriptor{
-		UUID:     "076cd234-d74f-11ee-aed2-776b2976eb9d",
-		Filename: "076cd234-d74f-11ee-aed2-776b2976eb9d.png",
-		URL:      "https://storage.googleapis.com/tc-dev-media-29b00b8a-cf4e-11ee-b66f-63251659d300/synthwave-retrowave-waves-sun-sky.jpg",
-		SHA256:   sha256,
+		UUID:     pictureUUID,
+		Filename: bf.Filename,
+		URL:      bf.Url,
+		SHA256:   []byte(bf.Sha256),
+	}, nil
+}
+
+func getBucketFile(uuid string, data v2.Data) (v2.BucketFileLink, error) {
+	for _, file := range data.BucketFiles.Value.Files {
+		if file.Uuid == uuid {
+			return file, nil
+		}
 	}
+	return v2.BucketFileLink{}, errors.New("video not found in bucketfile list")
 }
