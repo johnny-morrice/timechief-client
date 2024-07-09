@@ -3,14 +3,16 @@ package media
 import (
 	"errors"
 
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"gorm.io/gorm"
 )
 
 type Service struct {
-	videoService   VideoService
-	pictureService PictureService
+	videoService    VideoService
+	pictureService  PictureService
+	deviceDataStore DeviceDataStore
 }
 
 type VideoService interface {
@@ -23,16 +25,38 @@ type PictureService interface {
 	GetPreferences() (picture.Settings, error)
 }
 
-func MakeService(videoService VideoService, pictureService PictureService) (Service, error) {
+type DeviceDataStore interface {
+	GetDeviceData() (v2.Data, error)
+}
+
+func MakeService(videoService VideoService, pictureService PictureService, deviceDataStore DeviceDataStore) (Service, error) {
+	if videoService == nil {
+		return Service{}, errors.New("videoService is nil")
+	}
+	if pictureService == nil {
+		return Service{}, errors.New("pictureService is nil")
+	}
+	if deviceDataStore == nil {
+		return Service{}, errors.New("deviceDataStore is nil")
+	}
 	svc := Service{
-		videoService:   videoService,
-		pictureService: pictureService,
+		videoService:    videoService,
+		pictureService:  pictureService,
+		deviceDataStore: deviceDataStore,
 	}
 	return svc, nil
 }
 
 func (svc Service) GetMedia() (Media, error) {
-	myTheme := defaultTheme()
+	deviceData, err := svc.deviceDataStore.GetDeviceData()
+	if err != nil {
+		return Media{}, err
+	}
+	myTheme := deviceData.DeviceProfile.Value.Theme
+	// Sensible default if not initialised yet
+	if deviceData.DeviceProfile.Dt == 0 {
+		myTheme = defaultTheme()
+	}
 	themeCSS, err := renderThemeCSS(myTheme)
 	if err != nil {
 		return Media{}, err

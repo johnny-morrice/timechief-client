@@ -257,7 +257,7 @@ func Daemon(ctx *cli.Context) error {
 	apiMux := http.NewServeMux()
 	mediaMux := http.NewServeMux()
 
-	mediaService, err := makeMediaService(ctx, videoService, pictureService)
+	mediaService, err := makeMediaService(ctx, videoService, pictureService, deviceDataStore)
 	if err != nil {
 		return err
 	}
@@ -358,10 +358,10 @@ func Daemon(ctx *cli.Context) error {
 	return http.ListenAndServe(addr, rootMux)
 }
 
-func makeMediaService(ctx *cli.Context, videoService mediasvc.VideoService, pictureService mediasvc.PictureService) (data.MediaService, error) {
+func makeMediaService(ctx *cli.Context, videoService mediasvc.VideoService, pictureService mediasvc.PictureService, deviceDataStore store.DeviceDataStore) (data.MediaService, error) {
 	mediaFilePath := ctx.String("media-file")
 	if mediaFilePath == "" {
-		return mediasvc.MakeService(videoService, pictureService)
+		return mediasvc.MakeService(videoService, pictureService, deviceDataStore)
 	}
 	return mediasvc.MakeFileService(mediaFilePath, ctx.Duration("media-file-frequency"))
 }
