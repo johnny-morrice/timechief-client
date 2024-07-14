@@ -1505,8 +1505,7 @@ components:
           type: object
           properties:
             duration:
-              type: integer
-              format: int64
+              type: string
 
     BucketFilesDatum:
       type: object
@@ -1831,8 +1830,7 @@ components:
           type: object
           properties:
             duration:
-              type: integer
-              format: int64
+              type: string
 
     BucketFileDownload:
       type: object
@@ -1875,5 +1873,4 @@ components:
           type: object
           properties:
             duration:
-              type: integer
-              format: int64
+              type: string
