@@ -49,13 +49,13 @@ func (source DeviceVideoSource) GetVideo() (VideoDescriptor, error) {
 	if err != nil {
 		return VideoDescriptor{}, err
 	}
+
 	return VideoDescriptor{
 		UUID:     videoUUID,
 		Filename: bf.Filename,
-		// TODO fix duration.
-		// Duration: bf.Duration,
-		URL:    bf.Url,
-		SHA256: []byte(bf.Sha256),
+		Duration: time.Duration(bf.Metadata.Duration) * time.Second,
+		URL:      bf.Url,
+		SHA256:   []byte(bf.Sha256),
 	}, nil
 }
 

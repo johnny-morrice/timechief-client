@@ -1503,9 +1503,12 @@ components:
           type: string
         metadata:
           type: object
+          required:
+            - duration
           properties:
             duration:
-              type: string
+              type: integer
+              format: int64
 
     BucketFilesDatum:
       type: object
@@ -1828,9 +1831,12 @@ components:
           type: string
         metadata:
           type: object
+          required:
+            - duration
           properties:
             duration:
-              type: string
+              type: integer
+              format: int64
 
     BucketFileDownload:
       type: object
@@ -1871,6 +1877,9 @@ components:
           type: string
         metadata:
           type: object
+          required:
+            - duration
           properties:
             duration:
-              type: string
+              type: integer
+              format: int64

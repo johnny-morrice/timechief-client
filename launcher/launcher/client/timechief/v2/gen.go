@@ -46,7 +46,7 @@ type BucketFile struct {
 	Bucket   string `json:"bucket"`
 	Filename string `json:"filename"`
 	Metadata struct {
-		Duration *int64 `json:"duration,omitempty"`
+		Duration int64 `json:"duration"`
 	} `json:"metadata"`
 	Mimetype *string `json:"mimetype,omitempty"`
 	Object   string  `json:"object"`
@@ -62,7 +62,7 @@ type BucketFileDownload struct {
 	DownloadUrl string `json:"download_url"`
 	Filename    string `json:"filename"`
 	Metadata    struct {
-		Duration *int64 `json:"duration,omitempty"`
+		Duration int64 `json:"duration"`
 	} `json:"metadata"`
 	Mimetype *string `json:"mimetype,omitempty"`
 	Object   string  `json:"object"`
@@ -77,7 +77,7 @@ type BucketFileDownload struct {
 type BucketFileLink struct {
 	Filename string `json:"filename"`
 	Metadata struct {
-		Duration *int64 `json:"duration,omitempty"`
+		Duration int64 `json:"duration"`
 	} `json:"metadata"`
 	Mimetype string `json:"mimetype"`
 	Sha256   string `json:"sha256"`
