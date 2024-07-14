@@ -43,8 +43,11 @@ type APIKey struct {
 
 // BucketFile defines model for BucketFile.
 type BucketFile struct {
-	Bucket   string  `json:"bucket"`
-	Filename string  `json:"filename"`
+	Bucket   string `json:"bucket"`
+	Filename string `json:"filename"`
+	Metadata struct {
+		Duration *int64 `json:"duration,omitempty"`
+	} `json:"metadata"`
 	Mimetype *string `json:"mimetype,omitempty"`
 	Object   string  `json:"object"`
 	Sha256   string  `json:"sha256"`
@@ -55,21 +58,27 @@ type BucketFile struct {
 
 // BucketFileDownload defines model for BucketFileDownload.
 type BucketFileDownload struct {
-	Bucket      string  `json:"bucket"`
-	DownloadUrl string  `json:"download_url"`
-	Filename    string  `json:"filename"`
-	Mimetype    *string `json:"mimetype,omitempty"`
-	Object      string  `json:"object"`
-	Sha256      string  `json:"sha256"`
-	Size        int64   `json:"size"`
-	Tag         string  `json:"tag"`
-	Url         string  `json:"url"`
-	Uuid        string  `json:"uuid"`
+	Bucket      string `json:"bucket"`
+	DownloadUrl string `json:"download_url"`
+	Filename    string `json:"filename"`
+	Metadata    struct {
+		Duration *int64 `json:"duration,omitempty"`
+	} `json:"metadata"`
+	Mimetype *string `json:"mimetype,omitempty"`
+	Object   string  `json:"object"`
+	Sha256   string  `json:"sha256"`
+	Size     int64   `json:"size"`
+	Tag      string  `json:"tag"`
+	Url      string  `json:"url"`
+	Uuid     string  `json:"uuid"`
 }
 
 // BucketFileLink defines model for BucketFileLink.
 type BucketFileLink struct {
 	Filename string `json:"filename"`
+	Metadata struct {
+		Duration *int64 `json:"duration,omitempty"`
+	} `json:"metadata"`
 	Mimetype string `json:"mimetype"`
 	Sha256   string `json:"sha256"`
 	Size     int    `json:"size"`
