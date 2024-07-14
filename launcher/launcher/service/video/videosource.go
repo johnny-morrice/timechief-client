@@ -50,6 +50,10 @@ func (source DeviceVideoSource) GetVideo() (VideoDescriptor, error) {
 		return VideoDescriptor{}, err
 	}
 
+	if bf.Metadata.Duration == 0 {
+		return VideoDescriptor{}, errors.New("video duration is zero")
+	}
+
 	return VideoDescriptor{
 		UUID:     videoUUID,
 		Filename: bf.Filename,
