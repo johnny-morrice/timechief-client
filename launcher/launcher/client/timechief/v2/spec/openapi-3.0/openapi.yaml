@@ -1487,6 +1487,7 @@ components:
         - filename
         - mimetype
         - url
+        - metadata
       properties:
         uuid:
           type: string
@@ -1500,6 +1501,12 @@ components:
           type: string
         url:
           type: string
+        metadata:
+          type: object
+          properties:
+            duration:
+              type: integer
+              format: int64
 
     BucketFilesDatum:
       type: object
@@ -1800,6 +1807,7 @@ components:
         - filename
         - mimeType
         - tag
+        - metadata
       properties:
         uuid:
           type: string
@@ -1819,6 +1827,12 @@ components:
           type: string
         tag:
           type: string
+        metadata:
+          type: object
+          properties:
+            duration:
+              type: integer
+              format: int64
 
     BucketFileDownload:
       type: object
@@ -1833,6 +1847,7 @@ components:
         - tag
         - url
         - download_url
+        - metadata
       properties:
         uuid:
           type: string
@@ -1856,3 +1871,9 @@ components:
           type: string
         download_url:
           type: string
+        metadata:
+          type: object
+          properties:
+            duration:
+              type: integer
+              format: int64
