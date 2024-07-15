@@ -148,6 +148,11 @@ func getCLIApp() *cli.App {
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
 				},
+				&cli.BoolFlag{
+					Name:  "update",
+					Value: true,
+					Usage: "Update the client after initialisation",
+				},
 				&cli.StringFlag{
 					Name:  "api-base-url",
 					Value: store.DefaultBaseURL,
