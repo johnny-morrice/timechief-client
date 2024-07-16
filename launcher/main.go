@@ -148,33 +148,46 @@ func getCLIApp() *cli.App {
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
 				},
-				&cli.StringFlag{
-					Name:  "api-base-url",
-					Value: store.DefaultBaseURL,
+				&cli.BoolFlag{
+					Name:    "update",
+					Value:   true,
+					Usage:   "Update the client after initialisation",
+					EnvVars: []string{"UPDATE"},
 				},
 				&cli.StringFlag{
-					Name:  "product",
-					Value: store.DefaultProduct,
+					Name:    "api-base-url",
+					Value:   store.DefaultBaseURL,
+					EnvVars: []string{"API_BASE_URL"},
 				},
 				&cli.StringFlag{
-					Name:  "stream",
-					Value: store.DefaultStream,
+					Name:    "product",
+					Value:   store.DefaultProduct,
+					EnvVars: []string{"PRODUCT"},
+				},
+				&cli.StringFlag{
+					Name:    "stream",
+					Value:   store.DefaultStream,
+					EnvVars: []string{"STREAM"},
 				},
 				&cli.StringFlag{
 					Name:     "auth0-client-id",
 					Required: true,
+					EnvVars:  []string{"AUTH0_CLIENT_ID"},
 				},
 				&cli.StringFlag{
 					Name:     "auth0-audience",
 					Required: true,
+					EnvVars:  []string{"AUTH0_AUDIENCE"},
 				},
 				&cli.StringFlag{
 					Name:     "auth0-base-url",
 					Required: true,
+					EnvVars:  []string{"AUTH0_BASE_URL"},
 				},
 				&cli.BoolFlag{
-					Name:  "install-daemon",
-					Value: defaultInstallDaemon,
+					Name:    "install-daemon",
+					Value:   defaultInstallDaemon,
+					EnvVars: []string{"INSTALL_DAEMON"},
 				},
 				&cli.DurationFlag{
 					Name:  "service-request-timeout",

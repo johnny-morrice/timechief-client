@@ -1,8 +1,10 @@
 package video
 
 import (
-	"encoding/hex"
+	"errors"
 	"time"
+
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 )
 
 type VideoSource interface {
@@ -17,30 +19,55 @@ type VideoDescriptor struct {
 	SHA256   []byte        `json:"sha256"`
 }
 
-type StaticVideoSource struct {
-	video VideoDescriptor
+type DeviceDataStore interface {
+	GetDeviceData() (v2.Data, error)
 }
 
-func NewStaticVideoSource(video VideoDescriptor) StaticVideoSource {
-	return StaticVideoSource{video: video}
+type DeviceVideoSource struct {
+	deviceDataStore DeviceDataStore
 }
 
-func (s StaticVideoSource) GetVideo() (VideoDescriptor, error) {
-	return s.video, nil
+func MakeDeviceVideoSource(deviceDataStore DeviceDataStore) (DeviceVideoSource, error) {
+	if deviceDataStore == nil {
+		return DeviceVideoSource{}, errors.New("deviceDataStore is nil")
+	}
+	return DeviceVideoSource{
+		deviceDataStore: deviceDataStore,
+	}, nil
 }
 
-func MakeTestVideo() VideoDescriptor {
-	// shaText is output of fmt.Printf("%x", theBytes)
-	const shaText = "d6617a009c0c6c9aebf7398d43cad6d1985ddc1b9ab0479e2ea977362b8af5b0"
-	sha256, err := hex.DecodeString(shaText)
+func (source DeviceVideoSource) GetVideo() (VideoDescriptor, error) {
+	deviceData, err := source.deviceDataStore.GetDeviceData()
 	if err != nil {
-		panic(err)
+		return VideoDescriptor{}, err
 	}
+	videoUUID := deviceData.SpookyCampaign.Value.VideoUuid
+	if videoUUID == "" {
+		return VideoDescriptor{}, nil
+	}
+	bf, err := getBucketFile(videoUUID, deviceData)
+	if err != nil {
+		return VideoDescriptor{}, err
+	}
+
+	if bf.Metadata.Duration == 0 {
+		return VideoDescriptor{}, errors.New("video duration is zero")
+	}
+
 	return VideoDescriptor{
-		UUID:     "fa296dba-d1b5-11ee-81c7-8b87e46806f5",
-		Duration: 30 * time.Second,
-		Filename: "fa296dba-d1b5-11ee-81c7-8b87e46806f5.mp4",
-		URL:      "https://storage.googleapis.com/tc-dev-media-29b00b8a-cf4e-11ee-b66f-63251659d300/file_example_MP4_1920_18MG.mp4",
-		SHA256:   sha256,
+		UUID:     videoUUID,
+		Filename: bf.Filename,
+		Duration: time.Duration(bf.Metadata.Duration) * time.Second,
+		URL:      bf.Url,
+		SHA256:   []byte(bf.Sha256),
+	}, nil
+}
+
+func getBucketFile(uuid string, data v2.Data) (v2.BucketFileLink, error) {
+	for _, file := range data.BucketFiles.Value.Files {
+		if file.Uuid == uuid {
+			return file, nil
+		}
 	}
+	return v2.BucketFileLink{}, errors.New("video not found in bucketfile list")
 }

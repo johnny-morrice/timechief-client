@@ -19,7 +19,7 @@ var backgroundImageCSS string
 var themeTemplate = template.Must(template.New("theme").Parse(themeCSS))
 var backgroundImageTemplate = template.Must(template.New("backgroundImage").Parse(backgroundImageCSS))
 
-func renderThemeCSS(theme *v2.Theme) (string, error) {
+func renderThemeCSS(theme v2.Theme) (string, error) {
 	buf := bytes.Buffer{}
 	err := themeTemplate.Execute(&buf, theme)
 	if err != nil {

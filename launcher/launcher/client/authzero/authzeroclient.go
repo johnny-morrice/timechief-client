@@ -38,6 +38,12 @@ func (clnt AuthZeroClient) GetDeviceCode(ctx context.Context, clientID, audience
 	//   --header 'content-type: application/x-www-form-urlencoded' \
 	//   --data 'client_id=xxxxx' \
 	//   --data audience=https://timechief-dev.onrender.com
+	if clientID == "" {
+		return DeviceCodeResp{}, errors.New("clientID cannot be empty")
+	}
+	if audience == "" {
+		return DeviceCodeResp{}, errors.New("audience cannot be empty")
+	}
 	url := clnt.BaseURL + "/oauth/device/code"
 	payload := strings.NewReader("client_id=" + clientID + "&audience=" + audience + "&scope=offline_access")
 	req, err := http.NewRequest("POST", url, payload)
@@ -51,10 +57,20 @@ func (clnt AuthZeroClient) GetDeviceCode(ctx context.Context, clientID, audience
 		return DeviceCodeResp{}, err
 	}
 	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		// Log body
+		bodyContent := make([]byte, 1000)
+		n, _ := res.Body.Read(bodyContent)
+		log.Printf("error getting device code: %s %s", res.Status, string(bodyContent[:n]))
+		return DeviceCodeResp{}, fmt.Errorf("error getting device code: %s", res.Status)
+	}
 	result := DeviceCodeResp{}
 	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
 		return DeviceCodeResp{}, err
+	}
+	if result.DeviceCode == "" {
+		return result, fmt.Errorf("error getting device code: %v", result)
 	}
 	return result, nil
 }

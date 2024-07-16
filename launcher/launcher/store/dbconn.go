@@ -3,6 +3,7 @@
 package store
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/urfave/cli/v2"
@@ -17,7 +18,7 @@ func GetDBConnection(ctx *cli.Context) (*gorm.DB, error) {
 	dialect := sqlite.Open(dbPath)
 	db, err := gorm.Open(dialect, getGormConfig())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open sqlite database at %s: %w", dbPath, err)
 	}
 	err = db.Exec("PRAGMA synchronous = FULL;").Error
 	if err != nil {

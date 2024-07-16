@@ -196,38 +196,37 @@ func (svc Service) SetMyDevice(deviceUUID string) error {
 func (svc Service) GetDeviceData() (DeviceData, error) {
 	deviceData, err := svc.deviceDataStore.GetDeviceData()
 	if err != nil {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get device data from store: %w", err)
 	}
 
 	flags, err := svc.stateFlagStore.List()
 	if err != nil {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get state flags: %w", err)
 	}
 
 	target, err := svc.launchTargetStore.GetActiveLaunchTarget()
-
-	if err != nil {
-		return DeviceData{}, err
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, fmt.Errorf("failed to get active launch target: %w", err)
 	}
 
 	wifiInterface, err := svc.wifiInterfaceStore.GetActive()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get active wifi interface: %w", err)
 	}
 
 	storeNets, err := svc.wifiNetworkStore.List()
 	if err != nil {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get wifi networks: %w", err)
 	}
 
 	activeNet, err := svc.wifiNetworkStore.GetActive()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get active wifi network: %w", err)
 	}
 
 	isWifiError, err := svc.stateFlagStore.Exists("wifi-error")
 	if err != nil {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get wifi error flag: %w", err)
 	}
 
 	networks := make([]WifiNetwork, len(storeNets))
@@ -241,17 +240,17 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 
 	ipAddress, err := svc.keyValueStore.Get(store.IPAddressKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get ip address: %w", err)
 	}
 
 	interfaceMode, err := svc.keyValueStore.Get(store.InterfaceModeKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get interface mode: %w", err)
 	}
 
 	setupState, err := svc.keyValueStore.Get("setup")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get setup state: %w", err)
 	}
 
 	hotspotSSID, err := svc.keyValueStore.Get(store.HotspotSSID)
@@ -292,7 +291,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 
 	media, err := svc.mediaService.GetMedia()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return DeviceData{}, err
+		return DeviceData{}, fmt.Errorf("failed to get media: %w", err)
 	}
 
 	result := DeviceData{

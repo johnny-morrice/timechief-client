@@ -27,6 +27,11 @@ func (init Initialiser) Initialise(ctx *cli.Context, cfg store.Config) error {
 	if err != nil {
 		return err
 	}
+	isUpdate := ctx.Bool("update")
+	if !isUpdate {
+		log.Print("Skipping update, initialised client OK")
+		return nil
+	}
 	err = init.FirstUpdate(ctx)
 	if err != nil {
 		return err

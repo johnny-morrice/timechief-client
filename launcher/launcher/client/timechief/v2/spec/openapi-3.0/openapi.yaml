@@ -63,8 +63,8 @@ paths:
             type: "integer"
         - in: "query"
           name: "offset"
-          description: "Offset for paginated results (optional)"
-          required: false
+          description: "Offset for paginated results"
+          required: true
           schema:
             type: "integer"
       responses:
@@ -144,8 +144,8 @@ paths:
             type: "integer"
         - in: "query"
           name: "offset"
-          description: "Offset for paginated results (optional)"
-          required: false
+          description: "Offset for paginated results"
+          required: true
           schema:
             type: "integer"
       responses:
@@ -242,8 +242,8 @@ paths:
             type: "integer"
         - in: "query"
           name: "offset"
-          description: "Offset for paginated results (optional)"
-          required: false
+          description: "Offset for paginated results"
+          required: true
           schema:
             type: "integer"
       responses:
@@ -341,8 +341,8 @@ paths:
             type: "integer"
         - in: "query"
           name: "offset"
-          description: "Offset for paginated results (optional)"
-          required: false
+          description: "Offset for paginated results"
+          required: true
           schema:
             type: "integer"
       responses:
@@ -438,8 +438,8 @@ paths:
             type: "integer"
         - in: "query"
           name: "offset"
-          description: "Offset for paginated results (optional)"
-          required: false
+          description: "Offset for paginated results"
+          required: true
           schema:
             type: "integer"
       responses:
@@ -577,8 +577,8 @@ paths:
             type: "integer"
         - in: "query"
           name: "offset"
-          description: "Offset for paginated results (optional)"
-          required: false
+          description: "Offset for paginated results"
+          required: true
           schema:
             type: "integer"
       responses:
@@ -833,8 +833,8 @@ paths:
             type: "integer"
         - in: "query"
           name: "offset"
-          description: "Offset for paginated results (optional)"
-          required: false
+          description: "Offset for paginated results"
+          required: true
           schema:
             type: "integer"
       responses:
@@ -941,19 +941,19 @@ paths:
       parameters:
         - name: lat
           in: query
-          required: false
+          required: true
           schema:
             type: string
             format: latitude
         - name: lng
           in: query
-          required: false
+          required: true
           schema:
             type: string
             format: longitude
         - name: term
           in: query
-          required: false
+          required: true
           schema:
             type: string
             maxLength: 1024
@@ -971,6 +971,172 @@ paths:
         "500":
           description: Internal server error
 
+  /theme:
+    post:
+      summary: "Create a new theme"
+      operationId: "createTheme"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Theme"
+      responses:
+        "200":
+          description: "Theme created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    put:
+      summary: "Update a theme"
+      operationId: "updateTheme"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Theme"
+      responses:
+        "204":
+          description: "Theme updated successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    get:
+      summary: "Get a list of themes"
+      operationId: "listThemes"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of themes to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results (optional)"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of themes retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+  /theme/{id}:
+    get:
+      summary: "Get a theme by ID"
+      operationId: "getThemeById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the theme to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Theme retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+  /bucketfile:
+    get:
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: tag
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BucketFile'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+  /bucketfile/{uuid}:
+    get:
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+  /bucketfile/{uuid}/download:
+    get:
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFileDownload'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -980,6 +1146,13 @@ components:
   schemas:
     GeocodeResult:
       type: object
+      required:
+        - lat
+        - lng
+        - timezone
+        - address
+        - location
+        - culture
       properties:
         lat:
           type: string
@@ -993,6 +1166,11 @@ components:
           type: string
         culture:
           type: object
+          required:
+            - country_code
+            - default_locale
+            - default_temperature_option
+            - default_hour_cycle_option
           properties:
             country_code:
               type: string
@@ -1005,6 +1183,12 @@ components:
 
     APIKey:
       type: object
+      required:
+        - uuid
+        - principal_uuid
+        - name
+        - scopes
+        - is_admin
       properties:
         uuid:
           type: string
@@ -1020,6 +1204,22 @@ components:
             type: string
     Device:
       type: "object"
+      required:
+        - uuid
+        - nickname
+        - latitude
+        - longitude
+        - timezone
+        - location
+        - locale
+        - hour_cycle_option
+        - temperature_option
+        - license_uuid
+        - is_muted
+        - is_mute_range
+        - mute_hour_start
+        - mute_hour_end
+        - theme_uuid
       properties:
         uuid:
           type: "string"
@@ -1040,6 +1240,11 @@ components:
           enum:
             - "12h"
             - "24h"
+        temperature_option:
+          type: "string"
+          enum:
+            - "c"
+            - "f"
         license_uuid:
           type: "string"
         is_muted:
@@ -1050,9 +1255,16 @@ components:
           type: integer
         mute_hour_end:
           type: integer
+        theme_uuid:
+          type: "string"
 
     License:
       type: "object"
+      required:
+        - uuid
+        - principal_uuid
+        - valid_until
+        - premium
       properties:
         uuid:
           type: "string"
@@ -1065,6 +1277,9 @@ components:
 
     Principal:
       type: "object"
+      required:
+        - uuid
+        - auth_zero_sub
       properties:
         uuid:
           type: "string"
@@ -1073,6 +1288,10 @@ components:
 
     PrincipalGoogleAccount:
       type: "object"
+      required:
+        - uuid
+        - principal_uuid
+        - token
       properties:
         uuid:
           type: "string"
@@ -1083,6 +1302,10 @@ components:
 
     GoogleProfile:
       type: "object"
+      required:
+        - uuid
+        - email_address
+        - dt
       properties:
         uuid:
           type: "string"
@@ -1093,6 +1316,17 @@ components:
 
     Version:
       type: "object"
+      required:
+        - uuid
+        - version
+        - product
+        - stream
+        - bucket
+        - object
+        - sha256
+        - command
+        - filename
+        - size
       properties:
         uuid:
           type: "string"
@@ -1110,9 +1344,23 @@ components:
           type: "string"
         command:
           type: "string"
+        filename:
+          type: "string"
+        size:
+          type: "integer"
 
     VersionDownload:
       type: "object"
+      required:
+        - uuid
+        - version
+        - product
+        - stream
+        - sha256
+        - command
+        - download_url
+        - filename
+        - size
       properties:
         uuid:
           type: "string"
@@ -1128,9 +1376,16 @@ components:
           type: "string"
         download_url:
           type: "string"
+        filename:
+          type: "string"
+        size:
+          type: "integer"
 
     WeatherCondition:
       type: object
+      required:
+        - condition_code
+        - warning
       properties:
         condition_code:
           type: string
@@ -1139,6 +1394,10 @@ components:
 
     CurrentWeather:
       type: object
+      required:
+        - temp
+        - feels_like
+        - weather_conditions
       properties:
         temp:
           type: string
@@ -1149,6 +1408,11 @@ components:
 
     DailyTemperature:
       type: object
+      required:
+        - morn
+        - day
+        - eve
+        - night
       properties:
         morn:
           type: string
@@ -1161,6 +1425,16 @@ components:
 
     DailyWeather:
       type: object
+      required:
+        - dt
+        - temp
+        - feels_like
+        - weather_conditions
+        - sunrise
+        - sunset
+        - moonrise
+        - moonset
+        - moon_phase
       properties:
         dt:
           type: integer
@@ -1183,6 +1457,9 @@ components:
 
     OWMData:
       type: object
+      required:
+        - current
+        - daily
       properties:
         current:
           $ref: "#/components/schemas/CurrentWeather"
@@ -1191,35 +1468,73 @@ components:
           items:
             $ref: "#/components/schemas/DailyWeather"
 
+    BucketFileLinks:
+      type: object
+      required:
+        - files
+      properties:
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/BucketFileLink"
+
+    BucketFileLink:
+      type: object
+      required:
+        - uuid
+        - sha256
+        - size
+        - filename
+        - mimetype
+        - url
+        - metadata
+      properties:
+        uuid:
+          type: string
+        sha256:
+          type: string
+        size:
+          type: integer
+        filename:
+          type: string
+        mimetype:
+          type: string
+        url:
+          type: string
+        metadata:
+          type: object
+          required:
+            - duration
+          properties:
+            duration:
+              type: integer
+              format: int64
+
+    BucketFilesDatum:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        value:
+          $ref: "#/components/schemas/BucketFileLinks"
+        dt:
+          type: integer
+
     DeviceProfile:
       type: object
+      required:
+        - principal_uuid
+        - device
+        - theme
+        - features
       properties:
-        device_uuid:
-          type: string
         principal_uuid:
           type: string
-        latitude:
-          type: string
-        longitude:
-          type: string
-        timezone:
-          type: string
-        location:
-          type: string
-        locale:
-          type: string
-        hour_cycle_option:
-          type: string
-        is_muted:
-          type: boolean
-        is_mute_range:
-          type: boolean
-        mute_hour_start:
-          type: integer
-        mute_hour_end:
-          type: integer
-        license_uuid:
-          type: string
+        device:
+          $ref: "#/components/schemas/Device"
+        theme:
+          $ref: "#/components/schemas/Theme"
         features:
           $ref: "#/components/schemas/Features"
         profile_create_dt:
@@ -1227,6 +1542,10 @@ components:
 
     Features:
       type: object
+      required:
+        - open_weather_map
+        - google_calendar
+        - google_profile
       properties:
         open_weather_map:
           type: boolean
@@ -1237,6 +1556,24 @@ components:
 
     Theme:
       type: object
+      required:
+        - uuid
+        - foreground_color
+        - background_color
+        - box_background_color
+        - box_border_radius
+        - box_border_width
+        - box_border_color
+        - main_font
+        - time_font
+        - time_color
+        - button_border_radius
+        - button_border_width
+        - button_border_color
+        - button_foreground_color
+        - button_background_color
+        - image_fit
+        - image_uuids
       properties:
         uuid:
           type: string
@@ -1268,17 +1605,18 @@ components:
           type: string
         button_background_color:
           type: string
-
-    ThemeDatum:
-      type: object
-      properties:
-        value:
-          $ref: "#/components/schemas/Theme"
-        dt:
-          type: integer
+        image_fit:
+          type: string
+        image_uuids:
+          type: array
+          items:
+            type: string
 
     OWMDataDatum:
       type: object
+      required:
+        - value
+        - dt
       properties:
         value:
           $ref: "#/components/schemas/OWMData"
@@ -1287,6 +1625,9 @@ components:
 
     DeviceProfileDatum:
       type: object
+      required:
+        - value
+        - dt
       properties:
         value:
           $ref: "#/components/schemas/DeviceProfile"
@@ -1295,12 +1636,18 @@ components:
 
     GoogleProfileData:
       type: object
+      required:
+        - value
+        - dt
       properties:
         email_address:
           type: string
 
     GoogleProfileDatum:
       type: object
+      required:
+        - value
+        - dt
       properties:
         value:
           $ref: "#/components/schemas/GoogleProfileData"
@@ -1309,6 +1656,11 @@ components:
 
     Calendar:
       type: object
+      required:
+        - events
+        - min_dt
+        - max_dt
+        - dt
       properties:
         events:
           type: array
@@ -1326,6 +1678,12 @@ components:
 
     CalendarEvent:
       type: object
+      required:
+        - id
+        - short_text
+        - all_day
+        - start
+        - end
       properties:
         id:
           type: string
@@ -1342,14 +1700,44 @@ components:
 
     CalendarDatum:
       type: object
+      required:
+        - value
+        - dt
       properties:
         value:
           $ref: "#/components/schemas/Calendar"
         dt:
           type: integer
 
+    SpookyCampaign:
+      type: object
+      required:
+        - video_uuid
+      properties:
+        video_uuid:
+          type: string
+
+    SpookyCampaignDatum:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        value:
+          $ref: "#/components/schemas/SpookyCampaign"
+        dt:
+          type: integer
+
     Data:
       type: object
+      required:
+        - device_profile
+        - owm
+        - google_calendar
+        - google_profile
+        - spooky_campaign
+        - bucket_files
+        - dt
       properties:
         device_profile:
           $ref: "#/components/schemas/DeviceProfileDatum"
@@ -1359,13 +1747,24 @@ components:
           $ref: "#/components/schemas/CalendarDatum"
         google_profile:
           $ref: "#/components/schemas/GoogleProfileDatum"
-        theme:
-          $ref: "#/components/schemas/ThemeDatum"
+        spooky_campaign:
+          $ref: "#/components/schemas/SpookyCampaignDatum"
+        bucket_files:
+          $ref: "#/components/schemas/BucketFilesDatum"
         dt:
           type: integer
 
     Order:
       type: object
+      required:
+        - uuid
+        - incoming_sheet_id
+        - order_system_uuid
+        - customer_identifier
+        - product_name
+        - activation_code
+        - ordered_at
+        - info
       properties:
         uuid:
           type: string
@@ -1383,6 +1782,8 @@ components:
           type: integer
         info:
           type: object
+          required:
+            - license_count
           properties:
             license_count:
               type: integer
@@ -1391,6 +1792,94 @@ components:
 
     OrderActivation:
       type: object
+      required:
+        - code
       properties:
         code:
           type: string
+
+    BucketFile:
+      type: object
+      required:
+        - uuid
+        - bucket
+        - object
+        - sha256
+        - size
+        - filename
+        - mimeType
+        - tag
+        - metadata
+      properties:
+        uuid:
+          type: string
+        bucket:
+          type: string
+        object:
+          type: string
+        sha256:
+          type: string
+          format: sha256
+        size:
+          type: integer
+          format: int64
+        filename:
+          type: string
+        mimetype:
+          type: string
+        tag:
+          type: string
+        metadata:
+          type: object
+          required:
+            - duration
+          properties:
+            duration:
+              type: integer
+              format: int64
+
+    BucketFileDownload:
+      type: object
+      required:
+        - uuid
+        - bucket
+        - object
+        - sha256
+        - size
+        - filename
+        - mimeType
+        - tag
+        - url
+        - download_url
+        - metadata
+      properties:
+        uuid:
+          type: string
+        bucket:
+          type: string
+        object:
+          type: string
+        sha256:
+          type: string
+          format: sha256
+        size:
+          type: integer
+          format: int64
+        filename:
+          type: string
+        mimetype:
+          type: string
+        tag:
+          type: string
+        url:
+          type: string
+        download_url:
+          type: string
+        metadata:
+          type: object
+          required:
+            - duration
+          properties:
+            duration:
+              type: integer
+              format: int64

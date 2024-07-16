@@ -7,7 +7,7 @@ import (
 )
 
 // randomTheme returns a random theme and is intended for testing.
-func randomTheme() *v2.Theme {
+func randomTheme() v2.Theme {
 	i := randomColorIndex()
 	bg := backgroundColor(i)
 	boxBg := boxBackgroundColor(i)
@@ -17,25 +17,25 @@ func randomTheme() *v2.Theme {
 	borderWidth := boxBorderWidth()
 	timeFont := "Seven Segment"
 	mainFont := randomFont()
-	return &v2.Theme{
-		ForegroundColor:       &fg,
-		BackgroundColor:       &bg,
-		BoxBackgroundColor:    &boxBg,
-		ButtonBackgroundColor: &buttonBg,
-		BoxBorderRadius:       &radius,
-		BoxBorderWidth:        &borderWidth,
-		BoxBorderColor:        &fg,
-		ButtonBorderRadius:    &radius,
-		ButtonBorderWidth:     &borderWidth,
-		ButtonBorderColor:     &fg,
-		ButtonForegroundColor: &fg,
-		TimeFont:              &timeFont,
-		TimeColor:             &fg,
-		MainFont:              &mainFont,
+	return v2.Theme{
+		ForegroundColor:       fg,
+		BackgroundColor:       bg,
+		BoxBackgroundColor:    boxBg,
+		ButtonBackgroundColor: buttonBg,
+		BoxBorderRadius:       radius,
+		BoxBorderWidth:        borderWidth,
+		BoxBorderColor:        fg,
+		ButtonBorderRadius:    radius,
+		ButtonBorderWidth:     borderWidth,
+		ButtonBorderColor:     fg,
+		ButtonForegroundColor: fg,
+		TimeFont:              timeFont,
+		TimeColor:             fg,
+		MainFont:              mainFont,
 	}
 }
 
-func synthwaveDemoTheme() *v2.Theme {
+func synthwaveDemoTheme() v2.Theme {
 	fgColor := "#fd49c7"
 	bgColor := "#000000"
 	boxBgColor := "#3d215355"
@@ -44,46 +44,46 @@ func synthwaveDemoTheme() *v2.Theme {
 	timeFont := "Seven Segment"
 	mainFont := "'Titillium Web'"
 	borderWidth := "1px"
-	return &v2.Theme{
-		ForegroundColor:       &fgColor,
-		BackgroundColor:       &bgColor,
-		BoxBackgroundColor:    &boxBgColor,
-		ButtonBackgroundColor: &boxBgColor,
-		BoxBorderRadius:       &borderRadius,
-		BoxBorderWidth:        &borderWidth,
-		BoxBorderColor:        &boxBgColor,
-		ButtonBorderRadius:    &borderRadius,
-		ButtonBorderWidth:     &borderWidth,
-		ButtonBorderColor:     &boxBgColor,
-		ButtonForegroundColor: &fgColor,
-		TimeFont:              &timeFont,
-		TimeColor:             &timeColor,
-		MainFont:              &mainFont,
+	return v2.Theme{
+		ForegroundColor:       fgColor,
+		BackgroundColor:       bgColor,
+		BoxBackgroundColor:    boxBgColor,
+		ButtonBackgroundColor: boxBgColor,
+		BoxBorderRadius:       borderRadius,
+		BoxBorderWidth:        borderWidth,
+		BoxBorderColor:        boxBgColor,
+		ButtonBorderRadius:    borderRadius,
+		ButtonBorderWidth:     borderWidth,
+		ButtonBorderColor:     boxBgColor,
+		ButtonForegroundColor: fgColor,
+		TimeFont:              timeFont,
+		TimeColor:             timeColor,
+		MainFont:              mainFont,
 	}
 }
 
-func defaultTheme() *v2.Theme {
+func defaultTheme() v2.Theme {
 	fgColor := "#008000"
 	bgColor := "#000000"
 	borderRadius := "0px"
 	timeFont := "Seven Segment"
 	mainFont := "'Titillium Web'"
 	borderWidth := "1px"
-	return &v2.Theme{
-		ForegroundColor:       &fgColor,
-		BackgroundColor:       &bgColor,
-		BoxBackgroundColor:    &bgColor,
-		ButtonBackgroundColor: &bgColor,
-		BoxBorderRadius:       &borderRadius,
-		BoxBorderWidth:        &borderWidth,
-		BoxBorderColor:        &fgColor,
-		ButtonBorderRadius:    &borderRadius,
-		ButtonBorderWidth:     &borderWidth,
-		ButtonBorderColor:     &fgColor,
-		ButtonForegroundColor: &fgColor,
-		TimeFont:              &timeFont,
-		TimeColor:             &fgColor,
-		MainFont:              &mainFont,
+	return v2.Theme{
+		ForegroundColor:       fgColor,
+		BackgroundColor:       bgColor,
+		BoxBackgroundColor:    bgColor,
+		ButtonBackgroundColor: bgColor,
+		BoxBorderRadius:       borderRadius,
+		BoxBorderWidth:        borderWidth,
+		BoxBorderColor:        fgColor,
+		ButtonBorderRadius:    borderRadius,
+		ButtonBorderWidth:     borderWidth,
+		ButtonBorderColor:     fgColor,
+		ButtonForegroundColor: fgColor,
+		TimeFont:              timeFont,
+		TimeColor:             fgColor,
+		MainFont:              mainFont,
 	}
 
 }

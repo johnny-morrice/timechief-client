@@ -81,12 +81,12 @@ func (vd *VersionDownloader) fetchVersionDownloadURL(version service.Version) (s
 		if err != nil {
 			return "", err
 		}
-		if download.DownloadUrl == nil || *download.DownloadUrl == "" {
+		if download.DownloadUrl == "" {
 			log.Printf("waiting for download url for %s", version.Details())
 			time.Sleep(time.Second * 1)
 			continue
 		}
-		return *download.DownloadUrl, nil
+		return download.DownloadUrl, nil
 	}
 }
 
