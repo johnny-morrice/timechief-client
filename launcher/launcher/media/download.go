@@ -26,11 +26,11 @@ func MakeMediaDownloader(timeout time.Duration) (MediaDownloader, error) {
 func (md MediaDownloader) Download(ctx context.Context, url string, sha256 []byte) ([]byte, error) {
 	content, err := md.doDownload(ctx, url)
 	if err != nil {
-		return nil, fmt.Errorf("failed to download video content: %w", err)
+		return nil, fmt.Errorf("failed to download content at: %s: %w", url, err)
 	}
 	err = doSHA256(bytes.NewReader(content), sha256)
 	if err != nil {
-		return nil, fmt.Errorf("failed to validate video content at %s: %w", url, err)
+		return nil, fmt.Errorf("failed to validate content at %s: %w", url, err)
 	}
 	return content, nil
 }

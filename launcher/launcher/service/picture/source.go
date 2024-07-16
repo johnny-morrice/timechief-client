@@ -1,7 +1,9 @@
 package picture
 
 import (
+	"encoding/hex"
 	"errors"
+	"fmt"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 )
@@ -55,11 +57,17 @@ func (src DevicePictureSource) GetPicture() (PictureDescriptor, error) {
 	if err != nil {
 		return PictureDescriptor{}, err
 	}
+
+	hx, err := hex.DecodeString(bf.Sha256)
+	if err != nil {
+		return PictureDescriptor{}, fmt.Errorf("failed to decode sha256: %w", err)
+	}
+
 	return PictureDescriptor{
 		UUID:     pictureUUID,
 		Filename: bf.Filename,
 		URL:      bf.Url,
-		SHA256:   []byte(bf.Sha256),
+		SHA256:   hx,
 	}, nil
 }
 

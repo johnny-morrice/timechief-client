@@ -204,6 +204,7 @@ type Features struct {
 	GoogleCalendar bool `json:"google_calendar"`
 	GoogleProfile  bool `json:"google_profile"`
 	OpenWeatherMap bool `json:"open_weather_map"`
+	SpookyCampaign bool `json:"spooky_campaign"`
 }
 
 // GeocodeResult defines model for GeocodeResult.

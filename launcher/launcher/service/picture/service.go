@@ -13,9 +13,10 @@ import (
 )
 
 type Service struct {
-	keyValueStore KeyValueStore
-	filesystem    media.FS
-	downloader    Downloader
+	keyValueStore   KeyValueStore
+	filesystem      media.FS
+	downloader      Downloader
+	deviceDataStore DeviceDataStore
 }
 
 type Downloader interface {
@@ -27,7 +28,7 @@ type KeyValueStore interface {
 	Set(key, value string) error
 }
 
-func MakeService(keyValueStore KeyValueStore, filesystem media.FS, downloader Downloader) (Service, error) {
+func MakeService(keyValueStore KeyValueStore, filesystem media.FS, downloader Downloader, deviceDataStore DeviceDataStore) (Service, error) {
 	if keyValueStore == nil {
 		return Service{}, errors.New("keyValueStore must not be nil")
 	}
@@ -37,11 +38,15 @@ func MakeService(keyValueStore KeyValueStore, filesystem media.FS, downloader Do
 	if downloader == nil {
 		return Service{}, errors.New("downloader must not be nil")
 	}
+	if deviceDataStore == nil {
+		return Service{}, errors.New("deviceDataStore must not be nil")
+	}
 
 	svc := Service{
-		keyValueStore: keyValueStore,
-		filesystem:    filesystem,
-		downloader:    downloader,
+		keyValueStore:   keyValueStore,
+		filesystem:      filesystem,
+		downloader:      downloader,
+		deviceDataStore: deviceDataStore,
 	}
 	return svc, nil
 }
@@ -108,15 +113,29 @@ type Settings struct {
 }
 
 func (svc Service) GetPreferences() (Settings, error) {
-	descriptor, err := svc.keyValueStore.Get(store.BackgroundPictureDescriptor)
+	descriptorText, err := svc.keyValueStore.Get(store.BackgroundPictureDescriptor)
 	if err != nil {
 		return Settings{}, fmt.Errorf("failed to get background picture descriptor: %w", err)
 	}
-	// TODO remove forceDisabled
-	const forceDisabled = true
+	data, err := svc.deviceDataStore.GetDeviceData()
+	if err != nil {
+		return Settings{}, fmt.Errorf("failed to get device data: %w", err)
+	}
+	if descriptorText == "" {
+		return Settings{}, nil
+	}
+	descriptor := PictureDescriptor{}
+	err = json.Unmarshal([]byte(descriptorText), &descriptor)
+	if err != nil {
+		return Settings{}, fmt.Errorf("failed to unmarshal picture descriptor: %w", err)
+	}
+	theme := data.DeviceProfile.Value.Theme
+	enabled := theme.ImageFit == "cover"
+	enabled = enabled && len(theme.ImageUuids) > 0
+	enabled = enabled && theme.ImageUuids[0] == descriptor.UUID
 	settings := Settings{
-		Enabled:        !forceDisabled && descriptor != "",
-		BackgroundSize: "cover",
+		Enabled:        enabled,
+		BackgroundSize: theme.ImageFit,
 	}
 	return settings, nil
 }

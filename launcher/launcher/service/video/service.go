@@ -15,9 +15,10 @@ import (
 )
 
 type Service struct {
-	keyValueStore KeyValueStore
-	filesystem    media.FS
-	downloader    Downloader
+	keyValueStore   KeyValueStore
+	filesystem      media.FS
+	downloader      Downloader
+	deviceDataStore DeviceDataStore
 }
 
 type Downloader interface {
@@ -29,7 +30,7 @@ type KeyValueStore interface {
 	Set(key, value string) error
 }
 
-func MakeService(keyValueStore KeyValueStore, filesystem media.FS, downloader Downloader) (Service, error) {
+func MakeService(keyValueStore KeyValueStore, filesystem media.FS, downloader Downloader, deviceDataStore DeviceDataStore) (Service, error) {
 	if keyValueStore == nil {
 		return Service{}, errors.New("keyValueStore must not be nil")
 	}
@@ -39,11 +40,15 @@ func MakeService(keyValueStore KeyValueStore, filesystem media.FS, downloader Do
 	if downloader == nil {
 		return Service{}, errors.New("downloader must not be nil")
 	}
+	if deviceDataStore == nil {
+		return Service{}, errors.New("deviceDataStore must not be nil")
+	}
 
 	svc := Service{
-		keyValueStore: keyValueStore,
-		filesystem:    filesystem,
-		downloader:    downloader,
+		keyValueStore:   keyValueStore,
+		filesystem:      filesystem,
+		downloader:      downloader,
+		deviceDataStore: deviceDataStore,
 	}
 	return svc, nil
 }
@@ -51,13 +56,11 @@ func MakeService(keyValueStore KeyValueStore, filesystem media.FS, downloader Do
 const defaultLastVideoDescriptor = "{}"
 const defaultContentHourRange = "21-04"
 const defaultContentFrequency = time.Hour * 17
-const defaultContentEnabled = "false"
 const defaultContentLastUpdate = "2006-01-02T15:04:05Z07:00"
 
 func (svc Service) Initialise() error {
 	defaultVideoViewed := time.Now().Format(time.RFC3339)
 	defaults := map[string]string{
-		store.VideoContentEnabledKey:    defaultContentEnabled,
 		store.VideoContentHourRangeKey:  defaultContentHourRange,
 		store.VideoContentLastUpdateKey: defaultContentLastUpdate,
 		store.VideoContentFrequencyKey:  fmt.Sprint(defaultContentFrequency),
@@ -89,13 +92,18 @@ func (svc Service) initKey(key, value string) error {
 	return nil
 }
 
+func (svc Service) isOptedIn() (bool, error) {
+	data, err := svc.deviceDataStore.GetDeviceData()
+	if err != nil {
+		return false, fmt.Errorf("failed to get device data: %w", err)
+	}
+	return data.DeviceProfile.Value.Features.SpookyCampaign, nil
+}
+
 func (svc Service) ReadyForUpdate() (bool, error) {
 	// If video content is not enabled, do nothing.
-	enabled, err := svc.keyValueStore.Get(store.VideoContentEnabledKey)
-	if err != nil {
-		return false, fmt.Errorf("failed to get video content enabled: %w", err)
-	}
-	if enabled != "true" {
+	optedIn, err := svc.isOptedIn()
+	if !optedIn {
 		log.Println("video content is not enabled")
 		return false, nil
 	}
@@ -180,9 +188,17 @@ type Settings struct {
 
 func (svc Service) GetPreferences() (Settings, error) {
 	// If video content is not enabled, do nothing.
-	enabled, err := svc.keyValueStore.Get(store.VideoContentEnabledKey)
+	descriptorText, err := svc.keyValueStore.Get(store.VideoDescriptorKey)
 	if err != nil {
-		return Settings{}, fmt.Errorf("failed to get video content enabled: %w", err)
+		return Settings{}, fmt.Errorf("failed to get video descriptor: %w", err)
+	}
+	if descriptorText == "" {
+		return Settings{}, nil
+	}
+	descriptor := VideoDescriptor{}
+	err = json.Unmarshal([]byte(descriptorText), &descriptor)
+	if err != nil {
+		return Settings{}, fmt.Errorf("failed to unmarshal video descriptor: %w", err)
 	}
 	// If we are not in the correct hour range for video content, do nothing.
 	timeRange, err := svc.keyValueStore.Get(store.VideoContentHourRangeKey)
@@ -193,10 +209,14 @@ func (svc Service) GetPreferences() (Settings, error) {
 	if err != nil {
 		return Settings{}, fmt.Errorf("failed to parse hour range: %w", err)
 	}
-	// TODO remove forceEnabled
-	const forceEnabled = true
+	data, err := svc.deviceDataStore.GetDeviceData()
+	if err != nil {
+		return Settings{}, fmt.Errorf("failed to get device data: %w", err)
+	}
+	enabled := data.DeviceProfile.Value.Features.SpookyCampaign
+	enabled = enabled && data.SpookyCampaign.Value.VideoUuid == descriptor.UUID
 	settings := Settings{
-		Enabled:          forceEnabled || enabled == "true",
+		Enabled:          enabled,
 		EnabledHourStart: hours[0],
 		EnabledHourEnd:   hours[1],
 	}

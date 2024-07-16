@@ -1,7 +1,9 @@
 package video
 
 import (
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"time"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
@@ -54,12 +56,16 @@ func (source DeviceVideoSource) GetVideo() (VideoDescriptor, error) {
 		return VideoDescriptor{}, errors.New("video duration is zero")
 	}
 
+	hx, err := hex.DecodeString(bf.Sha256)
+	if err != nil {
+		return VideoDescriptor{}, fmt.Errorf("failed to decode sha256: %w", err)
+	}
 	return VideoDescriptor{
 		UUID:     videoUUID,
 		Filename: bf.Filename,
 		Duration: time.Duration(bf.Metadata.Duration) * time.Second,
 		URL:      bf.Url,
-		SHA256:   []byte(bf.Sha256),
+		SHA256:   hx,
 	}, nil
 }
 
