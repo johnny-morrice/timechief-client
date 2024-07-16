@@ -173,7 +173,10 @@ func Daemon(ctx *cli.Context) error {
 	}
 	// TODO make this configurable
 	const videoDownloadInterval = 53 * time.Minute
-	videoSource := video.NewStaticVideoSource(video.MakeTestVideo())
+	videoSource, err := video.MakeDeviceVideoSource(deviceDataStore)
+	if err != nil {
+		return err
+	}
 	mediaFilesystem, err := media.MakeMediaFS(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to make video filesystem: %v", err)
@@ -184,7 +187,10 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 	const pictureInterval = time.Minute
-	pictureSource := picture.NewStaticPictureSource(picture.MakeTestPicture())
+	pictureSource, err := picture.MakeDevicePictureSource(deviceDataStore)
+	if err != nil {
+		return err
+	}
 	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem, downloader)
 	if err != nil {
 		return err
