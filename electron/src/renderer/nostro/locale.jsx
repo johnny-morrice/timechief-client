@@ -21,11 +21,15 @@ function updateSignals(signals, data) {
         return;
     }
     let deviceProfile = deviceProfileDatum["value"];
-    let location = deviceProfile["location"];
-    let latitude = deviceProfile["latitude"];
-    let longitude = deviceProfile["longitude"];
-    let timezone = deviceProfile["timezone"];
-    let locale = deviceProfile["locale"];
+    if (!deviceProfile) {
+        return;
+    }
+    let device = deviceProfile["device"];
+    let location = device["location"];
+    let latitude = device["latitude"];
+    let longitude = device["longitude"];
+    let timezone = device["timezone"];
+    let locale = device["locale"];
     signals.setCoords(`${latitude}, ${longitude}`);
     signals.setTimezone(timezone);
     signals.setLocation(location);

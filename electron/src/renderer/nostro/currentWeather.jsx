@@ -20,12 +20,16 @@ class Signals {
 }
 
 function updateSignals(signals, data) {
-    let deviceProfileWrapper =   data["device_profile"];
+    let deviceProfileWrapper = data["device_profile"];
     let deviceProfile = deviceProfileWrapper["value"];
     if (!deviceProfileWrapper) {
         return;
     }
-    let location = deviceProfile["location"];
+    let device = deviceProfile["device"];
+    if (!device) {
+        return;
+    }
+    let location = device["location"];
     signals.setLocation(location);
     let owm = data["owm"];
     if (!owm) {
