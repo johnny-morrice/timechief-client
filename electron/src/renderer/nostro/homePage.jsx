@@ -97,10 +97,17 @@ function handleEventChange(signals) {
 function updateSignals(signals, data) {
   let calendar = data["google_calendar"];
   let deviceProfileWrapper = data["device_profile"];
+  if (!deviceProfileWrapper) {
+    return;
+  }
   let deviceProfile = deviceProfileWrapper["value"];
-  let hourCycleOption = deviceProfile["hour_cycle_option"];
-  let timezone = deviceProfile["timezone"];
-  let locale = deviceProfile["locale"];
+  if (!deviceProfile) {
+    return;
+  }
+  let device = deviceProfile["device"];
+  let hourCycleOption = device["hour_cycle_option"];
+  let timezone = device["timezone"];
+  let locale = device["locale"];
   signals.setHourCycleOption(hourCycleOption);
   signals.setLocale(locale);
   signals.setTimezone(timezone);

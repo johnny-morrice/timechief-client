@@ -27,8 +27,12 @@ function updateSignals(signals, data) {
   if (!deviceProfile) {
     return;
   }
-  signals.setLocale(deviceProfile["locale"]);
-  const tz = deviceProfile["timezone"]
+  let device = deviceProfile["device"];
+  if (!device) {
+    return;
+  }
+  signals.setLocale(device["locale"]);
+  const tz = device["timezone"]
   signals.setTimeZone(tz);
   signals.setLoaded(true);
   let calendarDatum = data["google_calendar"];

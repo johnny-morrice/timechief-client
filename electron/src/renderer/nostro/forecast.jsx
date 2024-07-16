@@ -41,13 +41,20 @@ class DaySignals {
 
 function updateSignals(signals, data) {
     var locale = "en-GB";
-    if ("device_profile" in data) {
-        const deviceProfileDatum = data["device_profile"];
-        const deviceProfile = deviceProfileDatum["value"];
-        if ("locale" in deviceProfile && deviceProfile["locale"] !== "") {
-            locale = deviceProfile["locale"];
-        }
+
+    const deviceProfileDatum = data["device_profile"];
+    if (!deviceProfileDatum) {
+        return;
     }
+    const deviceProfile = deviceProfileDatum["value"];
+    if (!deviceProfile) {
+        return;
+    }
+    const device = deviceProfile["device"];
+    if (!device) {
+        return;
+    }
+    locale = device["locale"];
     if ("owm" in data) {
         let weatherDatum = data["owm"];
         let weather = weatherDatum["value"];
