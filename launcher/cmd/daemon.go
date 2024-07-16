@@ -191,7 +191,7 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem, downloader)
+	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem, downloader, deviceDataStore)
 	if err != nil {
 		return err
 	}

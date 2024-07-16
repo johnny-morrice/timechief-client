@@ -1546,12 +1546,15 @@ components:
         - open_weather_map
         - google_calendar
         - google_profile
+        - spooky_campaign
       properties:
         open_weather_map:
           type: boolean
         google_calendar:
           type: boolean
         google_profile:
+          type: boolean
+        spooky_campaign:
           type: boolean
 
     Theme:
