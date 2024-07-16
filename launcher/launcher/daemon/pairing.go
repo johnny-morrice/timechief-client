@@ -119,28 +119,26 @@ func (p Pairing) createPairing() error {
 	defer cancel()
 	deviceResp, err := p.AuthZeroClient.GetDeviceCode(ctx, clientID, audience)
 	if err != nil {
-		return fmt.Errorf("error getting device code: %s", err)
-	}
-	if deviceResp.DeviceCode == "" {
-		return fmt.Errorf("no device code in response")
+		return fmt.Errorf("error getting device code: %w", err)
 	}
 	err = p.KeyValueStore.Set(store.PairingDeviceCodeKey, deviceResp.DeviceCode)
 	if err != nil {
-		return fmt.Errorf("error setting pairing device code: %s", err)
+		return fmt.Errorf("error setting pairing device code: %w", err)
 	}
 	err = p.KeyValueStore.Set(store.PairingUserCodeKey, deviceResp.UserCode)
 	if err != nil {
-		return fmt.Errorf("error setting pairing user code: %s", err)
+		return fmt.Errorf("error setting pairing user code: %w", err)
 	}
 	err = p.KeyValueStore.Set(store.PairingURLKey, deviceResp.VerificationUri)
 	if err != nil {
-		return fmt.Errorf("error setting pairing url: %s", err)
+		return fmt.Errorf("error setting pairing url: %w", err)
 	}
 	err = p.KeyValueStore.Set(store.PairingQRCodeURLKey, deviceResp.VerificationUriComplete)
 	if err != nil {
-		return fmt.Errorf("error setting pairing qr code URL: %s", err)
+		return fmt.Errorf("error setting pairing qr code URL: %w", err)
 	}
 
+	log.Printf("pairing created: %s", deviceResp.VerificationUri)
 	return nil
 }
 
