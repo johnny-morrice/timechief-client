@@ -205,8 +205,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	}
 
 	target, err := svc.launchTargetStore.GetActiveLaunchTarget()
-
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return DeviceData{}, fmt.Errorf("failed to get active launch target: %w", err)
 	}
 
