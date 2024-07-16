@@ -199,7 +199,7 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	videoService, err := video.MakeService(keyValueStore, mediaFilesystem, downloader)
+	videoService, err := video.MakeService(keyValueStore, mediaFilesystem, downloader, deviceDataStore)
 	if err != nil {
 		return err
 	}
