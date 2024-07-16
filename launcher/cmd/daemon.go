@@ -203,7 +203,7 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	videoDownload, err := videodownload.MakeDaemon(videoDownloadInterval, videoSource, videoService, videodownload.Options{ForceDownload: true})
+	videoDownload, err := videodownload.MakeDaemon(videoDownloadInterval, videoSource, videoService)
 	if err != nil {
 		return err
 	}

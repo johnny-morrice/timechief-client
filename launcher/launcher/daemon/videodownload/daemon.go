@@ -14,7 +14,6 @@ type Daemon struct {
 	tickInterval time.Duration
 	source       video.VideoSource
 	videoService VideoService
-	opts         Options
 }
 
 type VideoService interface {
@@ -24,11 +23,7 @@ type VideoService interface {
 	Initialise() error
 }
 
-type Options struct {
-	ForceDownload bool
-}
-
-func MakeDaemon(tickInterval time.Duration, source video.VideoSource, videoService VideoService, opts Options) (Daemon, error) {
+func MakeDaemon(tickInterval time.Duration, source video.VideoSource, videoService VideoService) (Daemon, error) {
 	if tickInterval <= 0 {
 		return Daemon{}, errors.New("refreshInterval must be positive")
 	}
@@ -43,7 +38,6 @@ func MakeDaemon(tickInterval time.Duration, source video.VideoSource, videoServi
 		tickInterval: tickInterval,
 		source:       source,
 		videoService: videoService,
-		opts:         opts,
 	}
 	return result, nil
 }
@@ -97,9 +91,5 @@ func (d Daemon) downloadVideoContent() error {
 }
 
 func (d Daemon) shouldUpdateVideoContent() (bool, error) {
-	if d.opts.ForceDownload {
-		return true, nil
-	}
-
 	return d.videoService.ReadyForUpdate()
 }
