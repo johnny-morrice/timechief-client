@@ -121,6 +121,9 @@ func (p Pairing) createPairing() error {
 	if err != nil {
 		return fmt.Errorf("error getting device code: %s", err)
 	}
+	if deviceResp.DeviceCode == "" {
+		return fmt.Errorf("no device code in response")
+	}
 	err = p.KeyValueStore.Set(store.PairingDeviceCodeKey, deviceResp.DeviceCode)
 	if err != nil {
 		return fmt.Errorf("error setting pairing device code: %s", err)
