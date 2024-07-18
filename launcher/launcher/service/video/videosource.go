@@ -53,7 +53,7 @@ func (source DeviceVideoSource) GetVideo() (VideoDescriptor, error) {
 	}
 
 	if bf.Metadata.Duration == 0 {
-		return VideoDescriptor{}, errors.New("video duration is zero")
+		return VideoDescriptor{}, fmt.Errorf("video duration is zero: %v", bf)
 	}
 
 	hx, err := hex.DecodeString(bf.Sha256)

@@ -56,7 +56,7 @@ func MakeService(keyValueStore KeyValueStore, filesystem media.FS, downloader Do
 const defaultLastVideoDescriptor = "{}"
 const defaultContentHourRange = "21-04"
 const defaultContentFrequency = time.Hour * 17
-const defaultContentLastUpdate = "2006-01-02T15:04:05Z07:00"
+const defaultContentLastUpdate = "2006-01-02T15:04:05Z"
 
 func (svc Service) Initialise() error {
 	defaultVideoViewed := time.Now().Format(time.RFC3339)
@@ -103,6 +103,9 @@ func (svc Service) isOptedIn() (bool, error) {
 func (svc Service) ReadyForUpdate() (bool, error) {
 	// If video content is not enabled, do nothing.
 	optedIn, err := svc.isOptedIn()
+	if err != nil {
+		return false, fmt.Errorf("failed to check if opted in: %w", err)
+	}
 	if !optedIn {
 		log.Println("video content is not enabled")
 		return false, nil
@@ -120,7 +123,7 @@ func (svc Service) ReadyForUpdate() (bool, error) {
 		log.Println("video content is not in permitted range")
 		return false, nil
 	}
-	// If we have downloaded video content within the frequency, do nothing.
+	// // If we have downloaded video content within the frequency, do nothing.
 	frequencyStr, err := svc.keyValueStore.Get(store.VideoContentFrequencyKey)
 	if err != nil {
 		return false, fmt.Errorf("failed to get video content frequency: %w", err)

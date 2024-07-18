@@ -72,6 +72,7 @@ func (d Daemon) doTick() error {
 		return fmt.Errorf("failed to check if video content is ready: %w", err)
 	}
 	if !isReady {
+		log.Print("video content is not ready for update")
 		return nil
 	}
 	err = d.downloadVideoContent()
