@@ -298,6 +298,10 @@ div.fortune-message {
     gap: 0.5em;
 }
 
+div.fortune-mascot {
+    width: 3em;
+}
+
 div.next-event-summary {
     font-size: 24pt;
 }

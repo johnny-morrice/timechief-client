@@ -21,7 +21,7 @@ class Message {
         return <div class="fortune-message">
             <div class="fortune-message-text">{text}</div>
             <div class="fortune-message-mascot-wrapper">
-                <img src={this.mascotPath()} alt={"Mascot with expression: " + this.mascotNickname}></img>
+                <img class="fortune-mascot" src={this.mascotPath()} alt={"Mascot with expression: " + this.mascotNickname}></img>
             </div>
         </div>;
     }
