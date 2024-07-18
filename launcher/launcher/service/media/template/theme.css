@@ -4,6 +4,13 @@ body {
     font-family: {{.MainFont}};
 }
 
+/**
+    Use CSS filters to recolour png with this class, so that black in that image becomes {{.ForegroundColor}}.
+*/
+image-fg-recolor {
+    filter: opacity(0.5) drop-shadow(0 0 0 {{.ForegroundColor}}) saturate(1000%)
+}
+
 div.home-time {
     font-family: {{.TimeFont}};
     color: {{.TimeColor}};
