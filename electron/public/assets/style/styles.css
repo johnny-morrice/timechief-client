@@ -291,8 +291,15 @@ span.inverted-color {
     background-color: green; */
 }
 
-div.fortune-text {
+div.fortune-message {
     font-size: 14pt;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+div.fortune-mascot {
+    width: 3em;
 }
 
 div.next-event-summary {
@@ -416,7 +423,7 @@ div.status-note {
         font-size: 22pt;
     }
 
-    div.fortune-text {
+    div.fortune-message {
         font-size: 16pt;
     }
 }
@@ -470,7 +477,8 @@ div.status-note {
         font-size: 24pt;
     }
 
-    div.fortune-text {
+    div.fortune-message {
         font-size: 18pt;
     }
 }
+
