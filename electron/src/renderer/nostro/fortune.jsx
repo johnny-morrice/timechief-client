@@ -1,4 +1,4 @@
-import { onCleanup } from "solid-js";
+import { onCleanup, createSignal } from "solid-js";
 import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
 import { random } from './fakeRandom';
@@ -10,9 +10,16 @@ class Message {
     }
 
     element() {
+        const [text, setText] = textTransitionSignal("");
+        var timeout = setTimeout(() => {
+            setText(this.text);
+        }, 100);
+        onCleanup(() => {
+            clearTimeout(timeout);
+        });
         this.validateNickname();
         return <div class="fortune-message">
-            <div class="fortune-message-text">{this.text}</div>
+            <div class="fortune-message-text">{text}</div>
             <div class="fortune-message-mascot-wrapper">
                 <img src={this.mascotPath()} alt={"Mascot with expression: " + this.mascotNickname}></img>
             </div>
@@ -47,7 +54,7 @@ export const Fortune = () => {
     const poems = [
         msg("Blinking cursor waits patiently.", "neutral"),
     ];
-    const [fortune, setFortune] = textTransitionSignal("");
+    const [fortune, setFortune] = createSignal(poems[0]);
     const updatePoem = () => {
         setFortune(poems[Math.floor(random() * poems.length)]);
     };
