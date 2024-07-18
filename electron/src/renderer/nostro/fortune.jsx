@@ -28,7 +28,7 @@ class Message {
 
     mascotPath() {
         this.validateNickname();
-        return `/assets/image/mascot/mascot-${this.mascotNickname}.png`;
+        return `assets/image/mascot/mascot-${this.mascotNickname}.png`;
     }
 
     validateNickname() {
