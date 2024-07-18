@@ -64,5 +64,5 @@ export const Fortune = () => {
     onCleanup(() => {
         clearInterval(interval);
     });
-    return fortune.element();
+    return fortune().element();
 }
