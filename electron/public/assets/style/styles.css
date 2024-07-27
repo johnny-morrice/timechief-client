@@ -294,11 +294,11 @@ span.inverted-color {
 div.fortune-message {
     font-size: 14pt;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5em;
 }
 
-div.fortune-mascot {
+img.fortune-mascot {
     width: 3em;
 }
 
