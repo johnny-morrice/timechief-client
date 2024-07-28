@@ -2,6 +2,7 @@ import { onCleanup, createSignal } from "solid-js";
 import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
 import { random } from './fakeRandom';
+import { addServiceDataCallback, removeDataCallback } from "./ipc";
 
 class Message {
     constructor(text, mascotNickname) {
@@ -9,7 +10,7 @@ class Message {
         this.mascotNickname = mascotNickname;
     }
 
-    element() {
+    element(signals) {
         const [text, setText] = textTransitionSignal("");
         var timeout = setTimeout(() => {
             setText(this.text);
@@ -17,6 +18,8 @@ class Message {
         onCleanup(() => {
             clearTimeout(timeout);
         });
+        const boxBackgroundColor = signals.boxBackgroundColor();
+        const foregroundColor = signals.foregroundColor();
         this.validateNickname();
         return <div class="fortune-message">
             <div class="fortune-message-text">{text}</div>
@@ -46,11 +49,47 @@ class Message {
     }
 }
 
+class Signals {
+    constructor() {
+        [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
+        [this.foregroundColor, this.setForegroundColor] = createSignal("green");
+    }
+}
+
 function msg(text, mascotNickname) {
     return new Message(text, mascotNickname);
 }
 
+function updateSignals(signals, data) {
+    const deviceProfileWrapper = data["device_profile"];
+    if (!deviceProfileWrapper) {
+        return;
+    }
+    const deviceProfile = deviceProfileWrapper["value"];
+    if (!deviceProfile) {
+        return;
+    }
+    const theme = deviceProfile["theme"];
+    if (!theme) {
+        return;
+    }
+    let boxBackgroundColor = theme["box_background_color"];
+    let foregroundColor = theme["foreground_color"];
+    if (boxBackgroundColor) {
+        signals.setBoxBackgroundColor(boxBackgroundColor);
+    }
+    if (foregroundColor) {
+        signals.setForegroundColor(foregroundColor);
+    }
+}
+
 export const Fortune = () => {
+    const signals = new Signals();
+    const cbName = callbackName("HomePage");
+    addServiceDataCallback(cbName, data => updateSignals(signals, data));
+    onCleanup(() => {
+        removeDataCallback(cbName);
+    });
     const poems = [
         msg("Blinking cursor waits patiently.", "neutral"),
     ];
@@ -64,5 +103,5 @@ export const Fortune = () => {
     onCleanup(() => {
         clearInterval(interval);
     });
-    return fortune().element();
+    return fortune().element(signals);
 }
