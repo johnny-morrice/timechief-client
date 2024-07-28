@@ -3,6 +3,7 @@ import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
 import { random } from './fakeRandom';
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
+import { callbackName } from "./callback";
 
 class Message {
     constructor(text, mascotNickname) {
