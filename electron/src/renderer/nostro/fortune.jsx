@@ -1,4 +1,5 @@
-import { onCleanup, createSignal } from "solid-js";
+import { onCleanup, createSignal, createEffect } from "solid-js";
+import { fabric } from 'fabric';
 import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
 import { random } from './fakeRandom';
@@ -12,6 +13,8 @@ class Message {
     }
 
     element(signals) {
+        this.validateNickname();
+        let canvasRef;
         const [text, setText] = textTransitionSignal("");
         var timeout = setTimeout(() => {
             setText(this.text);
@@ -19,13 +22,34 @@ class Message {
         onCleanup(() => {
             clearTimeout(timeout);
         });
+        createEffect(() => {
+            const canvas = new fabric.Canvas(canvasRef, {
+                backgroundColor: boxBackgroundColor,
+            });
+
+            fabric.Image.fromURL(this.mascotPath(), (img) => {
+                img.filters.push(new fabric.Image.filters.ReplaceColor({
+                    originalColor: 'rgb(0,0,255)',
+                    newColor: boxBackgroundColor,
+                }));
+                img.filters.push(new fabric.Image.filters.ReplaceColor({
+                    originalColor: 'rgba(0,0,0,0)',
+                    newColor: foregroundColor,
+                }));
+                img.applyFilters();
+                canvas.add(img);
+            });
+
+            onCleanup(() => {
+                canvas.dispose();
+            });
+        });
         const boxBackgroundColor = signals.boxBackgroundColor();
         const foregroundColor = signals.foregroundColor();
-        this.validateNickname();
         return <div class="fortune-message">
             <div class="fortune-message-text">{text}</div>
             <div class="fortune-message-mascot-wrapper">
-                <img class="fortune-mascot image-fg-recolor" src={this.mascotPath()} alt={"Mascot with expression: " + this.mascotNickname}></img>
+                <canvas ref={el => canvasRef = el} class="fortune-mascot"></canvas>
             </div>
         </div>;
     }
