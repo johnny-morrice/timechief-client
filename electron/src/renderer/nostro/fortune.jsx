@@ -1,5 +1,5 @@
 import { onCleanup, createSignal, createEffect } from "solid-js";
-import { fabric } from 'fabric';
+import * as fabric from 'fabric'
 import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
 import { random } from './fakeRandom';
@@ -13,43 +13,66 @@ class Message {
     }
 
     element(signals) {
+        const self = this;
         this.validateNickname();
-        let canvasRef;
         const [text, setText] = textTransitionSignal("");
-        var timeout = setTimeout(() => {
+        var glitchTimeout = setTimeout(() => {
             setText(this.text);
         }, 100);
-        onCleanup(() => {
-            clearTimeout(timeout);
-        });
-        createEffect(() => {
-            const canvas = new fabric.Canvas(canvasRef, {
+        let done = false
+        let initCanvas = function () {
+            if (self.canvas) {
+                return true;
+            }
+            if (done) {
+                return true;
+            }
+            done = true;
+            const canvasRef = document.getElementById("fortune-canvas");
+            if (!canvasRef) {
+                return false;
+            }
+            if (canvasRef.getAttribute("data-initialized") === "true") {
+                return true;
+            }
+            self.canvas = new fabric.Canvas(canvasRef, {
                 backgroundColor: boxBackgroundColor,
             });
+            canvasRef.setAttribute("data-initialized", "true");
 
-            fabric.Image.fromURL(this.mascotPath(), (img) => {
-                img.filters.push(new fabric.Image.filters.ReplaceColor({
+            fabric.FabricImage.fromURL(self.mascotPath(), (img) => {
+                img.filters.push(new fabric.FabricImage.filters.ReplaceColor({
                     originalColor: 'rgb(0,0,255)',
                     newColor: boxBackgroundColor,
                 }));
-                img.filters.push(new fabric.Image.filters.ReplaceColor({
+                img.filters.push(new fabric.FabricImage.filters.ReplaceColor({
                     originalColor: 'rgba(0,0,0,0)',
                     newColor: foregroundColor,
                 }));
                 img.applyFilters();
                 canvas.add(img);
             });
-
-            onCleanup(() => {
-                canvas.dispose();
-            });
+            return true;
+        };
+        const interval = setInterval(() => {
+            const ok = initCanvas();
+            if (ok) {
+                clearInterval(interval);
+            }
+        }, 1000);
+        onCleanup(() => {
+            clearTimeout(glitchTimeout);
+            self.canvas.dispose();
+            self.canvas = null;
+            done = false;
+            clearInterval(interval);
         });
         const boxBackgroundColor = signals.boxBackgroundColor();
         const foregroundColor = signals.foregroundColor();
         return <div class="fortune-message">
             <div class="fortune-message-text">{text}</div>
             <div class="fortune-message-mascot-wrapper">
-                <canvas ref={el => canvasRef = el} class="fortune-mascot"></canvas>
+                <canvas id="fortune-canvas" class="fortune-mascot"></canvas>
             </div>
         </div>;
     }
