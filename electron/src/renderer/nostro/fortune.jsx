@@ -6,6 +6,7 @@ import { random } from './fakeRandom';
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { callbackName } from "./callback";
 
+
 class Message {
     constructor(text, mascotNickname) {
         this.text = text;
@@ -19,15 +20,9 @@ class Message {
         var glitchTimeout = setTimeout(() => {
             setText(this.text);
         }, 100);
-        let done = false
+        const boxBackgroundColor = signals.boxBackgroundColor();
+        const foregroundColor = signals.foregroundColor();
         let initCanvas = function () {
-            if (self.canvas) {
-                return true;
-            }
-            if (done) {
-                return true;
-            }
-            done = true;
             const canvasRef = document.getElementById("fortune-canvas");
             if (!canvasRef) {
                 return false;
@@ -36,39 +31,47 @@ class Message {
                 return true;
             }
             self.canvas = new fabric.Canvas(canvasRef, {
-                backgroundColor: boxBackgroundColor,
+                backgroundColor: foregroundColor,
             });
             canvasRef.setAttribute("data-initialized", "true");
 
-            fabric.FabricImage.fromURL(self.mascotPath(), (img) => {
-                img.filters.push(new fabric.FabricImage.filters.ReplaceColor({
+            console.log("adding canvas image");
+            fabric.FabricImage.fromURL(self.mascotPath()).then((img) => {
+                console.log("fromURL start");
+                img.filters.push(replaceColorFilter({
                     originalColor: 'rgb(0,0,255)',
                     newColor: boxBackgroundColor,
                 }));
-                img.filters.push(new fabric.FabricImage.filters.ReplaceColor({
-                    originalColor: 'rgba(0,0,0,0)',
-                    newColor: foregroundColor,
-                }));
+                // img.filters.push(replaceColorFilter({
+                //     originalColor: 'rgba(0,0,0,0)',
+                //     newColor: foregroundColor,
+                // }));
                 img.applyFilters();
-                canvas.add(img);
+                // Get canvas dimensions
+                const canvasWidth = self.canvas.getWidth();
+                const canvasHeight = self.canvas.getHeight();
+
+                // Calculate the scale factor to preserve aspect ratio and fit within the canvas
+                const scaleFactor = Math.min(canvasWidth / img.width, canvasHeight / img.height);
+
+                // Apply the scale factor to the image
+                img.scale(scaleFactor);
+                self.canvas.add(img);
+            }).catch((err) => {
+                console.error("error adding canvas: ", err);
             });
             return true;
         };
         const interval = setInterval(() => {
-            const ok = initCanvas();
-            if (ok) {
-                clearInterval(interval);
-            }
-        }, 1000);
+            initCanvas();
+        });
         onCleanup(() => {
             clearTimeout(glitchTimeout);
             self.canvas.dispose();
             self.canvas = null;
-            done = false;
             clearInterval(interval);
         });
-        const boxBackgroundColor = signals.boxBackgroundColor();
-        const foregroundColor = signals.foregroundColor();
+
         return <div class="fortune-message">
             <div class="fortune-message-text">{text}</div>
             <div class="fortune-message-mascot-wrapper">
@@ -95,6 +98,63 @@ class Message {
             throw new Error(`invalid mascot nickname: ${this.mascotNickname}`);
         }
     }
+}
+
+function replaceColorFilter({ originalColor, newColor }) {
+    // Helper function to convert CSS color to RGB
+    function cssColorToRgb(color) {
+        let r, g, b, a;
+
+        if (color.startsWith('#')) {
+            // Handle hex color
+            if (color.length === 4) {
+                r = parseInt(color[1] + color[1], 16);
+                g = parseInt(color[2] + color[2], 16);
+                b = parseInt(color[3] + color[3], 16);
+                a = 1; // Default alpha value
+            } else if (color.length === 5) {
+                r = parseInt(color[1] + color[1], 16);
+                g = parseInt(color[2] + color[2], 16);
+                b = parseInt(color[3] + color[3], 16);
+                a = parseInt(color[4] + color[4], 16) / 255;
+            } else if (color.length === 7) {
+                r = parseInt(color[1] + color[2], 16);
+                g = parseInt(color[3] + color[4], 16);
+                b = parseInt(color[5] + color[6], 16);
+                a = 1; // Default alpha value
+            } else if (color.length === 9) {
+                r = parseInt(color[1] + color[2], 16);
+                g = parseInt(color[3] + color[4], 16);
+                b = parseInt(color[5] + color[6], 16);
+                a = parseInt(color[7] + color[8], 16) / 255;
+            }
+        } else if (color.startsWith('rgb')) {
+            // Handle rgb and rgba color
+            const rgbValues = color.match(/\d+/g).map(Number);
+            [r, g, b] = rgbValues;
+        } else {
+            throw new Error(`Unsupported color format: ${color}`);
+        }
+
+        return [r, g, b, a];
+    }
+
+    // Convert original and new colors to RGB
+    // const originalRgba = cssColorToRgb(originalColor);
+    const newRgba = cssColorToRgb(newColor);
+
+    // Create a color matrix for the transformation
+    const colorMatrix = [
+        newRgba[0] / 255, 0, 0, 0, 0,
+        0, newRgba[1] / 255, 0, 0, 0,
+        0, 0, newRgba[2] / 255, 0, 0,
+        0, 0, newRgba[3], 1, 0
+    ];
+
+    // Apply the color matrix filter using fabric.js
+    return new fabric.filters.ColorMatrix({
+        matrix: colorMatrix
+    });
 }
 
 class Signals {
