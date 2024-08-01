@@ -22,18 +22,24 @@ class Message {
         }, 100);
         const boxBackgroundColor = signals.boxBackgroundColor();
         const foregroundColor = signals.foregroundColor();
-        let initCanvas = function () {
+        let manageCanvas = function () {
             const canvasRef = document.getElementById("fortune-canvas");
             if (!canvasRef) {
-                return false;
+                return;
             }
-            if (canvasRef.getAttribute("data-initialized") === "true") {
-                return true;
+            const initialised = canvasRef.getAttribute("data-initialised");
+
+            if (!initialised) {
+                self.canvas = new fabric.Canvas(canvasRef, {
+                    backgroundColor: foregroundColor,
+                });
             }
-            self.canvas = new fabric.Canvas(canvasRef, {
-                backgroundColor: foregroundColor,
-            });
-            canvasRef.setAttribute("data-initialized", "true");
+            canvasRef.setAttribute("data-initialised", "true");
+            const renderedForegroundColor = canvasRef.getAttribute("data-foreground-color");
+            const renderedBackgroundColor = canvasRef.getAttribute("data-background-color");
+            if (foregroundColor === renderedForegroundColor && boxBackgroundColor === renderedBackgroundColor) {
+                return;
+            }
 
             console.log("adding canvas image");
             fabric.FabricImage.fromURL(self.mascotPath()).then((img) => {
@@ -42,10 +48,6 @@ class Message {
                     originalColor: 'rgb(0,0,255)',
                     newColor: boxBackgroundColor,
                 }));
-                // img.filters.push(replaceColorFilter({
-                //     originalColor: 'rgba(0,0,0,0)',
-                //     newColor: foregroundColor,
-                // }));
                 img.applyFilters();
                 // Get canvas dimensions
                 const canvasWidth = self.canvas.getWidth();
@@ -61,13 +63,16 @@ class Message {
                 self.canvas.setHeight(img.height * scaleFactor);
 
                 self.canvas.add(img);
+
+                canvasRef.setAttribute("data-foreground-color", foregroundColor);
+                canvasRef.setAttribute("data-background-color", boxBackgroundColor);
             }).catch((err) => {
                 console.error("error adding canvas: ", err);
             });
-            return true;
+            return;
         };
         const interval = setInterval(() => {
-            initCanvas();
+            manageCanvas();
         });
         onCleanup(() => {
             clearTimeout(glitchTimeout);
@@ -104,7 +109,7 @@ class Message {
     }
 }
 
-function replaceColorFilter({ originalColor, newColor }) {
+function replaceColorFilter({ newColor }) {
     // Helper function to convert CSS color to RGB
     function cssColorToRgb(color) {
         let r, g, b, a;
