@@ -298,8 +298,8 @@ div.fortune-message {
     gap: 0.5em;
 }
 
-img.fortune-mascot {
-    width: 3em;
+canvas.fortune-mascot {
+    /* width: 5em; */
 }
 
 div.next-event-summary {
