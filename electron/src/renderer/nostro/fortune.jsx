@@ -54,8 +54,12 @@ class Message {
                 // Calculate the scale factor to preserve aspect ratio and fit within the canvas
                 const scaleFactor = Math.min(canvasWidth / img.width, canvasHeight / img.height);
 
-                // Apply the scale factor to the image
                 img.scale(scaleFactor);
+
+                // Apply the scale factor to the image
+                self.canvas.setWidth(img.width * scaleFactor);
+                self.canvas.setHeight(img.height * scaleFactor);
+
                 self.canvas.add(img);
             }).catch((err) => {
                 console.error("error adding canvas: ", err);
