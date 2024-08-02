@@ -79,5 +79,8 @@ func (d Daemon) downloadPicture() error {
 	if err != nil {
 		return fmt.Errorf("failed to get picture: %w", err)
 	}
+	if picture.UUID == "" {
+		return nil
+	}
 	return d.pictureService.Download(picture)
 }

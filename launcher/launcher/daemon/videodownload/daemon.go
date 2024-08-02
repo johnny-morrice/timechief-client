@@ -88,6 +88,9 @@ func (d Daemon) downloadVideoContent() error {
 	if err != nil {
 		return fmt.Errorf("failed to get video: %w", err)
 	}
+	if video.UUID == "" {
+		return nil
+	}
 	return d.videoService.Download(video)
 }
 
