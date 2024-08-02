@@ -24,6 +24,7 @@ class Message {
         }, 100);
         const boxBackgroundColor = signals.boxBackgroundColor();
         const foregroundColor = signals.foregroundColor();
+        // const foregroundColor = "yellow";
 
         // TODO move this management to the top level because it is getting run multiple times
         // We should explicitly manage the canvas lifecycle at an upper level.
@@ -36,7 +37,7 @@ class Message {
             const initialised = canvasRef.getAttribute("data-initialised");
             if (!initialised) {
                 globalCanvas = new fabric.Canvas(canvasRef, {
-                    backgroundColor: foregroundColor,
+                    backgroundColor: boxBackgroundColor,
                 });
             }
             canvasRef.setAttribute("data-initialised", "true");
@@ -49,14 +50,25 @@ class Message {
             }
             // Remove all objects from the canvas
             globalCanvas.clear();
-            globalCanvas.set("backgroundColor", foregroundColor);
+            globalCanvas.set("backgroundColor", boxBackgroundColor);
             console.log("adding canvas image");
             fabric.FabricImage.fromURL(self.mascotPath()).then((img) => {
                 console.log("fromURL start");
                 img.filters.push(replaceColorFilter({
-                    originalColor: 'rgb(0,0,255)',
-                    newColor: boxBackgroundColor,
+                    chromakeys: [{
+                        newColor: foregroundColor,
+                        chromakey: 0,
+                    },
+                    {
+                        newColor: boxBackgroundColor,
+                        chromakey: 2,
+                    },
+                    ]
                 }));
+                // img.filters.push(replaceColorFilter({
+                //     newColor: boxBackgroundColor,
+                //     chromakey: 0,
+                // }));
                 img.applyFilters();
                 // Get canvas dimensions
                 const canvasWidth = globalCanvas.getWidth();
@@ -119,7 +131,7 @@ class Message {
     }
 }
 
-function replaceColorFilter({ newColor }) {
+function replaceColorFilter({ chromakeys}) {
     // Helper function to convert CSS color to RGB
     function cssColorToRgb(color) {
         let r, g, b, a;
@@ -130,45 +142,45 @@ function replaceColorFilter({ newColor }) {
                 r = parseInt(color[1] + color[1], 16);
                 g = parseInt(color[2] + color[2], 16);
                 b = parseInt(color[3] + color[3], 16);
-                a = 1; // Default alpha value
+                a = 255; // Default alpha value
             } else if (color.length === 5) {
                 r = parseInt(color[1] + color[1], 16);
                 g = parseInt(color[2] + color[2], 16);
                 b = parseInt(color[3] + color[3], 16);
-                a = parseInt(color[4] + color[4], 16) / 255;
+                a = parseInt(color[4] + color[4], 16);
             } else if (color.length === 7) {
                 r = parseInt(color[1] + color[2], 16);
                 g = parseInt(color[3] + color[4], 16);
                 b = parseInt(color[5] + color[6], 16);
-                a = 1; // Default alpha value
+                a = 255; // Default alpha value
             } else if (color.length === 9) {
                 r = parseInt(color[1] + color[2], 16);
                 g = parseInt(color[3] + color[4], 16);
                 b = parseInt(color[5] + color[6], 16);
-                a = parseInt(color[7] + color[8], 16) / 255;
+                a = parseInt(color[7] + color[8], 16);
             }
-        } else if (color.startsWith('rgb')) {
-            // Handle rgb and rgba color
-            const rgbValues = color.match(/\d+/g).map(Number);
-            [r, g, b] = rgbValues;
-        } else {
-            throw new Error(`Unsupported color format: ${color}`);
         }
 
         return [r, g, b, a];
     }
 
-    // Convert original and new colors to RGB
-    // const originalRgba = cssColorToRgb(originalColor);
-    const newRgba = cssColorToRgb(newColor);
-
-    // Create a color matrix for the transformation
     const colorMatrix = [
-        newRgba[0] / 255, 0, 0, 0, 0,
-        0, newRgba[1] / 255, 0, 0, 0,
-        0, 0, newRgba[2] / 255, 0, 0,
-        0, 0, newRgba[3], 1, 0
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
     ];
+    chromakeys.forEach(({ newColor, chromakey }) => {
+        const [r, g, b, a] = cssColorToRgb(newColor);
+        if (chromakey >= 0 && chromakey <= 2) {
+            colorMatrix[chromakey] = r / 255;
+            colorMatrix[chromakey + 5] = g / 255;
+            colorMatrix[chromakey + 10] = b / 255;
+            colorMatrix[chromakey + 15] = a / 255;
+        } else {
+            throw new Error(`invalid chromakey value: ${chromakey}`);
+        }
+    });
 
     // Apply the color matrix filter using fabric.js
     return new fabric.filters.ColorMatrix({
