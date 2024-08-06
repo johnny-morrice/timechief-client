@@ -22,8 +22,6 @@ class Message {
         var glitchTimeout = setTimeout(() => {
             setText(this.text);
         }, 100);
-        const boxBackgroundColor = signals.boxBackgroundColor();
-        const foregroundColor = signals.foregroundColor();
         // const foregroundColor = "yellow";
 
         // TODO move this management to the top level because it is getting run multiple times
@@ -34,10 +32,17 @@ class Message {
             if (!canvasRef) {
                 return;
             }
+            const foregroundColor = canvasRef.getAttribute("data-sig-fg-color");
+            const boxBackgroundColor = canvasRef.getAttribute("data-sig-bg-color");
+            if (!foregroundColor || !boxBackgroundColor) {
+                return;
+            }
+
             const initialised = canvasRef.getAttribute("data-initialised");
             if (!initialised) {
                 globalCanvas = new fabric.Canvas(canvasRef, {
                     backgroundColor: boxBackgroundColor,
+                    selection: false,
                 });
             }
             canvasRef.setAttribute("data-initialised", "true");
@@ -51,7 +56,7 @@ class Message {
             // Remove all objects from the canvas
             globalCanvas.clear();
             globalCanvas.set("backgroundColor", boxBackgroundColor);
-            console.log("adding canvas image");
+            console.log("adding canvas image fg: ", foregroundColor, " bg: ", boxBackgroundColor);
             fabric.FabricImage.fromURL(self.mascotPath()).then((img) => {
                 console.log("fromURL start");
                 img.filters.push(replaceColorFilter({
@@ -106,7 +111,7 @@ class Message {
         return <div class="fortune-message">
             <div class="fortune-message-text">{text}</div>
             <div class="fortune-message-mascot-wrapper">
-                <canvas id="fortune-canvas" class="fortune-mascot"></canvas>
+                <canvas id="fortune-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()}></canvas>
             </div>
         </div>;
     }
