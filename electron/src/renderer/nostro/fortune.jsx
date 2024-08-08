@@ -83,6 +83,8 @@ class Message {
                 const scaleFactor = Math.min(canvasWidth / img.width, canvasHeight / img.height);
 
                 img.scale(scaleFactor);
+                img.selectable = false;
+                img.hoverCursor = "default";
 
                 // Apply the scale factor to the image
                 globalCanvas.setWidth(img.width * scaleFactor);
