@@ -43,6 +43,11 @@ class Message {
                 globalCanvas = new fabric.Canvas(canvasRef, {
                     backgroundColor: boxBackgroundColor,
                     selection: false,
+                    hoverCursor: "default",
+                    moveCursor: "default",
+                    // TODO: we may have to revisit this height.
+                    // The canvas is absolutely positioned, leading to strange behaviour when the height is too big.
+                    height: 120,
                 });
             }
             canvasRef.setAttribute("data-initialised", "true");
