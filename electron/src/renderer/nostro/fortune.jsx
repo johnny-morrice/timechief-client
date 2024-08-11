@@ -10,14 +10,23 @@ var globalCanvas = null;
 var leakingIntervals = [];
 
 class Message {
-    constructor(text, mascotNickname) {
+    constructor(text, emote, tags) {
         this.text = text;
-        this.mascotNickname = mascotNickname;
+        this.emote = emote;
+        this.tags = tags
+    }
+
+    isEmote(emote) {
+        return this.emote === emote;
+    }
+
+    hasTag(tag) {
+        return this.tags.includes(tag);
     }
 
     element(signals) {
         const self = this;
-        this.validateNickname();
+        this.validateEmote();
         const [text, setText] = textTransitionSignal("");
         var glitchTimeout = setTimeout(() => {
             setText(this.text);
@@ -124,21 +133,21 @@ class Message {
     }
 
     mascotPath() {
-        this.validateNickname();
-        return `assets/image/mascot/mascot-${this.mascotNickname}.png`;
+        this.validateEmote();
+        return `assets/image/mascot/mascot-${this.emote}.png`;
     }
 
-    validateNickname() {
-        const validNicks = [
+    validateEmote() {
+        const validEmotes = [
             "instruct",
             "neutral",
             "sigh",
             "spooky",
             "thumb"
         ];
-        const isValid = validNicks.filter(nick => nick === this.mascotNickname).length > 0;
+        const isValid = validEmotes.filter(emote => emote === this.emote).length > 0;
         if (!isValid) {
-            throw new Error(`invalid mascot nickname: ${this.mascotNickname}`);
+            throw new Error(`invalid mascot nickname: ${this.emote}`);
         }
     }
 }
@@ -204,11 +213,12 @@ class Signals {
     constructor() {
         [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
         [this.foregroundColor, this.setForegroundColor] = createSignal("green");
+        [this.isSpooky, this.setSpooky] = createSignal(false);
     }
 }
 
-function msg(text, mascotNickname) {
-    return new Message(text, mascotNickname);
+function msg(text, emote, tags) {
+    return new Message(text, emote, tags);
 }
 
 function updateSignals(signals, data) {
@@ -232,20 +242,43 @@ function updateSignals(signals, data) {
     if (foregroundColor) {
         signals.setForegroundColor(foregroundColor);
     }
+    const features = deviceProfile["features"];
+    if (!features) {
+        return;
+    }
+    const spooky = features["spooky"];
+    signals.setSpooky(spooky);
 }
 
-export const Fortune = () => {
+export const Fortune = (attrs) => {
+    const emoteFilter = attrs.emoteFilter;
+    const tagFilter = attrs.tagFilter;
     const signals = new Signals();
     const cbName = callbackName("HomePage");
     addServiceDataCallback(cbName, data => updateSignals(signals, data));
     const poems = [
         msg("Blinking cursor waits patiently.", "neutral"),
+
     ];
+    function pickPoem() {
+        const isSpooky = signals.isSpooky();
+        let filteredPoems = poems;
+        if (isSpooky) {
+            filteredPoems = poems.filter(poem => !poem.hasTag("spooky"));
+        }
+        if (emoteFilter) {
+            filteredPoems = filteredPoems.filter(poem => poem.isEmote(emoteFilter));
+        }
+        if (tagFilter) {
+            filteredPoems = filteredPoems.filter(poem => poem.hasTag(tagFilter));
+        }
+        return filteredPoems[Math.floor(random() * filteredPoems.length)]
+    }
     const [fortune, setFortune] = createSignal(poems[0]);
     const updatePoem = () => {
         leakingIntervals.forEach(clearInterval);
         leakingIntervals = [];
-        setFortune(poems[Math.floor(random() * poems.length)]);
+        setFortune(pickPoem());
     };
 
     updatePoem();
