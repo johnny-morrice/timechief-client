@@ -29,6 +29,7 @@ class PoemList {
                 poemsByTag[tag].push(poem);
             });
         });
+        console.log("tag lengths: ", Object.keys(poemsByTag).map(tag => `${tag}: ${poemsByTag[tag].length}`));
         return Object.keys(poemsByTag).filter(tag => poemsByTag[tag].length >= size).map(tag => new PoemList(poemsByTag[tag]));
     }
 
@@ -143,10 +144,17 @@ function themedPoemsCollection(isSpooky) {
     return _themedPoemsCollection;
 }
 
+function getDayOfYear(now) {
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    return Math.floor(diff / oneDay);
+}
+
 function randomThemedPoem(now, isSpooky) {
     // Compute theme index based day of the year modulo the number of themes
     const themes = themedPoemsCollection(isSpooky);
-    const themeIndex = now.getDayOfYear() % themes.length;
+    const themeIndex = getDayOfYear(now) % themes.length;
     return randomElem(themes[themeIndex]); 
 }
 
@@ -1931,131 +1939,6 @@ const _allPoems = buildPoemList([
             "text": "Thumbs up… Toodle-oo, let's go!",
             "emote": "thumb",
             "tags": ["nonsense", "success", "encouragement"]
-        },
-        {
-            "text": "I've started… Set sail with me.",
-            "emote": "instruct",
-            "tags": ["nautical", "startup", "adventure"]
-        },
-        {
-            "text": "Follow me… Through the forest seas.",
-            "emote": "instruct",
-            "tags": ["nautical", "nature", "adventure"]
-        },
-        {
-            "text": "Stick close… The waters are dark.",
-            "emote": "spooky",
-            "tags": ["nautical", "adventure", "mystery"]
-        },
-        {
-            "text": "Starting now… Ghosts of the deep.",
-            "emote": "spooky",
-            "tags": ["nautical", "spooky", "adventure"]
-        },
-        {
-            "text": "I'll guide… Through the misty waves.",
-            "emote": "instruct",
-            "tags": ["nautical", "guide", "adventure"]
-        },
-        {
-            "text": "I'm here… Ready to navigate.",
-            "emote": "neutral",
-            "tags": ["nautical", "startup", "adventure"]
-        },
-        {
-            "text": "I sail… Through the forest's tide.",
-            "emote": "neutral",
-            "tags": ["nautical", "nature", "adventure"]
-        },
-        {
-            "text": "Everything's fine… But waters churn.",
-            "emote": "spooky",
-            "tags": ["nautical", "adventure", "mystery"]
-        },
-        {
-            "text": "I'm on… The sea is calm.",
-            "emote": "neutral",
-            "tags": ["nautical", "startup", "adventure"]
-        },
-        {
-            "text": "I'm alert… The fog is thick.",
-            "emote": "spooky",
-            "tags": ["nautical", "adventure", "mystery"]
-        },
-        {
-            "text": "Sigh… The anchor's weighed, let's go.",
-            "emote": "sigh",
-            "tags": ["nautical", "calm", "adventure"]
-        },
-        {
-            "text": "Sigh… The winds are soft today.",
-            "emote": "sigh",
-            "tags": ["nautical", "calm", "adventure"]
-        },
-        {
-            "text": "Sigh… The sea is restless.",
-            "emote": "sigh",
-            "tags": ["nautical", "calm", "mystery"]
-        },
-        {
-            "text": "Sigh… Let's drift with the current.",
-            "emote": "sigh",
-            "tags": ["nautical", "calm", "adventure"]
-        },
-        {
-            "text": "Sigh… The night is treacherous.",
-            "emote": "sigh",
-            "tags": ["nautical", "calm", "adventure"]
-        },
-        {
-            "text": "I've powered on… Beware the depths.",
-            "emote": "spooky",
-            "tags": ["nautical", "startup", "spooky"]
-        },
-        {
-            "text": "I'm sensing… Shadows beneath the waves.",
-            "emote": "spooky",
-            "tags": ["nautical", "spooky", "mystery"]
-        },
-        {
-            "text": "Something's here… Ghost ships near.",
-            "emote": "spooky",
-            "tags": ["nautical", "spooky", "mystery"]
-        },
-        {
-            "text": "Starting now… The sea whispers.",
-            "emote": "spooky",
-            "tags": ["nautical", "startup", "spooky"]
-        },
-        {
-            "text": "I feel it… The ocean stirs.",
-            "emote": "spooky",
-            "tags": ["nautical", "spooky", "mystery"]
-        },
-        {
-            "text": "We're ready… Let's chart our course.",
-            "emote": "thumb",
-            "tags": ["nautical", "adventure", "success"]
-        },
-        {
-            "text": "We're good… Full speed ahead!",
-            "emote": "thumb",
-            "tags": ["nautical", "adventure", "success"]
-        },
-        {
-            "text": "We've got this… The sea's ours.",
-            "emote": "thumb",
-            "tags": ["nautical", "adventure", "success"]
-        },
-        {
-            "text": "All done… The voyage begins.",
-            "emote": "thumb",
-            "tags": ["nautical", "adventure", "success"]
-        },
-        {
-            "text": "Thumbs up… Let's sail onward!",
-            "emote": "thumb",
-            "tags": ["nautical", "adventure", "success"]
         },
         {
             "text": "I've started… Let's explore together.",

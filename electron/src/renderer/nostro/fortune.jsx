@@ -260,7 +260,7 @@ export const Fortune = () => {
         const poem = randomPoem(now, isSpooky);
         return msg(poem);
     }
-    const [fortune, setFortune] = createSignal(poems[0]);
+    const [fortune, setFortune] = createSignal(pickPoem());
     const updatePoem = () => {
         leakingIntervals.forEach(clearInterval);
         leakingIntervals = [];
@@ -268,7 +268,7 @@ export const Fortune = () => {
     };
 
     updatePoem();
-    const interval = setInterval(updatePoem, 60 * second);
+    const interval = setInterval(updatePoem, 10 * second);
     onCleanup(() => {
         clearInterval(interval);
         removeDataCallback(cbName);
