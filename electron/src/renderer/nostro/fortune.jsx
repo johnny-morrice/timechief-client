@@ -2,7 +2,7 @@ import { onCleanup, createSignal, createEffect } from "solid-js";
 import * as fabric from 'fabric'
 import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
-import { random } from './fakeRandom';
+import { randomPoem } from "./poems";
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { callbackName } from "./callback";
 
@@ -217,10 +217,6 @@ class Signals {
     }
 }
 
-function msg(text, emote, tags) {
-    return new Message(text, emote, tags);
-}
-
 function updateSignals(signals, data) {
     const deviceProfileWrapper = data["device_profile"];
     if (!deviceProfileWrapper) {
@@ -250,29 +246,19 @@ function updateSignals(signals, data) {
     signals.setSpooky(spooky);
 }
 
-export const Fortune = (attrs) => {
-    const emoteFilter = attrs.emoteFilter;
-    const tagFilter = attrs.tagFilter;
+function msg(poem) {
+    return new Message(poem.text, poem.emote, poem.tags);
+}
+
+export const Fortune = () => {
     const signals = new Signals();
     const cbName = callbackName("HomePage");
     addServiceDataCallback(cbName, data => updateSignals(signals, data));
-    const poems = [
-        msg("Blinking cursor waits patiently.", "neutral"),
-
-    ];
     function pickPoem() {
         const isSpooky = signals.isSpooky();
-        let filteredPoems = poems;
-        if (isSpooky) {
-            filteredPoems = poems.filter(poem => !poem.hasTag("spooky"));
-        }
-        if (emoteFilter) {
-            filteredPoems = filteredPoems.filter(poem => poem.isEmote(emoteFilter));
-        }
-        if (tagFilter) {
-            filteredPoems = filteredPoems.filter(poem => poem.hasTag(tagFilter));
-        }
-        return filteredPoems[Math.floor(random() * filteredPoems.length)]
+        const now = new Date();
+        const poem = randomPoem(now, isSpooky);
+        return msg(poem);
     }
     const [fortune, setFortune] = createSignal(poems[0]);
     const updatePoem = () => {
