@@ -1,5 +1,3 @@
-import { build } from "vite";
-
 class PoemList {
     constructor(poems) {
         this.poems = poems;

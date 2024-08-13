@@ -2,7 +2,7 @@ import { onCleanup, createSignal, createEffect } from "solid-js";
 import * as fabric from 'fabric'
 import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
-import { randomPoem } from "./poems";
+import { randomPoem } from "./poem";
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { callbackName } from "./callback";
 
