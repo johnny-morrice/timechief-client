@@ -1,6 +1,5 @@
-import { onCleanup, createSignal, createEffect } from "solid-js";
+import { onCleanup, createSignal } from "solid-js";
 import * as fabric from 'fabric'
-import { second } from "../timing";
 import { textTransitionSignal } from "./textGlitch";
 import { randomPoem } from "./poem";
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
@@ -9,150 +8,8 @@ import { callbackName } from "./callback";
 var globalCanvas = null;
 var leakingIntervals = [];
 
-class Message {
-    constructor(text, emote, tags) {
-        this.text = text;
-        this.emote = emote;
-        this.tags = tags
-    }
 
-    isEmote(emote) {
-        return this.emote === emote;
-    }
-
-    hasTag(tag) {
-        return this.tags.includes(tag);
-    }
-
-    element(signals) {
-        const self = this;
-        this.validateEmote();
-        const [text, setText] = textTransitionSignal("");
-        var glitchTimeout = setTimeout(() => {
-            setText(this.text);
-        }, 100);
-        // const foregroundColor = "yellow";
-
-        // TODO move this management to the top level because it is getting run multiple times
-        // We should explicitly manage the canvas lifecycle at an upper level.
-        // And pass it arguments from here for updating the management state like if different images or colours are needed.
-        let manageCanvas = function () {
-            const canvasRef = document.getElementById("fortune-canvas");
-            if (!canvasRef) {
-                return;
-            }
-            const foregroundColor = canvasRef.getAttribute("data-sig-fg-color");
-            const boxBackgroundColor = canvasRef.getAttribute("data-sig-bg-color");
-            if (!foregroundColor || !boxBackgroundColor) {
-                return;
-            }
-
-            const initialised = canvasRef.getAttribute("data-initialised");
-            if (!initialised) {
-                globalCanvas = new fabric.Canvas(canvasRef, {
-                    backgroundColor: boxBackgroundColor,
-                    selection: false,
-                    hoverCursor: "default",
-                    moveCursor: "default",
-                    // TODO: we may have to revisit this height.
-                    // The canvas is absolutely positioned, leading to strange behaviour when the height is too big.
-                    height: 120,
-                });
-            }
-            canvasRef.setAttribute("data-initialised", "true");
-
-            const renderedForeground = canvasRef.getAttribute("data-foreground-color");
-            const renderedBackground = canvasRef.getAttribute("data-background-color");
-            if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor) {
-                console.log("skipping canvas update");
-                return;
-            }
-            // Remove all objects from the canvas
-            globalCanvas.clear();
-            globalCanvas.set("backgroundColor", boxBackgroundColor);
-            console.log("adding canvas image fg: ", foregroundColor, " bg: ", boxBackgroundColor);
-            fabric.FabricImage.fromURL(self.mascotPath()).then((img) => {
-                console.log("fromURL start");
-                img.filters.push(replaceColorFilter({
-                    chromakeys: [{
-                        newColor: foregroundColor,
-                        chromakey: 0,
-                    },
-                    {
-                        newColor: boxBackgroundColor,
-                        chromakey: 2,
-                    },
-                    ]
-                }));
-                // img.filters.push(replaceColorFilter({
-                //     newColor: boxBackgroundColor,
-                //     chromakey: 0,
-                // }));
-                img.applyFilters();
-                // Get canvas dimensions
-                const canvasWidth = globalCanvas.getWidth();
-                const canvasHeight = globalCanvas.getHeight();
-
-                // Calculate the scale factor to preserve aspect ratio and fit within the canvas
-                const scaleFactor = Math.min(canvasWidth / img.width, canvasHeight / img.height);
-
-                img.scale(scaleFactor);
-                img.selectable = false;
-                img.hoverCursor = "default";
-
-                // Apply the scale factor to the image
-                globalCanvas.setWidth(img.width * scaleFactor);
-                globalCanvas.setHeight(img.height * scaleFactor);
-
-                globalCanvas.add(img);
-
-                canvasRef.setAttribute("data-foreground-color", foregroundColor);
-                canvasRef.setAttribute("data-background-color", boxBackgroundColor);
-            }).catch((err) => {
-                console.error("error adding canvas: ", err);
-            });
-            return;
-        };
-        const interval = setInterval(() => {
-            manageCanvas();
-        }, 1000);
-        leakingIntervals.push(interval);
-        onCleanup(() => {
-            clearTimeout(glitchTimeout);
-            globalCanvas.dispose();
-            globalCanvas = null;
-            clearInterval(interval);
-        });
-
-        return <div class="fortune-message">
-            <div class="fortune-message-text">{text}</div>
-            <div class="fortune-message-mascot-wrapper">
-                <canvas id="fortune-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()}></canvas>
-            </div>
-        </div>;
-    }
-
-    mascotPath() {
-        this.validateEmote();
-        return `assets/image/mascot/mascot-${this.emote}.png`;
-    }
-
-    validateEmote() {
-        const validEmotes = [
-            "instruct",
-            "neutral",
-            "sigh",
-            "spooky",
-            "thumb"
-        ];
-        const isValid = validEmotes.filter(emote => emote === this.emote).length > 0;
-        if (!isValid) {
-            throw new Error(`invalid mascot nickname: ${this.emote}`);
-        }
-    }
-}
-
-function replaceColorFilter({ chromakeys}) {
+function replaceColorFilter({ chromakeys }) {
     // Helper function to convert CSS color to RGB
     function cssColorToRgb(color) {
         let r, g, b, a;
@@ -213,6 +70,8 @@ class Signals {
     constructor() {
         [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
         [this.foregroundColor, this.setForegroundColor] = createSignal("green");
+        [this.text, this.setText] = textTransitionSignal("Hey there, I'm hands!");
+        [this.emote, this.setEmote] = createSignal("neutral");
         [this.isSpooky, this.setSpooky] = createSignal(false);
     }
 }
@@ -246,8 +105,23 @@ function updateSignals(signals, data) {
     signals.setSpooky(spooky);
 }
 
-function msg(poem) {
-    return new Message(poem.text, poem.emote, poem.tags);
+function mascotPath(emote) {
+    validateEmote(emote);
+    return `assets/image/mascot/mascot-${emote}.png`;
+}
+
+function validateEmote(emote) {
+    const validEmotes = [
+        "instruct",
+        "neutral",
+        "sigh",
+        "spooky",
+        "thumb"
+    ];
+    const isValid = validEmotes.filter(myEmote => myEmote === mote).length > 0;
+    if (!isValid) {
+        throw new Error(`invalid mascot nickname: ${emote}`);
+    }
 }
 
 export const Fortune = () => {
@@ -258,21 +132,111 @@ export const Fortune = () => {
         const isSpooky = signals.isSpooky();
         const now = new Date();
         const poem = randomPoem(now, isSpooky);
-        return msg(poem);
+        return poem;
     }
-    const [fortune, setFortune] = createSignal(pickPoem());
-    const updatePoem = () => {
-        leakingIntervals.forEach(clearInterval);
-        leakingIntervals = [];
-        setFortune(pickPoem());
-    };
 
-    updatePoem();
-    const interval = setInterval(updatePoem, 10 * second);
+    let managePoem = function () {
+        const poem = pickPoem();
+        signals.setText(poem.text);
+        signals.setEmote(poem.emote);
+    }
+
+    let manageCanvas = function () {
+        const canvasRef = document.getElementById("fortune-canvas");
+        if (!canvasRef) {
+            return;
+        }
+        const foregroundColor = canvasRef.getAttribute("data-sig-fg-color");
+        const boxBackgroundColor = canvasRef.getAttribute("data-sig-bg-color");
+        if (!foregroundColor || !boxBackgroundColor) {
+            return;
+        }
+
+        const initialised = canvasRef.getAttribute("data-initialised");
+        if (!initialised) {
+            globalCanvas = new fabric.Canvas(canvasRef, {
+                backgroundColor: boxBackgroundColor,
+                selection: false,
+                hoverCursor: "default",
+                moveCursor: "default",
+                // TODO: we may have to revisit this height.
+                // The canvas is absolutely positioned, leading to strange behaviour when the height is too big.
+                height: 120,
+            });
+        }
+        canvasRef.setAttribute("data-initialised", "true");
+
+        const renderedForeground = canvasRef.getAttribute("data-foreground-color");
+        const renderedBackground = canvasRef.getAttribute("data-background-color");
+        if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor) {
+            console.log("skipping canvas update");
+            return;
+        }
+        // Remove all objects from the canvas
+        globalCanvas.clear();
+        globalCanvas.set("backgroundColor", boxBackgroundColor);
+        console.log("adding canvas image fg: ", foregroundColor, " bg: ", boxBackgroundColor);
+        fabric.FabricImage.fromURL(mascotPath()).then((img) => {
+            console.log("fromURL start");
+            img.filters.push(replaceColorFilter({
+                chromakeys: [{
+                    newColor: foregroundColor,
+                    chromakey: 0,
+                },
+                {
+                    newColor: boxBackgroundColor,
+                    chromakey: 2,
+                },
+                ]
+            }));
+            // img.filters.push(replaceColorFilter({
+            //     newColor: boxBackgroundColor,
+            //     chromakey: 0,
+            // }));
+            img.applyFilters();
+            // Get canvas dimensions
+            const canvasWidth = globalCanvas.getWidth();
+            const canvasHeight = globalCanvas.getHeight();
+
+            // Calculate the scale factor to preserve aspect ratio and fit within the canvas
+            const scaleFactor = Math.min(canvasWidth / img.width, canvasHeight / img.height);
+
+            img.scale(scaleFactor);
+            img.selectable = false;
+            img.hoverCursor = "default";
+
+            // Apply the scale factor to the image
+            globalCanvas.setWidth(img.width * scaleFactor);
+            globalCanvas.setHeight(img.height * scaleFactor);
+
+            globalCanvas.add(img);
+
+            canvasRef.setAttribute("data-foreground-color", foregroundColor);
+            canvasRef.setAttribute("data-background-color", boxBackgroundColor);
+        }).catch((err) => {
+            console.error("error adding canvas: ", err);
+        });
+        return;
+    };
+    managePoem();
+    manageCanvas();
+    const canvasInterval = setInterval(() => {
+        manageCanvas();
+    }, 1000);
+    const poemInterval = setInterval(() => {
+        managePoem();
+    }, 10000);
+
     onCleanup(() => {
-        clearInterval(interval);
+        clearInterval(poemInterval);
+        clearInterval(canvasInterval);
         removeDataCallback(cbName);
         leakingIntervals.forEach(clearInterval);
     });
-    return fortune().element(signals);
+    return  <div class="fortune-message">
+        <div class="fortune-message-text">{signals.text()}</div>
+        <div class="fortune-message-mascot-wrapper">
+            <canvas id="fortune-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()}></canvas>
+        </div>
+    </div>;
 }
