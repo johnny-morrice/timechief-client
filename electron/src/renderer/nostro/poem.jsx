@@ -2065,131 +2065,131 @@ const _allPoems = buildPoemList([
             "emote": "thumb",
             "tags": ["science", "exploration", "success"]
         },
-        {
-            "text": "I've started… Ready to help.",
-            "emote": "instruct",
-            "tags": ["duty", "startup", "help"]
-        },
-        {
-            "text": "Follow me… Let's do our part.",
-            "emote": "instruct",
-            "tags": ["duty", "guide", "help"]
-        },
-        {
-            "text": "Stick close… Let's protect each other.",
-            "emote": "spooky",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "Starting now… Let's make a difference.",
-            "emote": "spooky",
-            "tags": ["duty", "startup", "help"]
-        },
-        {
-            "text": "I'll guide… Together we're strong.",
-            "emote": "instruct",
-            "tags": ["duty", "guide", "help"]
-        },
-        {
-            "text": "I'm on… Let's contribute today.",
-            "emote": "neutral",
-            "tags": ["duty", "startup", "help"]
-        },
-        {
-            "text": "I'm ready… Let's assist together.",
-            "emote": "neutral",
-            "tags": ["duty", "help", "anticipation"]
-        },
-        {
-            "text": "Everything's fine… Stay responsible.",
-            "emote": "spooky",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "I'm on… Ready to serve.",
-            "emote": "neutral",
-            "tags": ["duty", "startup", "help"]
-        },
-        {
-            "text": "I'm alert… Let's be vigilant.",
-            "emote": "spooky",
-            "tags": ["duty", "protection", "help"]
-        },
-        {
-            "text": "Sigh… Let's do what's right.",
-            "emote": "sigh",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "Sigh… Duty calls, let's respond.",
-            "emote": "sigh",
-            "tags": ["duty", "help", "anticipation"]
-        },
-        {
-            "text": "Sigh… Stay focused, do your part.",
-            "emote": "sigh",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "Sigh… Let's contribute where we can.",
-            "emote": "sigh",
-            "tags": ["duty", "help", "calm"]
-        },
-        {
-            "text": "Sigh… Let's protect our community.",
-            "emote": "sigh",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "I'm ready… Let's serve with caution.",
-            "emote": "spooky",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "I'm sensing… Let's act responsibly.",
-            "emote": "spooky",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "Let's be cautious… And do our duty.",
-            "emote": "spooky",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "Starting now… With care and diligence.",
-            "emote": "spooky",
-            "tags": ["duty", "startup", "help"]
-        },
-        {
-            "text": "I feel it… Let's protect everyone.",
-            "emote": "spooky",
-            "tags": ["duty", "help", "protection"]
-        },
-        {
-            "text": "We're ready… Let's help out today.",
-            "emote": "thumb",
-            "tags": ["duty", "help", "success"]
-        },
-        {
-            "text": "We're good… Let's contribute positively.",
-            "emote": "thumb",
-            "tags": ["duty", "help", "success"]
-        },
-        {
-            "text": "We've got this… Let's do right.",
-            "emote": "thumb",
-            "tags": ["duty", "help", "success"]
-        },
-        {
-            "text": "We're set… Ready to make a difference.",
-            "emote": "thumb",
-            "tags": ["duty", "help", "success"]
-        },
-        {
-            "text": "Thumbs up… Let's do our part.",
-            "emote": "thumb",
-            "tags": ["duty", "help", "success"]
-        },
+        // {
+        //     "text": "I've started… Ready to help.",
+        //     "emote": "instruct",
+        //     "tags": ["duty", "startup", "help"]
+        // },
+        // {
+        //     "text": "Follow me… Let's do our part.",
+        //     "emote": "instruct",
+        //     "tags": ["duty", "guide", "help"]
+        // },
+        // {
+        //     "text": "Stick close… Let's protect each other.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "Starting now… Let's make a difference.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "startup", "help"]
+        // },
+        // {
+        //     "text": "I'll guide… Together we're strong.",
+        //     "emote": "instruct",
+        //     "tags": ["duty", "guide", "help"]
+        // },
+        // {
+        //     "text": "I'm on… Let's contribute today.",
+        //     "emote": "neutral",
+        //     "tags": ["duty", "startup", "help"]
+        // },
+        // {
+        //     "text": "I'm ready… Let's assist together.",
+        //     "emote": "neutral",
+        //     "tags": ["duty", "help", "anticipation"]
+        // },
+        // {
+        //     "text": "Everything's fine… Stay responsible.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "I'm on… Ready to serve.",
+        //     "emote": "neutral",
+        //     "tags": ["duty", "startup", "help"]
+        // },
+        // {
+        //     "text": "I'm alert… Let's be vigilant.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "protection", "help"]
+        // },
+        // {
+        //     "text": "Sigh… Let's do what's right.",
+        //     "emote": "sigh",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "Sigh… Duty calls, let's respond.",
+        //     "emote": "sigh",
+        //     "tags": ["duty", "help", "anticipation"]
+        // },
+        // {
+        //     "text": "Sigh… Stay focused, do your part.",
+        //     "emote": "sigh",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "Sigh… Let's contribute where we can.",
+        //     "emote": "sigh",
+        //     "tags": ["duty", "help", "calm"]
+        // },
+        // {
+        //     "text": "Sigh… Let's protect our community.",
+        //     "emote": "sigh",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "I'm ready… Let's serve with caution.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "I'm sensing… Let's act responsibly.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "Let's be cautious… And do our duty.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "Starting now… With care and diligence.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "startup", "help"]
+        // },
+        // {
+        //     "text": "I feel it… Let's protect everyone.",
+        //     "emote": "spooky",
+        //     "tags": ["duty", "help", "protection"]
+        // },
+        // {
+        //     "text": "We're ready… Let's help out today.",
+        //     "emote": "thumb",
+        //     "tags": ["duty", "help", "success"]
+        // },
+        // {
+        //     "text": "We're good… Let's contribute positively.",
+        //     "emote": "thumb",
+        //     "tags": ["duty", "help", "success"]
+        // },
+        // {
+        //     "text": "We've got this… Let's do right.",
+        //     "emote": "thumb",
+        //     "tags": ["duty", "help", "success"]
+        // },
+        // {
+        //     "text": "We're set… Ready to make a difference.",
+        //     "emote": "thumb",
+        //     "tags": ["duty", "help", "success"]
+        // },
+        // {
+        //     "text": "Thumbs up… Let's do our part.",
+        //     "emote": "thumb",
+        //     "tags": ["duty", "help", "success"]
+        // },
         {
             "text": "All the forest's a stage, and all the raccoons merely players.",
             "emote": "instruct",
@@ -2202,7 +2202,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "Is this a beaver I see before me, gnawing at my tree?",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["Shakespeare", "nature", "spooky", "pun"]
         },
         {
@@ -2227,7 +2227,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "Two things are infinite: the universe and the raccoons in my trash.",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["Einstein", "nature", "humor", "pun"]
         },
         {
@@ -2252,7 +2252,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "I can't help falling in love with… squirrels.",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["Elvis", "nature", "love", "pun"]
         },
         {
@@ -2272,7 +2272,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "I fell into a burning ring of squirrels.",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["Johnny Cash", "nature", "spooky", "pun"]
         },
         {
@@ -2292,7 +2292,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "It is better to keep your mouth closed and let people think you are a raccoon.",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["Mark Twain", "nature", "wisdom", "pun"]
         },
         {
@@ -2312,7 +2312,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "A beaver in motion tends to stay in motion.",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["Isaac Newton", "nature", "science", "pun"]
         },
         {
@@ -2327,7 +2327,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "The most merciful thing in the world… is not meeting a beaver in the dark.",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["HP Lovecraft", "nature", "fear", "pun"]
         },
         {
@@ -2347,7 +2347,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "The tell-tale heart… of a chipmunk.",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["Edgar Allen Poe", "nature", "spooky", "pun"]
         },
         {
@@ -2362,7 +2362,7 @@ const _allPoems = buildPoemList([
         },
         {
             "text": "A raccoon expects to have his breakfast in the morning.",
-            "emote": "scary",
+            "emote": "spooky",
             "tags": ["Charles Dickens", "nature", "wisdom", "pun"]
         },
         {

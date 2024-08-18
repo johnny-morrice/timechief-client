@@ -74,6 +74,11 @@ class Signals {
     }
 }
 
+var globalSignals = new Signals();
+var canvasInterval = setInterval(() => {
+    manageCanvas(globalSignals);
+}, 1000);
+
 function manageCanvas(signals) {
     const canvasRef = document.getElementById("fortune-canvas");
     if (!canvasRef) {
@@ -88,7 +93,9 @@ function manageCanvas(signals) {
 
     const initialised = canvasRef.getAttribute("data-initialised");
     if (!initialised) {
-
+        if (globalCanvas) {
+            globalCanvas.dispose();
+        }
         globalCanvas = new fabric.Canvas(canvasRef, {
             backgroundColor: boxBackgroundColor,
             selection: false,
@@ -105,7 +112,7 @@ function manageCanvas(signals) {
     const renderedBackground = canvasRef.getAttribute("data-background-color");
     const renderedEmote = canvasRef.getAttribute("data-emote");
     if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor && emote === renderedEmote) {
-        console.log("skipping canvas update");
+        // console.log("skipping canvas update");
         return;
     }
     // Remove all objects from the canvas
@@ -203,9 +210,9 @@ function validateEmote(emote) {
     }
 }
 
-const leakingCanvasIntervals = [];
 export const Fortune = () => {
     const signals = new Signals();
+    globalSignals = signals;
     const cbName = callbackName("Fortune");
     addServiceDataCallback(cbName, data => updateSignals(signals, data));
     function pickPoem() {
@@ -227,14 +234,7 @@ export const Fortune = () => {
         managePoem();
     }, 10000);
 
-    const canvasInterval = setInterval(() => {
-        manageCanvas(signals);
-    }, 1000);
-    leakingCanvasIntervals.push(canvasInterval);
-
     onCleanup(() => {
-        leakingCanvasIntervals.forEach(interval => clearInterval(interval));
-        leakingCanvasIntervals.length = 0;
         clearInterval(poemInterval);
         removeDataCallback(cbName);
     });
