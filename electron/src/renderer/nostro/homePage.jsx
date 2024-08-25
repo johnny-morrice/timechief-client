@@ -95,7 +95,18 @@ function handleEventChange(signals) {
 }
 
 function updateSignals(signals, data) {
-  let calendar = data["google_calendar"];
+  let calendarWrapper = data["google_calendar"];
+  if (!calendarWrapper) {
+    return;
+  }
+  let calendar = calendarWrapper["value"];
+  if (!calendar) {
+    return;
+  }
+  let calendarEvents = calendar["events"];
+  if (!calendarEvents) {
+    return;
+  }
   let deviceProfileWrapper = data["device_profile"];
   if (!deviceProfileWrapper) {
     return;
@@ -113,10 +124,8 @@ function updateSignals(signals, data) {
   signals.setTimezone(timezone);
   signals.setLastUpdateTime(new Date());
   // setFakeEvent(signals);
-  if (calendar.Calendar) {
-    const nextEvent = findNextEvent(calendar.Calendar.Events);
-    signals.setNextEventBuffer(nextEvent, timezone);
-  }
+  const nextEvent = findNextEvent(calendarEvents);
+  signals.setNextEventBuffer(nextEvent, timezone);
   handleEventChange(signals);
 }
 

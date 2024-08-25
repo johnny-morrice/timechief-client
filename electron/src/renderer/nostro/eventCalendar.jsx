@@ -40,7 +40,10 @@ function updateSignals(signals, data) {
     return;
   }
   let googleCalendar = calendarDatum["value"];
-  let dataEvents = calendar["events"];
+  if (!googleCalendar) {
+    return;
+  }
+  let dataEvents = googleCalendar["events"];
   if (!dataEvents) {
     return;
   }
