@@ -17,7 +17,7 @@ import { EventCalendar } from './eventCalendar';
 import { fadeTransition } from './fadeTransition';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
-import { manageMascotCanvas } from './mascot';
+import { manageMascotCanvas, scoreEmote } from './mascot';
 
 class Signals {
   constructor() {
@@ -152,6 +152,12 @@ function updateSignals(signals, data) {
   }
   const spooky = features["spooky"];
   signals.setSpooky(spooky);
+  if (nextEvent) {
+    const emote = scoreEmote(nextEvent.eventShortText());
+    signals.setEmote(emote);
+  } else {
+    signals.setEmote("neutral");
+  }
 }
 
 // setFakeEvent is a useful test utility

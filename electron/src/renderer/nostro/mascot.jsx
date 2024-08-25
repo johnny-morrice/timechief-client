@@ -90,21 +90,55 @@ function mascotPath(emote) {
     return `assets/image/mascot/mascot-${emote}.png`;
 }
 
+const validEmotes = [
+    "instruct",
+    "neutral",
+    "sigh",
+    "spooky",
+    "thumb"
+];
 
 function validateEmote(emote) {
-    const validEmotes = [
-        "instruct",
-        "neutral",
-        "sigh",
-        "spooky",
-        "thumb"
-    ];
     const isValid = validEmotes.filter(myEmote => myEmote === emote).length > 0;
     if (!isValid) {
         throw new Error(`invalid mascot nickname: ${emote}`);
     }
 }
 
+export function scoreEmote(text) {
+    // Split the text into words, and remove anything other than ascii letters.
+    const words = text.split(/\s+/).map(word => word.replace(/[^A-Za-z]/g, ""));
+    const scores = {};
+    for (const emote in emoteKeywordMap) {
+        scores[emote] = 0;
+    }
+    for (const word of words) {
+        for (const emote in emoteKeywordMap) {
+            if (emoteKeywordMap[emote].includes(word)) {
+                scores[emote]++;
+            }
+        }
+    }
+    const limit = 1;
+    // Return emote with the highest score.  If the limit is not reached, return "neutral".
+    let maxEmote = "neutral";
+    let maxScore = 0;
+    for (const emote in scores) {
+        if (scores[emote] > maxScore && scores[emote] >= limit) {
+            maxScore = scores[emote];
+            maxEmote = emote;
+        }
+    }
+    return maxEmote;
+}
+
+const emoteKeywordMap = {
+    "instruct": [],
+    "neutral": [],
+    "sigh": [],
+    "spooky": [],
+    "thumb": [],
+};
 
 function replaceColorFilter({ chromakeys }) {
     // Helper function to convert CSS color to RGB
@@ -162,3 +196,4 @@ function replaceColorFilter({ chromakeys }) {
         matrix: colorMatrix
     });
 }
+
