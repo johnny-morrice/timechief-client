@@ -695,6 +695,7 @@ const spookyKeywords = [
     "decomposing", "grave", "graveyard", "tomb", "crypt", "undead", 
     "zombie", "zombies", "ghoul", "ghouls", "mummy", "mummies", 
     "freak", "freaks", "oddity", "oddities", "mystery", "mysteries", 
+    "alien", "aliens", "x-files",
     "anomaly", "anomalies", "glitch", "glitches", "virus", "viruses", 
     "malware", "hacked", "hacker", "hackers", "cyber", "cyberstalker", 
     "cyberstalkers", "obsession", "obsessive", "stalker", "stalkers",
@@ -758,7 +759,8 @@ const spookyKeywords = [
     "darkness", "cloaked", "masked", 
     "veil", "veiled", "disguised", 
     "identity", "unknown", "nameless", 
-    "faceless", "shadow", "shrouded"
+    "faceless", "shadow", "shrouded",
+    "lovecraft"
 ]
 
 class WordSet {
