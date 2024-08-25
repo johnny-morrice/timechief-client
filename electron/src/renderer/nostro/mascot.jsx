@@ -746,7 +746,7 @@ const spookyKeywords = [
     "beast", "fiend", "demon", "creature", 
     "abomination", "mutant", "mutation", 
     "experiment", "experiments", "lab", "laboratory", 
-    "science", "madscience", "madscientist", 
+    "science", "mad", "science", "scientist", 
     "obsession", "obsessive", "stalker", 
     "stalkers", "creep", "creeping", 
     "lurker", "lurkers", "voyeur", "spy", 
