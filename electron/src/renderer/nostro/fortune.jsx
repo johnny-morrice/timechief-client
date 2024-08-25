@@ -139,7 +139,7 @@ function manageCanvas(signals) {
         img.applyFilters();
         // Get canvas dimensions
         const canvasWidth = globalCanvas.getWidth();
-        const canvasHeight = globalCanvas.getHeight();
+        const canvasHeight = 120;
 
         // Calculate the scale factor to preserve aspect ratio and fit within the canvas
         const scaleFactor = Math.min(canvasWidth / img.width, canvasHeight / img.height);

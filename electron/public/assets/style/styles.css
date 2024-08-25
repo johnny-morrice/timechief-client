@@ -298,6 +298,10 @@ div.fortune-message {
     gap: 0.5em;
 }
 
+#fortune-canvas {
+    height: 120px;
+}
+
 div.next-event-summary {
     font-size: 24pt;
 }
