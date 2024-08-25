@@ -17,6 +17,7 @@ import { EventCalendar } from './eventCalendar';
 import { fadeTransition } from './fadeTransition';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
+import { manageMascotCanvas } from './mascot';
 
 class Signals {
   constructor() {
@@ -29,6 +30,11 @@ class Signals {
     [this.nextEventBuffer, this.setNextEventBuffer] = createSignal(null);
     [this.nextEvent, this.setNextEvent] = createSignal(null);
     [this.actionCentreTransition, this.setActionCentreTransition] = createSignal("no-transition");
+
+    [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
+    [this.foregroundColor, this.setForegroundColor] = createSignal("green");
+    [this.emote, this.setEmote] = createSignal("neutral");
+    [this.isSpooky, this.setSpooky] = createSignal(false);
   }
 }
 
@@ -127,6 +133,25 @@ function updateSignals(signals, data) {
   const nextEvent = findNextEvent(calendarEvents);
   signals.setNextEventBuffer(nextEvent, timezone);
   handleEventChange(signals);
+
+  const theme = deviceProfile["theme"];
+  if (!theme) {
+    return;
+  }
+  let boxBackgroundColor = theme["box_background_color"];
+  let foregroundColor = theme["foreground_color"];
+  if (boxBackgroundColor) {
+    signals.setBoxBackgroundColor(boxBackgroundColor);
+  }
+  if (foregroundColor) {
+    signals.setForegroundColor(foregroundColor);
+  }
+  const features = deviceProfile["features"];
+  if (!features) {
+    return;
+  }
+  const spooky = features["spooky"];
+  signals.setSpooky(spooky);
 }
 
 // setFakeEvent is a useful test utility
@@ -232,8 +257,21 @@ function hasNextEvent(signals) {
   return true;
 }
 
+var globalSignals = new Signals();
+var globalCanvas = null;
+setInterval(() => {
+  function setCanvas(canvas) {
+    globalCanvas = canvas;
+  }
+  function getCanvas() {
+    return globalCanvas;
+  }
+  manageMascotCanvas(setCanvas, getCanvas, "event-canvas", globalSignals.emote, 80);
+}, 1000);
+
 export const HomePage = () => {
   const signals = new Signals();
+  globalSignals = signals;
   const cbName = callbackName("HomePage");
   addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
 
@@ -282,13 +320,18 @@ export const HomePage = () => {
       <div class="home-action-center flex-grow border crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
           <Show when={hasNextEvent(signals)}>
-            <div class='next-event-summary flex-column flex-grow'>
-              <div class='next-event-time flex-row'>
-                <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
-                <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
+            <div class='next-event-wrapper'>
+              <div class='next-event-summary flex-column flex-grow'>
+                <div class='next-event-time flex-row'>
+                  <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
+                  <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
+                </div>
+                <div class='next-event-shorttext'>
+                  {getNextEventShortText(signals)}
+                </div>
               </div>
-              <div class='next-event-shorttext'>
-                {getNextEventShortText(signals)}
+              <div class="event-mascot-wrapper">
+                <canvas id="event-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
               </div>
             </div>
           </Show>
