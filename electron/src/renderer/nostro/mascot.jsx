@@ -105,7 +105,7 @@ function validateEmote(emote) {
     }
 }
 
-export function scoreEmote(text) {
+export function scoreEmote(text, isSpooky) {
     // Split the text into words, and remove anything other than ascii letters.
     const words = text.split(/\s+/).map(word => word.replace(/[^A-Za-z]/g, ""));
     const scores = {};
@@ -128,6 +128,9 @@ export function scoreEmote(text) {
             maxScore = scores[emote];
             maxEmote = emote;
         }
+    }
+    if (maxEmote === "spooky" && !isSpooky) {
+        maxEmote = "neutral";
     }
     return maxEmote;
 }

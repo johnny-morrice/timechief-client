@@ -153,7 +153,7 @@ function updateSignals(signals, data) {
   const spooky = features["spooky"];
   signals.setSpooky(spooky);
   if (nextEvent) {
-    const emote = scoreEmote(nextEvent.eventShortText());
+    const emote = scoreEmote(nextEvent.eventShortText(), spooky);
     signals.setEmote(emote);
   } else {
     signals.setEmote("neutral");
