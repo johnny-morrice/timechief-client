@@ -1,9 +1,10 @@
 import { onCleanup, createSignal } from "solid-js";
 import { textTransitionSignal } from "./textGlitch";
 import { randomPoem } from "./poem";
-import { addServiceDataCallback, removeDataCallback } from "./ipc";
+import { addServiceDataCallback, isEcoMode, removeDataCallback } from "./ipc";
 import { callbackName } from "./callback";
 import { manageMascotCanvas } from "./mascot";
+import { ecoRefreshInterval } from "../timing";
 
 class Signals {
     constructor() {
@@ -17,6 +18,7 @@ class Signals {
 
 var globalSignals = new Signals();
 var globalCanvas = null;
+var lastManaged = new Date();
 setInterval(() => {
     function setCanvas(canvas) {
         globalCanvas = canvas;
@@ -24,7 +26,16 @@ setInterval(() => {
     function getCanvas() {
         return globalCanvas;
     }
+    if (isEcoMode()) {
+        const now = new Date();
+        const timeout = ecoRefreshInterval;
+        const diff = now.getTime() - lastManaged.getTime();
+        if (diff < timeout) {
+            return;
+        }
+    }
     manageMascotCanvas(setCanvas, getCanvas,"fortune-canvas", globalSignals.emote, 120);
+    lastManaged = new Date();
 }, 1000);
 
 function updateSignals(signals, data) {

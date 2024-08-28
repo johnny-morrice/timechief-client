@@ -66,8 +66,8 @@ export const StatusNote = () => {
     const cbName = callbackName("StatusNote");
     addDataCallback(cbName, (data) => updateSignals(signals, data));
     const ipcCheckInterval = setInterval(() => {
-        signals.setIPCTimeoutBuffer(isTimeout(signals.lastUpdateTime(), 6 * second));
-    }, 3 * second);
+        signals.setIPCTimeoutBuffer(isTimeout(signals.lastUpdateTime(), 20 * second));
+    }, 5 * second);
     onCleanup(() => {
         removeDataCallback(cbName);
         clearInterval(ipcCheckInterval);

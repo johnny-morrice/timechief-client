@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addServiceDataCallback } from './ipc';
+import { addServiceDataCallback, ecoRefreshInterval, isEcoMode } from './ipc';
 import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
 import { removeDataCallback } from './ipc';
@@ -276,6 +276,7 @@ function hasNextEvent(signals) {
 
 var globalSignals = new Signals();
 var globalCanvas = null;
+var lastManaged = new Date();
 setInterval(() => {
   function setCanvas(canvas) {
     globalCanvas = canvas;
@@ -283,7 +284,16 @@ setInterval(() => {
   function getCanvas() {
     return globalCanvas;
   }
+  if (isEcoMode()) {
+    const now = new Date();
+    const timeout = ecoRefreshInterval;
+    const diff = now.getTime() - lastManaged.getTime();
+    if (diff < timeout) {
+      return;
+    }
+  }
   manageMascotCanvas(setCanvas, getCanvas, "event-canvas", globalSignals.emote, 80);
+  lastManaged = new Date();
 }, 1000);
 
 export const HomePage = () => {
