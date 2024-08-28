@@ -371,7 +371,7 @@
 }
 
 .crt:not(.crt-jank) {
-    animation: textShadow 1.6s infinite;
+    text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.1), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
 }
 
 .crt-jank {
@@ -379,7 +379,7 @@
 }
 
 .crt-box:not(.crt-box-jank) {
-    animation: boxShadow 1.6s infinite;
+    text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.1), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
 }
 
 .crt-box-jank {

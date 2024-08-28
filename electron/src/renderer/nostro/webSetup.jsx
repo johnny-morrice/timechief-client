@@ -200,6 +200,10 @@ export const WebSetupPage = (props) => {
         // Get the crt-root element
         const crtRoot = document.getElementById("crt-root");
         const boxes = document.getElementsByClassName("crt-box");
+        const currentClasses = crtRoot.classList;
+        if (!currentClasses.contains("crt-jank")) {
+            return;
+        }
         // The CRT jank is removed by removing the crt-jank class from the crt-root element.
         crtRoot.classList.remove("crt-jank");
         // Remove jank from all the boxes;
