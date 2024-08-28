@@ -73,6 +73,7 @@ export const StatusNote = () => {
         removeDataCallback(cbName);
         clearInterval(ipcCheckInterval);
     });
+    const useEcoMode = false;
 
     return <div id="status-note-content" className={`status-note flex-column ${signals.statusNoteTransition()}`}>
             <Show when={signals.isCalendarError()}>
@@ -90,7 +91,7 @@ export const StatusNote = () => {
                     <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
                 </div>
             </Show>
-            <Show when={signals.isEcoMode()}>
+            <Show when={useEcoMode && signals.isEcoMode()}>
                 <div class="status-note-indicator">
                     <i class='fa-solid fa-leaf'></i>
                 </div>
