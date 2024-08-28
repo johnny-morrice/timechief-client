@@ -26,11 +26,12 @@ class Signals {
     [this.hourCycleOption, this.setHourCycleOption] = createSignal("h23");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
     [this.myTime, this.setMyTime] = createSignal("");
-    [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
+    [this.myDate, this.setMyDate] = createSignal("");
     [this.nextEventBuffer, this.setNextEventBuffer] = createSignal(null);
     [this.nextEvent, this.setNextEvent] = createSignal(null);
     [this.actionCentreTransition, this.setActionCentreTransition] = createSignal("no-transition");
-
+    [this.timeFormatter, this.setTimeFormatter] = createSignal(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
+    [this.dateFormatter, this.setDateFormatter] = createSignal(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
     [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
     [this.foregroundColor, this.setForegroundColor] = createSignal("green");
     [this.emote, this.setEmote] = createSignal("neutral");
@@ -38,7 +39,7 @@ class Signals {
   }
 }
 
-function timeOptions(homePageSignals) {
+function makeTimeFormatter(homePageSignals) {
   let options = {
     hour: "numeric", minute: "2-digit", "second": "2-digit"
   };
@@ -52,26 +53,26 @@ function timeOptions(homePageSignals) {
   if (timeZone) {
     options["timeZone"] = timeZone;
   }
-  return options;
+  return new Intl.DateTimeFormat(homePageSignals.getLocale(), options);
 }
 
-function localeTimeString(date, locale, options) {
-  return date.toLocaleTimeString(locale, options);
+function makeDateFormatter(homePageSignals) {
+  let options = {
+    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+  };
+  return new Intl.DateTimeFormat(homePageSignals.getLocale(), options);
 }
+
 
 function getTimeText(homePageSignals) {
-  const options = timeOptions(homePageSignals);
-  let locale = homePageSignals.locale();
-  if (!locale) {
-    locale = undefined;
-  }
-  const time = localeTimeString(new Date(), locale, options);
+  const formatter = homePageSignals.timeFormatter();
+  const time = formatter.format(new Date());
   return time.replace(/\s+(am|pm|AM|PM)/, "");
 }
 
-function getDateText(locale) {
-  let dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-  var dateText = new Date().toLocaleDateString(locale, dateOptions);
+function getDateText(homePageSignals) {
+  const formatter = homePageSignals.dateFormatter();
+  const dateText = formatter.format(new Date());
   return dateText.replace(',', '');
 }
 
@@ -137,6 +138,8 @@ function updateSignals(signals, data) {
   signals.setLocale(locale);
   signals.setTimezone(timezone);
   signals.setLastUpdateTime(new Date());
+  signals.setTimeFormatter(makeTimeFormatter(signals));
+  signals.setDateFormatter(makeDateFormatter(signals));
   // setFakeEvent(signals);
   const nextEvent = findNextEvent(calendarEvents);
   signals.setNextEventBuffer(nextEvent, timezone);
@@ -302,7 +305,11 @@ export const HomePage = () => {
 
   let dateInterval = setInterval(
     () => {
-      signals.setMyDate(getDateText(getLocale(signals)));
+      const newDateText = getDateText(signals);
+      const oldDateText = signals.myDate();
+      if (newDateText !== oldDateText) {
+        signals.setMyDate(newDateText);
+      }
     },
     second
   );

@@ -78,7 +78,7 @@ export const Fortune = () => {
 
     const poemInterval = setInterval(() => {
         managePoem();
-    }, 10000);
+    }, 60 * 1000);
 
     onCleanup(() => {
         clearInterval(poemInterval);
