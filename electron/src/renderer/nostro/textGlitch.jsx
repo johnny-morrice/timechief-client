@@ -89,13 +89,11 @@ export const textTransitionSignal = (value) => {
     const [buffer, setBuffer] = createSignal("");
     const [intermediate, setIntermediate] = createSignal("");
     const applyHighlight = (text) => {
-        console.log("textTransitionSignal applying highlight");
         return highlightSpansGlitch(text, buffer());
     };
     const [out] = createResource(intermediate, applyHighlight);
     var count = 0
     function doSet(data) {
-        console.log("textTransitionSignal doSet " + count);
         count++;
         setBuffer(data);
         textTransitionGlitch(buffer, intermediate, setIntermediate, 3);
