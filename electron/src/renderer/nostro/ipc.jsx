@@ -1,4 +1,4 @@
-import { apiRefreshInterval, deviceRefreshInterval } from "../timing";
+import { refreshInterval, ecoRefreshInterval } from "../timing";
 
 class APIResultReceiver {
     constructor(channel) {
@@ -185,16 +185,47 @@ export function sendLoggedIn() {
     window.api.send("loggedIn");
 }
 
+var lastInteracted = new Date();
+
+export function recordInteraction() {
+    lastInteracted = new Date();
+}
+
+export function isEcoMode() {
+    const interactionDuration = 30 * 1000; // 30 seconds marks an interaction period.
+    const now = new Date();
+    return now - lastInteracted > interactionDuration;
+}
+
 export function initializeIPC() {
-    let deviceInterval = setInterval(() => {
-        sendDeviceHeartbeat();
-    },
-        deviceRefreshInterval
+    lastInteracted = new Date();
+    let fastDeviceInterval = setInterval(() => {
+        if (!isEcoMode()) {
+            console.log("doing non-eco device heartbeat");
+            sendDeviceHeartbeat();
+        }
+    }, refreshInterval
     );
-    let apiInterval = setInterval(() => {
-        sendClockDataRequest();
-    },
-        apiRefreshInterval
+    let fastApiInterval = setInterval(() => {
+        if (!isEcoMode()) {
+            console.log("doing non-eco clock data request");
+            sendClockDataRequest();
+        }
+    }, refreshInterval
+    );
+    let ecoApiInterval = setInterval(() => {
+        if (isEcoMode()) {
+            console.log("doing eco clock data request");
+            sendClockDataRequest();
+        }
+    }, ecoRefreshInterval
+    );
+    let ecoDeviceInterval = setInterval(() => {
+        if (isEcoMode()) {
+            console.log("doing eco device heartbeat");
+            sendDeviceHeartbeat();
+        }
+    }, ecoRefreshInterval
     );
     sendClockDataRequest();
     sendDeviceHeartbeat();
@@ -208,5 +239,5 @@ export function initializeIPC() {
     sshPasswordRegenReceiver.receive();
     apiKeyRegenReceiver.receive();
     sendLoggedIn();
-    return [deviceInterval, apiInterval];
+    return [fastDeviceInterval, fastApiInterval, ecoApiInterval, ecoDeviceInterval];
 }

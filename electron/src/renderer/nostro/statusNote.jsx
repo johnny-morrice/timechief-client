@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addDataCallback, removeDataCallback } from './ipc';
+import { addDataCallback, isEcoMode, removeDataCallback } from './ipc';
 import { second } from '../timing'
 import { callbackName } from "./callback";
 import { fadeTransition } from './fadeTransition';
@@ -15,6 +15,7 @@ class Signals {
         [this.isDeviceDataError, this.setDeviceDataError] = createSignal(false);
         [this.isIPCTimeoutBuffer, this.setIPCTimeoutBuffer] = createSignal(false);
         [this.isIPCTimeout, this.setIPCTimeout] = createSignal(false);
+        [this.isEcoMode, this.setEcoMode] = createSignal(false);
         [this.statusNoteTransition, this.setStatusNoteTransition] = createSignal("no-transition");
     }
 }
@@ -35,6 +36,7 @@ function updateSignals(signals, data) {
     signals.setCalendarErrorBuffer(hasStateFlag(data, "calendar-error"))
     signals.setDeviceDataErrorBuffer(hasStateFlag(data, "device-data-error"));
     signals.setUpdatingBuffer(hasStateFlag(data, "updating"));
+    signals.setEcoMode(isEcoMode());
 
     if (signals.isCalendarErrorBuffer() !== signals.isCalendarError() || 
             signals.isDeviceDataErrorBuffer() !== signals.isDeviceDataError() ||
@@ -85,6 +87,11 @@ export const StatusNote = () => {
             <Show when={signals.isUpdating()}>
                 <div class="status-note-api-error-indicator">
                     <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
+                </div>
+            </Show>
+            <Show when={signals.isEcoMode()}>
+                <div class="status-note-indicator">
+                    <i class='fa-solid fa-leaf'></i>
                 </div>
             </Show>
     </div>

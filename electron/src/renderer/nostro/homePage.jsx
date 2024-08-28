@@ -23,7 +23,7 @@ class Signals {
   constructor() {
     [this.locale, this.setLocale] = createSignal("");
     [this.timeZone, this.setTimezone] = createSignal("");
-    [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
+    [this.hourCycleOption, this.setHourCycleOption] = createSignal("h23");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
     [this.myTime, this.setMyTime] = createSignal("");
     [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
@@ -39,16 +39,15 @@ class Signals {
 }
 
 function getTimeText(homePageSignals) {
-  let options = {};
-  let hourCycleOption = homePageSignals.hourCycleOption();
-  let hourCycleMapping = {
-    "24h": false,
-    "12h": true
+  let options = {
+    hour: "numeric", minute: "2-digit", "second": "2-digit"
   };
-  if (hourCycleOption) {
-    let timeOpt = hourCycleMapping[hourCycleOption];
-    options["hour12"] = timeOpt;
+  let hourCycleOption = homePageSignals.hourCycleOption();
+  options["hourCycle"] = hourCycleOption;
+  if (hourCycleOption === "h23") {
+    options["hour"] = "2-digit";
   }
+
   let timeZone = homePageSignals.timeZone();
   if (timeZone) {
     options["timeZone"] = timeZone;
@@ -57,7 +56,7 @@ function getTimeText(homePageSignals) {
   if (!locale) {
     locale = undefined;
   }
-  let time = new Date().toLocaleTimeString(locale, options);
+  const time = new Date().toLocaleTimeString(locale, options);
   return time.replace(/\s+(am|pm|AM|PM)/, "");
 }
 
@@ -283,7 +282,11 @@ export const HomePage = () => {
 
   let timeInterval = setInterval(
     () => {
-      signals.setMyTime(getTimeText(signals));
+      const newTimeText = getTimeText(signals);
+      const oldTimeText = signals.myTime();
+      if (newTimeText !== oldTimeText) {
+        signals.setMyTime(newTimeText);
+      }
     },
     second / 10
   );
