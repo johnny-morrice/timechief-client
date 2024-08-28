@@ -120,6 +120,7 @@ function renderLongDateText(locale, date) {
 }
 
 export const Forecast = () => {
+    console.log("Forecast render");
     let signals = new Signals();
     const cbName = callbackName("Forecast");
     addServiceDataCallback(cbName, (data) => updateSignals(signals, data));

@@ -201,28 +201,24 @@ export function initializeIPC() {
     lastInteracted = new Date();
     let fastDeviceInterval = setInterval(() => {
         if (!isEcoMode()) {
-            console.log("doing non-eco device heartbeat");
             sendDeviceHeartbeat();
         }
     }, refreshInterval
     );
     let fastApiInterval = setInterval(() => {
         if (!isEcoMode()) {
-            console.log("doing non-eco clock data request");
             sendClockDataRequest();
         }
     }, refreshInterval
     );
     let ecoApiInterval = setInterval(() => {
         if (isEcoMode()) {
-            console.log("doing eco clock data request");
             sendClockDataRequest();
         }
     }, ecoRefreshInterval
     );
     let ecoDeviceInterval = setInterval(() => {
         if (isEcoMode()) {
-            console.log("doing eco device heartbeat");
             sendDeviceHeartbeat();
         }
     }, ecoRefreshInterval

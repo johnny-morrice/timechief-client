@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addServiceDataCallback, ecoRefreshInterval, isEcoMode } from './ipc';
+import { addServiceDataCallback, isEcoMode } from './ipc';
 import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
 import { removeDataCallback } from './ipc';
@@ -18,6 +18,7 @@ import { fadeTransition } from './fadeTransition';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { manageMascotCanvas, scoreEmote } from './mascot';
+import { ecoRefreshInterval } from "../timing";
 
 class Signals {
   constructor() {
@@ -30,12 +31,28 @@ class Signals {
     [this.nextEventBuffer, this.setNextEventBuffer] = createSignal(null);
     [this.nextEvent, this.setNextEvent] = createSignal(null);
     [this.actionCentreTransition, this.setActionCentreTransition] = createSignal("no-transition");
-    [this.timeFormatter, this.setTimeFormatter] = createSignal(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
-    [this.dateFormatter, this.setDateFormatter] = createSignal(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
     [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
     [this.foregroundColor, this.setForegroundColor] = createSignal("green");
     [this.emote, this.setEmote] = createSignal("neutral");
     [this.isSpooky, this.setSpooky] = createSignal(false);
+    this.setTimeFormatter(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
+    this.setDateFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
+  }
+
+  timeFormatter() {
+    return this._timeFormatter;
+  }
+
+  setTimeFormatter(formatter) {
+    this._timeFormatter = formatter;
+  }
+
+  dateFormatter() {
+    return this._dateFormatter;
+  }
+
+  setDateFormatter(formatter) {
+    this._dateFormatter = formatter;
   }
 }
 
@@ -297,28 +314,31 @@ setInterval(() => {
 }, 1000);
 
 export const HomePage = () => {
+  console.log("home page render");
   const signals = new Signals();
   globalSignals = signals;
   const cbName = callbackName("HomePage");
   addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
 
+  var oldTimeText = "";
   let timeInterval = setInterval(
     () => {
       const newTimeText = getTimeText(signals);
-      const oldTimeText = signals.myTime();
       if (newTimeText !== oldTimeText) {
         signals.setMyTime(newTimeText);
+        oldTimeText = newTimeText;
       }
     },
     second / 10
   );
 
+  var oldDateText = "";
   let dateInterval = setInterval(
     () => {
       const newDateText = getDateText(signals);
-      const oldDateText = signals.myDate();
       if (newDateText !== oldDateText) {
         signals.setMyDate(newDateText);
+        oldDateText = newDateText;
       }
     },
     second

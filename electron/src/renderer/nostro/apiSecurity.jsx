@@ -33,6 +33,7 @@ function updateSignalsOnAPIKeyRegen(signals, data) {
 }
 
 export const APISecurity = () => {
+    console.log("APISecurity render");
     const signals = new Signals();
     const cbName = callbackName("APISecurity");
     addDataCallback(cbName, (data) => {

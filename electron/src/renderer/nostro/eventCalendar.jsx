@@ -184,6 +184,7 @@ function formatCalendarEventEndTime(signals, calendarEvent) {
 }
 
 export const EventCalendar = () => {
+  console.log("EventCalendar render");
   let signals = new Signals();
   const cbName = callbackName("EventCalendar");
   addServiceDataCallback(cbName, (data) => updateSignals(signals, data));

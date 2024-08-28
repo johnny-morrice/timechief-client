@@ -165,6 +165,7 @@ function isDisplayStateInternet(signals) {
 }
 
 export const WebSetupPage = (props) => {
+    console.log("WebSetupPage render");
     const signals = new Signals();
     const cbName = callbackName("WebSetupPage");
     addDataCallback(cbName, (data) => updateSignals(signals, data));

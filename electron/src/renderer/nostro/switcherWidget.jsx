@@ -44,6 +44,7 @@ function changeSwitcherContent(onTransition, indexFunc, widgets, currentIndex, s
 }
 
 export const SwitcherWidget = (props) => {
+    console.log("SwitcherWidget render");
     const widgets = props.widgets;
     const [switcherWidgetTransition, setSwitcherWidgetTransition] = createSignal("no-transition");
     const [currentIndex, setCurrentIndex] = createSignal(0);

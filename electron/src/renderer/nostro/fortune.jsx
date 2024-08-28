@@ -68,6 +68,7 @@ function updateSignals(signals, data) {
 }
 
 export const Fortune = () => {
+    console.log("Fortune render");
     const signals = new Signals();
     globalSignals = signals;
     const cbName = callbackName("Fortune");

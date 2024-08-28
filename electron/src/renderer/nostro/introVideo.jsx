@@ -5,6 +5,7 @@ export function IntroVideo(props) {
     if (props.element === undefined) {
         throw new Error('element must be defined');
     }
+    console.log("IntroVideo render");
     const [ended, setEnded] = createSignal(false);
     function onEnded() {
         setEnded(true);

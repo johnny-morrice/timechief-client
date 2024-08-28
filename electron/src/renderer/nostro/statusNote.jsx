@@ -62,6 +62,7 @@ function isDeviceDataError(signals) {
 }
 
 export const StatusNote = () => {
+    console.log("StatusNote render");
     const signals = new Signals();
     const cbName = callbackName("StatusNote");
     addDataCallback(cbName, (data) => updateSignals(signals, data));

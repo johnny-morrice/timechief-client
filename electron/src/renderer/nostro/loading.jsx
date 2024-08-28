@@ -34,6 +34,7 @@ function advanceLoadingLine(signals) {
 }
 
 export const LineLoading = () => {
+    console.log("LineLoading render");
     const signals = new LineSignals();
     const interval = setInterval(() => advanceLoadingLine(signals), 150);
     onCleanup(() => {
@@ -43,6 +44,7 @@ export const LineLoading = () => {
 }
 
 export const GridLoading = () => {
+    console.log("GridLoading render");
     // const symbols = [
     //     "@",
     //     "#",

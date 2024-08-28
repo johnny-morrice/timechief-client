@@ -43,6 +43,7 @@ export function MediaVideo(props) {
     if (props.element === undefined) {
         throw new Error('element must be defined');
     }
+    console.log("MediaVideo render");
     const delay = 53 * 1000 * 60;
     const chance = 1.0 / 53.0;
     const signals = new Signals();

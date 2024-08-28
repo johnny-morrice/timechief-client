@@ -36,6 +36,7 @@ function updateSignalsOnSSHPasswordRegen(signals, data) {
 }
 
 export const SSHSecurity = () => {
+    console.log("SSHSecurity render");
     const signals = new Signals();
     const cbName = callbackName("SSHSecurity");
     addDataCallback(cbName, (data) => {
