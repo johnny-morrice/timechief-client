@@ -38,7 +38,7 @@ class Signals {
   }
 }
 
-function getTimeText(homePageSignals) {
+function timeOptions(homePageSignals) {
   let options = {
     hour: "numeric", minute: "2-digit", "second": "2-digit"
   };
@@ -52,11 +52,20 @@ function getTimeText(homePageSignals) {
   if (timeZone) {
     options["timeZone"] = timeZone;
   }
+  return options;
+}
+
+function localeTimeString(date, locale, options) {
+  return date.toLocaleTimeString(locale, options);
+}
+
+function getTimeText(homePageSignals) {
+  const options = timeOptions(homePageSignals);
   let locale = homePageSignals.locale();
   if (!locale) {
     locale = undefined;
   }
-  const time = new Date().toLocaleTimeString(locale, options);
+  const time = localeTimeString(new Date(), locale, options);
   return time.replace(/\s+(am|pm|AM|PM)/, "");
 }
 
