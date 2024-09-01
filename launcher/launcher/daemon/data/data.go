@@ -37,6 +37,7 @@ func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, 
 		keyValueStore:   keyValueStore,
 		stateFlagStore:  stateFlagStore,
 		requestTimeout:  requestTimeout,
+		ticker:          ticker,
 	}
 }
 
