@@ -44,7 +44,10 @@ func (t *TwoModeTicker) Tick() <-chan struct{} {
 			if t.isUnderThreshold() {
 				time.Sleep(t.underThreshold)
 			} else {
-				time.Sleep(t.exceedThreshold)
+				startSleep := time.Now()
+				for !t.isUnderThreshold() && time.Since(startSleep) < t.exceedThreshold {
+					time.Sleep(t.underThreshold)
+				}
 			}
 			out <- struct{}{}
 		}
@@ -57,7 +60,7 @@ func (t *TwoModeTicker) isUnderThreshold() bool {
 	defer t.mutex.RUnlock()
 
 	lastPoke := t.pokes[len(t.pokes)-1]
-	if lastPoke.Add(t.timeout).Before(time.Now()) {
+	if time.Since(lastPoke) > t.timeout {
 		return false
 	}
 
