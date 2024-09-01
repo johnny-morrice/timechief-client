@@ -55,7 +55,7 @@ func (dd DeviceData) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("device data daemon tick error: %s", err)
 	}
-	ticker := adaptivetick.NewTwoModeTicker(dd.refreshInterval, time.Second*2, time.Second*5, 2)
+	ticker := adaptivetick.NewTwoModeTicker(dd.refreshInterval, time.Second*2, time.Second*5, time.Second*60, 2)
 	for range ticker.Tick() {
 		err := dd.doTick(ctx)
 		if err != nil {
