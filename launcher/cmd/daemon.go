@@ -17,6 +17,7 @@ import (
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/adaptivetick"
 	datadaemon "github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/picturedownload"
@@ -101,8 +102,9 @@ func Daemon(ctx *cli.Context) error {
 		KeyValueStore:         keyValueStore,
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
+	ticker := adaptivetick.NewTwoModeTicker(ctx.Duration("service-refresh-interval"), time.Second*2, time.Second*5, time.Second*15, 2)
 	deviceDataStore := store.DeviceDataStore{DB: db}
-	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
+	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ticker, ctx.Duration("service-request-timeout"))
 	// pairingDaemon := daemon.Pairing{
 	// 	ConfigStore:          cfgStore,
 	// 	StateFlagStore:       flagStore,
@@ -277,6 +279,7 @@ func Daemon(ctx *cli.Context) error {
 		keyValueStore,
 		wifiInterfaceStore,
 		wifiNetworkStore,
+		ticker,
 	)
 
 	securePackages := []apiPackage{

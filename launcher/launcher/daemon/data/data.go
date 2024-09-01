@@ -14,7 +14,6 @@ import (
 	"github.com/johnny-morrice/timechief-client/client/authnclient"
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/adaptivetick"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
@@ -27,10 +26,10 @@ type DeviceData struct {
 	keyValueStore   store.KeyValueStore
 	stateFlagStore  store.StateFlagStore
 	requestTimeout  time.Duration
-	refreshInterval time.Duration
+	ticker          Ticker
 }
 
-func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) DeviceData {
+func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, ticker Ticker, requestTimeout time.Duration) DeviceData {
 	return DeviceData{
 		client:          client,
 		deviceDataStore: deviceDataStore,
@@ -38,8 +37,11 @@ func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, 
 		keyValueStore:   keyValueStore,
 		stateFlagStore:  stateFlagStore,
 		requestTimeout:  requestTimeout,
-		refreshInterval: refreshInterval,
 	}
+}
+
+type Ticker interface {
+	Tick() <-chan struct{}
 }
 
 type SoundService interface {
@@ -55,8 +57,7 @@ func (dd DeviceData) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("device data daemon tick error: %s", err)
 	}
-	ticker := adaptivetick.NewTwoModeTicker(dd.refreshInterval, time.Second*2, time.Second*5, time.Second*15, 2)
-	for range ticker.Tick() {
+	for range dd.ticker.Tick() {
 		err := dd.doTick(ctx)
 		if err != nil {
 			log.Printf("device data daemon tick error: %s", err)

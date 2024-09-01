@@ -20,9 +20,10 @@ type Service struct {
 	keyValueStore      store.KeyValueStore
 	wifiInterfaceStore store.WifiInterfaceStore
 	wifiNetworkStore   store.WifiNetworkStore
+	poker              Poker
 }
 
-func MakeService(mediaService MediaService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore) Service {
+func MakeService(mediaService MediaService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore, poker Poker) Service {
 	return Service{
 		mediaService:       mediaService,
 		deviceDataStore:    deviceDataStore,
@@ -31,7 +32,12 @@ func MakeService(mediaService MediaService, deviceDataStore DeviceDataStore, lau
 		keyValueStore:      keyValueStore,
 		wifiInterfaceStore: wifiInterfaceStore,
 		wifiNetworkStore:   wifiNetworkStore,
+		poker:              poker,
 	}
+}
+
+type Poker interface {
+	Poke()
 }
 
 type MediaService interface {
@@ -103,6 +109,7 @@ type PairingStatus struct {
 }
 
 func (svc Service) Logout() error {
+	svc.poker.Poke()
 	err := svc.keyValueStore.Delete(store.AccessTokenKey)
 	if err != nil {
 		return fmt.Errorf("failed to delete access token: %w", err)
@@ -115,6 +122,7 @@ func (svc Service) Logout() error {
 }
 
 func (svc Service) SetLicenseActivationCode(code string) error {
+	svc.poker.Poke()
 	err := svc.keyValueStore.Set(store.LicenseActivationCodeKey, code)
 	if err != nil {
 		return fmt.Errorf("failed to set license activation code: %w", err)
@@ -123,6 +131,7 @@ func (svc Service) SetLicenseActivationCode(code string) error {
 }
 
 func (svc Service) PairDevice() error {
+	svc.poker.Poke()
 	err := svc.keyValueStore.Delete(store.PairingDeviceCodeKey)
 	if err != nil {
 		return fmt.Errorf("failed to delete pairing code: %w", err)
@@ -135,6 +144,7 @@ func (svc Service) PairDevice() error {
 }
 
 func (svc Service) GetPairingStatus() (PairingStatus, error) {
+	svc.poker.Poke()
 	url, err := svc.keyValueStore.Get(store.PairingURLKey)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return PairingStatus{}, fmt.Errorf("failed to get pairing code: %w", err)
@@ -177,10 +187,12 @@ func webURL(ip string) string {
 }
 
 func (svc Service) RefreshMyDevices() error {
+	svc.poker.Poke()
 	return svc.stateFlagStore.CreateIfNotExists("refresh-mydevices")
 }
 
 func (svc Service) SetMyDevice(deviceUUID string) error {
+	svc.poker.Poke()
 	// Verify UUID is valid UUID
 	_, err := uuid.Parse(deviceUUID)
 	if err != nil {
@@ -194,6 +206,7 @@ func (svc Service) SetMyDevice(deviceUUID string) error {
 }
 
 func (svc Service) GetDeviceData() (DeviceData, error) {
+	svc.poker.Poke()
 	deviceData, err := svc.deviceDataStore.GetDeviceData()
 	if err != nil {
 		return DeviceData{}, fmt.Errorf("failed to get device data from store: %w", err)
