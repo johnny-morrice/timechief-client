@@ -32,7 +32,7 @@ func (t *TwoModeTicker) Poke() {
 	defer t.mutex.Unlock()
 
 	t.pokes = append([]time.Time{time.Now()}, t.pokes...)
-	if t.pokeCount > len(t.pokes) {
+	if t.pokeCount < len(t.pokes) {
 		t.pokes = t.pokes[:t.pokeCount-1]
 	}
 }
@@ -59,7 +59,7 @@ func (t *TwoModeTicker) isUnderThreshold() bool {
 	t.mutex.RLock()
 	defer t.mutex.RUnlock()
 
-	lastPoke := t.pokes[len(t.pokes)-1]
+	lastPoke := t.pokes[0]
 	if time.Since(lastPoke) > t.timeout {
 		return false
 	}
@@ -74,11 +74,17 @@ func averageDurationBetweenTimes(times []time.Time) time.Duration {
 	}
 	durations := make([]time.Duration, 0)
 	for i := 0; i < len(times)-1; i++ {
-		durations = append(durations, times[i+1].Sub(times[i]))
+		dur := times[i].Sub(times[i+1])
+		if dur >= 0 {
+			durations = append(durations, dur)
+		}
 	}
 	average := time.Duration(0)
 	for _, d := range durations {
 		average += d
+	}
+	if len(durations) == 0 {
+		return time.Duration(0)
 	}
 	return average / time.Duration(len(durations))
 }
