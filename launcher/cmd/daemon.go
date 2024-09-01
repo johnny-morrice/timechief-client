@@ -17,13 +17,14 @@ import (
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
+	datadaemon "github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/picturedownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/videodownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
+	datasvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
 	mediasvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
@@ -101,7 +102,7 @@ func Daemon(ctx *cli.Context) error {
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
 	deviceDataStore := store.DeviceDataStore{DB: db}
-	deviceDataDaemon := daemon.MakeDeviceDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
+	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
 	// pairingDaemon := daemon.Pairing{
 	// 	ConfigStore:          cfgStore,
 	// 	StateFlagStore:       flagStore,
@@ -268,7 +269,7 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	dataService := data.MakeService(
+	dataService := datasvc.MakeService(
 		mediaService,
 		deviceDataStore,
 		launchTargetStore,
@@ -364,7 +365,7 @@ func Daemon(ctx *cli.Context) error {
 	return http.ListenAndServe(addr, rootMux)
 }
 
-func makeMediaService(ctx *cli.Context, videoService mediasvc.VideoService, pictureService mediasvc.PictureService, deviceDataStore store.DeviceDataStore) (data.MediaService, error) {
+func makeMediaService(ctx *cli.Context, videoService mediasvc.VideoService, pictureService mediasvc.PictureService, deviceDataStore store.DeviceDataStore) (datasvc.MediaService, error) {
 	mediaFilePath := ctx.String("media-file")
 	if mediaFilePath == "" {
 		return mediasvc.MakeService(videoService, pictureService, deviceDataStore)

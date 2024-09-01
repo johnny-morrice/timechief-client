@@ -1,4 +1,4 @@
-package daemon
+package data
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/client/authnclient"
 	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/adaptivetick"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
@@ -30,7 +30,7 @@ type DeviceData struct {
 	refreshInterval time.Duration
 }
 
-func MakeDeviceDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) DeviceData {
+func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, requestTimeout time.Duration, refreshInterval time.Duration) DeviceData {
 	return DeviceData{
 		client:          client,
 		deviceDataStore: deviceDataStore,
@@ -55,15 +55,16 @@ func (dd DeviceData) Start(ctx *cli.Context) {
 	if err != nil {
 		log.Printf("device data daemon tick error: %s", err)
 	}
-	util.RunEvery(dd.refreshInterval, func() {
+	ticker := adaptivetick.NewTwoModeTicker(dd.refreshInterval, time.Second*2, time.Second*5, 2)
+	for range ticker.Tick() {
 		err := dd.doTick(ctx)
 		if err != nil {
 			log.Printf("device data daemon tick error: %s", err)
 		}
-	})
+	}
 }
 
-func (dd DeviceData) doTick(ctx *cli.Context) error {
+func (dd DeviceData) doTick(_ *cli.Context) error {
 	log.Println("downloading device data")
 	data, err := dd.FetchLatest()
 	if err != nil {

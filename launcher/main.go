@@ -129,7 +129,7 @@ func getCLIApp() *cli.App {
 				},
 				&cli.DurationFlag{
 					Name:  "service-refresh-interval",
-					Value: 20 * time.Second,
+					Value: 61 * time.Second,
 				},
 				&cli.DurationFlag{
 					Name:  "version-update-interval",
