@@ -1,42 +1,23 @@
 import { onCleanup, createSignal } from "solid-js";
 import { textTransitionSignal } from "./textGlitch";
 import { randomPoem } from "./poem";
-import { addServiceDataCallback, isEcoMode, removeDataCallback } from "./ipc";
+import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { callbackName } from "./callback";
 import { manageMascotCanvas } from "./mascot";
-import { ecoRefreshInterval } from "../timing";
 
 class Signals {
     constructor() {
         [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
         [this.foregroundColor, this.setForegroundColor] = createSignal("green");
         [this.text, this.setText] = textTransitionSignal("Hey there, I'm hands!");
-        [this.emote, this.setEmote] = createSignal("");
+        [this.emote, this.setEmote] = createSignal("neutral");
         [this.isSpooky, this.setSpooky] = createSignal(false);
     }
 }
 
 var globalSignals = new Signals();
-var globalCanvas = null;
-var lastManaged = new Date();
-setInterval(() => {
-    function setCanvas(canvas) {
-        globalCanvas = canvas;
-    }
-    function getCanvas() {
-        return globalCanvas;
-    }
-    if (isEcoMode()) {
-        const now = new Date();
-        const timeout = ecoRefreshInterval;
-        const diff = now.getTime() - lastManaged.getTime();
-        if (diff < timeout) {
-            return;
-        }
-    }
-    manageMascotCanvas(setCanvas, getCanvas,"fortune-canvas", globalSignals.emote, 120);
-    lastManaged = new Date();
-}, 1000);
+const mascotHeight = 120;
+manageMascotCanvas("fortune-canvas", function () { return globalSignals.emote() }, mascotHeight);
 
 function updateSignals(signals, data) {
     const deviceProfileWrapper = data["device_profile"];
@@ -96,7 +77,7 @@ export const Fortune = () => {
         clearInterval(poemInterval);
         removeDataCallback(cbName);
     });
-    return  <div class="fortune-message">
+    return <div class="fortune-message">
         <div class="fortune-message-text">{signals.text()}</div>
         <div class="fortune-message-mascot-wrapper">
             <canvas id="fortune-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>

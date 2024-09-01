@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addServiceDataCallback, isEcoMode } from './ipc';
+import { addServiceDataCallback } from './ipc';
 import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
 import { removeDataCallback } from './ipc';
@@ -18,7 +18,6 @@ import { fadeTransition } from './fadeTransition';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { manageMascotCanvas, scoreEmote } from './mascot';
-import { ecoRefreshInterval } from "../timing";
 
 class Signals {
   constructor() {
@@ -292,26 +291,8 @@ function hasNextEvent(signals) {
 }
 
 var globalSignals = new Signals();
-var globalCanvas = null;
-var lastManaged = new Date();
-setInterval(() => {
-  function setCanvas(canvas) {
-    globalCanvas = canvas;
-  }
-  function getCanvas() {
-    return globalCanvas;
-  }
-  if (isEcoMode()) {
-    const now = new Date();
-    const timeout = ecoRefreshInterval;
-    const diff = now.getTime() - lastManaged.getTime();
-    if (diff < timeout) {
-      return;
-    }
-  }
-  manageMascotCanvas(setCanvas, getCanvas, "event-canvas", globalSignals.emote, 80);
-  lastManaged = new Date();
-}, 1000);
+const mascotHeight = 80;
+manageMascotCanvas("event-canvas", function () { return globalSignals.emote() }, mascotHeight);
 
 export const HomePage = () => {
   console.log("home page render");
