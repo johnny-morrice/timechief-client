@@ -16,6 +16,7 @@ export function Video(props) {
     if (props.onClick) {
         onClick = props.onClick;
     }
+    console.log("Video render");
     function onEnded() {
         console.log(`video ${props.videoSrc} ended`);
         props.onEnded();

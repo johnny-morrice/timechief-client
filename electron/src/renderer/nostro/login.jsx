@@ -31,6 +31,7 @@ function onDataUpdate(data, signals) {
 }
 
 export function LoginPage(props) {
+    console.log("LoginPage render");
     const signals = new Signals();
     const cbName = callbackName("LoginPage");
     addDataCallback(cbName, (data) => onDataUpdate(data, signals));

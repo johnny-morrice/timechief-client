@@ -88,6 +88,7 @@ function onClickLogout() {
 }
 
 export const DeviceControl = () => {
+    console.log("DeviceControl render");
     const signals = new Signals();
     const cbName = callbackName("DeviceControl")
     addDataCallback(cbName, (data) => updateSignalsForAPIData(signals, data));

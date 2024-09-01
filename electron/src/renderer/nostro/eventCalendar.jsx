@@ -40,21 +40,19 @@ function updateSignals(signals, data) {
     return;
   }
   let googleCalendar = calendarDatum["value"];
-  if ("calendar" in googleCalendar && googleCalendar["calendar"] != null) {
-    let calendar = googleCalendar["google_calendar"];
-    if ("events" in calendar) {
-      let dataEvents = calendar["events"];
-      if (dataEvents) {
-        let events = dataEvents.map(cev => new CalendarEvent(cev));
-        let calendarDays = new CalendarDaysModel(tz);
-        events.forEach(cev => calendarDays.addNewEvent(cev));
-        let ourCalendar = calendarDays.nextEvents(30, 3);
-        // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
-        signals.setCalendarDays(ourCalendar);
-      }
-    }
+  if (!googleCalendar) {
+    return;
   }
-
+  let dataEvents = googleCalendar["events"];
+  if (!dataEvents) {
+    return;
+  }
+  let events = dataEvents.map(cev => new CalendarEvent(cev));
+  let calendarDays = new CalendarDaysModel(tz);
+  events.forEach(cev => calendarDays.addNewEvent(cev));
+  let ourCalendar = calendarDays.nextEvents(30, 3);
+  // console.log(`our calendar: ${JSON.stringify(ourCalendar)}`);
+  signals.setCalendarDays(ourCalendar);
 }
 
 
@@ -186,6 +184,7 @@ function formatCalendarEventEndTime(signals, calendarEvent) {
 }
 
 export const EventCalendar = () => {
+  console.log("EventCalendar render");
   let signals = new Signals();
   const cbName = callbackName("EventCalendar");
   addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
@@ -224,20 +223,20 @@ export const EventCalendar = () => {
   function onClickPrev() {
     if (hasPrevDay()) {
       fadeTransition(signals.setCalendarTransition,
-      () => {
-        const dayIndex = signals.dayIndex();
-        signals.setDayIndex(dayIndex - 1);
-      });
+        () => {
+          const dayIndex = signals.dayIndex();
+          signals.setDayIndex(dayIndex - 1);
+        });
     }
   }
 
   function onClickNext() {
     if (hasNextDay()) {
       fadeTransition(signals.setCalendarTransition,
-      () => {
-        const dayIndex = signals.dayIndex();
-        signals.setDayIndex(dayIndex + 1);
-      });
+        () => {
+          const dayIndex = signals.dayIndex();
+          signals.setDayIndex(dayIndex + 1);
+        });
     }
   }
 

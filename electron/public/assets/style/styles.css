@@ -298,12 +298,26 @@ div.fortune-message {
     gap: 0.5em;
 }
 
-canvas.fortune-mascot {
-    /* width: 5em; */
+div.next-event-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
 }
 
-div.next-event-summary {
-    font-size: 24pt;
+#fortune-canvas {
+    height: 120px;
+}
+
+#event-canvas {
+    height: 80px;
+}
+
+div.next-event-time {
+    font-size: 18pt;
+}
+
+div.next-event-shorttext {
+    font-size: 16pt;
 }
 
 div.loading-grid {

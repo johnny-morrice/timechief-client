@@ -9,10 +9,13 @@ import { IntroVideo } from './introVideo';
 import { MediaVideo } from './mediavideo';
 
 
-const AppScreen = (props) => 
-  <IntroVideo element={<WebSetupPage element={<LoginPage element={<MediaVideo element={props.element} />} />}/>} />;
+const AppScreen = (props) => {
+  console.log("AppScreen render");
+  return <IntroVideo element={<WebSetupPage element={<LoginPage element={<MediaVideo element={props.element} />} />}/>} />;
+};
 
 const App = () => {
+  console.log("App render");
   let ipcIntervals = initializeIPC();
   onCleanup(() => {
     ipcIntervals.forEach(interval => clearInterval(interval));

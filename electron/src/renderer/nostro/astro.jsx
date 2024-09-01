@@ -89,6 +89,7 @@ function moonPhaseDescription(moonPhase) {
 }
 
 export const Astro = () => {
+    console.log("Astro render");
     const signals = new Signals();
     const cbName = callbackName("Astro");
     addServiceDataCallback(cbName, (data) => updateAstroPageSignals(signals, data));

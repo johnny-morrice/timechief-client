@@ -70,10 +70,14 @@ export const textTransitionResource = (value, getter, setter, transform) => {
     const [textBuffer] = createResource(getter, transform);
     const [intermediate, setIntermediate] = createSignal("");
     const applyHighlight = (text) => {
+        console.log("textTransitionResource applying highlight");
         return highlightSpansGlitch(text, textBuffer());
     };
     const [out] = createResource(intermediate, applyHighlight);
+    var count = 0
     function doSet(data) {
+        console.log("textTransitionResource doSet " + count);
+        count++;
         setter(data);
         textTransitionGlitch(textBuffer, intermediate, setIntermediate, 3);
     }
@@ -88,7 +92,9 @@ export const textTransitionSignal = (value) => {
         return highlightSpansGlitch(text, buffer());
     };
     const [out] = createResource(intermediate, applyHighlight);
+    var count = 0
     function doSet(data) {
+        count++;
         setBuffer(data);
         textTransitionGlitch(buffer, intermediate, setIntermediate, 3);
     }
@@ -103,6 +109,7 @@ export const textTransitionGlitch = (buffer, display, setter, n) => {
     
     if (more) {
         const interval = setInterval(() => {
+            console.log("textTransitionGlitch interval");
             const more = transitionBuffer(buffer, display, setter, n);
             if (!more) {
                 clearInterval(interval);

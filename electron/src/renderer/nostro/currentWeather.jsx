@@ -63,6 +63,7 @@ function hasWeather(signals) {
 
 
 export const CurrentWeather = () => {
+    console.log("CurrentWeather render");
     const signals = new Signals();
     const cbName = callbackName("CurrentWeather");
     addServiceDataCallback(cbName, (data) => {

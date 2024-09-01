@@ -17,47 +17,78 @@ import { EventCalendar } from './eventCalendar';
 import { fadeTransition } from './fadeTransition';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
+import { manageMascotCanvas, scoreEmote } from './mascot';
 
 class Signals {
   constructor() {
     [this.locale, this.setLocale] = createSignal("");
     [this.timeZone, this.setTimezone] = createSignal("");
-    [this.hourCycleOption, this.setHourCycleOption] = createSignal("");
+    [this.hourCycleOption, this.setHourCycleOption] = createSignal("h23");
     [this.lastUpdateTime, this.setLastUpdateTime] = createSignal(new Date());
     [this.myTime, this.setMyTime] = createSignal("");
-    [this.myDate, this.setMyDate] = createSignal(getDateText("en-GB"));
+    [this.myDate, this.setMyDate] = createSignal("");
     [this.nextEventBuffer, this.setNextEventBuffer] = createSignal(null);
     [this.nextEvent, this.setNextEvent] = createSignal(null);
     [this.actionCentreTransition, this.setActionCentreTransition] = createSignal("no-transition");
+    [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
+    [this.foregroundColor, this.setForegroundColor] = createSignal("green");
+    [this.emote, this.setEmote] = createSignal("neutral");
+    [this.isSpooky, this.setSpooky] = createSignal(false);
+    this.setTimeFormatter(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
+    this.setDateFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
+  }
+
+  timeFormatter() {
+    return this._timeFormatter;
+  }
+
+  setTimeFormatter(formatter) {
+    this._timeFormatter = formatter;
+  }
+
+  dateFormatter() {
+    return this._dateFormatter;
+  }
+
+  setDateFormatter(formatter) {
+    this._dateFormatter = formatter;
   }
 }
 
-function getTimeText(homePageSignals) {
-  let options = {};
-  let hourCycleOption = homePageSignals.hourCycleOption();
-  let hourCycleMapping = {
-    "24h": false,
-    "12h": true
+function makeTimeFormatter(homePageSignals) {
+  let options = {
+    hour: "numeric", minute: "2-digit", "second": "2-digit"
   };
-  if (hourCycleOption) {
-    let timeOpt = hourCycleMapping[hourCycleOption];
-    options["hour12"] = timeOpt;
+  let hourCycleOption = homePageSignals.hourCycleOption();
+  options["hourCycle"] = hourCycleOption;
+  if (hourCycleOption === "h23") {
+    options["hour"] = "2-digit";
   }
+
   let timeZone = homePageSignals.timeZone();
   if (timeZone) {
     options["timeZone"] = timeZone;
   }
-  let locale = homePageSignals.locale();
-  if (!locale) {
-    locale = undefined;
-  }
-  let time = new Date().toLocaleTimeString(locale, options);
+  return new Intl.DateTimeFormat(homePageSignals.getLocale(), options);
+}
+
+function makeDateFormatter(homePageSignals) {
+  let options = {
+    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+  };
+  return new Intl.DateTimeFormat(homePageSignals.getLocale(), options);
+}
+
+
+function getTimeText(homePageSignals) {
+  const formatter = homePageSignals.timeFormatter();
+  const time = formatter.format(new Date());
   return time.replace(/\s+(am|pm|AM|PM)/, "");
 }
 
-function getDateText(locale) {
-  let dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-  var dateText = new Date().toLocaleDateString(locale, dateOptions);
+function getDateText(homePageSignals) {
+  const formatter = homePageSignals.dateFormatter();
+  const dateText = formatter.format(new Date());
   return dateText.replace(',', '');
 }
 
@@ -95,7 +126,18 @@ function handleEventChange(signals) {
 }
 
 function updateSignals(signals, data) {
-  let calendar = data["google_calendar"];
+  let calendarWrapper = data["google_calendar"];
+  if (!calendarWrapper) {
+    return;
+  }
+  let calendar = calendarWrapper["value"];
+  if (!calendar) {
+    return;
+  }
+  let calendarEvents = calendar["events"];
+  if (!calendarEvents) {
+    return;
+  }
   let deviceProfileWrapper = data["device_profile"];
   if (!deviceProfileWrapper) {
     return;
@@ -112,12 +154,37 @@ function updateSignals(signals, data) {
   signals.setLocale(locale);
   signals.setTimezone(timezone);
   signals.setLastUpdateTime(new Date());
+  signals.setTimeFormatter(makeTimeFormatter(signals));
+  signals.setDateFormatter(makeDateFormatter(signals));
   // setFakeEvent(signals);
-  if (calendar.Calendar) {
-    const nextEvent = findNextEvent(calendar.Calendar.Events);
-    signals.setNextEventBuffer(nextEvent, timezone);
-  }
+  const nextEvent = findNextEvent(calendarEvents);
+  signals.setNextEventBuffer(nextEvent, timezone);
   handleEventChange(signals);
+
+  const theme = deviceProfile["theme"];
+  if (!theme) {
+    return;
+  }
+  let boxBackgroundColor = theme["box_background_color"];
+  let foregroundColor = theme["foreground_color"];
+  if (boxBackgroundColor) {
+    signals.setBoxBackgroundColor(boxBackgroundColor);
+  }
+  if (foregroundColor) {
+    signals.setForegroundColor(foregroundColor);
+  }
+  const features = deviceProfile["features"];
+  if (!features) {
+    return;
+  }
+  const spooky = features["spooky"];
+  signals.setSpooky(spooky);
+  if (nextEvent) {
+    const emote = scoreEmote(nextEvent.eventShortText(), spooky);
+    signals.setEmote(emote);
+  } else {
+    signals.setEmote("neutral");
+  }
 }
 
 // setFakeEvent is a useful test utility
@@ -223,21 +290,37 @@ function hasNextEvent(signals) {
   return true;
 }
 
+var globalSignals = new Signals();
+const mascotHeight = 80;
+manageMascotCanvas("event-canvas", function () { return globalSignals.emote() }, mascotHeight);
+
 export const HomePage = () => {
+  console.log("home page render");
   const signals = new Signals();
+  globalSignals = signals;
   const cbName = callbackName("HomePage");
   addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
 
+  var oldTimeText = "";
   let timeInterval = setInterval(
     () => {
-      signals.setMyTime(getTimeText(signals));
+      const newTimeText = getTimeText(signals);
+      if (newTimeText !== oldTimeText) {
+        signals.setMyTime(newTimeText);
+        oldTimeText = newTimeText;
+      }
     },
     second / 10
   );
 
+  var oldDateText = "";
   let dateInterval = setInterval(
     () => {
-      signals.setMyDate(getDateText(getLocale(signals)));
+      const newDateText = getDateText(signals);
+      if (newDateText !== oldDateText) {
+        signals.setMyDate(newDateText);
+        oldDateText = newDateText;
+      }
     },
     second
   );
@@ -273,13 +356,18 @@ export const HomePage = () => {
       <div class="home-action-center flex-grow border crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
           <Show when={hasNextEvent(signals)}>
-            <div class='next-event-summary flex-column flex-grow'>
-              <div class='next-event-time flex-row'>
-                <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
-                <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
+            <div class='next-event-wrapper'>
+              <div class='next-event-summary flex-column flex-grow'>
+                <div class='next-event-time flex-row'>
+                  <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
+                  <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
+                </div>
+                <div class='next-event-shorttext'>
+                  {getNextEventShortText(signals)}
+                </div>
               </div>
-              <div class='next-event-shorttext'>
-                {getNextEventShortText(signals)}
+              <div class="event-mascot-wrapper">
+                <canvas id="event-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
               </div>
             </div>
           </Show>

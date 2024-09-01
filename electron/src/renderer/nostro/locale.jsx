@@ -42,6 +42,7 @@ function hasLocaleInfo(signals) {
 }
 
 export const Locale = () => {
+    console.log("Locale render");
     let signals = new Signals();
     const cbName = callbackName("Locale");
     addServiceDataCallback(cbName, (data) => updateSignals(signals, data));

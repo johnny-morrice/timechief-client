@@ -3,6 +3,6 @@ export const minute = second * 60;
 export const hour = minute * 60;
 export const day = hour * 24;
 
-export const apiRefreshInterval = second;
-export const deviceRefreshInterval = second;
+export const refreshInterval = second;
+export const ecoRefreshInterval = second * 10;
 export const apiErrorTimeout = second * 30;

@@ -46,6 +46,7 @@ function updateSignalsForElectronStatus(signals, statusResponse) {
 }
 
 export const DeviceInfo = () => {
+    console.log("DeviceInfo render");
     const signals = new Signals();
     const cbName = callbackName("DeviceInfo");
 

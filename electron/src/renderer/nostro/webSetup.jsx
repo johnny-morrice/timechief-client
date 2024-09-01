@@ -9,6 +9,7 @@ import { labelMaker, textMaker } from './label';
 import { fadeTransition } from './fadeTransition';
 import { generateWifiQRCode } from 'wifi-qr-code-generator';
 import { NoConnection } from './noconnection';
+import { recordInteraction } from './ipc';
 
 class Signals {
     constructor() {
@@ -164,6 +165,7 @@ function isDisplayStateInternet(signals) {
 }
 
 export const WebSetupPage = (props) => {
+    console.log("WebSetupPage render");
     const signals = new Signals();
     const cbName = callbackName("WebSetupPage");
     addDataCallback(cbName, (data) => updateSignals(signals, data));
@@ -172,11 +174,11 @@ export const WebSetupPage = (props) => {
     });
 
     const applyCRTJank = () => {
-        // Get the crt-root element
-        const crtRoot = document.getElementById("crt-root");
-        const boxes = document.getElementsByClassName("crt-box");
         // There is a 1 in 120 chance of the CRT jank being applied.
         if (random() < 0.008333) {
+            // Get the crt-root element
+            const crtRoot = document.getElementById("crt-root");
+            const boxes = document.getElementsByClassName("crt-box");
             // The CRT jank is applied crt-jank class to the crt-root element.
             crtRoot.classList.add("crt-jank");
             // Add jank to all the boxes;
@@ -198,6 +200,10 @@ export const WebSetupPage = (props) => {
         // Get the crt-root element
         const crtRoot = document.getElementById("crt-root");
         const boxes = document.getElementsByClassName("crt-box");
+        const currentClasses = crtRoot.classList;
+        if (!currentClasses.contains("crt-jank")) {
+            return;
+        }
         // The CRT jank is removed by removing the crt-jank class from the crt-root element.
         crtRoot.classList.remove("crt-jank");
         // Remove jank from all the boxes;
@@ -215,7 +221,10 @@ export const WebSetupPage = (props) => {
 
     const label = labelMaker("web-setup");
     const plainText = textMaker("web-setup");
-    return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`}>
+    const handleOnClickAnywhere = (e) => {
+        recordInteraction();
+    };
+    return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`} onClick={handleOnClickAnywhere}>
         <Show when={signals.connectedToLocalService()}>
             <Show when={isDisplayStateHotspot(signals)}>
                 <div class="setup-wrapper flex-column flex-grow">
