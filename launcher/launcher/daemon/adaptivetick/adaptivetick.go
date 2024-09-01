@@ -6,24 +6,24 @@ import (
 )
 
 type TwoModeTicker struct {
-	exceedThreshold   time.Duration
-	underThreshold    time.Duration
-	threshold         time.Duration
-	initialiseTimeout time.Duration
-	mutex             *sync.RWMutex
-	pokeCount         int
-	pokes             []time.Time
+	exceedThreshold time.Duration
+	underThreshold  time.Duration
+	threshold       time.Duration
+	timeout         time.Duration
+	mutex           *sync.RWMutex
+	pokeCount       int
+	pokes           []time.Time
 }
 
-func NewTwoModeTicker(exceedThreshold time.Duration, underThreshold time.Duration, threshold time.Duration, initialiseTimeout time.Duration, pokeCount int) *TwoModeTicker {
+func NewTwoModeTicker(exceedThreshold time.Duration, underThreshold time.Duration, threshold time.Duration, timeout time.Duration, pokeCount int) *TwoModeTicker {
 	return &TwoModeTicker{
-		exceedThreshold:   exceedThreshold,
-		underThreshold:    underThreshold,
-		initialiseTimeout: initialiseTimeout,
-		threshold:         threshold,
-		mutex:             &sync.RWMutex{},
-		pokeCount:         pokeCount,
-		pokes:             make([]time.Time, 0),
+		exceedThreshold: exceedThreshold,
+		underThreshold:  underThreshold,
+		timeout:         timeout,
+		threshold:       threshold,
+		mutex:           &sync.RWMutex{},
+		pokeCount:       pokeCount,
+		pokes:           []time.Time{time.Now()},
 	}
 }
 
@@ -31,7 +31,7 @@ func (t *TwoModeTicker) Poke() {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	t.pokes = append(t.pokes, time.Now())
+	t.pokes = append([]time.Time{time.Now()}, t.pokes...)
 	if t.pokeCount > len(t.pokes) {
 		t.pokes = t.pokes[:t.pokeCount-1]
 	}
@@ -39,10 +39,9 @@ func (t *TwoModeTicker) Poke() {
 
 func (t *TwoModeTicker) Tick() <-chan struct{} {
 	out := make(chan struct{})
-	startTime := time.Now()
 	go func() {
 		for {
-			if t.isUnderThreshold(startTime) {
+			if t.isUnderThreshold() {
 				time.Sleep(t.underThreshold)
 			} else {
 				time.Sleep(t.exceedThreshold)
@@ -53,11 +52,12 @@ func (t *TwoModeTicker) Tick() <-chan struct{} {
 	return out
 }
 
-func (t *TwoModeTicker) isUnderThreshold(startTime time.Time) bool {
+func (t *TwoModeTicker) isUnderThreshold() bool {
 	t.mutex.RLock()
 	defer t.mutex.RUnlock()
 
-	if len(t.pokes) < 2 && startTime.Add(t.initialiseTimeout).Before(time.Now()) {
+	lastPoke := t.pokes[len(t.pokes)-1]
+	if lastPoke.Add(t.timeout).Before(time.Now()) {
 		return false
 	}
 
