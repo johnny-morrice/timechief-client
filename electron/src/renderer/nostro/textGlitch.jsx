@@ -103,15 +103,18 @@ export const textTransitionSignal = (value) => {
 }
 
 export const textTransitionGlitch = (buffer, display, setter, n) => {
-    let delayMs = 150;
+    const delayMs = 150;
 
-    let more = transitionBuffer(buffer, display, setter, n);
+    const more = transitionBuffer(buffer, display, setter, n);
+    const startTime = new Date();
+    const timeoutDuration = 1000 * 10;
     
     if (more) {
         const interval = setInterval(() => {
             console.log("textTransitionGlitch interval");
-            const more = transitionBuffer(buffer, display, setter, n);
-            if (!more) {
+            const moreAgain = transitionBuffer(buffer, display, setter, n);
+            const isTimeout = ((new Date()) - startTime) > timeoutDuration;
+            if (!moreAgain || isTimeout) {
                 clearInterval(interval);
             }
         }, delayMs);
