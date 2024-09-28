@@ -15,8 +15,12 @@ type DaemonClient struct {
 	BaseURL string
 }
 
-func NewDaemonClient(baseURL string) DaemonClient {
-	return DaemonClient{BaseURL: baseURL}
+func NewDaemonClient(baseURL string) (DaemonClient, error) {
+	if baseURL == "" {
+		return DaemonClient{}, fmt.Errorf("baseURL is required")
+	}
+	dc := DaemonClient{BaseURL: baseURL}
+	return dc, nil
 }
 
 func (dc DaemonClient) makeURL(path string) string {
