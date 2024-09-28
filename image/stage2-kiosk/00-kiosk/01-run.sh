@@ -71,6 +71,7 @@ After=network.target
 WorkingDirectory=/opt/timechief-launcher
 ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound
 Restart=always
+KillSignal=SIGKILL
 Nice=1
 
 [Install]
