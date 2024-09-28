@@ -35,7 +35,6 @@ on_chroot << 'EOF'
     systemctl --quiet set-default multi-user.target
     cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << CATEND
 [Service]
-ExecStart=
 ExecStart=-/sbin/agetty --noissue --skip-login --autologin timechief --noclear %I $TERM
 CATEND
 EOF

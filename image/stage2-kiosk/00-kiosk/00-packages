@@ -14,3 +14,5 @@ openssh-server
 dnsmasq
 hostapd
 nginx
+zlib1g-dev
+libfuse2
