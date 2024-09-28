@@ -18,17 +18,24 @@ type DaemonClient struct {
 	apiKey  string
 }
 
-func NewDaemonClient(baseURL, credentialPath string) (DaemonClient, error) {
+type CredentialProvider struct {
+	CredentialPath string
+	APIKey         string
+}
+
+func NewDaemonClient(baseURL string, creds CredentialProvider) (DaemonClient, error) {
 	if baseURL == "" {
 		return DaemonClient{}, fmt.Errorf("baseURL is required")
 	}
-	if credentialPath == "" {
-		return DaemonClient{}, fmt.Errorf("credentialPath is required")
+	apiKey := creds.APIKey
+	var err error
+	if creds.CredentialPath != "" {
+		apiKey, err = credfile.ReadCredentials(creds.CredentialPath)
+		if err != nil {
+			return DaemonClient{}, fmt.Errorf("error reading credentials: %w", err)
+		}
 	}
-	apiKey, err := credfile.ReadCredentials(credentialPath)
-	if err != nil {
-		return DaemonClient{}, fmt.Errorf("error reading credentials: %w", err)
-	}
+
 	dc := DaemonClient{
 		baseURL: baseURL,
 		apiKey:  apiKey,

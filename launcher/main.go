@@ -247,9 +247,8 @@ func getCLIApp() *cli.App {
 							Value: defaultSystemAutomation,
 						},
 						&cli.StringFlag{
-							Name:  "credentials-path",
-							Usage: "path to the credentials file to communicate with the daemon",
-							Value: credentialPath,
+							Name:    "api-key",
+							EnvVars: []string{"API_KEY"},
 						},
 					},
 				},

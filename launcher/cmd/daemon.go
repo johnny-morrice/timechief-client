@@ -79,7 +79,7 @@ func Daemon(ctx *cli.Context) error {
 	keyValueStore := store.KeyValueStore{DB: db}
 
 	// TODO bit weird that daemon client is for sound daemon and this daemon.
-	soundClient, err := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"), ctx.String("credentials-path"))
+	soundClient, err := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"), daemonclient.CredentialProvider{})
 	if err != nil {
 		return err
 	}

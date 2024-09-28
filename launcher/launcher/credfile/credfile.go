@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -14,6 +15,13 @@ type credentials struct {
 
 func WriteCredentials(credentialsPath string, apiKey string) error {
 	creds := credentials{APIKey: apiKey}
+	// Make directory for credentials file if it does not exist
+	dir := filepath.Dir(credentialsPath)
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to create directory for credentials file: %v", err)
+	}
+
 	file, err := os.Create(credentialsPath)
 	if err != nil {
 		return fmt.Errorf("failed to open credentials file for writing: %v", err)

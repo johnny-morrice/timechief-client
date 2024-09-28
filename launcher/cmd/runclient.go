@@ -13,7 +13,9 @@ import (
 func RunClient(ctx *cli.Context) error {
 	baseURL := ctx.String("daemon-base-url")
 	credentialsPath := ctx.String("credentials-path")
-	dc, err := daemonclient.NewDaemonClient(baseURL, credentialsPath)
+	dc, err := daemonclient.NewDaemonClient(baseURL, daemonclient.CredentialProvider{
+		CredentialPath: credentialsPath,
+	})
 	if err != nil {
 		return fmt.Errorf("error building daemon client: %w", err)
 	}
