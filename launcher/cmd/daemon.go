@@ -15,6 +15,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/credfile"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/adaptivetick"
@@ -77,7 +78,11 @@ func Daemon(ctx *cli.Context) error {
 
 	keyValueStore := store.KeyValueStore{DB: db}
 
-	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
+	// TODO bit weird that daemon client is for sound daemon and this daemon.
+	soundClient, err := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"), ctx.String("credentials-path"))
+	if err != nil {
+		return err
+	}
 	soundService, err := sound.NewSoundService(soundClient, keyValueStore)
 	if err != nil {
 		return err
@@ -377,6 +382,7 @@ func makeMediaService(ctx *cli.Context, videoService mediasvc.VideoService, pict
 }
 
 func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {
+	credentialsPath := ctx.String("credentials-path")
 	ctxApiKey := ctx.String("test-app-api-key")
 	if ctxApiKey != "" {
 		err := kvStore.Set(store.APIAppAuthKey, ctxApiKey)
@@ -384,6 +390,10 @@ func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {
 			return fmt.Errorf("failed to set app API key from command line parameter: %v", err)
 		}
 		log.Println("INSECURE: using app API key from command line")
+		err = credfile.WriteCredentials(credentialsPath, ctxApiKey)
+		if err != nil {
+			return fmt.Errorf("failed to write app API key to credentials file: %v", err)
+		}
 		return nil
 	}
 
@@ -394,6 +404,10 @@ func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {
 	err = kvStore.Set(store.APIAppAuthKey, apiKey)
 	if err != nil {
 		return fmt.Errorf("failed to set app API key: %v", err)
+	}
+	err = credfile.WriteCredentials(credentialsPath, apiKey)
+	if err != nil {
+		return fmt.Errorf("failed to write app API key to credentials file: %v", err)
 	}
 	return nil
 }

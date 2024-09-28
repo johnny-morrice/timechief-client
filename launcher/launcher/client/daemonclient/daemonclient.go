@@ -4,31 +4,70 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/credfile"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 )
 
 type DaemonClient struct {
-	BaseURL string
+	baseURL string
+	apiKey  string
 }
 
-func NewDaemonClient(baseURL string) (DaemonClient, error) {
+func NewDaemonClient(baseURL, credentialPath string) (DaemonClient, error) {
 	if baseURL == "" {
 		return DaemonClient{}, fmt.Errorf("baseURL is required")
 	}
-	dc := DaemonClient{BaseURL: baseURL}
+	if credentialPath == "" {
+		return DaemonClient{}, fmt.Errorf("credentialPath is required")
+	}
+	apiKey, err := credfile.ReadCredentials(credentialPath)
+	if err != nil {
+		return DaemonClient{}, fmt.Errorf("error reading credentials: %w", err)
+	}
+	dc := DaemonClient{
+		baseURL: baseURL,
+		apiKey:  apiKey,
+	}
 	return dc, nil
 }
 
 func (dc DaemonClient) makeURL(path string) string {
-	return dc.BaseURL + path
+	return dc.baseURL + path
+}
+
+func (dc DaemonClient) get(path string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", dc.makeURL(path), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+dc.apiKey)
+	return http.DefaultClient.Do(req)
+}
+
+func (dc DaemonClient) post(path, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest("POST", dc.makeURL(path), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+dc.apiKey)
+	if contentType != "" {
+		req.Header.Add("Content-Type", contentType)
+	}
+	if body != nil {
+		nopCloser := io.NopCloser(body)
+		req.Body = nopCloser
+	}
+
+	return http.DefaultClient.Do(req)
 }
 
 func (dc DaemonClient) GetConfig() (store.Config, error) {
-	resp, err := http.Get(dc.makeURL("/api/launcher/config"))
+	resp, err := dc.get("/api/launcher/config")
 	if err != nil {
 		return store.Config{}, err
 	}
@@ -44,7 +83,7 @@ func (dc DaemonClient) GetConfig() (store.Config, error) {
 }
 
 func (dc DaemonClient) GetTargetEnv() (launcher.TargetEnv, error) {
-	resp, err := http.Get(dc.makeURL("/api/launcher/target/env"))
+	resp, err := dc.get("/api/launcher/target/env")
 	if err != nil {
 		return launcher.TargetEnv{}, err
 	}
@@ -58,7 +97,7 @@ func (dc DaemonClient) GetTargetEnv() (launcher.TargetEnv, error) {
 }
 
 func (dc DaemonClient) GetTarget() (service.LaunchTarget, error) {
-	resp, err := http.Get(dc.makeURL("/api/launcher/target"))
+	resp, err := dc.get("/api/launcher/target")
 	if err != nil {
 		return service.LaunchTarget{}, err
 	}
@@ -74,7 +113,7 @@ func (dc DaemonClient) GetTarget() (service.LaunchTarget, error) {
 }
 
 func (dc DaemonClient) PostTargetRecover() (launcher.TargetStatus, error) {
-	resp, err := http.Post(dc.makeURL("/api/launcher/target/recover"), "", nil)
+	resp, err := dc.post("/api/launcher/target/recover", "", nil)
 	if err != nil {
 		return launcher.TargetStatus{}, err
 	}
@@ -90,7 +129,7 @@ func (dc DaemonClient) PostTargetRecover() (launcher.TargetStatus, error) {
 }
 
 func (dc DaemonClient) PostReboot() error {
-	resp, err := http.Post(dc.makeURL("/api/system/reboot"), "", nil)
+	resp, err := dc.post("/api/system/reboot", "", nil)
 	if err != nil {
 		return err
 	}
@@ -109,7 +148,7 @@ func (dc DaemonClient) PostPlaySound(req PlaySoundRequest) error {
 	if err != nil {
 		return err
 	}
-	resp, err := http.Post(dc.makeURL("/api/sound/play"), "application/json", &buf)
+	resp, err := dc.post("/api/sound/play", "application/json", &buf)
 	if err != nil {
 		return err
 	}

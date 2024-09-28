@@ -40,6 +40,11 @@ func getCLIApp() *cli.App {
 					Name:  "daemon-base-url",
 					Value: daemonBaseURL,
 				},
+				&cli.StringFlag{
+					Name:  "credentials-path",
+					Usage: "path to the credentials file to communicate with the daemon",
+					Value: credentialPath,
+				},
 			},
 		},
 		{
@@ -80,6 +85,11 @@ func getCLIApp() *cli.App {
 			Usage:   "Run the launcher daemon",
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "credentials-path",
+					Usage: "path to the credentials file which the daemon may update",
+					Value: credentialPath,
+				},
 				&cli.StringFlag{
 					Name:  "media-file",
 					Usage: "load media settings from file",
@@ -236,6 +246,11 @@ func getCLIApp() *cli.App {
 							Name:  "system-automation",
 							Value: defaultSystemAutomation,
 						},
+						&cli.StringFlag{
+							Name:  "credentials-path",
+							Usage: "path to the credentials file to communicate with the daemon",
+							Value: credentialPath,
+						},
 					},
 				},
 				{
@@ -270,3 +285,4 @@ func getCLIApp() *cli.App {
 const defaultInstallDaemon = true
 const defaultSystemAutomation = false
 const daemonBaseURL = "http://localhost:8080"
+const credentialPath = "/opt/timechief-launcher/credentials/api.json"
