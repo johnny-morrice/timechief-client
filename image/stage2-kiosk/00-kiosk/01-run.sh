@@ -168,3 +168,8 @@ EOF
 on_chroot << EOF
 raspi-config nonint do_i2c 0
 EOF
+
+# Disable username set prompt
+on_chroot << EOF
+systemctl disable userconfig
+EOF
