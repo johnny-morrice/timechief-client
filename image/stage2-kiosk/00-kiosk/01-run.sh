@@ -172,4 +172,5 @@ EOF
 # Disable username set prompt
 on_chroot << EOF
 systemctl disable userconfig
+rm /etc/systemd/system/multi-user.target.wants/userconfig.service
 EOF
