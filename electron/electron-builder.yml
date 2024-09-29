@@ -28,14 +28,14 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  asar: true
+  executableName: timechief-client-electron
   target:
     - AppImage
-    - snap
-    - deb
   maintainer: electronjs.org
   category: Utility
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: timechief-client-electron
 npmRebuild: false
 publish:
   provider: generic
