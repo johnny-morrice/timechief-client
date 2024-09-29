@@ -1,5 +1,5 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+import { app, BrowserWindow } from 'electron';
+import path from 'path';
 
 function isShowDevTools() {
     return process.env.showDevTools == 'true';
@@ -20,7 +20,7 @@ function isFullScreen() {
 let isDevMode = process.env.devMode == 'true';
 let mainWindow;
 
-function getMainWindow() {
+export function getMainWindow() {
     return mainWindow;
 }
 
@@ -30,7 +30,7 @@ function createWindow(callback) {
         width: getWidth(),
         height: getHeight(),
         webPreferences: {
-            preload: path.join(__dirname, '../preload/preload.js'),
+            preload: path.join(__dirname, '../preload/index.js'),
         },
         autoHideMenuBar: true,
         fullscreen: isFullScreen(),
@@ -38,8 +38,13 @@ function createWindow(callback) {
         show: false,
     })
 
-    // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, '../../frontend-dist/index.html'));
+    // HMR for renderer base on electron-vite cli.
+    // Load the remote URL for development or the local html file for production.
+    if (process.env['ELECTRON_RENDERER_URL']) {
+        mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    } else {
+        mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
+    }
 
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
@@ -50,7 +55,7 @@ function createWindow(callback) {
     })
 }
 
-function startTimechiefApp(logger, callback) {
+export function startTimechiefApp(logger, callback) {
     var refreshInterval = null;
 
     // This method will be called when Electron has finished
@@ -87,6 +92,3 @@ function startTimechiefApp(logger, callback) {
     logger.info(`Width: ${getWidth()} Height: ${getHeight()}`);
     logger.info(`Fullscreen: ${isFullScreen()}`);
 }
-
-exports.startTimechiefApp = startTimechiefApp;
-exports.getMainWindow = getMainWindow;

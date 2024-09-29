@@ -1,4 +1,4 @@
-const { networkInterfaces } = require('os');
+import { networkInterfaces } from 'os';
 
 function getIpAddress() {
     const nets = networkInterfaces();
@@ -27,7 +27,7 @@ function getWwwBaseURL() {
     return process.env.wwwBaseURL;
 }
 
-function baseDeviceStatus() {
+export function baseDeviceStatus() {
     return {
         "status": "ok",
         "ip_address": getIpAddress(),
@@ -35,5 +35,3 @@ function baseDeviceStatus() {
         "client_version": getClientVersion()
     }
 }
-
-exports.baseDeviceStatus = baseDeviceStatus;

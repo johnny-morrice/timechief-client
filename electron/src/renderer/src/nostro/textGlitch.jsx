@@ -111,7 +111,6 @@ export const textTransitionGlitch = (buffer, display, setter, n) => {
     
     if (more) {
         const interval = setInterval(() => {
-            console.log("textTransitionGlitch interval");
             const moreAgain = transitionBuffer(buffer, display, setter, n);
             const isTimeout = ((new Date()) - startTime) > timeoutDuration;
             if (!moreAgain || isTimeout) {

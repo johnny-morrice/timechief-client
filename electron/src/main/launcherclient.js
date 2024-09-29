@@ -1,5 +1,4 @@
-
-class LauncherClient {
+export class LauncherClient {
     constructor(axios) {
         this.axios = axios;
         this.baseURL = getAPIBaseURL();
@@ -256,6 +255,4 @@ class LauncherClient {
 
 function getAPIBaseURL() {
     return process.env.clockAPIBaseURL;
-  }
-
-exports.LauncherClient = LauncherClient;
+}
