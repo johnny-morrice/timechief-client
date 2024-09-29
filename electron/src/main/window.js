@@ -30,7 +30,7 @@ function createWindow(callback) {
         width: getWidth(),
         height: getHeight(),
         webPreferences: {
-            preload: path.join(__dirname, '../preload/preload.js'),
+            preload: path.join(__dirname, '../preload/index.js'),
         },
         autoHideMenuBar: true,
         fullscreen: isFullScreen(),
@@ -38,8 +38,13 @@ function createWindow(callback) {
         show: false,
     })
 
-    // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, '../../frontend-dist/index.html'));
+    // HMR for renderer base on electron-vite cli.
+    // Load the remote URL for development or the local html file for production.
+    if (process.env['ELECTRON_RENDERER_URL']) {
+        mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    } else {
+        mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
+    }
 
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
