@@ -1,4 +1,4 @@
-class MediaDecorator {
+export class MediaDecorator {
     constructor() {
         this.mediaRoot = `${process.env.clockAPIBaseURL}/media`;
     }
@@ -40,5 +40,3 @@ class MediaDecorator {
         return data;
     }
 }
-
-exports.MediaDecorator = MediaDecorator;

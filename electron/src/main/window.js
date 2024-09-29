@@ -1,5 +1,5 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+import { app, BrowserWindow } from 'electron';
+import path from 'path';
 
 function isShowDevTools() {
     return process.env.showDevTools == 'true';
@@ -20,7 +20,7 @@ function isFullScreen() {
 let isDevMode = process.env.devMode == 'true';
 let mainWindow;
 
-function getMainWindow() {
+export function getMainWindow() {
     return mainWindow;
 }
 
@@ -50,7 +50,7 @@ function createWindow(callback) {
     })
 }
 
-function startTimechiefApp(logger, callback) {
+export function startTimechiefApp(logger, callback) {
     var refreshInterval = null;
 
     // This method will be called when Electron has finished
@@ -87,6 +87,3 @@ function startTimechiefApp(logger, callback) {
     logger.info(`Width: ${getWidth()} Height: ${getHeight()}`);
     logger.info(`Fullscreen: ${isFullScreen()}`);
 }
-
-exports.startTimechiefApp = startTimechiefApp;
-exports.getMainWindow = getMainWindow;

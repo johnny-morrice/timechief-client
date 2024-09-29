@@ -1,6 +1,6 @@
-const { getMainWindow } = require("./window");
+import { getMainWindow } from "./window.js";
 
-class Themer {
+export class Themer {
     constructor() {
         this.lastThemeCssKey = null;
         this.lastThemeCSS = null;
@@ -30,7 +30,7 @@ class Themer {
     }
 }
 
-class BackgroundImageThemer {
+export class BackgroundImageThemer {
     constructor() {
         this.lastThemeCssKey = null;
         this.lastThemeCSS = null;
@@ -108,6 +108,3 @@ function getDefaultThemeCSS() {
         background-color: green;
     }`;
 }
-
-exports.Themer = Themer;
-exports.BackgroundImageThemer = BackgroundImageThemer;

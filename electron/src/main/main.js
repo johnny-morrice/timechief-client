@@ -1,12 +1,13 @@
 // Modules to control application life and create native browser window
-const { ipcMain } = require('electron');
-const axios = require('axios');
-const winston = require('winston');
-const { baseDeviceStatus } = require('./status.js');
-const { startTimechiefApp, getMainWindow } = require('./window.js');
-const { LauncherClient } = require('./launcherclient.js');
-const { Themer, BackgroundImageThemer } = require('./themer.js');
-const { MediaDecorator } = require('./mediadecorator.js');
+import { ipcMain } from 'electron';
+import axios from 'axios';
+import winston from 'winston';
+import { baseDeviceStatus } from './status.js';
+import { startTimechiefApp, getMainWindow } from './window.js';
+import { LauncherClient } from './launcherclient.js';
+import { Themer, BackgroundImageThemer } from './themer.js';
+import { MediaDecorator } from './mediadecorator.js';
+
 
 const logger = winston.createLogger({
   level: 'debug',

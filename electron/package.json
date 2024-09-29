@@ -10,6 +10,7 @@
     "dist-dir": "vite build && electron-builder --dir",
     "dist": "vite build && electron-builder"
   },
+  "type": "module",
   "build": {
     "directories": {
       "output": "dist",
