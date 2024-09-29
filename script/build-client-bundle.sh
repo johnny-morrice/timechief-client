@@ -64,7 +64,7 @@ cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_UNPACK/ti
 # Build electron app
 pushd $BUILD_DIR/timechief-client/electron
   npm install
-  npm run dist
+  npm run build:linux
 popd
 
 cp $BUILD_DIR/timechief-client/electron/dist/timechief-client-electron $BUNDLE_UNPACK
