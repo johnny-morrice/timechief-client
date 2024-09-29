@@ -7,8 +7,6 @@ set -x
 # PHASE
 # VERSION
 # IMAGE_OUTPUT
-# weatherclock_client_security_apikey
-# weatherclock_client_core_baseurl
 # BUCKET_NAME
 # PRODUCT
 # STREAM

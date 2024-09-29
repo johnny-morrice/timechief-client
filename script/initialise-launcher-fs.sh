@@ -24,6 +24,7 @@ mkdir -p $INSTALL_ROOT/assets/images
 mkdir -p $INSTALL_ROOT/logs/timechief-launcher
 mkdir -p $INSTALL_ROOT/logs/timechief-client
 mkdir -p $INSTALL_ROOT/media
+mkdir -p $INSTALL_ROOT/credentials
 rm -rf $FS_LAUNCHER_BIN/*
 cp $LAUNCHER_BIN $FS_LAUNCHER_BIN
 chmod +x $FS_LAUNCHER_BIN
