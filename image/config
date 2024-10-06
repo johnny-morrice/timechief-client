@@ -1,5 +1,5 @@
 IMG_NAME="Timechief"
-RELEASE="bookworm"
+RELEASE="bullseye"
 LOCALE_DEFAULT="en_GB.UTF-8"
 TARGET_HOSTNAME="timechief"
 KEYBOARD_KEYMAP="us"
