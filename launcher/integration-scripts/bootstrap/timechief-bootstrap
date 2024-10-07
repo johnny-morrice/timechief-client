@@ -9,7 +9,7 @@
 # xrandr --output HDMI-1 --rotate left
 
 # show a splash the app boots
-feh --bg-scale /opt/timechief-launcher/assets/images/splash.png
+# feh --bg-scale /opt/timechief-launcher/assets/images/splash.png
 
 # start timechief
 /opt/timechief-launcher/bin/timechief-launcher run-client 2>&1 | multilog T s10485760 n10 /opt/timechief-launcher/logs/timechief-launcher

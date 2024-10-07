@@ -46,7 +46,7 @@ cat > /usr/share/wayland-sessions/weston.desktop << CATEND
 [Desktop Entry]
 Name=Weston
 Comment=Start Weston compositor
-Exec=weston
+Exec=weston --xwayland
 Type=Application
 CATEND
 EOF
@@ -57,12 +57,14 @@ mkdir -p /etc/xdg/weston
 cat > /etc/xdg/weston/weston.ini << CATEND
 [core]
 cursor-size=0
-modules=kiosk-shell.so
+idle-time=0
+
+[idle]
+idle-time=0
 
 [shell]
 client=/opt/timechief-launcher/bin/timechief-bootstrap
 CATEND
-
 EOF
 
 # timechief-launcher daemon.
@@ -79,8 +81,6 @@ Group=$FIRST_USER_NAME
 WorkingDirectory=/opt/timechief-launcher
 ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon --system-automation
 Restart=always
-KillSignal=SIGKILL
-TimeoutStopSec=5
 
 [Install]
 WantedBy=multi-user.target
@@ -99,7 +99,8 @@ After=network.target
 WorkingDirectory=/opt/timechief-launcher
 ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound
 Restart=always
-KillSignal
+KillSignal=SIGKILL
+TimeoutStopSec=5
 Nice=1
 
 [Install]
