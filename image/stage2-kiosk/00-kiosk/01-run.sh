@@ -57,19 +57,12 @@ mkdir -p /etc/xdg/weston
 cat > /etc/xdg/weston/weston.ini << CATEND
 [core]
 cursor-size=0
-CATEND
-EOF
+modules=kiosk-shell.so
 
-# Set up desktop file to autostart timechief
-on_chroot << EOF
-mkdir -p /etc/xdg/autostart
-cat > /etc/xdg/autostart/timechief.desktop << CATEND
-[Desktop Entry]
-Name=Timechief Autologin
-Comment=Session for autologin with Timechief launcher
-Exec=/opt/timechief-launcher/bin/timechief-bootstrap
-Type=Application
+[shell]
+client=/opt/timechief-launcher/bin/timechief-bootstrap
 CATEND
+
 EOF
 
 # timechief-launcher daemon.
