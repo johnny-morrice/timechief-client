@@ -40,7 +40,7 @@ cat <<EOF > $INSTALL_ROOT/client-config.json
 		"wwwBaseURL": "$WWW_BASE_URL",
 		"timechief_width": "$WIDTH",
 		"timechief_height": "$HEIGHT",
-		"timechief_fullscreen": "false"
+		"timechief_fullscreen": "true"
 	}
 }
 EOF

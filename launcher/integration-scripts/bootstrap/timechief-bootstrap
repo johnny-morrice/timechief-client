@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+# TODO this x related stuff needs ported to Wayland.
+
 # never blank the screen
-xset s off -dpms
+# xset s off -dpms
 
 # rotate to portrait mounted TV
 # xrandr --output HDMI-1 --rotate left

@@ -1,5 +1,7 @@
 lightdm
 weston
+xwayland
+tree
 fonts-noto-color-emoji
 feh
 gjs
