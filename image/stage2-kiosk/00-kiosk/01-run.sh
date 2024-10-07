@@ -53,6 +53,7 @@ EOF
 
 # Disable the cursor
 on_chroot << EOF
+mkdir -p /etc/xdg/weston
 cat > /etc/xdg/weston/weston.ini << CATEND
 [core]
 cursor-size=0
@@ -61,6 +62,7 @@ EOF
 
 # Set up desktop file to autostart timechief
 on_chroot << EOF
+mkdir -p /etc/xdg/autostart
 cat > /etc/xdg/autostart/timechief.desktop << CATEND
 [Desktop Entry]
 Name=Timechief Autologin
