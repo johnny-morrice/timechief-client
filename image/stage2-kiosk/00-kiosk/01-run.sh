@@ -42,6 +42,7 @@ EOF
 
 
 # timechief-launcher daemon.
+# Use sigkill and timeout after 5 seconds.
 on_chroot << EOF
 cat > /etc/systemd/system/timechief-launcher.service << CATEND
 [Unit]
@@ -54,6 +55,8 @@ Group=$FIRST_USER_NAME
 WorkingDirectory=/opt/timechief-launcher
 ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon --system-automation
 Restart=always
+KillSignal=SIGKILL
+TimeoutStopSec=5
 
 [Install]
 WantedBy=multi-user.target
