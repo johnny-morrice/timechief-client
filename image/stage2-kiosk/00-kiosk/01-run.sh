@@ -30,16 +30,45 @@ if [ "$CURSOR" = "yes" ]; then
     install -m 644 -o 1000 -g 1000 files/.cursor "${HOME}/"
 fi
 
-# Autologin
-on_chroot << 'EOF'
-    systemctl --quiet set-default multi-user.target
-    cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << CATEND
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty --noissue --skip-login --autologin timechief --noclear %I $TERM
+# Set up lightdm for autologin
+on_chroot << EOF
+cat > /etc/lightdm/lightdm.conf << CATEND
+[Seat:*]
+autologin-user=timechief
+autologin-user-timeout=0
+user-session=weston
 CATEND
 EOF
 
+# Make lightdm use weston for window management
+on_chroot << EOF
+cat > /usr/share/wayland-sessions/weston.desktop << CATEND
+[Desktop Entry]
+Name=Weston
+Comment=Start Weston compositor
+Exec=weston
+Type=Application
+CATEND
+EOF
+
+# Disable the cursor
+on_chroot << EOF
+cat > /etc/xdg/weston/weston.ini << CATEND
+[core]
+cursor-size=0
+CATEND
+EOF
+
+# Set up desktop file to autostart timechief
+on_chroot << EOF
+cat > /etc/xdg/autostart/timechief.desktop << CATEND
+[Desktop Entry]
+Name=Timechief Autologin
+Comment=Session for autologin with Timechief launcher
+Exec=/opt/timechief-launcher/bin/timechief-bootstrap
+Type=Application
+CATEND
+EOF
 
 # timechief-launcher daemon.
 # Use sigkill and timeout after 5 seconds.
