@@ -24,38 +24,49 @@ fi
 # Stop services that may conflict with Wi-Fi connection
 systemctl stop hostapd
 systemctl stop dnsmasq
-systemctl stop systemd-networkd
 
-# Generate wpa_supplicant configuration file
-wpa_passphrase "$SSID" "$PASSWORD" > /etc/wpa_supplicant/wpa_supplicant-$IFNAME.conf
+# Disable the hotspot service if it's enabled
+if systemctl is-active --quiet hotspot.service; then
+    systemctl stop hotspot.service
+    systemctl disable hotspot.service
+fi
 
-# Create systemd service to handle wpa_supplicant for the interface
-cat > /etc/systemd/system/wpa_supplicant@$IFNAME.service <<EOF
-[Unit]
-Description=WPA supplicant for %i
-Before=network.target
+# Ensure the Wi-Fi interface is down before making changes
+ip link set "$IFNAME" down || true
 
-[Service]
-ExecStart=/sbin/wpa_supplicant -i%i -c/etc/wpa_supplicant/wpa_supplicant-%i.conf
-Restart=always
+# Create the wpa_supplicant configuration file
+WPA_CONF="/etc/wpa_supplicant/wpa_supplicant-${IFNAME}.conf"
+cat <<EOF > "$WPA_CONF"
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=US
 
-[Install]
-WantedBy=multi-user.target
+network={
+    ssid="${SSID}"
+    psk="${PASSWORD}"
+    key_mgmt=WPA-PSK
+}
 EOF
 
-# Enable and start wpa_supplicant service for the interface
-systemctl enable wpa_supplicant@$IFNAME
-systemctl start wpa_supplicant@$IFNAME
+# Reload the systemd configuration to ensure any changes are recognized
+systemctl daemon-reload
 
-# Create systemd-networkd configuration file for DHCP client
-cat > /etc/systemd/network/$IFNAME.network <<EOF
+# Start and enable the wpa_supplicant service for the specified interface
+systemctl start wpa_supplicant@"${IFNAME}"
+systemctl enable wpa_supplicant@"${IFNAME}"
+
+# Bring the Wi-Fi interface up
+ip link set "$IFNAME" up
+
+# Ensure that systemd-networkd is configured to manage the interface
+NETWORK_CONF="/etc/systemd/network/${IFNAME}.network"
+cat <<EOF > "$NETWORK_CONF"
 [Match]
-Name=$IFNAME
+Name=${IFNAME}
 
 [Network]
 DHCP=yes
 EOF
 
-# Restart systemd-networkd to apply the changes
-systemctl enable systemd-networkd
+# Restart systemd-networkd to apply the new configuration
 systemctl restart systemd-networkd
