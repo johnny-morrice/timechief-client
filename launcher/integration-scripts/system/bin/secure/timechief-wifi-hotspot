@@ -5,7 +5,6 @@ set -x
 SSID=$1
 PASSWORD=$2
 IFNAME=$3
-# AP_IP is IP address in form 192.168.0.1/24.
 AP_IP=$4
 DHCP_RANGE=$5
 
@@ -34,19 +33,32 @@ if [ -z "$DHCP_RANGE" ]; then
     exit 1
 fi
 
-# This script is to configure a wifi hotspot on raspberry pi.
+# Stop and disable services that might interfere
+systemctl stop systemd-networkd
+systemctl stop wpa_supplicant
 
-# Disable dhcpcd on the interface.
-systemctl stop dhcpcd
+# Create systemd-networkd configuration for the interface
+cat > /etc/systemd/network/$IFNAME.network <<EOF
+[Match]
+Name=$IFNAME
 
-# Create dnsmasq config file.
-cat > /tmp/dnsmasq.conf <<EOF
+[Network]
+Address=$AP_IP
+DHCPServer=yes
+EOF
+
+# Restart systemd-networkd to apply the changes
+systemctl enable systemd-networkd
+systemctl restart systemd-networkd
+
+# Create dnsmasq config file for DHCP service
+cat > /etc/dnsmasq.d/hotspot.conf <<EOF
 interface=$IFNAME
 dhcp-range=$DHCP_RANGE
 EOF
 
-# Create hostapd config file.
-cat > /tmp/hostapd.conf <<EOF
+# Configure hostapd for the hotspot
+cat > /etc/hostapd/hostapd.conf <<EOF
 interface=$IFNAME
 driver=nl80211
 ssid=$SSID
@@ -62,21 +74,12 @@ wpa_pairwise=TKIP
 rsn_pairwise=CCMP
 EOF
 
-# Disable wpa_supplicant on the interface.
-killall wpa_supplicant || true
-systemctl stop dnsmasq-timechief 
-systemctl stop hostapd-timechief
+# Enable hostapd service
+sed -i 's/^#DAEMON_CONF.*/DAEMON_CONF="\/etc\/hostapd\/hostapd.conf"/' /etc/default/hostapd
+systemctl unmask hostapd
+systemctl enable hostapd
+systemctl restart hostapd
 
-# Configure the interface.
-ip addr flush dev $IFNAME
-ip link set $IFNAME down
-ip link set $IFNAME up
-ip addr add $AP_IP dev $IFNAME
-
-# Start dnsmasq with systemd.
-systemctl start dnsmasq-timechief
-
-# Start hostapd with systemd.
-systemctl start hostapd-timechief
-
-
+# Restart dnsmasq to apply the configuration
+systemctl enable dnsmasq
+systemctl restart dnsmasq

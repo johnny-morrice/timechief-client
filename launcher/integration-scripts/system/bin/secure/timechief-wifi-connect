@@ -2,8 +2,6 @@
 set -e
 set -x
 
-# This script is to configure raspberry pi to join a wifi network.
-
 SSID=$1
 PASSWORD=$2
 IFNAME=$3
@@ -23,21 +21,41 @@ if [ -z "$IFNAME" ]; then
     exit 1
 fi
 
-# Bring network done first
-killall wpa_supplicant || true
-systemctl stop dnsmasq-timechief
-systemctl stop hostapd-timechief
+# Stop services that may conflict with Wi-Fi connection
+systemctl stop hostapd
+systemctl stop dnsmasq
+systemctl stop systemd-networkd
 
-# Bring down the interface.
-ip addr flush dev $IFNAME
-ip link set $IFNAME down
+# Generate wpa_supplicant configuration file
+wpa_passphrase "$SSID" "$PASSWORD" > /etc/wpa_supplicant/wpa_supplicant-$IFNAME.conf
 
-# Bring up the interface.
-ip link set $IFNAME up
+# Create systemd service to handle wpa_supplicant for the interface
+cat > /etc/systemd/system/wpa_supplicant@$IFNAME.service <<EOF
+[Unit]
+Description=WPA supplicant for %i
+Before=network.target
 
-# Now connect.
-wpa_passphrase $SSID $PASSWORD > /tmp/wpa_supplicant.conf
-wpa_supplicant -B -i $IFNAME -c /tmp/wpa_supplicant.conf
+[Service]
+ExecStart=/sbin/wpa_supplicant -i%i -c/etc/wpa_supplicant/wpa_supplicant-%i.conf
+Restart=always
 
-# Now start dhcpcd.
-systemctl start dhcpcd
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start wpa_supplicant service for the interface
+systemctl enable wpa_supplicant@$IFNAME
+systemctl start wpa_supplicant@$IFNAME
+
+# Create systemd-networkd configuration file for DHCP client
+cat > /etc/systemd/network/$IFNAME.network <<EOF
+[Match]
+Name=$IFNAME
+
+[Network]
+DHCP=yes
+EOF
+
+# Restart systemd-networkd to apply the changes
+systemctl enable systemd-networkd
+systemctl restart systemd-networkd
