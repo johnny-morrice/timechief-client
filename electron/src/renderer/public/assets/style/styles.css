@@ -164,7 +164,7 @@ div.switcher-widget-button-wrapper {
 }
 
 div.current-weather {
-    font-size: 22pt;
+    font-size: 18pt;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
