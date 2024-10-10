@@ -39,7 +39,7 @@ WPA_CONF="/etc/wpa_supplicant/wpa_supplicant-${IFNAME}.conf"
 cat <<EOF > "$WPA_CONF"
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
-country=US
+country=GB
 
 network={
     ssid="${SSID}"
@@ -65,7 +65,7 @@ cat <<EOF > "$NETWORK_CONF"
 Name=${IFNAME}
 
 [Network]
-DHCP=yes
+DHCP=ipv4
 EOF
 
 # Restart systemd-networkd to apply the new configuration
