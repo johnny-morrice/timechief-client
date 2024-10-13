@@ -157,6 +157,7 @@ div.flex-shrink {
 div.switcher-widget-button-wrapper {
     justify-self: flex-end;
     align-items: flex-end;
+    justify-content: space-between;
 }
 
 .is-error {
@@ -197,6 +198,12 @@ button.action-button {
     border-style: solid;
     font-size: 18pt
 }
+
+button.switcher-button {
+    font-size: 16pt;
+}
+
+
 
 div.setup-wrapper {
     height: 100vh;
