@@ -69,14 +69,14 @@ function makeTimeFormatter(homePageSignals) {
   if (timeZone) {
     options["timeZone"] = timeZone;
   }
-  return new Intl.DateTimeFormat(homePageSignals.getLocale(), options);
+  return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
 }
 
 function makeDateFormatter(homePageSignals) {
   let options = {
     weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
   };
-  return new Intl.DateTimeFormat(homePageSignals.getLocale(), options);
+  return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
 }
 
 

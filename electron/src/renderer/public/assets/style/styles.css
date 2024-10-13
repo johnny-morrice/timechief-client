@@ -167,7 +167,7 @@ div.current-weather {
     font-size: 18pt;
     display: flex;
     flex-direction: column;
-    gap: 0.5em;
+    gap: 0.2em;
 }
 
 div.current-weather-location {
@@ -217,7 +217,7 @@ div.astro {
 }
 
 div.weather-data {
-    font-size: 34pt;
+    font-size: 32pt;
 }
 
 div.current-weather-icon {
@@ -398,7 +398,7 @@ div.status-note {
     }
 
     div.current-weather {
-        font-size: 24pt
+        font-size: 20pt
     }
 
     body {
@@ -422,7 +422,7 @@ div.status-note {
     }
 
     div.weather-data {
-        font-size: 36pt;
+        font-size: 34pt;
     }
 
     div.current-weather-icon {
@@ -452,7 +452,7 @@ div.status-note {
     }
 
     div.current-weather {
-        font-size: 28pt
+        font-size: 22pt
     }
 
     body {
@@ -476,7 +476,7 @@ div.status-note {
     }
 
     div.weather-data {
-        font-size: 38pt;
+        font-size: 36pt;
     }
 
     div.current-weather-icon {

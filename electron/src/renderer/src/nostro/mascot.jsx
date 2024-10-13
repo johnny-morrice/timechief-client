@@ -40,7 +40,7 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height)
 
     var canvas = getCanvas();
     const initialised = canvasRef.getAttribute("data-initialised");
-    if (!initialised || !canvas) {
+    if (!initialised) {
         if (canvas) {
             canvas.dispose();
         }
