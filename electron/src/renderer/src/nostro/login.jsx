@@ -24,8 +24,11 @@ function onDataUpdate(data, signals) {
     }
     const hasAccessCode = dataState["has_access_token"];
     const deviceUUID = dataState["my_device_uuid"];
-    const devices = dataState["my_devices"];
-    signals.setHasDeviceUUID(deviceUUID.length > 0);
+    let devices = dataState["my_devices"];
+    if (devices == null) {
+        devices = [];
+    }
+    signals.setHasDeviceUUID(deviceUUID && deviceUUID.length > 0);
     signals.setHasAccessCode(hasAccessCode);
     signals.setDevices(devices);
 }
@@ -58,15 +61,15 @@ export function LoginPage(props) {
     });
     addPairingGetCallback(cbName, (data) => {
         const userCode = data["code"];
-        if (userCode.length > 0) {
+        if (userCode && userCode.length > 0) {
             signals.setUserCode(userCode);
         }
         const loginURL = data["url"];
-        if (loginURL.length > 0) {
+        if (loginURL && loginURL.length > 0) {
             signals.setLoginURL(loginURL);
         }
         const qrCodeURL = data["qr_code_url"];
-        if (qrCodeURL.length > 0) {
+        if (qrCodeURL && qrCodeURL.length > 0) {
             signals.setQrCodeURL(qrCodeURL);
         }
 

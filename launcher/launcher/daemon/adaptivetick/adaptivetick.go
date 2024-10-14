@@ -1,6 +1,7 @@
 package adaptivetick
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -15,7 +16,10 @@ type TwoModeTicker struct {
 	pokes           []time.Time
 }
 
-func NewTwoModeTicker(exceedThreshold time.Duration, underThreshold time.Duration, threshold time.Duration, timeout time.Duration, pokeCount int) *TwoModeTicker {
+func NewTwoModeTicker(exceedThreshold time.Duration, underThreshold time.Duration, threshold time.Duration, timeout time.Duration, pokeCount int) (*TwoModeTicker, error) {
+	if exceedThreshold <= 0 || underThreshold <= 0 || threshold <= 0 || timeout <= 0 || pokeCount <= 0 {
+		return nil, fmt.Errorf("all durations and pokeCount must be greater than 0")
+	}
 	return &TwoModeTicker{
 		exceedThreshold: exceedThreshold,
 		underThreshold:  underThreshold,
@@ -24,7 +28,7 @@ func NewTwoModeTicker(exceedThreshold time.Duration, underThreshold time.Duratio
 		mutex:           &sync.RWMutex{},
 		pokeCount:       pokeCount,
 		pokes:           []time.Time{time.Now()},
-	}
+	}, nil
 }
 
 func (t *TwoModeTicker) Poke() {

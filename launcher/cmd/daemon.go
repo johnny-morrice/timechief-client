@@ -107,7 +107,10 @@ func Daemon(ctx *cli.Context) error {
 		KeyValueStore:         keyValueStore,
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
-	ticker := adaptivetick.NewTwoModeTicker(ctx.Duration("service-refresh-interval"), time.Second*2, time.Second*5, time.Second*15, 2)
+	ticker, err := adaptivetick.NewTwoModeTicker(ctx.Duration("service-refresh-interval"), time.Second*2, time.Second*5, time.Second*15, 2)
+	if err != nil {
+		return err
+	}
 	deviceDataStore := store.DeviceDataStore{DB: db}
 	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ticker, ctx.Duration("service-request-timeout"))
 	// pairingDaemon := daemon.Pairing{

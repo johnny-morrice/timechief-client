@@ -157,6 +157,7 @@ div.flex-shrink {
 div.switcher-widget-button-wrapper {
     justify-self: flex-end;
     align-items: flex-end;
+    justify-content: space-between;
 }
 
 .is-error {
@@ -164,10 +165,10 @@ div.switcher-widget-button-wrapper {
 }
 
 div.current-weather {
-    font-size: 22pt;
+    font-size: 18pt;
     display: flex;
     flex-direction: column;
-    gap: 0.5em;
+    gap: 0.2em;
 }
 
 div.current-weather-location {
@@ -198,6 +199,12 @@ button.action-button {
     font-size: 18pt
 }
 
+button.switcher-button {
+    font-size: 16pt;
+}
+
+
+
 div.setup-wrapper {
     height: 100vh;
     padding: 1em;
@@ -217,7 +224,7 @@ div.astro {
 }
 
 div.weather-data {
-    font-size: 34pt;
+    font-size: 32pt;
 }
 
 div.current-weather-icon {
@@ -398,7 +405,7 @@ div.status-note {
     }
 
     div.current-weather {
-        font-size: 24pt
+        font-size: 20pt
     }
 
     body {
@@ -422,7 +429,7 @@ div.status-note {
     }
 
     div.weather-data {
-        font-size: 36pt;
+        font-size: 34pt;
     }
 
     div.current-weather-icon {
@@ -452,7 +459,7 @@ div.status-note {
     }
 
     div.current-weather {
-        font-size: 28pt
+        font-size: 22pt
     }
 
     body {
@@ -476,7 +483,7 @@ div.status-note {
     }
 
     div.weather-data {
-        font-size: 38pt;
+        font-size: 36pt;
     }
 
     div.current-weather-icon {
