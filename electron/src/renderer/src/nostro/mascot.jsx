@@ -6,8 +6,8 @@ export function manageMascotCanvas(canvasId, emoteSignal, height) {
     var canvas = null;
     var lastManaged = new Date();
     setInterval(() => {
-        function setCanvas(canvas) {
-            canvas = canvas;
+        function setCanvas(myCanvas) {
+            canvas = myCanvas;
         }
         function getCanvas() {
             return canvas;
@@ -44,6 +44,7 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height)
         if (canvas) {
             canvas.dispose();
         }
+        console.log("creating canvas")
         canvas = new fabric.Canvas(canvasRef, {
             backgroundColor: boxBackgroundColor,
             selection: false,
@@ -64,7 +65,9 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height)
         // console.log("skipping canvas update");
         return;
     }
+    canvas = getCanvas();
     if (!canvas) {
+        console.log("no canvas, skipping mascot render")
         return;
     }
     // Remove all objects from the canvas
