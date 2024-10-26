@@ -64,6 +64,9 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height)
         // console.log("skipping canvas update");
         return;
     }
+    if (!canvas) {
+        return;
+    }
     // Remove all objects from the canvas
     canvas.clear();
     canvas.set("backgroundColor", boxBackgroundColor);
