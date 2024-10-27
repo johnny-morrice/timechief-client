@@ -188,6 +188,10 @@ export function sendLoggedIn() {
 var lastInteracted = new Date();
 
 export function recordInteraction() {
+    const interactionDebug = false;
+    if (interactionDebug) {
+        console.log("recorded interaction");
+    }
     lastInteracted = new Date();
 }
 
