@@ -9,13 +9,16 @@ export const fadeTransition = (onTransition, doChange) => {
         const timerB = setTimeout(() => {
             onTransition("no-transition");
         }, transitionDurationMs);
-        onCleanup(() => {
+        // Is this explicit cleaning strictly necessary here?
+        // Always clean up after 5 minutes
+        setTimeout(() => {
             clearTimeout(timerB);
-        });
+        }, 1000 * 60 * 5);
     }, transitionDurationMs);
-    onCleanup(() => {
+    // Always clean up after 5 minutes
+    setTimeout(() => {
         clearTimeout(timerA);
-    });
+    }, 1000 * 60 * 5);
 }
 
 const transitionDurationMs = 190;
