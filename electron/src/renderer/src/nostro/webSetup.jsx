@@ -190,9 +190,11 @@ export const WebSetupPage = (props) => {
             // Where n is between 1.6 second and 2.4 second.
             const timeout = 2800 + (random() * 800);
             const timer = setTimeout(removeCRTJank, timeout);
-            onCleanup(() => {
+            // Always clean up after 5 minutes
+            // Is this strictly necessary?
+            setTimeout(() => {
                 clearTimeout(timer);
-            });
+            }, 1000 * 60 * 5);
         }
     };
 
@@ -215,8 +217,17 @@ export const WebSetupPage = (props) => {
 
     const jankInterval = setInterval(applyCRTJank, 1000);
 
+    // When doing setup, trigger interactivity every second.
+    const interactionInterval = setInterval(() => {
+        if (!isDisplayStateInternet(signals)) {
+            recordInteraction();
+        }
+    }, 1000);
+    
+
     onCleanup(() => {
         clearInterval(jankInterval);
+        clearInterval(interactionInterval);
     });
 
     const label = labelMaker("web-setup");

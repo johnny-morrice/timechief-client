@@ -5,6 +5,7 @@ import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 import { Loading } from "./loading";
 import { labelMaker, textMaker } from "./label";
+import { recordInteraction } from "./ipc";
 
 class Signals {
     constructor() {
@@ -44,10 +45,41 @@ export function LoginPage(props) {
         sendPairingCreateRequest();
         sendRefreshMyDevices();
     }
-    onCleanup(() => {
-        if (pairingGetInterval != null) {
-            clearInterval(pairingGetInterval);
+
+    
+    function isLoginStarted(signals) {
+        return signals.userCode().length > 0;
+    }
+    function isLoggedIn(signals) {
+        return signals.hasAccessCode() && signals.hasDeviceUUID();
+    }
+    function hasDevices(signals) {
+        return signals.devices().length > 0;
+    }
+    function isWaitingForSubscription(signals) {
+        return signals.hasAccessCode() && !signals.hasDeviceUUID() && !hasDevices(signals);
+    }
+    function isSelectingDevice(signals) {
+        return signals.hasAccessCode() && !signals.hasDeviceUUID() && hasDevices(signals);
+    }
+    function formatDevice(device) {
+        // TODO cope with missing nickname.
+        return device.nickname ? `${device.nickname} - ${device.location}` : device.location;
+    }
+
+    const label = labelMaker("login");
+    const plainText = textMaker("login");
+
+    // Continuously poke interaction until cleaned up.
+    const interactionInterval = setInterval(() => {
+        if (!isLoggedIn(signals)) {
+            recordInteraction();
         }
+    }, 1000);
+    
+    onCleanup(() => {
+        clearInterval(interactionInterval);
+        clearInterval(pairingGetInterval);
         removeDataCallback(cbName);
         removeDeviceStatusCallback(cbName);
         removePairingCreateCallback(cbName);
@@ -99,29 +131,6 @@ export function LoginPage(props) {
             }
         }
     }
-
-    function isLoginStarted(signals) {
-        return signals.userCode().length > 0;
-    }
-    function isLoggedIn(signals) {
-        return signals.hasAccessCode() && signals.hasDeviceUUID();
-    }
-    function hasDevices(signals) {
-        return signals.devices().length > 0;
-    }
-    function isWaitingForSubscription(signals) {
-        return signals.hasAccessCode() && !signals.hasDeviceUUID() && !hasDevices(signals);
-    }
-    function isSelectingDevice(signals) {
-        return signals.hasAccessCode() && !signals.hasDeviceUUID() && hasDevices(signals);
-    }
-    function formatDevice(device) {
-        // TODO cope with missing nickname.
-        return device.nickname ? `${device.nickname} - ${device.location}` : device.location;
-    }
-
-    const label = labelMaker("login");
-    const plainText = textMaker("login");
 
     return <>
         <Show when={isLoggedIn(signals)}>

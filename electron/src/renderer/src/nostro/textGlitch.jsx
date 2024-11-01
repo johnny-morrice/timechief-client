@@ -1,4 +1,4 @@
-import { createSignal, createResource, onCleanup } from "solid-js";
+import { createSignal, createResource } from "solid-js";
 import { random, randomButtonGlitchSymbol, randomGlitchTransitionSymbol } from './fakeRandom';
 
 export const buttonGlitchStyle = (text) => {
@@ -21,7 +21,10 @@ export const runButtonGlitch = (when, out, text, delayMs) => {
             }
         }, delayMs);
 
-        onCleanup(() => clearInterval(interval));
+        // Always clean up after 5 minutes;
+        setTimeout(() => {
+            clearInterval(interval);
+        }, 1000 * 60 * 5);
     }
 };
 
@@ -67,6 +70,13 @@ export const buttonGlitchText = (text, n) => {
 }
 
 export const textTransitionResource = (value, getter, setter, transform) => {
+    const cleanups = [];
+    const doCleanup = () => {
+        cleanups.forEach(cleanup => cleanup());
+    };
+    const addCleanup = (cleanup) => {
+        cleanups.push(cleanup);
+    };
     const [textBuffer] = createResource(getter, transform);
     const [intermediate, setIntermediate] = createSignal("");
     const applyHighlight = (text) => {
@@ -79,13 +89,24 @@ export const textTransitionResource = (value, getter, setter, transform) => {
         console.log("textTransitionResource doSet " + count);
         count++;
         setter(data);
-        textTransitionGlitch(textBuffer, intermediate, setIntermediate, 3);
+        textTransitionGlitch(textBuffer, intermediate, setIntermediate, 3, addCleanup);
     }
     doSet(value);
+    // Always clean up after 5 minutes.
+    setTimeout(() => {
+        doCleanup();
+    }, 1000 * 60 * 5);
     return [out, doSet];
 };
 
 export const textTransitionSignal = (value) => {
+    const cleanups = [];
+    const doCleanup = () => {
+        cleanups.forEach(cleanup => cleanup());
+    };
+    const addCleanup = (cleanup) => {
+        cleanups.push(cleanup);
+    };
     const [buffer, setBuffer] = createSignal("");
     const [intermediate, setIntermediate] = createSignal("");
     const applyHighlight = (text) => {
@@ -96,13 +117,17 @@ export const textTransitionSignal = (value) => {
     function doSet(data) {
         count++;
         setBuffer(data);
-        textTransitionGlitch(buffer, intermediate, setIntermediate, 3);
+        textTransitionGlitch(buffer, intermediate, setIntermediate, 3, addCleanup);
     }
     doSet(value);
+    // Always clean up after 5 minutes.
+    setTimeout(() => {
+        doCleanup();
+    }, 1000 * 60 * 5);
     return [out, doSet];
 }
 
-export const textTransitionGlitch = (buffer, display, setter, n) => {
+export const textTransitionGlitch = (buffer, display, setter, n, addCleanup) => {
     const delayMs = 150;
 
     const more = transitionBuffer(buffer, display, setter, n);
@@ -117,7 +142,7 @@ export const textTransitionGlitch = (buffer, display, setter, n) => {
                 clearInterval(interval);
             }
         }, delayMs);
-        onCleanup(() => clearInterval(interval));
+        addCleanup(() => clearInterval(interval));
     }
 }
 
