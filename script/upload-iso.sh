@@ -2,9 +2,10 @@
 set -e
 set -x
 
-if [ -z "$IMAGE_OUTPUT" ] ; then
+if [ -z "$IMAGE_OUTPUT" || [ -z "$IMG_PRODUCT" ]  ] ; then
   echo "missing parameters"
   echo "IMAGE_OUTPUT: $IMAGE_OUTPUT"
+  echo "IMG_PRODUCT: $IMG_PRODUCT"
   exit 1
 fi
 
