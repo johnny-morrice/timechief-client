@@ -33,53 +33,15 @@ if [ -z "$DHCP_RANGE" ]; then
     exit 1
 fi
 
-# Stop and disable services that might interfere
-systemctl stop systemd-networkd
+# Stop services that might interfere
 systemctl stop wpa_supplicant
 
-# Create systemd-networkd configuration for the interface
-cat > /etc/systemd/network/$IFNAME.network <<EOF
-[Match]
-Name=$IFNAME
+# Create a new hotspot connection with nmcli
+nmcli device set $IFNAME managed yes
+nmcli connection add type wifi ifname $IFNAME mode ap con-name hotspot ssid "$SSID"
+nmcli connection modify hotspot 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.addresses $AP_IP/24 ipv4.method shared
+nmcli connection modify hotspot wifi-sec.key-mgmt wpa-psk
+nmcli connection modify hotspot wifi-sec.psk "$PASSWORD"
 
-[Network]
-Address=$AP_IP
-DHCPServer=yes
-EOF
-
-# Restart systemd-networkd to apply the changes
-systemctl enable systemd-networkd
-systemctl restart systemd-networkd
-
-# Create dnsmasq config file for DHCP service
-cat > /etc/dnsmasq.d/hotspot.conf <<EOF
-interface=$IFNAME
-dhcp-range=$DHCP_RANGE
-EOF
-
-# Configure hostapd for the hotspot
-cat > /etc/hostapd/hostapd.conf <<EOF
-interface=$IFNAME
-driver=nl80211
-ssid=$SSID
-hw_mode=g
-channel=6
-macaddr_acl=0
-auth_algs=1
-ignore_broadcast_ssid=0
-wpa=2
-wpa_passphrase=$PASSWORD
-wpa_key_mgmt=WPA-PSK
-wpa_pairwise=TKIP
-rsn_pairwise=CCMP
-EOF
-
-# Enable hostapd service
-sed -i 's/^#DAEMON_CONF.*/DAEMON_CONF="\/etc\/hostapd\/hostapd.conf"/' /etc/default/hostapd
-systemctl unmask hostapd
-systemctl enable hostapd
-systemctl restart hostapd
-
-# Restart dnsmasq to apply the configuration
-systemctl enable dnsmasq
-systemctl restart dnsmasq
+# Start the hotspot
+nmcli connection up hotspot

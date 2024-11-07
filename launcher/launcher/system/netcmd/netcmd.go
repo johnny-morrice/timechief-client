@@ -148,16 +148,18 @@ type WiFiInterface struct {
 type WiFiNetwork struct {
 	SSID     string
 	Signal   int
-	Security string
+	Security []string
 }
 
 func (wn WiFiNetwork) Validate() error {
 	allowedSecurities := []string{"WPA2", "WPA3"}
 	isAllowed := false
 	for _, allowed := range allowedSecurities {
-		if wn.Security == allowed {
-			isAllowed = true
-			break
+		for _, mySecurity := range wn.Security {
+			if mySecurity == allowed {
+				isAllowed = true
+				break
+			}
 		}
 	}
 	if !isAllowed {

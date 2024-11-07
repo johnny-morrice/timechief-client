@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 import subprocess
 import json
@@ -6,7 +6,8 @@ import re
 
 ifname = sys.argv[1]
 
-cmd = ['iwlist', ifname, 'scan']
+# Command to scan WiFi networks using nmcli
+cmd = ['nmcli', '-f', 'SSID,SIGNAL,SECURITY', 'device', 'wifi', 'list', 'ifname', ifname]
 
 try:
     output = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode('utf-8')
@@ -16,23 +17,18 @@ except subprocess.CalledProcessError as e:
 
 networks = []
 
-network = {}
-cell_re = 'Cell \d+ - '
-# Match regex for ESSID:"<essid>"
-essid_re = 'ESSID:"([^"]+)"'
-quality_re = 'Quality=(\d+)\/\d+'
-for line in output.split('\n'):
-    line = line.strip()
-    if re.search(cell_re, line):
-        network = {}
-        networks.append(network)
-    if re.search(essid_re, line):
-        ssid = re.search(essid_re, line).group(1)
-        network['SSID'] = ssid
-    elif re.search(quality_re, line):
-        quality = re.search(quality_re, line).group(1)
-        network['Signal'] = int(quality)
-    elif line.startswith('IE: IEEE 802.11i/WPA2'):
-        network['Security'] = 'WPA2'
+# Parse each line for SSID, Signal, and Security
+for line in output.splitlines()[1:]:  # Skip the first line (header)
+    fields = re.split(r'\s{2,}', line.strip())
+    security = fields[2] if fields[2] else "Open"
 
+    if len(fields) >= 3:
+        network = {
+            "SSID": fields[0],
+            "Signal": int(fields[1]),
+            "Security": security.split()
+        }
+        networks.append(network)
+
+# Print output as JSON
 print(json.dumps(networks, indent=4))
