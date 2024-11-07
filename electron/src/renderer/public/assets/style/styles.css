@@ -196,13 +196,37 @@ button.action-button {
     /* background-color: black; */
     /* color: green; */
     border-style: solid;
-    font-size: 18pt
+    font-size: 18pt;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Apply the glow animation when button is active */
+button.action-button:active {
+    animation: button-glow 0.1s ease-in-out;
+}
+
+/* Keyframes for button-glow animation */
+@keyframes button-glow {
+    0% {
+        box-shadow: 0 0 1px green,
+            0 0 2px green,
+            0 0 4px green;
+    }
+
+    50% {
+        box-shadow: 0 0 6px 2px green,
+            0 0 8px 4px green,
+            0 0 10px 6px green;
+    }
+
+    100% {
+        box-shadow: 0 0 0 green;
+    }
 }
 
 button.switcher-button {
     font-size: 16pt;
 }
-
 
 
 div.setup-wrapper {
@@ -502,4 +526,3 @@ div.status-note {
         font-size: 18pt;
     }
 }
-
