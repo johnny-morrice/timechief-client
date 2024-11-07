@@ -1069,6 +1069,7 @@ paths:
           description: "Internal server error"
   /bucketfile:
     get:
+      operationId: "listBucketFiles"
       parameters:
         - name: offset
           in: query
@@ -1093,6 +1094,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BucketFile'
     post:
+      operationId: "createBucketFile"
       requestBody:
         required: true
         content:
@@ -1108,6 +1110,7 @@ paths:
                 $ref: '#/components/schemas/BucketFile'
   /bucketfile/{uuid}:
     get:
+      operationId: "getBucketFileByID"
       parameters:
         - name: uuid
           in: path
@@ -1123,6 +1126,7 @@ paths:
                 $ref: '#/components/schemas/BucketFile'
   /bucketfile/{uuid}/download:
     get:
+      operationId: "getBucketFileDownload"
       parameters:
         - name: uuid
           in: path
@@ -1468,6 +1472,69 @@ components:
           items:
             $ref: "#/components/schemas/DailyWeather"
 
+    BucketFileMetadata:
+        type: object
+        properties:
+          duration:
+            type: integer
+            format: int64
+          link:
+            type: string
+          theme:
+            type: object
+            required:
+              - foreground_color
+              - background_color
+              - box_background_color
+              - box_border_radius
+              - box_border_width
+              - box_border_color
+              - main_font
+              - time_font
+              - time_color
+              - button_border_radius
+              - button_border_width
+              - button_border_color
+              - button_foreground_color
+              - button_background_color
+              - image_fit
+              - image_uuids
+            properties:
+              foreground_color:
+                type: string
+              background_color:
+                type: string
+              box_background_color:
+                type: string
+              box_border_radius:
+                type: string
+              box_border_width:
+                type: string
+              box_border_color:
+                type: string
+              main_font:
+                type: string
+              time_font:
+                type: string
+              time_color:
+                type: string
+              button_border_radius:
+                type: string
+              button_border_width:
+                type: string
+              button_border_color:
+                type: string
+              button_foreground_color:
+                type: string
+              button_background_color:
+                type: string
+              image_fit:
+                type: string
+              image_uuids:
+                type: array
+                items:
+                  type: string
+
     BucketFileLinks:
       type: object
       required:
@@ -1502,13 +1569,7 @@ components:
         url:
           type: string
         metadata:
-          type: object
-          required:
-            - duration
-          properties:
-            duration:
-              type: integer
-              format: int64
+          $ref: "#/components/schemas/BucketFileMetadata"
 
     BucketFilesDatum:
       type: object
@@ -1833,13 +1894,7 @@ components:
         tag:
           type: string
         metadata:
-          type: object
-          required:
-            - duration
-          properties:
-            duration:
-              type: integer
-              format: int64
+          $ref: "#/components/schemas/BucketFileMetadata"
 
     BucketFileDownload:
       type: object
@@ -1879,10 +1934,4 @@ components:
         download_url:
           type: string
         metadata:
-          type: object
-          required:
-            - duration
-          properties:
-            duration:
-              type: integer
-              format: int64
+          $ref: "#/components/schemas/BucketFileMetadata"

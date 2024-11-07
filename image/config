@@ -12,3 +12,4 @@ STAGE_LIST="stage0 stage1 stage2 stage2-kiosk"
 CURSOR="no"
 TIMECHIEF_ROOT="/opt/timechief-launcher"
 DEPLOY_COMPRESSION="none"
+USE_QEMU=0

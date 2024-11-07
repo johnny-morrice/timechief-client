@@ -52,7 +52,12 @@ func (source DeviceVideoSource) GetVideo() (VideoDescriptor, error) {
 		return VideoDescriptor{}, err
 	}
 
-	if bf.Metadata.Duration == 0 {
+	if bf.Metadata.Duration == nil {
+		return VideoDescriptor{}, fmt.Errorf("video duration is nil: %v", bf)
+	}
+	duration := *bf.Metadata.Duration
+
+	if duration == 0 {
 		return VideoDescriptor{}, fmt.Errorf("video duration is zero: %v", bf)
 	}
 
@@ -63,7 +68,7 @@ func (source DeviceVideoSource) GetVideo() (VideoDescriptor, error) {
 	return VideoDescriptor{
 		UUID:     videoUUID,
 		Filename: bf.Filename,
-		Duration: time.Duration(bf.Metadata.Duration) * time.Second,
+		Duration: time.Duration(duration) * time.Second,
 		URL:      bf.Url,
 		SHA256:   hx,
 	}, nil
