@@ -29,6 +29,8 @@ if [ "$EXISTING_CONNECTIONS" ]; then
     nmcli connection delete id "hotspot"
 fi
 
+sleep 5s
+
 set -e
 
 # Ensure the Wi-Fi interface is managed by NetworkManager
