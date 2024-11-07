@@ -33,13 +33,16 @@ if [ -z "$DHCP_RANGE" ]; then
     exit 1
 fi
 
-# Stop services that might interfere
-systemctl stop wpa_supplicant
+# Check if a connection named "hotspot" exists and delete it
+EXISTING_CONNECTIONS=$(nmcli -t -f NAME connection show | grep '^hotspot$')
+if [ "$EXISTING_CONNECTIONS" ]; then
+    nmcli connection delete id "hotspot"
+fi
 
 # Create a new hotspot connection with nmcli
 nmcli device set $IFNAME managed yes
 nmcli connection add type wifi ifname $IFNAME mode ap con-name hotspot ssid "$SSID"
-nmcli connection modify hotspot 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.addresses $AP_IP/24 ipv4.method shared
+nmcli connection modify hotspot 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.addresses $AP_IP ipv4.method shared
 nmcli connection modify hotspot wifi-sec.key-mgmt wpa-psk
 nmcli connection modify hotspot wifi-sec.psk "$PASSWORD"
 

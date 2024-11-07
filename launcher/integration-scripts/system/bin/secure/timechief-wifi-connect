@@ -21,9 +21,12 @@ if [ -z "$IFNAME" ]; then
     exit 1
 fi
 
-# Stop any active hotspot or conflicting services
-systemctl stop hostapd
-systemctl stop dnsmasq
+# Check if a connection named "hotspot" exists and delete it
+EXISTING_CONNECTIONS=$(nmcli -t -f NAME connection show | grep '^hotspot$')
+if [ "$EXISTING_CONNECTIONS" ]; then
+    nmcli connection delete id "hotspot"
+fi
+
 
 # Ensure the Wi-Fi interface is managed by NetworkManager
 nmcli device set "$IFNAME" managed yes
