@@ -7,41 +7,45 @@ import re
 def get_ip_address(interface):
     ip_address = ""
     try:
-        ip_addr_output = subprocess.check_output(['ip', '-br', 'addr', 'show', interface]).decode()
-        lines = ip_addr_output.strip().split('\n')
-        for line in lines:
-            line_parts = line.split()
-            if len(line_parts) >= 3 and line_parts[2] != "lo":
-                ip_address = line_parts[2].split('/')[0]
-                break
+        ip_addr_output = subprocess.check_output(['nmcli', '-g', 'IP4.ADDRESS', 'device', 'show', interface]).decode()
+        ip_address = ip_addr_output.strip().split('/')[0]  # Get IP address without CIDR notation
     except subprocess.CalledProcessError:
         pass
-    
     return ip_address
+
+def get_device_state(interface):
+    try:
+        state_output = subprocess.check_output(['nmcli', '-t', '-f', 'GENERAL.STATE', 'device', 'show', interface]).decode()
+        state = state_output.split(':')[1].strip()  # Extract state value
+    except subprocess.CalledProcessError:
+        state = "Unknown"
+    return state
+
+def get_ssid(interface):
+    ssid = ""
+    try:
+        ssid_output = subprocess.check_output(['nmcli', '-g', 'GENERAL.CONNECTION', 'device', 'show', interface]).decode()
+        ssid = ssid_output.strip()
+    except subprocess.CalledProcessError:
+        pass
+    return ssid
+
+def get_mode(interface):
+    mode = ""
+    try:
+        mode_output = subprocess.check_output(['nmcli', '-g', 'GENERAL.TYPE', 'device', 'show', interface]).decode()
+        mode = mode_output.strip()
+    except subprocess.CalledProcessError:
+        pass
+    return mode
 
 # Get the device name from the command-line argument
 device_name = sys.argv[1]
 
-# Get the device state from /sys/class/net/wlan0/operstate
-state = open(f'/sys/class/net/{device_name}/operstate').read().strip()
-
-# Get the device SSID and mode from iwconfig
-iwconfig_output = subprocess.check_output(['iwconfig', device_name]).decode()
-ssid = ""
-mode = ""
-for line in iwconfig_output.split('\n'):
-    ssid_re = r'ESSID:"(\S+)"'
-    mode_re = r'Mode:(\S+)'
-    if re.search(ssid_re, line):
-        ssid = re.search(ssid_re, line).group(1)
-    elif re.search(mode_re, line):
-        mode = re.search(mode_re, line).group(1)
-    if ssid_re == None:
-        ssid_re = ""
-    if mode == None:
-        mode = ""
-
-# Get the device IP address from ip addr
+# Get device state, SSID, mode, and IP address using nmcli
+state = get_device_state(device_name)
+ssid = get_ssid(device_name)
+mode = get_mode(device_name)
 ip_address = get_ip_address(device_name)
 
 # Create a dictionary of the device information
