@@ -38,6 +38,7 @@ set +e
 # Check if a connection named "hotspot" exists and delete it
 EXISTING_CONNECTIONS=$(nmcli -t -f NAME connection show | grep '^hotspot$')
 if [ "$EXISTING_CONNECTIONS" ]; then
+    nmcli connection down "hotspot"
     nmcli connection delete id "hotspot"
 fi
 
