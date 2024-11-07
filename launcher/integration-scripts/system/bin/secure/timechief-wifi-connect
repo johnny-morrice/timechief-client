@@ -30,7 +30,7 @@ if [ "$EXISTING_CONNECTIONS" ]; then
     nmcli connection delete id "hotspot"
 fi
 
-sleep 5s
+sleep 0.5s
 
 set -e
 
