@@ -29,10 +29,15 @@ func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
 			log.Printf("Invalid network: %s", validErr)
 			continue
 		}
+		mostSecureProtocol, err := nmNet.SecureProtocol()
+		if err != nil {
+			log.Printf("Failde to get secure protocol for network: %s", validErr)
+			continue
+		}
 		result = append(result, WifiNetwork{
 			SSID:       nmNet.SSID,
 			Signal:     nmNet.Signal,
-			Encryption: nmNet.Security,
+			Encryption: mostSecureProtocol,
 		})
 	}
 	return result, nil

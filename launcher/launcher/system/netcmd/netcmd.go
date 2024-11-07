@@ -3,6 +3,7 @@ package netcmd
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
@@ -151,10 +152,13 @@ type WiFiNetwork struct {
 	Security []string
 }
 
+func allowedWifiSecurity() []string {
+	return []string{"WPA3", "WPA2"}
+}
+
 func (wn WiFiNetwork) Validate() error {
-	allowedSecurities := []string{"WPA2", "WPA3"}
 	isAllowed := false
-	for _, allowed := range allowedSecurities {
+	for _, allowed := range allowedWifiSecurity() {
 		for _, mySecurity := range wn.Security {
 			if mySecurity == allowed {
 				isAllowed = true
@@ -171,6 +175,17 @@ func (wn WiFiNetwork) Validate() error {
 	}
 
 	return nil
+}
+
+func (wn WiFiNetwork) SecureProtocol() (string, error) {
+	for _, allowed := range allowedWifiSecurity() {
+		for _, mySecurity := range wn.Security {
+			if mySecurity == allowed {
+				return mySecurity, nil
+			}
+		}
+	}
+	return "", errors.New("no secure protocol found")
 }
 
 type NetResult struct {
