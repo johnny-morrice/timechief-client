@@ -9,7 +9,7 @@ import { labelMaker, textMaker } from './label';
 import { fadeTransition } from './fadeTransition';
 import { generateWifiQRCode } from 'wifi-qr-code-generator';
 import { NoConnection } from './noconnection';
-import { recordInteraction } from './ipc';
+import { recordInteraction, sendClockDataRequest } from './ipc';
 
 class Signals {
     constructor() {
@@ -234,6 +234,7 @@ export const WebSetupPage = (props) => {
     const plainText = textMaker("web-setup");
     const handleOnClickAnywhere = (e) => {
         recordInteraction();
+        sendClockDataRequest();
     };
     return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`} onClick={handleOnClickAnywhere}>
         <Show when={signals.connectedToLocalService()}>
