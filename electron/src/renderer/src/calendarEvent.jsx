@@ -8,17 +8,36 @@ export function sortCalendarEvents(arr, timezone) {
     });
 }
 
+var _yearFormatter;
+var _monthFormatter;
+var _dayFormatter;
+
+// TODO use real locale on these...
+
 function getLocalYear(date, timezone) {
-    return parseInt(date.toLocaleString("en-US", { timeZone: timezone, year: "numeric" }));
+    if (!_yearFormatter) {
+        _yearFormatter = new Intl.DateTimeFormat("en-US", { timeZone: timezone, year: "numeric" })
+    }
+    return parseInt(_yearFormatter.format(date));
 }
 
 function getLocalMonth(date, timezone) {
-    return parseInt(date.toLocaleString("en-US", { timeZone: timezone, month: "numeric" }));
+    if (!_monthFormatter) {
+        _monthFormatter = new Intl.DateTimeFormat("en-US", { timeZone: timezone, month: "numeric" })
+    }
+    return parseInt(_monthFormatter.format(date))
 }
 
 function getLocalDay(date, timezone) {
-    return parseInt(date.toLocaleString("en-US", { timeZone: timezone, day: "numeric" }));
+    if (!_dayFormatter) {
+        _dayFormatter = new Intl.DateTimeFormat("en-US", { timeZone: timezone, day: "numeric" })
+    }
+    return parseInt(_dayFormatter.format(date));
 }
+
+
+
+
 
 export function compareCalendarEvents(a, b, timezone) {
     // Comparing events on different days.

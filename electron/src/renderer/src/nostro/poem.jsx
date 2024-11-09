@@ -1,4 +1,4 @@
-import { parse } from 'csv-parse';
+import { parse as papaParse } from 'papaparse';
 
 class PoemList {
     constructor(poems) {
@@ -224,27 +224,30 @@ function buildPoemList(poems) {
     return new PoemList(poems.map(poem => new Poem(poem.text, poem.emote, poem.tags)));
 }
 
-function parseCSVtoJSON(data) {
-    return new Promise((resolve, reject) => {
-        parse(data, { columns: true, skip_empty_lines: true }, (err, records) => {
-            if (err) return reject(err);
+function parseCSVToJSON(csvString, callback) {
+    const results = [];
 
-            // Transform records into desired format
-            const result = records.map(record => {
-                const { text, emote, ...tags } = record;
-                
-                // Extract tags into an array, filtering out any empty strings
+    papaParse(csvString, {
+        header: true, // Use first row as headers
+        skipEmptyLines: true, // Skip any empty rows
+        complete: function(parsedData) {
+            parsedData.data.forEach(row => {
+                // Destructure the row into text, emote, and the tag columns
+                const { text, emote, ...tags } = row;
+
+                // Collect non-empty tags into an array
                 const tagsArray = Object.values(tags).filter(tag => tag);
 
-                return {
+                // Push formatted object into results array
+                results.push({
                     text,
                     emote,
                     tags: tagsArray
-                };
+                });
             });
 
-            resolve(result);
-        });
+            callback(results);
+        }
     });
 }
 
@@ -266,7 +269,7 @@ What a magical day!,sigh,easter,calm,magic,
 The egg hunt is on!,sigh,easter,anticipation,fun,
 Eggs are hiding from us.,spooky,easter,startup,mystery,
 "Bunnies are hiding somewhere,",spooky,easter,nature,mystery,
-Something's here� But it's got a fluffy tail!,spooky,easter,fun,mystery,
+Something's here... But it's got a fluffy tail!,spooky,easter,fun,mystery,
 Easter makes my heart glow.,spooky,easter,startup,magic,
 "I feel it, Easter magic is near.",spooky,easter,nature,magic,
 We found the eggs!,thumb,easter,success,fun,
@@ -291,7 +294,7 @@ Today's a good day.,sigh,inclusive-holiday,calm,happy,
 Let's savour today.,sigh,inclusive-holiday,celebration,joy,
 Party mode activated!,spooky,inclusive-holiday,startup,anticipation,
 Weird vibes here.,spooky,inclusive-holiday,celebration,joy,
-Something's here�Party vibes strong.,spooky,inclusive-holiday,celebration,anticipation,
+Something's here...Party vibes strong.,spooky,inclusive-holiday,celebration,anticipation,
 Let's dance.,spooky,inclusive-holiday,startup,joy,
 I feel it in my fingers...,spooky,inclusive-holiday,celebration,happy,
 "Thumbs up, let's go!",thumb,inclusive-holiday,startup,joy,
@@ -306,7 +309,7 @@ Receiving strange signals!,spooky,space,startup,mystery,
 I'll help you through the stars,instruct,space,guide,exploration,
 Get me my telescope!,neutral,space,startup,exploration,
 Let's explore the stars.,neutral,space,exploration,anticipation,
-Everything's fine� Cosmic silence prevails.,spooky,space,calm,exploration,
+Everything's fine... Cosmic silence prevails.,spooky,space,calm,exploration,
 Star hands!,neutral,space,startup,calm,
 Ready to listen!,spooky,space,exploration,mystery,
 "Wow, the sky is big!",sigh,space,calm,exploration,
@@ -316,15 +319,15 @@ Infinite space for hands to touch.,sigh,space,calm,meditation,
 Wheeeeeeee...,sigh,space,calm,exploration,
 My tail is detecting something.,spooky,space,startup,mystery,
 Do stars watch us back?,spooky,space,exploration,mystery,
-Something's here�aliens? Raccoons?,spooky,space,mystery,exploration,
+Something's here...aliens? Raccoons?,spooky,space,mystery,exploration,
 Mystery awaits us!,spooky,space,startup,exploration,
 What's that UFO?,spooky,space,exploration,mystery,
 My tail is twitching...,thumb,space,exploration,anticipation,
 "Ooh, a cool star!",thumb,space,exploration,success,
 Stars guide our way!,thumb,space,exploration,success,
 Ready for stargazing!,thumb,space,calm,success,
-Hands up� The universe awaits!,thumb,space,exploration,anticipation,
-I've started� Let's debug together!,instruct,nerd,geek,startup,tech
+Hands up... The universe awaits!,thumb,space,exploration,anticipation,
+I've started... Let's debug together!,instruct,nerd,geek,startup,tech
 Lemme get my hands on that keyboard!,instruct,nerd,geek,guide,tech
 "Ooh, glitchy.",spooky,nerd,geek,tech,glitch
 Variables acting strange.,spooky,nerd,geek,startup,tech
@@ -343,15 +346,15 @@ Ghosts in the code. Again.,spooky,nerd,geek,tech,spooky
 No errors. I think.,spooky,nerd,geek,tech,glitch
 Code's possessed. Exorcist summoned!,spooky,nerd,geek,tech,spooky
 Weird outputs detected.,spooky,nerd,geek,tech,glitch
-I feel it� The algorithm's alive.,spooky,nerd,geek,tech,spooky
+I feel it... The algorithm's alive.,spooky,nerd,geek,tech,spooky
 Code running smoothly!,thumb,nerd,geek,tech,success
 Let's hack away!,thumb,nerd,geek,tech,success
 "Code compiled, with these hands!",thumb,nerd,geek,tech,success
 "No bugs here, chief!",thumb,nerd,geek,tech,success
-Thumbs up� Debugging success!,thumb,nerd,geek,tech,success
+Thumbs up... Debugging success!,thumb,nerd,geek,tech,success
 Let's explore the woods together!,instruct,ranger,nature,guide,startup
-Follow me� Nature path ahead.,instruct,ranger,nature,guide,
-Stick close� The woods are deep.,spooky,ranger,nature,guide,mystery
+Follow me... Nature path ahead.,instruct,ranger,nature,guide,
+Stick close... The woods are deep.,spooky,ranger,nature,guide,mystery
 Time for nature's secrets!,spooky,ranger,nature,startup,mystery
 I'll guide us through the wilderness.,instruct,ranger,nature,guide,
 I've got the directions in my hands!,neutral,ranger,nature,startup,guide
@@ -393,7 +396,7 @@ I'm hearing inner peace.,spooky,spiritual,startup,calm,
 My tail is calm.,spooky,spiritual,calm,meditation,
 What do I hear? Seems peaceful.,spooky,spiritual,calm,meditation,
 Spiritual journey underway.,spooky,spiritual,startup,meditation,
-I feel it� Calm surrounds us.,spooky,spiritual,calm,meditation,
+I feel it... Calm surrounds us.,spooky,spiritual,calm,meditation,
 Chillness achieved!,thumb,spiritual,meditation,success,
 Time for peace. And food!,thumb,spiritual,calm,success,
 We're gonna take this hands-on!,thumb,spiritual,meditation,success,
@@ -406,7 +409,7 @@ I think I sense some cash!,spooky,hustle,money,startup,anticipation
 Let's make a deal!,instruct,hustle,money,guide,
 Ready to hustle with these hands.,neutral,hustle,money,startup,
 Let's make funky moves.,neutral,hustle,money,anticipation,
-Everything's fine� Keep grinding.,spooky,hustle,money,calm,
+Everything's fine... Keep grinding.,spooky,hustle,money,calm,
 I smell money ahead.,neutral,hustle,money,startup,
 My tail is twitching...,spooky,hustle,money,anticipation,
 Hard work pays off.,sigh,hustle,money,calm,
@@ -415,7 +418,7 @@ Got some cash in hand!,sigh,hustle,money,calm,
 The grind is kinda soothing...,sigh,hustle,money,calm,
 "Power through, it'll pay off.",sigh,hustle,money,calm,
 Big things ahead!,spooky,hustle,money,startup,anticipation
-I'm sniffing� Wealth is in the air.,spooky,hustle,money,anticipation,
+I'm sniffing... Wealth is in the air.,spooky,hustle,money,anticipation,
 Opportunity's hands are knocking.,spooky,hustle,money,anticipation,
 Money's within grabbing distance!,spooky,hustle,money,startup,
 Success is approaching!,spooky,hustle,money,success,
@@ -431,7 +434,7 @@ My computer is haunted...,spooky,halloween,tech,spooky,
 "Halloween is near, listen up!",instruct,halloween,spooky,guide,
 Boo!,neutral,halloween,startup,spooky,
 Ghosts in the trees. Or raccoons.,neutral,halloween,spooky,nature,
-Everything's fine� Or is it?,spooky,halloween,spooky,mystery,
+Everything's fine... Or is it?,spooky,halloween,spooky,mystery,
 Spooky mode activate.,neutral,halloween,spooky,startup,
 Shadows and raccoons are lurking,spooky,halloween,spooky,mystery,
 The critters are restless.,sigh,halloween,spooky,calm,
@@ -441,7 +444,7 @@ Halloween vibes everywhere.,sigh,halloween,spooky,calm,
 Night's getting darker...excellent.,sigh,halloween,spooky,calm,
 Is your PC fan whispering?,spooky,halloween,spooky,tech,
 My friends are close.,spooky,halloween,spooky,nature,
-Something's here� Ghouls creeping near.,spooky,halloween,spooky,mystery,
+Something's here... Ghouls creeping near.,spooky,halloween,spooky,mystery,
 "Ooh, I think we're haunted!",spooky,halloween,spooky,startup,
 I feel it. Creatures surround us.,spooky,halloween,spooky,mystery,
 Ready for spoopy fun!,thumb,halloween,spooky,fun,
@@ -466,7 +469,7 @@ Warming my tail by the fire.,sigh,christmas,calm,joy,
 I love Christmas Eve...,sigh,christmas,calm,joy,
 Holiday vibes in the air.,spooky,christmas,startup,joy,
 I can feel Santa's presence...,spooky,christmas,joy,calm,
-Something's here� But it's festive!,spooky,christmas,joy,anticipation,
+Something's here... But it's festive!,spooky,christmas,joy,anticipation,
 I feel the festive glow!,spooky,christmas,startup,joy,
 Nothing is stirring...except me!,spooky,christmas,joy,anticipation,
 Let's have a Christmas party!,thumb,christmas,joy,success,
@@ -514,7 +517,7 @@ Remember to take a moment to breathe.,sigh,day,calm,encouragement,
 Today will be fine.,sigh,day,calm,encouragement,
 Let's take a breath and continue.,sigh,day,calm,encouragement,
 You've got this today.,sigh,day,calm,encouragement,
-Something's odd� But have a good day.,spooky,day,spooky,encouragement,
+Something's odd... But have a good day.,spooky,day,spooky,encouragement,
 "Today will be different, but good.",spooky,day,spooky,encouragement,
 "Stay alert, today could surprise you!",spooky,day,spooky,encouragement,
 What's your PC doing? You got this.,spooky,day,spooky,encouragement,
@@ -592,7 +595,7 @@ I'm going fishing for burgers!,sigh,nonsense,calm,nature,
 Boo! I'm a computer ghost!,spooky,nonsense,startup,tech,
 My tail is twitching...or are you pulling it?,spooky,nonsense,spooky,mystery,
 "Something's here. Wait, that's just my own tail!",spooky,nonsense,spooky,mystery,
-Starting now� Frizzle-frazzle floop!,spooky,nonsense,startup,spooky,
+Starting now... Frizzle-frazzle floop!,spooky,nonsense,startup,spooky,
 What are my little ears hearing?,spooky,nonsense,mystery,spooky,
 We're ready to ascend into the Cloud!,thumb,nonsense,tech,success,
 Let's get this bread bin!,thumb,nonsense,success,encouragement,
@@ -613,7 +616,7 @@ Let's check out these results!,sigh,science,exploration,anticipation,
 The data's looking good.,sigh,science,calm,anticipation,
 This experiment is taking ages!,sigh,science,calm,exploration,
 Science is slow sometimes.,sigh,science,calm,anticipation,
-These findings are� odd.,sigh,science,mystery,exploration,
+These findings are... odd.,sigh,science,mystery,exploration,
 Anomalies detected.,spooky,science,startup,mystery,
 I'm detecting some unusual activity.,spooky,science,exploration,mystery,
 Something's off with this data...,spooky,science,exploration,mystery,
@@ -632,16 +635,16 @@ A skunk by any other name would still stink.,thumb,Shakespeare,nature,fun,pun
 Logic will get you from ear to tail!,instruct,Einstein,nature,imagination,pun
 I have many special talents!,neutral,Einstein,nature,curiosity,pun
 Two things are infinite: the universe and my appetite,spooky,Einstein,nature,humor,pun
-"E=mc�, the energy of a chipmunk in motion.",spooky,Einstein,science,nature,pun
+"E=mc..., the energy of a chipmunk in motion.",spooky,Einstein,science,nature,pun
 You can't blame me for loving trash!,thumb,Einstein,nature,love,pun
 "A little less conversation, a lot more food!",instruct,Elvis,nature,action,pun
 You ain't nothing but a hedgehog.,neutral,Elvis,nature,fun,pun
 I can't help falling in love with food.,spooky,Elvis,nature,love,pun
-Don't be cruel to a heart that's true� or a raccoon.,spooky,Elvis,nature,kindness,pun
-Viva Las Vegas� and the squirrels!,thumb,Elvis,nature,fun,pun
-I walk the line� between the trees.,neutral,Johnny Cash,nature,journey,pun
+Don't be cruel to a heart that's true... or a raccoon.,spooky,Elvis,nature,kindness,pun
+Viva Las Vegas... and the squirrels!,thumb,Elvis,nature,fun,pun
+I walk the line... between the trees.,neutral,Johnny Cash,nature,journey,pun
 I fell into a burning ring of squirrels.,spooky,Johnny Cash,nature,spooky,pun
-The beast in me� is a raccoon.,spooky,Johnny Cash,nature,mystery,pun
+The beast in me... is a raccoon.,spooky,Johnny Cash,nature,mystery,pun
 "Get rhythm, buddy!",thumb,Johnny Cash,nature,fun,pun
 Let's steal the squirrel's nuts!,instruct,Mark Twain,nature,motivation,pun
 Let people think you are a wise raccoon.,spooky,Mark Twain,nature,wisdom,pun
@@ -650,14 +653,14 @@ Standing on the shoulders of bears.,instruct,Isaac Newton,nature,wisdom,pun
 Who really controls the movements of foxes?,neutral,Isaac Newton,nature,science,pun
 A beaver in motion tends to stay in motion.,spooky,Isaac Newton,nature,science,pun
 Fear of bears is the biggest feeling.,instruct,HP Lovecraft,nature,fear,pun
-I am Providence� but also a raccoon.,neutral,HP Lovecraft,nature,identity,pun
+I am Providence... but also a raccoon.,neutral,HP Lovecraft,nature,identity,pun
 Is that a beaver in the dark?,spooky,HP Lovecraft,nature,fear,pun
 I fear the world beyond the forest...,thumb,HP Lovecraft,nature,exploration,pun
 "Quoth the raccoon, 'Nevermore.'",instruct,Edgar Allen Poe,nature,spooky,pun
 "Once upon a midnight dreary, I am weary.",neutral,Edgar Allen Poe,nature,spooky,pun
-The tell-tale heart� of a worried squirrel.,spooky,Edgar Allen Poe,nature,spooky,pun
+The tell-tale heart... of a worried squirrel.,spooky,Edgar Allen Poe,nature,spooky,pun
 This is but a dream within a beaver's stream.,spooky,Edgar Allen Poe,nature,mystery,pun
-"Please, sir, I want some more�garbage.",neutral,Charles Dickens,nature,humor,pun
+"Please, sir, I want some more...garbage.",neutral,Charles Dickens,nature,humor,pun
 I expect my breakfast!,spooky,Charles Dickens,nature,wisdom,pun
 Beware the beaver with one shoe off.,spooky,Charles Dickens,nature,mystery,pun
 I know why the caged raccoon sings.,instruct,Maya Angelou,nature,wisdom,pun
@@ -665,6 +668,6 @@ Please don't shoot me with your words.,neutral,Maya Angelou,nature,resilience,pu
 I wish my trash digging was acknowledged.,spooky,Maya Angelou,nature,transformation,pun`;
 
 var _allPoems;
-parseCSVtoJSON(csvPoems).then(poems => {
-    _allPoems = buildPoemList(poems);
-}).catch("error parsing CSV");
+parseCSVToJSON(csvPoems, result => {
+    _allPoems = buildPoemList(result);
+})

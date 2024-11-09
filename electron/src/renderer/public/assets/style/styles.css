@@ -205,6 +205,14 @@ button.action-button:active {
     animation: button-glow 0.1s ease-in-out;
 }
 
+button.switcher-widget-button {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+button.switcher-widget-button:active {
+    animation: button-glow 0.1s ease-in-out;
+}
+
 /* Keyframes for button-glow animation */
 @keyframes button-glow {
     0% {

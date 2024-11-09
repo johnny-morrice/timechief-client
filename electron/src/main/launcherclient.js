@@ -11,7 +11,6 @@ export class LauncherClient {
         };
         return this.axios(cfg).then(resp => {
             if (resp.status != 204) {
-                logger.error(`reboot failed: ${resp.status}`);
                 return {
                     "APIError": "reboot failed"
                 }
@@ -27,7 +26,6 @@ export class LauncherClient {
         };
         return this.axios(cfg).then(resp => {
             if (resp.status != 204) {
-                logger.error(`shutdown failed: ${resp.status}`);
                 return {
                     "APIError": "shutdown failed"
                 }
