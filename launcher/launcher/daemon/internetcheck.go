@@ -1,6 +1,7 @@
 package daemon
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -35,5 +36,10 @@ func (daemon InternetCheck) Start(ctx *cli.Context) {
 // If the state flag is set, we synchronise the wifi cards and wifi networks using the system package.
 // We then clear the state flag.
 func (daemon InternetCheck) doTick(ctx *cli.Context) error {
-	return daemon.System.CheckInternet()
+	err := daemon.System.CheckInternet()
+	if err != nil {
+		return fmt.Errorf("failed to check internet status: %w", err)
+	}
+
+	return nil
 }

@@ -156,6 +156,11 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
+	err = daemon.KeyValueStore.Delete(store.LastInternetCheckKey)
+	if err != nil {
+		return err
+	}
+
 	return daemon.KeyValueStore.Set("setup", SetupFlagChooseNetworkType)
 }
 

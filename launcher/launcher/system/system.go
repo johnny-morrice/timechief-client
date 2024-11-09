@@ -439,16 +439,44 @@ func (check internetCheck) runCheck(nc netcmd.NetCmd, stopch <-chan struct{}) er
 }
 
 func (sys System) CheckInternet() error {
-	// Check network status
-	status, err := sys.activeCardNetworkStatus()
+	lastCheckTime, err := sys.KeyValueStore.Get(store.LastInternetCheckKey)
 	if err != nil {
-		return fmt.Errorf("failed to load network status: %w", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		return err
 	}
-
-	if status.Mode != InfraMode {
-		// log.Printf("not checking internet, network mode is %s", status.Mode)
+	const cacheDuration = time.Second * 120
+	checkTime, err := time.Parse(time.RFC3339, lastCheckTime)
+	if err != nil {
+		return err
+	}
+	if time.Since(checkTime) < cacheDuration {
 		return nil
 	}
+
+	networkType, err := sys.KeyValueStore.Get("network-type")
+	if err != nil {
+		return err
+	}
+
+	switch networkType {
+	case "manual":
+	case "wifi":
+		// Check network status
+		status, err := sys.activeCardNetworkStatus()
+		if err != nil {
+			return fmt.Errorf("failed to load network status: %w", err)
+		}
+
+		if status.Mode != InfraMode {
+			log.Printf("not checking internet, network mode is %s", status.Mode)
+			return nil
+		}
+	default:
+		return fmt.Errorf("unknown network type: %s", networkType)
+	}
+
 	const timeout = 15 * time.Second
 	const interval = time.Second
 	addresses := []string{
