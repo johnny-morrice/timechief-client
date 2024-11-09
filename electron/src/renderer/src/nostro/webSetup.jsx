@@ -242,7 +242,9 @@ export const WebSetupPage = (props) => {
     const plainText = textMaker("web-setup");
     const handleOnClickAnywhere = (e) => {
         recordInteraction();
-        sendClockDataRequest();
+        if (e.target.classList.contains("action-button")) {
+            sendClockDataRequest();
+        }
     };
 
     function onClickManualNetworkType(e) {
