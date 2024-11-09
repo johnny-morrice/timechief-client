@@ -3,6 +3,7 @@ package websetup
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/websetup"
@@ -11,6 +12,7 @@ import (
 type WebSetupService interface {
 	WifiSetActiveNetwork(ssid, key string) error
 	ListNetworks() ([]websetup.WifiNetwork, error)
+	ChooseNetworkType(networkType string) error
 }
 
 type WebSetup struct {
@@ -25,6 +27,46 @@ func MakeWebSetupAPI(service WebSetupService) (WebSetup, error) {
 func (api WebSetup) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /web-setup/wifi", api.HandleListNetworks)
 	mux.HandleFunc("POST /web-setup/wifi", api.HandleSelectNetwork)
+	mux.HandleFunc("POST /web-setup/network-type", api.HandleChooseNetworkType)
+}
+
+type chooseNetworkTypeRequest struct {
+	NetworkType string `json:"network_type"`
+}
+
+func (req chooseNetworkTypeRequest) Validate() error {
+	if req.NetworkType != "wifi" && req.NetworkType != "manual" {
+		return fmt.Errorf("unsupported network type: %s", req.NetworkType)
+	}
+	return nil
+}
+
+func (api WebSetup) HandleChooseNetworkType(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req chooseNetworkTypeRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	err = req.Validate()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = api.service.ChooseNetworkType(req.NetworkType)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (api WebSetup) HandleListNetworks(w http.ResponseWriter, r *http.Request) {

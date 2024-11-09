@@ -156,21 +156,6 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
-	err = daemon.StateFlagStore.CreateIfNotExists("wifi-load-interfaces")
-	if err != nil {
-		return err
-	}
-
-	err = daemon.StateFlagStore.CreateIfNotExists("wifi-scan")
-	if err != nil {
-		return err
-	}
-
-	err = daemon.StateFlagStore.CreateIfNotExists("wifi-hotspot")
-	if err != nil {
-		return err
-	}
-
 	return daemon.KeyValueStore.Set("setup", SetupFlagChooseNetworkType)
 }
 
@@ -186,15 +171,34 @@ func (daemon Setup) handleChooseNetworkType() error {
 
 	switch networkType {
 	case "wifi":
-		return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
+		return daemon.handleChooseWifiNetworkType()
 	case "manual":
-		return daemon.handleManualSetupCompletion()
+		return daemon.handleChooseManualNetworkType()
 	default:
 		return fmt.Errorf("unknown network type: %s", networkType)
 	}
 }
 
-func (daemon Setup) handleManualSetupCompletion() error {
+func (daemon Setup) handleChooseWifiNetworkType() error {
+	err := daemon.StateFlagStore.CreateIfNotExists("wifi-scan")
+	if err != nil {
+		return err
+	}
+
+	err = daemon.StateFlagStore.CreateIfNotExists("wifi-hotspot")
+	if err != nil {
+		return err
+	}
+
+	err = daemon.StateFlagStore.CreateIfNotExists("wifi-load-interfaces")
+	if err != nil {
+		return err
+	}
+
+	return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
+}
+
+func (daemon Setup) handleChooseManualNetworkType() error {
 	err := daemon.System.DownHotspot()
 	if err != nil {
 		return fmt.Errorf("setup failed to put down possible hotspot for manaul setup option")

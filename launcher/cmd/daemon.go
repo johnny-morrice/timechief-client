@@ -340,7 +340,7 @@ func Daemon(ctx *cli.Context) error {
 	fileServer.AddRoutes(webMux)
 
 	webSetupMux := http.NewServeMux()
-	webSetupService, err := websetupservice.MakeService(wifiNetworkStore)
+	webSetupService, err := websetupservice.MakeService(wifiNetworkStore, keyValueStore)
 	if err != nil {
 		return err
 	}
