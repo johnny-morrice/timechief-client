@@ -29,9 +29,15 @@ func Run(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
 	rebooter := task.RebootOnExit{
 		Command:  cmd,
 		Rebooter: clientRebooter{dc: dc},
+	}
+
+	isRebootOnExit := ctx.Bool("reboot-on-exit")
+	if !isRebootOnExit {
+		rebooter.Rebooter = nopRebooter{}
 	}
 
 	err = rebooter.RunTask(ctx)
@@ -39,6 +45,13 @@ func Run(ctx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to run client at %s: %w", clientExecutable, err)
 	}
+	return nil
+}
+
+type nopRebooter struct {
+}
+
+func (nopRebooter) Reboot() error {
 	return nil
 }
 
