@@ -125,6 +125,14 @@ export function sendSetSSHEnabled(isEnabled) {
     window.api.send("setSSHEnabled", { "state": isEnabled });
 }
 
+export function sendSetNetworkTypeWifi() {
+    window.api.send("setNetworkType", { "network_type": "wifi"});
+}
+
+export function sendSetNetworkTypeManual() {
+    window.api.send("setNetworkType", { "network_type": "manual"});
+}
+
 export function sendAPIRegenKey() {
     window.api.send("apiKeyRegen");
 }

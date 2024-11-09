@@ -41,13 +41,13 @@ function isUpdating(signals) {
 }
 
 function updateDisplayBuffer(signals) {
-    signals.setDisplayStateBuffer([isLoading(signals), isHotspotReady(signals), isInternetConnectedState(signals)]);
+    signals.setDisplayStateBuffer([isLoading(signals), isHotspotReady(signals), isInternetConnectedState(signals), isNetworkTypeChooseState(signals)]);
 }
 
 function applyDisplayBuffer(signals) {
     const displayStateBuffer = signals.displayStateBuffer();
     const displayState = signals.displayState();
-    if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2]) {
+    if (displayStateBuffer[0] !== displayState[0] || displayStateBuffer[1] !== displayState[1] || displayStateBuffer[2] !== displayState[2] || displayStateBuffer[3] !== displayState[3]) {
         fadeTransition(signals.setCrtRootTransition, () => signals.setDisplayState(displayStateBuffer));
     }
 }
@@ -127,7 +127,11 @@ function isHotspotReady(signals) {
 }
 
 function isLoading(signals) {
-    return signals.setupState() !== "InternetConnected" && signals.setupState() !== "WaitUserSelectNetwork";
+    return signals.setupState() !== "InternetConnected" && signals.setupState() !== "WaitUserSelectNetwork" && signals.setupState() !== "WaitUserChooseSetupType";
+}
+
+function isNetworkTypeChooseState(signals) {
+    return signals.setupState() === "WaitUserChooseSetupType";
 }
 
 function isDisplayBackButton(signals) {
@@ -162,6 +166,10 @@ function isDisplayStateHotspot(signals) {
 
 function isDisplayStateInternet(signals) {
     return signals.displayState()[2];
+}
+
+function isDisplayStateChooseNetworkType(signals) {
+    return signals.displayState()[3];
 }
 
 export const WebSetupPage = (props) => {
@@ -223,7 +231,7 @@ export const WebSetupPage = (props) => {
             recordInteraction();
         }
     }, 1000);
-    
+
 
     onCleanup(() => {
         clearInterval(jankInterval);
@@ -236,6 +244,15 @@ export const WebSetupPage = (props) => {
         recordInteraction();
         sendClockDataRequest();
     };
+
+    function onClickManualNetworkType(e) {
+
+    }
+
+    function onClickWifiNetworkType(e) {
+
+    }
+
     return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`} onClick={handleOnClickAnywhere}>
         <Show when={signals.connectedToLocalService()}>
             <Show when={isDisplayStateHotspot(signals)}>
@@ -275,6 +292,44 @@ export const WebSetupPage = (props) => {
                             </div>
                             <div class='flex-row'>
                                 <img class="hotspot-qr" src={signals.hotspotQRData()} alt='Hotspot QR Code' />
+                            </div>
+                            <Show when={isConnectionError(signals)}>
+                                <div class='flex-row'>
+                                    <div class="hotspot-error">{label("connection-error")}</div>
+                                </div>
+                            </Show>
+                        </div>
+                    </div>
+                </div>
+            </Show>
+            <Show when={isDisplayStateChooseNetworkType(signals)}>
+                <div class="setup-wrapper flex-column flex-grow">
+                    <div class="setup-title">Welcome to Timechief</div>
+                    <div class="setup-content-wrapper flex-row">
+                        <div class="setup-button-box border flex-column crt-box home-box">
+                            <Show when={isUpdating(signals)}>
+                                <button class='action-button crt-box' style={buttonGlitchStyle(plainText("reboot"))} disabled onClick={onClickReboot}>{signals.rebootGlitch} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' style={buttonGlitchStyle(plainText("shutdown"))} disabled onClick={onClickShutdown}>{signals.shutdownGlitch} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
+                            <Show when={!isUpdating(signals)}>
+                                <button class='action-button crt-box' onClick={onClickReboot}>{plainText("reboot")} &nbsp;&nbsp; <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' onClick={onClickShutdown}>{plainText("shutdown")} &nbsp;&nbsp; <i class='fa-solid fa-power-off'></i></button>
+                            </Show>
+                            <Show when={isDisplayBackButton(signals)}>
+                                <button class='action-button crt-box' onClick={onClickBack}>{plainText("cancel-setup")} &nbsp;&nbsp; <i class="fa-solid fa-xmark"></i></button>
+                            </Show>
+                            <Show when={isUpdating(signals)}>
+                                <div class="setup-button-box-isUpdating">
+                                    <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
+                                </div>
+                            </Show>
+                        </div>
+                        <div class="setup-instructions flex-column exposed">
+                            <div class='flex-row'>
+                                <button class="action-button crt-box" onClick={onClickWifiNetworkType}>{plainText("wifi-network-button")} <i class="fa-solid fa-wifi"></i></button>
+                            </div>
+                            <div class='flex-row'>
+                            <button class="action-button crt-box" onClick={onClickManualNetworkType}>{plainText("manual-network-button")} <i class="fa-solid fa-network-wired"></i></button>
                             </div>
                             <Show when={isConnectionError(signals)}>
                                 <div class='flex-row'>

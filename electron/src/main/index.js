@@ -90,6 +90,7 @@ handleIPCAPICall("setupRestart", "setupRestartResult", () => client.postSetupBeg
 handleIPCAPICall("sshPasswordRegen", "sshPasswordRegenResult", () => client.postSSHRegenPassword());
 handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKey());
 handleIPCAPICall("selectMyDevice", "selectMyDeviceResult", (args) => client.postSelectMyDevice(args["uuid"]));
+handleIPCAPICall("setNetworkType", "setNetworkTypeResult", (args) => client.postNetworkType(args["network_type"]))
 
 ipcMain.on("setSSHEnabled", (event, args) => {
   client.postSSHEnabled(args["state"])

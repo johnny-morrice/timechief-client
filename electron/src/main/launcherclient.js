@@ -251,6 +251,21 @@ export class LauncherClient {
             }
         });
     }
+
+    postSetNetworkType(networkType) {
+        let cfg = {
+            url: this.baseURL + '/api/launcher/network-type',
+            method: 'post',
+            data: {
+                "network_type": networkType
+            }
+        };
+        return this.axios(cfg).then(resp => {
+            if (resp.status == 204) {
+                return {};
+            }
+        });
+    }
 };
 
 function getAPIBaseURL() {

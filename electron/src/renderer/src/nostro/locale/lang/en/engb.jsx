@@ -64,7 +64,9 @@ export const Text = {
         "connect-wifi": "Connect to WiFi Network",
         "wifi-key": "WiFi password",
         "continue-via-browser": "Continue setup via your browser",
-        "connection-error": "Error connecting to network, please run through setup again"
+        "connection-error": "Error connecting to network, please run through setup again",
+        "manual-network-button": "Connect Manually",
+        "wifi-network-button": "Connect with Wifi"
     },
     "ssh-security": {
         "regen-password": "Regenerate Password",
