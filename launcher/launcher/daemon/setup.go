@@ -79,14 +79,15 @@ func (daemon Setup) init() error {
 }
 
 const (
-	SetupFlagBegin                 string = "Begin"
-	SetupFlagChooseNetworkType     string = "WaitUserChooseSetupType"
-	SetupFlagWaitHotspot           string = "WaitHotspot"
-	SetupFlagWaitUserSelectNetwork string = "WaitUserSelectNetwork"
-	SetupFlagNetworkSelected       string = "NetworkSelected"
-	SetupFlagWaitNetworkConnect    string = "WaitNetworkConnect"
-	SetupFlagNetworkConnected      string = "NetworkConnected"
-	SetupFlagInternetConnected     string = "InternetConnected"
+	SetupFlagBegin                  string = "Begin"
+	SetupFlagChooseNetworkType      string = "WaitUserChooseSetupType"
+	SetupFlagWaitNetworkTypeApplied string = "WaitNetworkTypeApplied"
+	SetupFlagWaitHotspot            string = "WaitHotspot"
+	SetupFlagWaitUserSelectNetwork  string = "WaitUserSelectNetwork"
+	SetupFlagNetworkSelected        string = "NetworkSelected"
+	SetupFlagWaitNetworkConnect     string = "WaitNetworkConnect"
+	SetupFlagNetworkConnected       string = "NetworkConnected"
+	SetupFlagInternetConnected      string = "InternetConnected"
 )
 
 // doTick is a single step in the main loop of the daemon.
@@ -106,6 +107,8 @@ func (daemon Setup) doTick(ctx *cli.Context) error {
 		return daemon.handleBegin()
 	case SetupFlagChooseNetworkType:
 		return daemon.handleChooseNetworkType()
+	case SetupFlagWaitNetworkTypeApplied:
+		return daemon.handleWaitNetworkTypeApplied()
 	case SetupFlagWaitHotspot:
 		return daemon.handleHotspotWait()
 	case SetupFlagWaitUserSelectNetwork:
@@ -161,6 +164,11 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
+	err = daemon.KeyValueStore.Delete(("network-type"))
+	if err != nil {
+		return err
+	}
+
 	return daemon.KeyValueStore.Set("setup", SetupFlagChooseNetworkType)
 }
 
@@ -170,8 +178,17 @@ func (daemon Setup) handleChooseNetworkType() error {
 		return err
 	}
 
-	if networkType == "" {
-		return nil
+	if networkType == "wifi" || networkType == "manual" {
+		return daemon.KeyValueStore.Set("setup", SetupFlagWaitNetworkTypeApplied)
+	}
+
+	return nil
+}
+
+func (daemon Setup) handleWaitNetworkTypeApplied() error {
+	networkType, err := daemon.KeyValueStore.Get("network-type")
+	if err != nil {
+		return err
 	}
 
 	switch networkType {

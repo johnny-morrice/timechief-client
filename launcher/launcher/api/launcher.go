@@ -34,7 +34,7 @@ func (api Launcher) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/launcher/setup", api.HandlePostSetup)
 	mux.HandleFunc("/api/launcher/on-login", api.HandlePostOnLoginCallback)
 	mux.HandleFunc("/api/launcher/api-key/user", api.HandlePostRegenerateUserAPIKey)
-	mux.HandleFunc("POST /web-setup/network-type", api.HandleChooseNetworkType)
+	mux.HandleFunc("POST /api/launcher/network-type", api.HandleChooseNetworkType)
 }
 
 type chooseNetworkTypeRequest struct {
