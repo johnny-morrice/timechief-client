@@ -100,3 +100,11 @@ func (svc Service) GetConfig() (store.Config, error) {
 func (svc Service) RecoverTarget() (TargetStatus, error) {
 	return TargetStatus{Ready: true}, nil
 }
+
+func (svc Service) ChooseNetworkType(networkType string) error {
+	if networkType != "wifi" && networkType != "manual" {
+		return fmt.Errorf("unsupported network type: %s", networkType)
+	}
+
+	return svc.KeyValueStore.Set("network-type", networkType)
+}
