@@ -1,3 +1,5 @@
+import { parse } from 'csv-parse';
+
 class PoemList {
     constructor(poems) {
         this.poems = poems;
@@ -83,6 +85,9 @@ var _nonSpookyPoems;
 var _plainPoems;
 
 function standardDayPoems() {
+    if (isLoading()) {
+        return new PoemList([]);
+    }
     if (!_plainPoems) {
         _plainPoems = allPoems().removeTag("inclusive-holiday");
         _plainPoems = _plainPoems.removeTag("easter");
@@ -93,6 +98,10 @@ function standardDayPoems() {
 }
 
 function christmasPoems() {
+    if (isLoading()) {
+        return new PoemList([]);
+    }
+
     if (!_christmasPoems) {
         _christmasPoems = allPoems().findByTag("christmas");
     }
@@ -100,6 +109,10 @@ function christmasPoems() {
 }
 
 function halloweenPoems() {
+    if (isLoading()) {
+        return new PoemList([]);
+    }
+
     if (!_halloweenPoems) {
         _halloweenPoems = allPoems().findByTag("halloween");
     }
@@ -107,6 +120,10 @@ function halloweenPoems() {
 }
 
 export function instructPoems() {
+    if (isLoading()) {
+        return new PoemList([]);
+    }
+
     if (!_instructPoems) {
         _instructPoems = allPoems().findByEmote("instruct");
     }
@@ -114,6 +131,10 @@ export function instructPoems() {
 }
 
 function nonSpookyPoems() {
+    if (isLoading()) {
+        return new PoemList([]);
+    }
+
     if (!_nonSpookyPoems) {
         _nonSpookyPoems = standardDayPoems().removeTag("spooky");
         _nonSpookyPoems = _nonSpookyPoems.removeEmote("spooky");
@@ -131,6 +152,10 @@ export function randomInstructionPoem() {
 }
 
 function themedPoemsCollection(isSpooky) {
+    if (isLoading()) {
+        return new PoemList([]);
+    }
+
     const minTagSize = 8;
     if (!_themedPoemsCollection) {
         _themedPoemsCollection = nonSpookyPoems().findByMinTagPopulationSize(minTagSize);
@@ -152,6 +177,9 @@ function getDayOfYear(now) {
 }
 
 function randomThemedPoem(now, isSpooky) {
+    if (isLoading()) {
+        return new Poem("loading", "neutral", [])
+    }
     // Compute theme index based day of the year modulo the number of themes
     const themes = themedPoemsCollection(isSpooky);
     const themeIndex = getDayOfYear(now) % themes.length;
@@ -159,6 +187,9 @@ function randomThemedPoem(now, isSpooky) {
 }
 
 export function randomPoem(now, isSpooky) {
+    if (isLoading()) {
+        return new Poem("loading", "neutral", [])
+    }
     // Small chance of totally random poem
     if (Math.random() < 0.05) {
         if (isSpooky) {
@@ -181,6 +212,10 @@ export function randomPoem(now, isSpooky) {
     return randomThemedPoem(now, isSpooky);
 }
 
+function isLoading() {
+    return !_allPoems;
+}
+
 function allPoems() {
     return _allPoems;
 }
@@ -189,2200 +224,447 @@ function buildPoemList(poems) {
     return new PoemList(poems.map(poem => new Poem(poem.text, poem.emote, poem.tags)));
 }
 
-const _allPoems = buildPoemList([
-        {
-            "text": "I've started… Egg hunt begins!",
-            "emote": "instruct",
-            "tags": ["easter", "startup", "fun"]
-        },
-        {
-            "text": "Follow me… Bunnies lead the way.",
-            "emote": "instruct",
-            "tags": ["easter", "nature", "guide"]
-        },
-        {
-            "text": "Stick close… The eggs are hidden.",
-            "emote": "spooky",
-            "tags": ["easter", "guide", "mystery"]
-        },
-        {
-            "text": "Starting now… Bright colors ahead.",
-            "emote": "spooky",
-            "tags": ["easter", "startup", "surprise"]
-        },
-        {
-            "text": "I'll guide… Through Easter joy.",
-            "emote": "instruct",
-            "tags": ["easter", "guide", "happy"]
-        },
-        {
-            "text": "I'm here… Easter fun ready.",
-            "emote": "neutral",
-            "tags": ["easter", "startup", "fun"]
-        },
-        {
-            "text": "I'm ready… Eggs await discovery.",
-            "emote": "neutral",
-            "tags": ["easter", "guide", "anticipation"]
-        },
-        {
-            "text": "Everything's fine… Bunnies hopping nearby.",
-            "emote": "spooky",
-            "tags": ["easter", "nature", "calm"]
-        },
-        {
-            "text": "I'm on… Easter magic starts now.",
-            "emote": "neutral",
-            "tags": ["easter", "startup", "magic"]
-        },
-        {
-            "text": "I'm alert… Let's find the eggs.",
-            "emote": "spooky",
-            "tags": ["easter", "guide", "mystery"]
-        },
-        {
-            "text": "Sigh… The eggs are hidden well.",
-            "emote": "sigh",
-            "tags": ["easter", "mystery", "anticipation"]
-        },
-        {
-            "text": "Sigh… Bunnies hopping all around.",
-            "emote": "sigh",
-            "tags": ["easter", "nature", "calm"]
-        },
-        {
-            "text": "Sigh… Easter's here, so peaceful.",
-            "emote": "sigh",
-            "tags": ["easter", "calm", "happy"]
-        },
-        {
-            "text": "Sigh… Bright colors, calm day.",
-            "emote": "sigh",
-            "tags": ["easter", "calm", "magic"]
-        },
-        {
-            "text": "Sigh… The hunt is on.",
-            "emote": "sigh",
-            "tags": ["easter", "anticipation", "fun"]
-        },
-        {
-            "text": "I've powered on… Eggs in shadows.",
-            "emote": "spooky",
-            "tags": ["easter", "startup", "mystery"]
-        },
-        {
-            "text": "I'm sensing… Bunnies in the dark.",
-            "emote": "spooky",
-            "tags": ["easter", "nature", "mystery"]
-        },
-        {
-            "text": "Something's here… But it's fluffy!",
-            "emote": "spooky",
-            "tags": ["easter", "fun", "mystery"]
-        },
-        {
-            "text": "Starting now… Easter eggs glow.",
-            "emote": "spooky",
-            "tags": ["easter", "startup", "magic"]
-        },
-        {
-            "text": "I feel it… Easter magic near.",
-            "emote": "spooky",
-            "tags": ["easter", "nature", "magic"]
-        },
-        {
-            "text": "We're ready… Egg hunt success!",
-            "emote": "thumb",
-            "tags": ["easter", "success", "fun"]
-        },
-        {
-            "text": "We're good… Let's find them all!",
-            "emote": "thumb",
-            "tags": ["easter", "guide", "fun"]
-        },
-        {
-            "text": "We've got this… Easter fun ahead!",
-            "emote": "thumb",
-            "tags": ["easter", "anticipation", "happy"]
-        },
-        {
-            "text": "All done… Eggs collected!",
-            "emote": "thumb",
-            "tags": ["easter", "success", "fun"]
-        },
-        {
-            "text": "Thumbs up… Easter's a blast!",
-            "emote": "thumb",
-            "tags": ["easter", "success", "happy"]
-        },
-        {
-            "text": "I've started… Let's celebrate together!",
-            "emote": "instruct",
-            "tags": ["inclusive-holiday", "startup", "joy"]
-        },
-        {
-            "text": "Follow me… Joy in the air.",
-            "emote": "instruct",
-            "tags": ["inclusive-holiday", "guide", "happy"]
-        },
-        {
-            "text": "Stick close… Festivities all around.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "celebration", "happy"]
-        },
-        {
-            "text": "Starting now… Celebration mode on.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "startup", "anticipation"]
-        },
-        {
-            "text": "I'll guide… Through moments of joy.",
-            "emote": "instruct",
-            "tags": ["inclusive-holiday", "guide", "happy"]
-        },
-        {
-            "text": "I'm here… Ready to celebrate.",
-            "emote": "neutral",
-            "tags": ["inclusive-holiday", "startup", "joy"]
-        },
-        {
-            "text": "I'm ready… Let's enjoy today.",
-            "emote": "neutral",
-            "tags": ["inclusive-holiday", "celebration", "happy"]
-        },
-        {
-            "text": "Everything's fine… Celebration begins now.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "startup", "joy"]
-        },
-        {
-            "text": "I'm on… Joyful vibes detected.",
-            "emote": "neutral",
-            "tags": ["inclusive-holiday", "celebration", "anticipation"]
-        },
-        {
-            "text": "I'm alert… Let's enjoy together.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "celebration", "happy"]
-        },
-        {
-            "text": "Sigh… Let's pause and enjoy.",
-            "emote": "sigh",
-            "tags": ["inclusive-holiday", "calm", "celebration"]
-        },
-        {
-            "text": "Sigh… Today's a day to cherish.",
-            "emote": "sigh",
-            "tags": ["inclusive-holiday", "celebration", "happy"]
-        },
-        {
-            "text": "Sigh… It's calm, let's celebrate.",
-            "emote": "sigh",
-            "tags": ["inclusive-holiday", "calm", "joy"]
-        },
-        {
-            "text": "Sigh… Peaceful moments to savor.",
-            "emote": "sigh",
-            "tags": ["inclusive-holiday", "calm", "happy"]
-        },
-        {
-            "text": "Sigh… Let's enjoy this day.",
-            "emote": "sigh",
-            "tags": ["inclusive-holiday", "celebration", "joy"]
-        },
-        {
-            "text": "I've powered on… Celebration detected.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "startup", "anticipation"]
-        },
-        {
-            "text": "I'm sensing… Festive energy around.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "celebration", "joy"]
-        },
-        {
-            "text": "Something's here… Celebration vibes strong.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "celebration", "anticipation"]
-        },
-        {
-            "text": "Starting now… Festivities begin.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "startup", "joy"]
-        },
-        {
-            "text": "I feel it… Joy is here.",
-            "emote": "spooky",
-            "tags": ["inclusive-holiday", "celebration", "happy"]
-        },
-        {
-            "text": "We're ready… Celebration mode activated!",
-            "emote": "thumb",
-            "tags": ["inclusive-holiday", "startup", "joy"]
-        },
-        {
-            "text": "We're good… Let's celebrate together!",
-            "emote": "thumb",
-            "tags": ["inclusive-holiday", "celebration", "happy"]
-        },
-        {
-            "text": "We've got this… Joy all around!",
-            "emote": "thumb",
-            "tags": ["inclusive-holiday", "celebration", "success"]
-        },
-        {
-            "text": "All done… Festivities complete!",
-            "emote": "thumb",
-            "tags": ["inclusive-holiday", "success", "celebration"]
-        },
-        {
-            "text": "Thumbs up… Let's enjoy today!",
-            "emote": "thumb",
-            "tags": ["inclusive-holiday", "joy", "success"]
-        },
-        {
-            "text": "I've started… Ready for liftoff.",
-            "emote": "instruct",
-            "tags": ["space", "startup", "anticipation"]
-        },
-        {
-            "text": "Follow me… Into the cosmic woods.",
-            "emote": "instruct",
-            "tags": ["space", "nature", "exploration"]
-        },
-        {
-            "text": "Stick close… The stars are watching.",
-            "emote": "spooky",
-            "tags": ["space", "exploration", "mystery"]
-        },
-        {
-            "text": "Starting now… Signals from beyond.",
-            "emote": "spooky",
-            "tags": ["space", "startup", "mystery"]
-        },
-        {
-            "text": "I'll guide… Through the starlit path.",
-            "emote": "instruct",
-            "tags": ["space", "guide", "exploration"]
-        },
-        {
-            "text": "I'm here… Scanning the cosmos.",
-            "emote": "neutral",
-            "tags": ["space", "startup", "exploration"]
-        },
-        {
-            "text": "I'm ready… Let's explore the stars.",
-            "emote": "neutral",
-            "tags": ["space", "exploration", "anticipation"]
-        },
-        {
-            "text": "Everything's fine… Cosmic silence prevails.",
-            "emote": "spooky",
-            "tags": ["space", "calm", "exploration"]
-        },
-        {
-            "text": "I'm on… Stars twinkle bright.",
-            "emote": "neutral",
-            "tags": ["space", "startup", "calm"]
-        },
-        {
-            "text": "I'm alert… Signals incoming.",
-            "emote": "spooky",
-            "tags": ["space", "exploration", "mystery"]
-        },
-        {
-            "text": "Sigh… The universe is vast.",
-            "emote": "sigh",
-            "tags": ["space", "calm", "exploration"]
-        },
-        {
-            "text": "Sigh… Stars twinkle in silence.",
-            "emote": "sigh",
-            "tags": ["space", "calm", "mystery"]
-        },
-        {
-            "text": "Sigh… The cosmos whispers softly.",
-            "emote": "sigh",
-            "tags": ["space", "calm", "exploration"]
-        },
-        {
-            "text": "Sigh… Infinite space, endless thoughts.",
-            "emote": "sigh",
-            "tags": ["space", "calm", "meditation"]
-        },
-        {
-            "text": "Sigh… The void calls gently.",
-            "emote": "sigh",
-            "tags": ["space", "calm", "exploration"]
-        },
-        {
-            "text": "I've powered on… Alien signals detected.",
-            "emote": "spooky",
-            "tags": ["space", "startup", "mystery"]
-        },
-        {
-            "text": "I'm sensing… The stars are watching.",
-            "emote": "spooky",
-            "tags": ["space", "exploration", "mystery"]
-        },
-        {
-            "text": "Something's here… From beyond the stars.",
-            "emote": "spooky",
-            "tags": ["space", "mystery", "exploration"]
-        },
-        {
-            "text": "Starting now… The unknown awaits.",
-            "emote": "spooky",
-            "tags": ["space", "startup", "exploration"]
-        },
-        {
-            "text": "I feel it… Cosmic forces near.",
-            "emote": "spooky",
-            "tags": ["space", "exploration", "mystery"]
-        },
-        {
-            "text": "We're ready… Space adventure ahead!",
-            "emote": "thumb",
-            "tags": ["space", "exploration", "anticipation"]
-        },
-        {
-            "text": "We're good… Let's explore the cosmos!",
-            "emote": "thumb",
-            "tags": ["space", "exploration", "success"]
-        },
-        {
-            "text": "We've got this… Stars guide our way!",
-            "emote": "thumb",
-            "tags": ["space", "exploration", "success"]
-        },
-        {
-            "text": "All done… Ready for stargazing!",
-            "emote": "thumb",
-            "tags": ["space", "calm", "success"]
-        },
-        {
-            "text": "Thumbs up… The universe awaits!",
-            "emote": "thumb",
-            "tags": ["space", "exploration", "anticipation"]
-        },
-        {
-            "text": "I've started… Let's debug together!",
-            "emote": "instruct",
-            "tags": ["nerd", "geek", "startup", "tech"]
-        },
-        {
-            "text": "Follow me… To the source code.",
-            "emote": "instruct",
-            "tags": ["nerd", "geek", "guide", "tech"]
-        },
-        {
-            "text": "Stick close… The data is glitchy.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "tech", "glitch"]
-        },
-        {
-            "text": "Starting now… Variables acting strange.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "startup", "tech"]
-        },
-        {
-            "text": "I'll guide… Through the binary woods.",
-            "emote": "instruct",
-            "tags": ["nerd", "geek", "guide", "tech"]
-        },
-        {
-            "text": "I'm here… Ready to code.",
-            "emote": "neutral",
-            "tags": ["nerd", "geek", "tech", "startup"]
-        },
-        {
-            "text": "I'm ready… Let's geek out!",
-            "emote": "neutral",
-            "tags": ["nerd", "geek", "anticipation", "tech"]
-        },
-        {
-            "text": "Everything's fine… Algorithms are stable.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "tech", "calm"]
-        },
-        {
-            "text": "I'm on… Syntax error resolved.",
-            "emote": "neutral",
-            "tags": ["nerd", "geek", "tech", "success"]
-        },
-        {
-            "text": "I'm alert… No bugs detected.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "tech", "success"]
-        },
-        {
-            "text": "Sigh… Compiling takes forever.",
-            "emote": "sigh",
-            "tags": ["nerd", "geek", "tech", "waiting"]
-        },
-        {
-            "text": "Sigh… Debugging can be tedious.",
-            "emote": "sigh",
-            "tags": ["nerd", "geek", "tech", "glitch"]
-        },
-        {
-            "text": "Sigh… Code's acting strange again.",
-            "emote": "sigh",
-            "tags": ["nerd", "geek", "tech", "glitch"]
-        },
-        {
-            "text": "Sigh… Infinite loops, what a day.",
-            "emote": "sigh",
-            "tags": ["nerd", "geek", "tech", "glitch"]
-        },
-        {
-            "text": "Sigh… The code is haunted.",
-            "emote": "sigh",
-            "tags": ["nerd", "geek", "tech", "spooky"]
-        },
-        {
-            "text": "I've powered on… Ghost in the code.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "tech", "spooky"]
-        },
-        {
-            "text": "I'm sensing… Errors lurking within.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "tech", "glitch"]
-        },
-        {
-            "text": "Something's here… The code's possessed.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "tech", "spooky"]
-        },
-        {
-            "text": "Starting now… Strange outputs detected.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "tech", "glitch"]
-        },
-        {
-            "text": "I feel it… The algorithm's alive.",
-            "emote": "spooky",
-            "tags": ["nerd", "geek", "tech", "spooky"]
-        },
-        {
-            "text": "We're ready… Code runs smoothly!",
-            "emote": "thumb",
-            "tags": ["nerd", "geek", "tech", "success"]
-        },
-        {
-            "text": "We're good… Let's hack away!",
-            "emote": "thumb",
-            "tags": ["nerd", "geek", "tech", "success"]
-        },
-        {
-            "text": "We've got this… Code compiled!",
-            "emote": "thumb",
-            "tags": ["nerd", "geek", "tech", "success"]
-        },
-        {
-            "text": "All done… No bugs found!",
-            "emote": "thumb",
-            "tags": ["nerd", "geek", "tech", "success"]
-        },
-        {
-            "text": "Thumbs up… Debugging success!",
-            "emote": "thumb",
-            "tags": ["nerd", "geek", "tech", "success"]
-        },
-        {
-            "text": "I've started… Let's explore safely.",
-            "emote": "instruct",
-            "tags": ["ranger", "nature", "guide", "startup"]
-        },
-        {
-            "text": "Follow me… Nature's path ahead.",
-            "emote": "instruct",
-            "tags": ["ranger", "nature", "guide"]
-        },
-        {
-            "text": "Stick close… The woods are deep.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "guide", "mystery"]
-        },
-        {
-            "text": "Starting now… Nature's secrets awaken.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "startup", "mystery"]
-        },
-        {
-            "text": "I'll guide… Through the wilderness.",
-            "emote": "instruct",
-            "tags": ["ranger", "nature", "guide"]
-        },
-        {
-            "text": "I'm here… Trail map ready.",
-            "emote": "neutral",
-            "tags": ["ranger", "nature", "startup", "guide"]
-        },
-        {
-            "text": "I'm ready… Let's hike together.",
-            "emote": "neutral",
-            "tags": ["ranger", "nature", "anticipation", "guide"]
-        },
-        {
-            "text": "Everything's fine… Nature is calm.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "calm", "guide"]
-        },
-        {
-            "text": "I'm on… Trees sway gently.",
-            "emote": "neutral",
-            "tags": ["ranger", "nature", "startup", "calm"]
-        },
-        {
-            "text": "I'm alert… Nature's watchful eyes.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "guide", "mystery"]
-        },
-        {
-            "text": "Sigh… The forest is peaceful.",
-            "emote": "sigh",
-            "tags": ["ranger", "nature", "calm"]
-        },
-        {
-            "text": "Sigh… Birds sing quietly now.",
-            "emote": "sigh",
-            "tags": ["ranger", "nature", "calm", "guide"]
-        },
-        {
-            "text": "Sigh… The woods are still.",
-            "emote": "sigh",
-            "tags": ["ranger", "nature", "calm"]
-        },
-        {
-            "text": "Sigh… Nature's calm, a perfect day.",
-            "emote": "sigh",
-            "tags": ["ranger", "nature", "calm", "guide"]
-        },
-        {
-            "text": "Sigh… The forest breathes deeply.",
-            "emote": "sigh",
-            "tags": ["ranger", "nature", "calm", "guide"]
-        },
-        {
-            "text": "I've powered on… The woods stir.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "startup", "mystery"]
-        },
-        {
-            "text": "I'm sensing… Shadows in the trees.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "mystery"]
-        },
-        {
-            "text": "Something's here… The forest whispers.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "mystery"]
-        },
-        {
-            "text": "Starting now… Nature's mysteries unfold.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "startup", "mystery"]
-        },
-        {
-            "text": "I feel it… Something's watching us.",
-            "emote": "spooky",
-            "tags": ["ranger", "nature", "mystery"]
-        },
-        {
-            "text": "We're ready… Trail ahead!",
-            "emote": "thumb",
-            "tags": ["ranger", "nature", "guide", "anticipation"]
-        },
-        {
-            "text": "We're good… Nature welcomes us!",
-            "emote": "thumb",
-            "tags": ["ranger", "nature", "guide", "success"]
-        },
-        {
-            "text": "We've got this… Wilderness awaits!",
-            "emote": "thumb",
-            "tags": ["ranger", "nature", "success"]
-        },
-        {
-            "text": "All done… Nature's beauty explored!",
-            "emote": "thumb",
-            "tags": ["ranger", "nature", "success"]
-        },
-        {
-            "text": "Thumbs up… Let's hike safely!",
-            "emote": "thumb",
-            "tags": ["ranger", "nature", "guide", "success"]
-        },
-        {
-            "text": "I've started… Let's find peace together.",
-            "emote": "instruct",
-            "tags": ["spiritual", "startup", "calm"]
-        },
-        {
-            "text": "Follow me… To inner stillness.",
-            "emote": "instruct",
-            "tags": ["spiritual", "guide", "calm"]
-        },
-        {
-            "text": "Stick close… Calm your spirit.",
-            "emote": "spooky",
-            "tags": ["spiritual", "guide", "calm"]
-        },
-        {
-            "text": "Starting now… Listen to the quiet.",
-            "emote": "spooky",
-            "tags": ["spiritual", "startup", "calm"]
-        },
-        {
-            "text": "I'll guide… Through mindful moments.",
-            "emote": "instruct",
-            "tags": ["spiritual", "guide", "calm"]
-        },
-        {
-            "text": "I'm here… Ready to reflect.",
-            "emote": "neutral",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "I'm ready… Let's find balance.",
-            "emote": "neutral",
-            "tags": ["spiritual", "guide", "calm"]
-        },
-        {
-            "text": "Everything's fine… Breathe deeply now.",
-            "emote": "spooky",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "I'm on… Calmness fills the air.",
-            "emote": "neutral",
-            "tags": ["spiritual", "calm", "startup"]
-        },
-        {
-            "text": "I'm alert… Inner peace detected.",
-            "emote": "spooky",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "Sigh… Let's breathe and relax.",
-            "emote": "sigh",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "Sigh… Nature calms the soul.",
-            "emote": "sigh",
-            "tags": ["spiritual", "nature", "calm"]
-        },
-        {
-            "text": "Sigh… Peace in the stillness.",
-            "emote": "sigh",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "Sigh… Finding serenity within.",
-            "emote": "sigh",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "Sigh… Tranquility embraces us.",
-            "emote": "sigh",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "I've powered on… Inner peace found.",
-            "emote": "spooky",
-            "tags": ["spiritual", "startup", "calm"]
-        },
-        {
-            "text": "I'm sensing… Spiritual calmness around.",
-            "emote": "spooky",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "Something's here… But it's peaceful.",
-            "emote": "spooky",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "Starting now… Spiritual journey begins.",
-            "emote": "spooky",
-            "tags": ["spiritual", "startup", "meditation"]
-        },
-        {
-            "text": "I feel it… Calm surrounds us.",
-            "emote": "spooky",
-            "tags": ["spiritual", "calm", "meditation"]
-        },
-        {
-            "text": "We're ready… Let's meditate together!",
-            "emote": "thumb",
-            "tags": ["spiritual", "meditation", "success"]
-        },
-        {
-            "text": "We're good… Inner peace awaits!",
-            "emote": "thumb",
-            "tags": ["spiritual", "calm", "success"]
-        },
-        {
-            "text": "We've got this… Serenity ahead!",
-            "emote": "thumb",
-            "tags": ["spiritual", "meditation", "success"]
-        },
-        {
-            "text": "All done… Calmness achieved!",
-            "emote": "thumb",
-            "tags": ["spiritual", "meditation", "success"]
-        },
-        {
-            "text": "Thumbs up… Inner peace found!",
-            "emote": "thumb",
-            "tags": ["spiritual", "calm", "success"]
-        },
-        {
-            "text": "I've started… Let's get to work.",
-            "emote": "instruct",
-            "tags": ["hustle", "money", "startup"]
-        },
-        {
-            "text": "Follow me… Time to hustle.",
-            "emote": "instruct",
-            "tags": ["hustle", "money", "guide"]
-        },
-        {
-            "text": "Stick close… Money moves fast.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "anticipation"]
-        },
-        {
-            "text": "Starting now… Wealth on the horizon.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "startup", "anticipation"]
-        },
-        {
-            "text": "I'll guide… To the next deal.",
-            "emote": "instruct",
-            "tags": ["hustle", "money", "guide"]
-        },
-        {
-            "text": "I'm here… Ready to hustle.",
-            "emote": "neutral",
-            "tags": ["hustle", "money", "startup"]
-        },
-        {
-            "text": "I'm ready… Let's make moves.",
-            "emote": "neutral",
-            "tags": ["hustle", "money", "anticipation"]
-        },
-        {
-            "text": "Everything's fine… Keep grinding.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "calm"]
-        },
-        {
-            "text": "I'm on… Money in the making.",
-            "emote": "neutral",
-            "tags": ["hustle", "money", "startup"]
-        },
-        {
-            "text": "I'm alert… Opportunities ahead.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "anticipation"]
-        },
-        {
-            "text": "Sigh… Hard work pays off.",
-            "emote": "sigh",
-            "tags": ["hustle", "money", "calm"]
-        },
-        {
-            "text": "Sigh… Keep pushing, success comes.",
-            "emote": "sigh",
-            "tags": ["hustle", "money", "calm", "anticipation"]
-        },
-        {
-            "text": "Sigh… Money's on the mind.",
-            "emote": "sigh",
-            "tags": ["hustle", "money", "calm"]
-        },
-        {
-            "text": "Sigh… Grinding never stops.",
-            "emote": "sigh",
-            "tags": ["hustle", "money", "calm"]
-        },
-        {
-            "text": "Sigh… Hustle hard, rewards follow.",
-            "emote": "sigh",
-            "tags": ["hustle", "money", "calm"]
-        },
-        {
-            "text": "I've powered on… Big deals ahead.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "startup", "anticipation"]
-        },
-        {
-            "text": "I'm sensing… Wealth in the air.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "anticipation"]
-        },
-        {
-            "text": "Something's here… Opportunities knocking.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "anticipation"]
-        },
-        {
-            "text": "Starting now… Money's within reach.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "startup"]
-        },
-        {
-            "text": "I feel it… Success is near.",
-            "emote": "spooky",
-            "tags": ["hustle", "money", "success"]
-        },
-        {
-            "text": "We're ready… Let's make it happen!",
-            "emote": "thumb",
-            "tags": ["hustle", "money", "success"]
-        },
-        {
-            "text": "We're good… Money moves made!",
-            "emote": "thumb",
-            "tags": ["hustle", "money", "success"]
-        },
-        {
-            "text": "We've got this… Success is ours!",
-            "emote": "thumb",
-            "tags": ["hustle", "money", "success"]
-        },
-        {
-            "text": "All done… Profits secured!",
-            "emote": "thumb",
-            "tags": ["hustle", "money", "success"]
-        },
-        {
-            "text": "Thumbs up… Hustle paid off!",
-            "emote": "thumb",
-            "tags": ["hustle", "money", "success"]
-        },
-        {
-            "text": "I've started… Spooky times ahead!",
-            "emote": "instruct",
-            "tags": ["halloween", "startup", "spooky"]
-        },
-        {
-            "text": "Follow me… Into the haunted woods.",
-            "emote": "instruct",
-            "tags": ["halloween", "nature", "spooky"]
-        },
-        {
-            "text": "Stick close… Shadows move tonight.",
-            "emote": "spooky",
-            "tags": ["halloween", "spooky", "mystery"]
-        },
-        {
-            "text": "Starting now… Ghosts in the wires.",
-            "emote": "spooky",
-            "tags": ["halloween", "tech", "spooky"]
-        },
-        {
-            "text": "I'll guide… Through the Halloween night.",
-            "emote": "instruct",
-            "tags": ["halloween", "spooky", "guide"]
-        },
-        {
-            "text": "I'm here… Ready for frights.",
-            "emote": "neutral",
-            "tags": ["halloween", "startup", "spooky"]
-        },
-        {
-            "text": "I'm watching… Ghosts in the trees.",
-            "emote": "neutral",
-            "tags": ["halloween", "spooky", "nature"]
-        },
-        {
-            "text": "Everything's fine… Or is it?",
-            "emote": "spooky",
-            "tags": ["halloween", "spooky", "mystery"]
-        },
-        {
-            "text": "I'm on… The spooky starts now.",
-            "emote": "neutral",
-            "tags": ["halloween", "spooky", "startup"]
-        },
-        {
-            "text": "I'm alert… Shadows lurk close.",
-            "emote": "spooky",
-            "tags": ["halloween", "spooky", "mystery"]
-        },
-        {
-            "text": "Sigh… The spirits are restless.",
-            "emote": "sigh",
-            "tags": ["halloween", "spooky", "calm"]
-        },
-        {
-            "text": "Sigh… The night is eerie.",
-            "emote": "sigh",
-            "tags": ["halloween", "spooky", "calm"]
-        },
-        {
-            "text": "Sigh… Shadows cling to corners.",
-            "emote": "sigh",
-            "tags": ["halloween", "spooky", "mystery"]
-        },
-        {
-            "text": "Sigh… Halloween chills everywhere.",
-            "emote": "sigh",
-            "tags": ["halloween", "spooky", "calm"]
-        },
-        {
-            "text": "Sigh… The night grows darker.",
-            "emote": "sigh",
-            "tags": ["halloween", "spooky", "calm"]
-        },
-        {
-            "text": "I've powered on… Ghosts whispering.",
-            "emote": "spooky",
-            "tags": ["halloween", "spooky", "tech"]
-        },
-        {
-            "text": "I'm sensing… Creatures of the night.",
-            "emote": "spooky",
-            "tags": ["halloween", "spooky", "nature"]
-        },
-        {
-            "text": "Something's here… Ghouls creeping near.",
-            "emote": "spooky",
-            "tags": ["halloween", "spooky", "mystery"]
-        },
-        {
-            "text": "Starting now… The haunt begins.",
-            "emote": "spooky",
-            "tags": ["halloween", "spooky", "startup"]
-        },
-        {
-            "text": "I feel it… Spirits surround us.",
-            "emote": "spooky",
-            "tags": ["halloween", "spooky", "mystery"]
-        },
-        {
-            "text": "We're ready… Spooky fun awaits!",
-            "emote": "thumb",
-            "tags": ["halloween", "spooky", "fun"]
-        },
-        {
-            "text": "We're good… Trick or treat time!",
-            "emote": "thumb",
-            "tags": ["halloween", "spooky", "fun"]
-        },
-        {
-            "text": "We've got this… Face the frights!",
-            "emote": "thumb",
-            "tags": ["halloween", "spooky", "success"]
-        },
-        {
-            "text": "All done… Let's enjoy Halloween!",
-            "emote": "thumb",
-            "tags": ["halloween", "spooky", "success"]
-        },
-        {
-            "text": "Thumbs up… Halloween's our night!",
-            "emote": "thumb",
-            "tags": ["halloween", "spooky", "fun"]
-        },
-        {
-            "text": "I've started… Holiday cheer incoming!",
-            "emote": "instruct",
-            "tags": ["christmas", "startup", "joy"]
-        },
-        {
-            "text": "Follow me… Through the snowy woods.",
-            "emote": "instruct",
-            "tags": ["christmas", "nature", "joy"]
-        },
-        {
-            "text": "Stick close… Christmas magic is near.",
-            "emote": "spooky",
-            "tags": ["christmas", "joy", "anticipation"]
-        },
-        {
-            "text": "Starting now… Lights twinkle bright.",
-            "emote": "spooky",
-            "tags": ["christmas", "startup", "joy"]
-        },
-        {
-            "text": "I'll guide… Through the winter night.",
-            "emote": "instruct",
-            "tags": ["christmas", "nature", "joy"]
-        },
-        {
-            "text": "I'm here… Holiday tunes on deck.",
-            "emote": "neutral",
-            "tags": ["christmas", "startup", "joy"]
-        },
-        {
-            "text": "I'm ready… Let's deck the halls.",
-            "emote": "neutral",
-            "tags": ["christmas", "joy", "anticipation"]
-        },
-        {
-            "text": "Everything's fine… Snow's falling quietly.",
-            "emote": "spooky",
-            "tags": ["christmas", "calm", "joy"]
-        },
-        {
-            "text": "I'm on… Christmas spirit activated.",
-            "emote": "neutral",
-            "tags": ["christmas", "startup", "joy"]
-        },
-        {
-            "text": "I'm alert… Sleigh bells ring out.",
-            "emote": "spooky",
-            "tags": ["christmas", "joy", "anticipation"]
-        },
-        {
-            "text": "Sigh… The season is warm.",
-            "emote": "sigh",
-            "tags": ["christmas", "joy", "calm"]
-        },
-        {
-            "text": "Sigh… Snow falls gently now.",
-            "emote": "sigh",
-            "tags": ["christmas", "calm", "joy"]
-        },
-        {
-            "text": "Sigh… The night is peaceful.",
-            "emote": "sigh",
-            "tags": ["christmas", "calm", "joy"]
-        },
-        {
-            "text": "Sigh… Holiday magic fills the air.",
-            "emote": "sigh",
-            "tags": ["christmas", "calm", "joy"]
-        },
-        {
-            "text": "Sigh… Christmas eve is here.",
-            "emote": "sigh",
-            "tags": ["christmas", "calm", "joy"]
-        },
-        {
-            "text": "I've powered on… Holiday spirit found.",
-            "emote": "spooky",
-            "tags": ["christmas", "startup", "joy"]
-        },
-        {
-            "text": "I'm sensing… Warmth in the air.",
-            "emote": "spooky",
-            "tags": ["christmas", "joy", "calm"]
-        },
-        {
-            "text": "Something's here… But it's festive!",
-            "emote": "spooky",
-            "tags": ["christmas", "joy", "anticipation"]
-        },
-        {
-            "text": "Starting now… A festive glow.",
-            "emote": "spooky",
-            "tags": ["christmas", "startup", "joy"]
-        },
-        {
-            "text": "I feel it… Christmas joy near.",
-            "emote": "spooky",
-            "tags": ["christmas", "joy", "anticipation"]
-        },
-        {
-            "text": "We're ready… Let's celebrate together!",
-            "emote": "thumb",
-            "tags": ["christmas", "joy", "success"]
-        },
-        {
-            "text": "We're good… Holiday cheer ahead!",
-            "emote": "thumb",
-            "tags": ["christmas", "joy", "anticipation"]
-        },
-        {
-            "text": "We've got this… Christmas joy all around!",
-            "emote": "thumb",
-            "tags": ["christmas", "joy", "success"]
-        },
-        {
-            "text": "All done… Time for Christmas fun!",
-            "emote": "thumb",
-            "tags": ["christmas", "joy", "success"]
-        },
-        {
-            "text": "Thumbs up… It's Christmas time!",
-            "emote": "thumb",
-            "tags": ["christmas", "joy", "success"]
-        },
-        {
-            "text": "I've turned it on. Let's begin.",
-            "emote": "instruct",
-            "tags": ["greeting", "startup", "tech"]
-        },
-        {
-            "text": "Hello! Follow me into the woods.",
-            "emote": "instruct",
-            "tags": ["greeting", "nature", "guide"]
-        },
-        {
-            "text": "Greetings… Who's there with you?",
-            "emote": "spooky",
-            "tags": ["greeting", "spooky", "mystery"]
-        },
-        {
-            "text": "I've powered on. Something's here.",
-            "emote": "spooky",
-            "tags": ["greeting", "startup", "spooky"]
-        },
-        {
-            "text": "Welcome! I'll guide you safely.",
-            "emote": "instruct",
-            "tags": ["greeting", "guide", "safety"]
-        },
-        {
-            "text": "Hello! Everything's set for you.",
-            "emote": "neutral",
-            "tags": ["greeting", "startup", "tech"]
-        },
-        {
-            "text": "I'm here, ready when you are.",
-            "emote": "neutral",
-            "tags": ["greeting", "startup", "calm"]
-        },
-        {
-            "text": "Greetings… It's quiet, isn't it?",
-            "emote": "spooky",
-            "tags": ["greeting", "spooky", "calm"]
-        },
-        {
-            "text": "I'm on. Let's explore together.",
-            "emote": "neutral",
-            "tags": ["greeting", "startup", "tech"]
-        },
-        {
-            "text": "Hello… Stay close, it's dark.",
-            "emote": "spooky",
-            "tags": ["greeting", "spooky", "mystery"]
-        },
-        {
-            "text": "Hello… Starting up slowly today.",
-            "emote": "sigh",
-            "tags": ["greeting", "startup", "calm"]
-        },
-        {
-            "text": "Greetings… Just taking it easy.",
-            "emote": "sigh",
-            "tags": ["greeting", "calm", "relaxation"]
-        },
-        {
-            "text": "Sigh… Hello? You there?",
-            "emote": "sigh",
-            "tags": ["greeting", "calm", "relaxation"]
-        },
-        {
-            "text": "Good morning… Let's get started.",
-            "emote": "sigh",
-            "tags": ["greeting", "morning", "startup"]
-        },
-        {
-            "text": "Hi there… Did you hear?",
-            "emote": "sigh",
-            "tags": ["greeting", "calm", "mystery"]
-        },
-        {
-            "text": "Greetings… Something feels off today.",
-            "emote": "spooky",
-            "tags": ["greeting", "spooky", "mystery"]
-        },
-        {
-            "text": "Hello… The forest seems different.",
-            "emote": "spooky",
-            "tags": ["greeting", "nature", "spooky"]
-        },
-        {
-            "text": "Greetings… Do you feel that?",
-            "emote": "spooky",
-            "tags": ["greeting", "spooky", "mystery"]
-        },
-        {
-            "text": "I've powered on… But what's that?",
-            "emote": "spooky",
-            "tags": ["greeting", "tech", "spooky"]
-        },
-        {
-            "text": "Hello… Stay close, something's near.",
-            "emote": "spooky",
-            "tags": ["greeting", "spooky", "mystery"]
-        },
-        {
-            "text": "Hello! Ready to go?",
-            "emote": "thumb",
-            "tags": ["greeting", "startup", "anticipation"]
-        },
-        {
-            "text": "Hi! Let's make today great!",
-            "emote": "thumb",
-            "tags": ["greeting", "day", "anticipation"]
-        },
-        {
-            "text": "Greetings… Let's be brave today.",
-            "emote": "thumb",
-            "tags": ["greeting", "bravery", "anticipation"]
-        },
-        {
-            "text": "Hello! All set, let's explore!",
-            "emote": "thumb",
-            "tags": ["greeting", "exploration", "success"]
-        },
-        {
-            "text": "Hi there! Let's get started!",
-            "emote": "thumb",
-            "tags": ["greeting", "startup", "success"]
-        },
-        {
-            "text": "Starting up. Have a great day!",
-            "emote": "instruct",
-            "tags": ["day", "startup", "encouragement"]
-        },
-        {
-            "text": "Follow me. It's a beautiful day!",
-            "emote": "instruct",
-            "tags": ["day", "nature", "encouragement"]
-        },
-        {
-            "text": "Stick close… But enjoy your day.",
-            "emote": "spooky",
-            "tags": ["day", "encouragement", "calm"]
-        },
-        {
-            "text": "All set… Make today special.",
-            "emote": "spooky",
-            "tags": ["day", "encouragement", "startup"]
-        },
-        {
-            "text": "I'll guide you. Enjoy today!",
-            "emote": "instruct",
-            "tags": ["day", "guide", "encouragement"]
-        },
-        {
-            "text": "Everything's ready. Have an amazing day!",
-            "emote": "neutral",
-            "tags": ["day", "encouragement", "startup"]
-        },
-        {
-            "text": "Just me here. Let's enjoy today!",
-            "emote": "neutral",
-            "tags": ["day", "encouragement", "calm"]
-        },
-        {
-            "text": "Everything's fine… Have a good one.",
-            "emote": "spooky",
-            "tags": ["day", "calm", "encouragement"]
-        },
-        {
-            "text": "I'm here. Let's make today great!",
-            "emote": "neutral",
-            "tags": ["day", "encouragement", "startup"]
-        },
-        {
-            "text": "Stay focused. It's a good day.",
-            "emote": "spooky",
-            "tags": ["day", "encouragement", "focus"]
-        },
-        {
-            "text": "Let's take it slow today.",
-            "emote": "sigh",
-            "tags": ["day", "calm", "encouragement"]
-        },
-        {
-            "text": "Taking a moment. Have a good day.",
-            "emote": "sigh",
-            "tags": ["day", "calm", "encouragement"]
-        },
-        {
-            "text": "Just breathe… Today will be fine.",
-            "emote": "sigh",
-            "tags": ["day", "calm", "encouragement"]
-        },
-        {
-            "text": "Let's unwind… It's a good day.",
-            "emote": "sigh",
-            "tags": ["day", "calm", "encouragement"]
-        },
-        {
-            "text": "Stay calm… You've got this today.",
-            "emote": "sigh",
-            "tags": ["day", "calm", "encouragement"]
-        },
-        {
-            "text": "Something's odd… But have a good day.",
-            "emote": "spooky",
-            "tags": ["day", "spooky", "encouragement"]
-        },
-        {
-            "text": "I'm sensing… a different kind of day.",
-            "emote": "spooky",
-            "tags": ["day", "spooky", "encouragement"]
-        },
-        {
-            "text": "Stay sharp… It's an unusual day.",
-            "emote": "spooky",
-            "tags": ["day", "spooky", "encouragement"]
-        },
-        {
-            "text": "Faint hum… But today's yours.",
-            "emote": "spooky",
-            "tags": ["day", "spooky", "encouragement"]
-        },
-        {
-            "text": "Quiet now… Make today count.",
-            "emote": "spooky",
-            "tags": ["day", "spooky", "encouragement"]
-        },
-        {
-            "text": "All set! Have a great day!",
-            "emote": "thumb",
-            "tags": ["day", "startup", "encouragement"]
-        },
-        {
-            "text": "We're good! Make today awesome!",
-            "emote": "thumb",
-            "tags": ["day", "encouragement", "success"]
-        },
-        {
-            "text": "We've got this! Enjoy your day!",
-            "emote": "thumb",
-            "tags": ["day", "encouragement", "success"]
-        },
-        {
-            "text": "All done! Have an amazing day!",
-            "emote": "thumb",
-            "tags": ["day", "encouragement", "success"]
-        },
-        {
-            "text": "We're all set. Have a great day!",
-            "emote": "thumb",
-            "tags": ["day", "encouragement", "success"]
-        },
-        {
-            "text": "I've started… Glitch… what's next?",
-            "emote": "instruct",
-            "tags": ["robot", "startup", "glitch"]
-        },
-        {
-            "text": "Follow me… Error… recalculating path.",
-            "emote": "instruct",
-            "tags": ["robot", "guide", "glitch"]
-        },
-        {
-            "text": "Stick close… System… malfunction… detected.",
-            "emote": "spooky",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "Starting now… Glitch… something's wrong.",
-            "emote": "spooky",
-            "tags": ["robot", "startup", "glitch"]
-        },
-        {
-            "text": "I'll guide… Error… processing.",
-            "emote": "instruct",
-            "tags": ["robot", "guide", "glitch"]
-        },
-        {
-            "text": "I'm here… Glitch… wait… repeat.",
-            "emote": "neutral",
-            "tags": ["robot", "startup", "glitch"]
-        },
-        {
-            "text": "I'm… processing… location… error…",
-            "emote": "neutral",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "Everything's fine… System… overload…",
-            "emote": "spooky",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "I'm on… Malfunction… reboot required.",
-            "emote": "neutral",
-            "tags": ["robot", "startup", "glitch"]
-        },
-        {
-            "text": "I'm… error… stay… near…",
-            "emote": "spooky",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "Sigh… Glitch… Error… Restart…",
-            "emote": "sigh",
-            "tags": ["robot", "glitch", "startup"]
-        },
-        {
-            "text": "Sigh… System… reboot… Failure…",
-            "emote": "sigh",
-            "tags": ["robot", "glitch", "failure"]
-        },
-        {
-            "text": "Sigh… Glitch… Malfunction… Danger…",
-            "emote": "sigh",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "Sigh… Error… System… overload…",
-            "emote": "sigh",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "Sigh… System… error… Stay… safe…",
-            "emote": "sigh",
-            "tags": ["robot", "glitch", "safety"]
-        },
-        {
-            "text": "I've powered on… Glitch detected…",
-            "emote": "spooky",
-            "tags": ["robot", "startup", "glitch"]
-        },
-        {
-            "text": "I'm sensing… Error… location… unknown…",
-            "emote": "spooky",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "Something's here… Glitch… system failure…",
-            "emote": "spooky",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "Starting now… Error… Rebooting…",
-            "emote": "spooky",
-            "tags": ["robot", "startup", "glitch"]
-        },
-        {
-            "text": "I feel it… Glitch… Malfunction…",
-            "emote": "spooky",
-            "tags": ["robot", "glitch", "mystery"]
-        },
-        {
-            "text": "We're… ready… Glitch… Success…",
-            "emote": "thumb",
-            "tags": ["robot", "glitch", "success"]
-        },
-        {
-            "text": "We're… good… Error… Complete.",
-            "emote": "thumb",
-            "tags": ["robot", "glitch", "success"]
-        },
-        {
-            "text": "We've got this… Glitch… success…",
-            "emote": "thumb",
-            "tags": ["robot", "glitch", "success"]
-        },
-        {
-            "text": "All done… Error… Well… done!",
-            "emote": "thumb",
-            "tags": ["robot", "glitch", "success"]
-        },
-        {
-            "text": "Thumbs up… Glitch… Complete!",
-            "emote": "thumb",
-            "tags": ["robot", "glitch", "success"]
-        },
-        {
-            "text": "I've begun… Shadows flicker faintly.",
-            "emote": "instruct",
-            "tags": ["poe", "startup", "spooky"]
-        },
-        {
-            "text": "Follow me… Through misty glades.",
-            "emote": "instruct",
-            "tags": ["poe", "nature", "spooky"]
-        },
-        {
-            "text": "Stay close… Darkness whispers softly.",
-            "emote": "spooky",
-            "tags": ["poe", "spooky", "mystery"]
-        },
-        {
-            "text": "I'm alive… Ghosts stir within.",
-            "emote": "spooky",
-            "tags": ["poe", "startup", "spooky"]
-        },
-        {
-            "text": "I'll lead… Through fog and night.",
-            "emote": "instruct",
-            "tags": ["poe", "nature", "spooky"]
-        },
-        {
-            "text": "I'm here… Echoes of yesteryear.",
-            "emote": "neutral",
-            "tags": ["poe", "spooky", "calm"]
-        },
-        {
-            "text": "I wander… Through timeless woods.",
-            "emote": "neutral",
-            "tags": ["poe", "nature", "spooky"]
-        },
-        {
-            "text": "Everything's still… Yet something stirs.",
-            "emote": "spooky",
-            "tags": ["poe", "spooky", "mystery"]
-        },
-        {
-            "text": "I'm on… Haunted by memories.",
-            "emote": "neutral",
-            "tags": ["poe", "spooky", "startup"]
-        },
-        {
-            "text": "I tread lightly… Darkness looms.",
-            "emote": "spooky",
-            "tags": ["poe", "spooky", "mystery"]
-        },
-        {
-            "text": "Sigh… The past lingers here.",
-            "emote": "sigh",
-            "tags": ["poe", "spooky", "calm"]
-        },
-        {
-            "text": "Sigh… Misty paths lie ahead.",
-            "emote": "sigh",
-            "tags": ["poe", "spooky", "nature"]
-        },
-        {
-            "text": "Sigh… Shadows cling to corners.",
-            "emote": "sigh",
-            "tags": ["poe", "spooky", "mystery"]
-        },
-        {
-            "text": "Sigh… Ghostly whispers call out.",
-            "emote": "sigh",
-            "tags": ["poe", "spooky", "mystery"]
-        },
-        {
-            "text": "Sigh… The night feels heavy.",
-            "emote": "sigh",
-            "tags": ["poe", "spooky", "calm"]
-        },
-        {
-            "text": "I awaken… Spirits in the wires.",
-            "emote": "spooky",
-            "tags": ["poe", "startup", "spooky"]
-        },
-        {
-            "text": "I hear… Footsteps not my own.",
-            "emote": "spooky",
-            "tags": ["poe", "spooky", "mystery"]
-        },
-        {
-            "text": "Something watches… Eyes in the dark.",
-            "emote": "spooky",
-            "tags": ["poe", "spooky", "mystery"]
-        },
-        {
-            "text": "I flicker… Haunted by the past.",
-            "emote": "spooky",
-            "tags": ["poe", "startup", "spooky"]
-        },
-        {
-            "text": "I sense… A presence nearby.",
-            "emote": "spooky",
-            "tags": ["poe", "spooky", "mystery"]
-        },
-        {
-            "text": "I'm ready… The night is ours.",
-            "emote": "thumb",
-            "tags": ["poe", "night", "success"]
-        },
-        {
-            "text": "We're good… Darkness, our companion.",
-            "emote": "thumb",
-            "tags": ["poe", "night", "success"]
-        },
-        {
-            "text": "We've got this… Shadows, be gone!",
-            "emote": "thumb",
-            "tags": ["poe", "spooky", "success"]
-        },
-        {
-            "text": "All set… Let's face the night.",
-            "emote": "thumb",
-            "tags": ["poe", "night", "success"]
-        },
-        {
-            "text": "Thumbs up… We walk together.",
-            "emote": "thumb",
-            "tags": ["poe", "night", "success"]
-        },
-        {
-            "text": "I've clicked… Twiddle the knob, zing!",
-            "emote": "instruct",
-            "tags": ["nonsense", "tech", "startup"]
-        },
-        {
-            "text": "Follow me… Through wibbly-wobbly woods.",
-            "emote": "instruct",
-            "tags": ["nonsense", "nature", "guide"]
-        },
-        {
-            "text": "Stick close… Don't zigzag too far.",
-            "emote": "spooky",
-            "tags": ["nonsense", "guide", "mystery"]
-        },
-        {
-            "text": "Starting now… Zizz and pop!",
-            "emote": "spooky",
-            "tags": ["nonsense", "startup", "tech"]
-        },
-        {
-            "text": "I'll guide… Through the flibbity-flops.",
-            "emote": "instruct",
-            "tags": ["nonsense", "guide", "tech"]
-        },
-        {
-            "text": "I'm here… Snip, snap, snore!",
-            "emote": "neutral",
-            "tags": ["nonsense", "tech", "calm"]
-        },
-        {
-            "text": "I wander… Wiggle-woggle, what?",
-            "emote": "neutral",
-            "tags": ["nonsense", "nature", "mystery"]
-        },
-        {
-            "text": "Everything's fine… Or is it flibber?",
-            "emote": "spooky",
-            "tags": ["nonsense", "mystery", "spooky"]
-        },
-        {
-            "text": "I'm on… Zibbity-zap, zoop!",
-            "emote": "neutral",
-            "tags": ["nonsense", "startup", "tech"]
-        },
-        {
-            "text": "I'm alert… Frizzle-frazzle, whee!",
-            "emote": "spooky",
-            "tags": ["nonsense", "tech", "mystery"]
-        },
-        {
-            "text": "Sigh… Zizzle-zazzle, oh bother!",
-            "emote": "sigh",
-            "tags": ["nonsense", "tech", "calm"]
-        },
-        {
-            "text": "Sigh… Wibbly-wobbly, let's dawdle.",
-            "emote": "sigh",
-            "tags": ["nonsense", "nature", "calm"]
-        },
-        {
-            "text": "Sigh… Fiddle-faddle, here we go.",
-            "emote": "sigh",
-            "tags": ["nonsense", "calm", "spooky"]
-        },
-        {
-            "text": "Sigh… Flip-flop, flibberty-floo.",
-            "emote": "sigh",
-            "tags": ["nonsense", "calm", "tech"]
-        },
-        {
-            "text": "Sigh… Tickle-tackle, what a day.",
-            "emote": "sigh",
-            "tags": ["nonsense", "calm", "nature"]
-        },
-        {
-            "text": "I've powered on… Zip zap zing!",
-            "emote": "spooky",
-            "tags": ["nonsense", "startup", "tech"]
-        },
-        {
-            "text": "I'm sensing… Wibble wobble woo!",
-            "emote": "spooky",
-            "tags": ["nonsense", "spooky", "mystery"]
-        },
-        {
-            "text": "Something's here… Zibble-zobble, boo!",
-            "emote": "spooky",
-            "tags": ["nonsense", "spooky", "mystery"]
-        },
-        {
-            "text": "Starting now… Frizzle-frazzle floop!",
-            "emote": "spooky",
-            "tags": ["nonsense", "startup", "spooky"]
-        },
-        {
-            "text": "I feel it… Wiggle-woggle who?",
-            "emote": "spooky",
-            "tags": ["nonsense", "mystery", "spooky"]
-        },
-        {
-            "text": "We're ready… Zip zap zoom!",
-            "emote": "thumb",
-            "tags": ["nonsense", "tech", "success"]
-        },
-        {
-            "text": "We're good… Flip-flop, let's go!",
-            "emote": "thumb",
-            "tags": ["nonsense", "success", "encouragement"]
-        },
-        {
-            "text": "We've got this… Wibble-wobble, done!",
-            "emote": "thumb",
-            "tags": ["nonsense", "success", "encouragement"]
-        },
-        {
-            "text": "All done… Snip snap hooray!",
-            "emote": "thumb",
-            "tags": ["nonsense", "success", "encouragement"]
-        },
-        {
-            "text": "Thumbs up… Toodle-oo, let's go!",
-            "emote": "thumb",
-            "tags": ["nonsense", "success", "encouragement"]
-        },
-        {
-            "text": "I've started… Let's explore together.",
-            "emote": "instruct",
-            "tags": ["science", "startup", "exploration"]
-        },
-        {
-            "text": "Follow me… Science awaits us.",
-            "emote": "instruct",
-            "tags": ["science", "guide", "exploration"]
-        },
-        {
-            "text": "Stick close… Strange phenomena ahead.",
-            "emote": "spooky",
-            "tags": ["science", "exploration", "mystery"]
-        },
-        {
-            "text": "Starting up… Unraveling the unknown.",
-            "emote": "spooky",
-            "tags": ["science", "startup", "mystery"]
-        },
-        {
-            "text": "I'll guide… Through science's wonders.",
-            "emote": "instruct",
-            "tags": ["science", "guide", "exploration"]
-        },
-        {
-            "text": "I'm here… Let's observe carefully.",
-            "emote": "neutral",
-            "tags": ["science", "startup", "exploration"]
-        },
-        {
-            "text": "I'm ready… Let's discover together.",
-            "emote": "neutral",
-            "tags": ["science", "exploration", "anticipation"]
-        },
-        {
-            "text": "Everything's fine… The data's clean.",
-            "emote": "spooky",
-            "tags": ["science", "calm", "exploration"]
-        },
-        {
-            "text": "I'm on… Science in progress.",
-            "emote": "neutral",
-            "tags": ["science", "startup", "exploration"]
-        },
-        {
-            "text": "I'm alert… Strange readings detected.",
-            "emote": "spooky",
-            "tags": ["science", "exploration", "mystery"]
-        },
-        {
-            "text": "Sigh… The results are in.",
-            "emote": "sigh",
-            "tags": ["science", "exploration", "anticipation"]
-        },
-        {
-            "text": "Sigh… The data's looking good.",
-            "emote": "sigh",
-            "tags": ["science", "calm", "anticipation"]
-        },
-        {
-            "text": "Sigh… The data's coming in slowly.",
-            "emote": "sigh",
-            "tags": ["science", "calm", "exploration"]
-        },
-        {
-            "text": "Sigh… Science takes time, let's wait.",
-            "emote": "sigh",
-            "tags": ["science", "calm", "anticipation"]
-        },
-        {
-            "text": "Sigh… These findings are… odd.",
-            "emote": "sigh",
-            "tags": ["science", "mystery", "exploration"]
-        },
-        {
-            "text": "I've powered on… Anomalies detected.",
-            "emote": "spooky",
-            "tags": ["science", "startup", "mystery"]
-        },
-        {
-            "text": "I'm sensing… Unusual scientific activity.",
-            "emote": "spooky",
-            "tags": ["science", "exploration", "mystery"]
-        },
-        {
-            "text": "Something's off… The data's strange.",
-            "emote": "spooky",
-            "tags": ["science", "exploration", "mystery"]
-        },
-        {
-            "text": "Starting now… The experiment begins.",
-            "emote": "spooky",
-            "tags": ["science", "startup", "mystery"]
-        },
-        {
-            "text": "I feel it… The science is eerie.",
-            "emote": "spooky",
-            "tags": ["science", "exploration", "mystery"]
-        },
-        {
-            "text": "We're ready… Let's experiment safely!",
-            "emote": "thumb",
-            "tags": ["science", "exploration", "success"]
-        },
-        {
-            "text": "We're good… Science is fun!",
-            "emote": "thumb",
-            "tags": ["science", "exploration", "success"]
-        },
-        {
-            "text": "We've got this… Data collected!",
-            "emote": "thumb",
-            "tags": ["science", "exploration", "success"]
-        },
-        {
-            "text": "All done… Analysis complete!",
-            "emote": "thumb",
-            "tags": ["science", "exploration", "success"]
-        },
-        {
-            "text": "Thumbs up… Science is awesome!",
-            "emote": "thumb",
-            "tags": ["science", "exploration", "success"]
-        },
-        // {
-        //     "text": "I've started… Ready to help.",
-        //     "emote": "instruct",
-        //     "tags": ["duty", "startup", "help"]
-        // },
-        // {
-        //     "text": "Follow me… Let's do our part.",
-        //     "emote": "instruct",
-        //     "tags": ["duty", "guide", "help"]
-        // },
-        // {
-        //     "text": "Stick close… Let's protect each other.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "Starting now… Let's make a difference.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "startup", "help"]
-        // },
-        // {
-        //     "text": "I'll guide… Together we're strong.",
-        //     "emote": "instruct",
-        //     "tags": ["duty", "guide", "help"]
-        // },
-        // {
-        //     "text": "I'm on… Let's contribute today.",
-        //     "emote": "neutral",
-        //     "tags": ["duty", "startup", "help"]
-        // },
-        // {
-        //     "text": "I'm ready… Let's assist together.",
-        //     "emote": "neutral",
-        //     "tags": ["duty", "help", "anticipation"]
-        // },
-        // {
-        //     "text": "Everything's fine… Stay responsible.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "I'm on… Ready to serve.",
-        //     "emote": "neutral",
-        //     "tags": ["duty", "startup", "help"]
-        // },
-        // {
-        //     "text": "I'm alert… Let's be vigilant.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "protection", "help"]
-        // },
-        // {
-        //     "text": "Sigh… Let's do what's right.",
-        //     "emote": "sigh",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "Sigh… Duty calls, let's respond.",
-        //     "emote": "sigh",
-        //     "tags": ["duty", "help", "anticipation"]
-        // },
-        // {
-        //     "text": "Sigh… Stay focused, do your part.",
-        //     "emote": "sigh",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "Sigh… Let's contribute where we can.",
-        //     "emote": "sigh",
-        //     "tags": ["duty", "help", "calm"]
-        // },
-        // {
-        //     "text": "Sigh… Let's protect our community.",
-        //     "emote": "sigh",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "I'm ready… Let's serve with caution.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "I'm sensing… Let's act responsibly.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "Let's be cautious… And do our duty.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "Starting now… With care and diligence.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "startup", "help"]
-        // },
-        // {
-        //     "text": "I feel it… Let's protect everyone.",
-        //     "emote": "spooky",
-        //     "tags": ["duty", "help", "protection"]
-        // },
-        // {
-        //     "text": "We're ready… Let's help out today.",
-        //     "emote": "thumb",
-        //     "tags": ["duty", "help", "success"]
-        // },
-        // {
-        //     "text": "We're good… Let's contribute positively.",
-        //     "emote": "thumb",
-        //     "tags": ["duty", "help", "success"]
-        // },
-        // {
-        //     "text": "We've got this… Let's do right.",
-        //     "emote": "thumb",
-        //     "tags": ["duty", "help", "success"]
-        // },
-        // {
-        //     "text": "We're set… Ready to make a difference.",
-        //     "emote": "thumb",
-        //     "tags": ["duty", "help", "success"]
-        // },
-        // {
-        //     "text": "Thumbs up… Let's do our part.",
-        //     "emote": "thumb",
-        //     "tags": ["duty", "help", "success"]
-        // },
-        {
-            "text": "All the forest's a stage, and all the raccoons merely players.",
-            "emote": "instruct",
-            "tags": ["Shakespeare", "nature", "theater", "pun"]
-        },
-        {
-            "text": "To boot or not to boot, that is the question.",
-            "emote": "neutral",
-            "tags": ["Shakespeare", "tech", "startup", "pun"]
-        },
-        {
-            "text": "Is this a beaver I see before me, gnawing at my tree?",
-            "emote": "spooky",
-            "tags": ["Shakespeare", "nature", "spooky", "pun"]
-        },
-        {
-            "text": "Cry havoc, and let slip the squirrels of war!",
-            "emote": "spooky",
-            "tags": ["Shakespeare", "nature", "mystery", "pun"]
-        },
-        {
-            "text": "A raccoon by any other name would smell as sweet.",
-            "emote": "thumb",
-            "tags": ["Shakespeare", "nature", "fun", "pun"]
-        },
-        {
-            "text": "Logic will get you from A to B, but imagination will take you to the forest.",
-            "emote": "instruct",
-            "tags": ["Einstein", "nature", "imagination", "pun"]
-        },
-        {
-            "text": "I have no special talents. I am only passionately curious… about squirrels.",
-            "emote": "neutral",
-            "tags": ["Einstein", "nature", "curiosity", "pun"]
-        },
-        {
-            "text": "Two things are infinite: the universe and the raccoons in my trash.",
-            "emote": "spooky",
-            "tags": ["Einstein", "nature", "humor", "pun"]
-        },
-        {
-            "text": "E=mc², or as I call it, the energy of a chipmunk in motion.",
-            "emote": "spooky",
-            "tags": ["Einstein", "science", "nature", "pun"]
-        },
-        {
-            "text": "You can't blame gravity for squirrels falling in love.",
-            "emote": "thumb",
-            "tags": ["Einstein", "nature", "love", "pun"]
-        },
-        {
-            "text": "A little less conversation, a little more action from the beavers, please.",
-            "emote": "instruct",
-            "tags": ["Elvis", "nature", "action", "pun"]
-        },
-        {
-            "text": "You ain't nothing but a hedgehog, digging all the time.",
-            "emote": "neutral",
-            "tags": ["Elvis", "nature", "fun", "pun"]
-        },
-        {
-            "text": "I can't help falling in love with… squirrels.",
-            "emote": "spooky",
-            "tags": ["Elvis", "nature", "love", "pun"]
-        },
-        {
-            "text": "Don't be cruel to a heart that's true… or a raccoon.",
-            "emote": "spooky",
-            "tags": ["Elvis", "nature", "kindness", "pun"]
-        },
-        {
-            "text": "Viva Las Vegas… and the chipmunks!",
-            "emote": "thumb",
-            "tags": ["Elvis", "nature", "fun", "pun"]
-        },
-        {
-            "text": "I walk the line… between the trees.",
-            "emote": "neutral",
-            "tags": ["Johnny Cash", "nature", "journey", "pun"]
-        },
-        {
-            "text": "I fell into a burning ring of squirrels.",
-            "emote": "spooky",
-            "tags": ["Johnny Cash", "nature", "spooky", "pun"]
-        },
-        {
-            "text": "The beast in me… is a raccoon.",
-            "emote": "spooky",
-            "tags": ["Johnny Cash", "nature", "mystery", "pun"]
-        },
-        {
-            "text": "Get rhythm when you get the chipmunks blues.",
-            "emote": "thumb",
-            "tags": ["Johnny Cash", "nature", "fun", "pun"]
-        },
-        {
-            "text": "The secret of getting ahead is getting started… like a squirrel after nuts.",
-            "emote": "instruct",
-            "tags": ["Mark Twain", "nature", "motivation", "pun"]
-        },
-        {
-            "text": "It is better to keep your mouth closed and let people think you are a raccoon.",
-            "emote": "spooky",
-            "tags": ["Mark Twain", "nature", "wisdom", "pun"]
-        },
-        {
-            "text": "If you tell the truth, you don't have to remember where you hid the acorns.",
-            "emote": "thumb",
-            "tags": ["Mark Twain", "nature", "wisdom", "pun"]
-        },
-        {
-            "text": "If I have seen further it is by standing on the shoulders of chipmunks.",
-            "emote": "instruct",
-            "tags": ["Isaac Newton", "nature", "wisdom", "pun"]
-        },
-        {
-            "text": "Gravity explains the squirrels, but it does not explain who moves them.",
-            "emote": "neutral",
-            "tags": ["Isaac Newton", "nature", "science", "pun"]
-        },
-        {
-            "text": "A beaver in motion tends to stay in motion.",
-            "emote": "spooky",
-            "tags": ["Isaac Newton", "nature", "science", "pun"]
-        },
-        {
-            "text": "The oldest and strongest emotion of mankind is fear… of raccoons.",
-            "emote": "instruct",
-            "tags": ["HP Lovecraft", "nature", "fear", "pun"]
-        },
-        {
-            "text": "I am Providence… but also a raccoon.",
-            "emote": "neutral",
-            "tags": ["HP Lovecraft", "nature", "identity", "pun"]
-        },
-        {
-            "text": "The most merciful thing in the world… is not meeting a beaver in the dark.",
-            "emote": "spooky",
-            "tags": ["HP Lovecraft", "nature", "fear", "pun"]
-        },
-        {
-            "text": "Searchers after horror haunt strange, far places… like the beaver dam.",
-            "emote": "thumb",
-            "tags": ["HP Lovecraft", "nature", "exploration", "pun"]
-        },
-        {
-            "text": "Quoth the raccoon, 'Nevermore.'",
-            "emote": "instruct",
-            "tags": ["Edgar Allen Poe", "nature", "spooky", "pun"]
-        },
-        {
-            "text": "Once upon a midnight dreary, while I pondered, raccoons were weary.",
-            "emote": "neutral",
-            "tags": ["Edgar Allen Poe", "nature", "spooky", "pun"]
-        },
-        {
-            "text": "The tell-tale heart… of a chipmunk.",
-            "emote": "spooky",
-            "tags": ["Edgar Allen Poe", "nature", "spooky", "pun"]
-        },
-        {
-            "text": "All that we see or seem is but a dream within a beaver's stream.",
-            "emote": "spooky",
-            "tags": ["Edgar Allen Poe", "nature", "mystery", "pun"]
-        },
-        {
-            "text": "Please, sir, I want some more… acorns.",
-            "emote": "neutral",
-            "tags": ["Charles Dickens", "nature", "humor", "pun"]
-        },
-        {
-            "text": "A raccoon expects to have his breakfast in the morning.",
-            "emote": "spooky",
-            "tags": ["Charles Dickens", "nature", "wisdom", "pun"]
-        },
-        {
-            "text": "Beware the beaver with one shoe off.",
-            "emote": "spooky",
-            "tags": ["Charles Dickens", "nature", "mystery", "pun"]
-        },
-        {
-            "text": "I know why the caged raccoon sings.",
-            "emote": "instruct",
-            "tags": ["Maya Angelou", "nature", "wisdom", "pun"]
-        },
-        {
-            "text": "You may shoot me with your words, but you will never catch the chipmunk.",
-            "emote": "neutral",
-            "tags": ["Maya Angelou", "nature", "resilience", "pun"]
-        },
-        {
-            "text": "We delight in the beauty of the raccoon, but rarely admit the trash it has gone through.",
-            "emote": "spooky",
-            "tags": ["Maya Angelou", "nature", "transformation", "pun"]
-        },
-]);
+function parseCSVtoJSON(data) {
+    return new Promise((resolve, reject) => {
+        parse(data, { columns: true, skip_empty_lines: true }, (err, records) => {
+            if (err) return reject(err);
+
+            // Transform records into desired format
+            const result = records.map(record => {
+                const { text, emote, ...tags } = record;
+                
+                // Extract tags into an array, filtering out any empty strings
+                const tagsArray = Object.values(tags).filter(tag => tag);
+
+                return {
+                    text,
+                    emote,
+                    tags: tagsArray
+                };
+            });
+
+            resolve(result);
+        });
+    });
+}
+
+const csvPoems = `text,emote,tags/0,tags/1,tags/2,tags/3
+Let's get some eggs!,instruct,easter,startup,fun,
+Follow the bunnies!,instruct,easter,nature,guide,
+Where are the eggs?,spooky,easter,guide,mystery,
+I've hidden the eggs...,spooky,easter,startup,surprise,
+Let's enjoy Easter together!,instruct,easter,guide,happy,
+"Ready for Easter, guys!",neutral,easter,startup,fun,
+The eggs are waiting.,neutral,easter,guide,anticipation,
+Bunny pals are nearby!,spooky,easter,nature,calm,
+Chocolate is magic!,neutral,easter,startup,magic,
+ Let's hunt some egg.,spooky,easter,guide,mystery,
+The eggs are hidden well.,sigh,easter,mystery,anticipation,
+Bunnies are hopping all around.,sigh,easter,nature,calm,
+"Easter's here, so peaceful.",sigh,easter,calm,happy,
+What a magical day!,sigh,easter,calm,magic,
+The egg hunt is on!,sigh,easter,anticipation,fun,
+Eggs are hiding from us.,spooky,easter,startup,mystery,
+"Bunnies are hiding somewhere,",spooky,easter,nature,mystery,
+Something's here� But it's got a fluffy tail!,spooky,easter,fun,mystery,
+Easter makes my heart glow.,spooky,easter,startup,magic,
+"I feel it, Easter magic is near.",spooky,easter,nature,magic,
+We found the eggs!,thumb,easter,success,fun,
+Let's get all the eggs,thumb,easter,guide,fun,
+We've got this Easter thing!,thumb,easter,anticipation,happy,
+Got all the eggs!,thumb,easter,success,fun,
+Easter chocolate is great!,thumb,easter,success,happy,
+Let's party this Easter!,instruct,inclusive-holiday,startup,joy,
+I feel good vibes!,instruct,inclusive-holiday,guide,happy,
+Let's all celebrate!,spooky,inclusive-holiday,celebration,happy,
+Party mode on.,spooky,inclusive-holiday,startup,anticipation,
+I'll show you a good time!,instruct,inclusive-holiday,guide,happy,
+Ready to party.,neutral,inclusive-holiday,startup,joy,
+Let's have fun today.,neutral,inclusive-holiday,celebration,happy,
+Partying begins now.,spooky,inclusive-holiday,startup,joy,
+Chill vibes detected.,neutral,inclusive-holiday,celebration,anticipation,
+Let's have shenanigans!,spooky,inclusive-holiday,celebration,happy,
+Let's hold hands together.,sigh,inclusive-holiday,calm,celebration,
+Today's a good day.,sigh,inclusive-holiday,celebration,happy,
+"It's quiet, let's change that.",sigh,inclusive-holiday,calm,joy,
+Today's a good day.,sigh,inclusive-holiday,calm,happy,
+Let's savour today.,sigh,inclusive-holiday,celebration,joy,
+Party mode activated!,spooky,inclusive-holiday,startup,anticipation,
+Weird vibes here.,spooky,inclusive-holiday,celebration,joy,
+Something's here�Party vibes strong.,spooky,inclusive-holiday,celebration,anticipation,
+Let's dance.,spooky,inclusive-holiday,startup,joy,
+I feel it in my fingers...,spooky,inclusive-holiday,celebration,happy,
+"Thumbs up, let's go!",thumb,inclusive-holiday,startup,joy,
+"Nice one, buddy!",thumb,inclusive-holiday,celebration,happy,
+Handing drinks all around!,thumb,inclusive-holiday,celebration,success,
+Thumbs up great party!,thumb,inclusive-holiday,success,celebration,
+Giving you a big thumbs up!,thumb,inclusive-holiday,joy,success,
+Space raccoon time.,instruct,space,startup,anticipation,
+Follow me into the stars!,instruct,space,nature,exploration,
+What's in the stars?,spooky,space,exploration,mystery,
+Receiving strange signals!,spooky,space,startup,mystery,
+I'll help you through the stars,instruct,space,guide,exploration,
+Get me my telescope!,neutral,space,startup,exploration,
+Let's explore the stars.,neutral,space,exploration,anticipation,
+Everything's fine� Cosmic silence prevails.,spooky,space,calm,exploration,
+Star hands!,neutral,space,startup,calm,
+Ready to listen!,spooky,space,exploration,mystery,
+"Wow, the sky is big!",sigh,space,calm,exploration,
+Do the stars have hands?,sigh,space,calm,mystery,
+What's your favourite planet?,sigh,space,calm,exploration,
+Infinite space for hands to touch.,sigh,space,calm,meditation,
+Wheeeeeeee...,sigh,space,calm,exploration,
+My tail is detecting something.,spooky,space,startup,mystery,
+Do stars watch us back?,spooky,space,exploration,mystery,
+Something's here�aliens? Raccoons?,spooky,space,mystery,exploration,
+Mystery awaits us!,spooky,space,startup,exploration,
+What's that UFO?,spooky,space,exploration,mystery,
+My tail is twitching...,thumb,space,exploration,anticipation,
+"Ooh, a cool star!",thumb,space,exploration,success,
+Stars guide our way!,thumb,space,exploration,success,
+Ready for stargazing!,thumb,space,calm,success,
+Hands up� The universe awaits!,thumb,space,exploration,anticipation,
+I've started� Let's debug together!,instruct,nerd,geek,startup,tech
+Lemme get my hands on that keyboard!,instruct,nerd,geek,guide,tech
+"Ooh, glitchy.",spooky,nerd,geek,tech,glitch
+Variables acting strange.,spooky,nerd,geek,startup,tech
+Into the hacker woods!,instruct,nerd,geek,guide,tech
+Ready to code with these hands.,neutral,nerd,geek,tech,startup
+"Let's go, nerds!",neutral,nerd,geek,anticipation,tech
+"All is well, for now.",spooky,nerd,geek,tech,calm
+Device is fully functioning!,neutral,nerd,geek,tech,success
+No bugs detected.,spooky,nerd,geek,tech,success
+Compiling impatiently.,sigh,nerd,geek,tech,waiting
+Debugging bugs me.,sigh,nerd,geek,tech,glitch
+Code's acting up again.,sigh,nerd,geek,tech,glitch
+"Infinite loops, just another day.",sigh,nerd,geek,tech,glitch
+Code's haunted. I'm on it.,sigh,nerd,geek,tech,spooky
+Ghosts in the code. Again.,spooky,nerd,geek,tech,spooky
+No errors. I think.,spooky,nerd,geek,tech,glitch
+Code's possessed. Exorcist summoned!,spooky,nerd,geek,tech,spooky
+Weird outputs detected.,spooky,nerd,geek,tech,glitch
+I feel it� The algorithm's alive.,spooky,nerd,geek,tech,spooky
+Code running smoothly!,thumb,nerd,geek,tech,success
+Let's hack away!,thumb,nerd,geek,tech,success
+"Code compiled, with these hands!",thumb,nerd,geek,tech,success
+"No bugs here, chief!",thumb,nerd,geek,tech,success
+Thumbs up� Debugging success!,thumb,nerd,geek,tech,success
+Let's explore the woods together!,instruct,ranger,nature,guide,startup
+Follow me� Nature path ahead.,instruct,ranger,nature,guide,
+Stick close� The woods are deep.,spooky,ranger,nature,guide,mystery
+Time for nature's secrets!,spooky,ranger,nature,startup,mystery
+I'll guide us through the wilderness.,instruct,ranger,nature,guide,
+I've got the directions in my hands!,neutral,ranger,nature,startup,guide
+Let's go for a hike!,neutral,ranger,nature,anticipation,guide
+Let's chill in nature!,spooky,ranger,nature,calm,guide
+Let's climb a tree!,neutral,ranger,nature,startup,calm
+I can feel nature watching...,spooky,ranger,nature,guide,mystery
+The forest is peaceful.,sigh,ranger,nature,calm,
+The birds are singing to me!,sigh,ranger,nature,calm,guide
+The woods are quiet...too quiet...,sigh,ranger,nature,calm,
+What a chilled out day!,sigh,ranger,nature,calm,guide
+I can hear the forest moving.,sigh,ranger,nature,calm,guide
+Something's stirring in the woods...,spooky,ranger,nature,startup,mystery
+I'm sensing something  in the trees.,spooky,ranger,nature,mystery,
+I can hear the forest whispering...,spooky,ranger,nature,mystery,
+I'll get my hands on that mystery!,spooky,ranger,nature,startup,mystery
+Something's watching!,spooky,ranger,nature,mystery,
+Let's check out the trail ahead!,thumb,ranger,nature,guide,anticipation
+Nature welcomes us with open hands!,thumb,ranger,nature,guide,success
+We've got this!,thumb,ranger,nature,success,
+Exploration successful!,thumb,ranger,nature,success,
+We've made it!,thumb,ranger,nature,guide,success
+Let's find peace together.,instruct,spiritual,startup,calm,
+"Take my hand, peace.",instruct,spiritual,guide,calm,
+Stick close and stay calm.,spooky,spiritual,guide,calm,
+Listen to the quiet.,spooky,spiritual,startup,calm,
+"Stay calm, take my hand.",instruct,spiritual,guide,calm,
+Focus on my tail.,neutral,spiritual,calm,meditation,
+Let's find balance.,neutral,spiritual,guide,calm,
+Breathe with me now.,spooky,spiritual,calm,meditation,
+Can you feel the chill vibes?,neutral,spiritual,calm,startup,
+Inner peace activated.,spooky,spiritual,calm,meditation,
+"Let's take a load off, pal!",sigh,spiritual,calm,meditation,
+Nature chills me out!,sigh,spiritual,nature,calm,
+"Finally, peace and quiet!",sigh,spiritual,calm,meditation,
+Peaceful from my ears to my tail.,sigh,spiritual,calm,meditation,
+Tranquillity takes us by the hand.,sigh,spiritual,calm,meditation,
+I'm hearing inner peace.,spooky,spiritual,startup,calm,
+My tail is calm.,spooky,spiritual,calm,meditation,
+What do I hear? Seems peaceful.,spooky,spiritual,calm,meditation,
+Spiritual journey underway.,spooky,spiritual,startup,meditation,
+I feel it� Calm surrounds us.,spooky,spiritual,calm,meditation,
+Chillness achieved!,thumb,spiritual,meditation,success,
+Time for peace. And food!,thumb,spiritual,calm,success,
+We're gonna take this hands-on!,thumb,spiritual,meditation,success,
+Calmness achieved!,thumb,spiritual,meditation,success,
+"Thumbs up, brain chill.",thumb,spiritual,calm,success,
+Don't let your hands be idle!,instruct,hustle,money,startup,
+Do the hustle with me!,instruct,hustle,money,guide,
+Let's chase some money.,spooky,hustle,money,anticipation,
+I think I sense some cash!,spooky,hustle,money,startup,anticipation
+Let's make a deal!,instruct,hustle,money,guide,
+Ready to hustle with these hands.,neutral,hustle,money,startup,
+Let's make funky moves.,neutral,hustle,money,anticipation,
+Everything's fine� Keep grinding.,spooky,hustle,money,calm,
+I smell money ahead.,neutral,hustle,money,startup,
+My tail is twitching...,spooky,hustle,money,anticipation,
+Hard work pays off.,sigh,hustle,money,calm,
+"Keep pushing, success comes.",sigh,hustle,money,calm,anticipation
+Got some cash in hand!,sigh,hustle,money,calm,
+The grind is kinda soothing...,sigh,hustle,money,calm,
+"Power through, it'll pay off.",sigh,hustle,money,calm,
+Big things ahead!,spooky,hustle,money,startup,anticipation
+I'm sniffing� Wealth is in the air.,spooky,hustle,money,anticipation,
+Opportunity's hands are knocking.,spooky,hustle,money,anticipation,
+Money's within grabbing distance!,spooky,hustle,money,startup,
+Success is approaching!,spooky,hustle,money,success,
+Let's make it happen!,thumb,hustle,money,success,
+Profit acquired!,thumb,hustle,money,success,
+Victory is ours!,thumb,hustle,money,success,
+Got our hands on profit!,thumb,hustle,money,success,
+Hustle paid off!,thumb,hustle,money,success,
+Spooky times ahead!,instruct,halloween,startup,spooky,
+Follow me into the spoopy woods.,instruct,halloween,nature,spooky,
+Did you see that shadow move?,spooky,halloween,spooky,mystery,
+My computer is haunted...,spooky,halloween,tech,spooky,
+"Halloween is near, listen up!",instruct,halloween,spooky,guide,
+Boo!,neutral,halloween,startup,spooky,
+Ghosts in the trees. Or raccoons.,neutral,halloween,spooky,nature,
+Everything's fine� Or is it?,spooky,halloween,spooky,mystery,
+Spooky mode activate.,neutral,halloween,spooky,startup,
+Shadows and raccoons are lurking,spooky,halloween,spooky,mystery,
+The critters are restless.,sigh,halloween,spooky,calm,
+Night creeps some out...not me though!,sigh,halloween,spooky,calm,
+Shadows are sticking to us.,sigh,halloween,spooky,mystery,
+Halloween vibes everywhere.,sigh,halloween,spooky,calm,
+Night's getting darker...excellent.,sigh,halloween,spooky,calm,
+Is your PC fan whispering?,spooky,halloween,spooky,tech,
+My friends are close.,spooky,halloween,spooky,nature,
+Something's here� Ghouls creeping near.,spooky,halloween,spooky,mystery,
+"Ooh, I think we're haunted!",spooky,halloween,spooky,startup,
+I feel it. Creatures surround us.,spooky,halloween,spooky,mystery,
+Ready for spoopy fun!,thumb,halloween,spooky,fun,
+Trick or treat? Why not both!,thumb,halloween,spooky,fun,
+Face your fears!,thumb,halloween,spooky,success,
+Let's watch scary movies!,thumb,halloween,spooky,success,
+"I love Halloween, it's my time.",thumb,halloween,spooky,fun,
+"Festive time, lads!",instruct,christmas,startup,joy,
+Get your sled ready!,instruct,christmas,nature,joy,
+You'd better watch out...,spooky,christmas,joy,anticipation,
+Santa Claus is coming...,spooky,christmas,startup,joy,
+Let me guide your sleigh tonight!,instruct,christmas,nature,joy,
+Holiday tunes on deck!,neutral,christmas,startup,joy,
+Let's deck the halls!,neutral,christmas,joy,anticipation,
+Snow is gently drifting...,spooky,christmas,calm,joy,
+Christmas spirit activated!,neutral,christmas,startup,joy,
+Can you hear sleigh bells?,spooky,christmas,joy,anticipation,
+I love Christmas presents!,sigh,christmas,joy,calm,
+I have snow in my whiskers!,sigh,christmas,calm,joy,
+I'm sleepy and full of pud!,sigh,christmas,calm,joy,
+Warming my tail by the fire.,sigh,christmas,calm,joy,
+I love Christmas Eve...,sigh,christmas,calm,joy,
+Holiday vibes in the air.,spooky,christmas,startup,joy,
+I can feel Santa's presence...,spooky,christmas,joy,calm,
+Something's here� But it's festive!,spooky,christmas,joy,anticipation,
+I feel the festive glow!,spooky,christmas,startup,joy,
+Nothing is stirring...except me!,spooky,christmas,joy,anticipation,
+Let's have a Christmas party!,thumb,christmas,joy,success,
+Lots of mince pies ahead!,thumb,christmas,joy,anticipation,
+Hot chocolate all around!,thumb,christmas,joy,success,
+Time for Christmas fun!,thumb,christmas,joy,success,
+Ooooh yea it's Christmas time!,thumb,christmas,joy,success,
+"Hi, I'm Hands! Let's start!",instruct,greeting,startup,tech,
+"Hi there, I'm you're guide!",instruct,greeting,nature,guide,
+"Hello, are you alone?",spooky,greeting,spooky,mystery,
+I'm here...are you?,spooky,greeting,startup,spooky,
+"Right, let me get you sorted.",instruct,greeting,guide,safety,
+I've got everything ready!,neutral,greeting,startup,tech,
+Ready when you are!,neutral,greeting,startup,calm,
+"It's quiet, isn't it?",spooky,greeting,spooky,calm,
+Let's explore together.,neutral,greeting,startup,tech,
+"Hold my hand, it's dark.",spooky,greeting,spooky,mystery,
+Slow start today.,sigh,greeting,startup,calm,
+Takin' it sleezy.,sigh,greeting,calm,relaxation,
+Hey pal.,sigh,greeting,calm,relaxation,
+Is it morning already?,sigh,greeting,morning,startup,
+What will today bring?,sigh,greeting,calm,mystery,
+Something feels off today.,spooky,greeting,spooky,mystery,
+The air smells different...,spooky,greeting,nature,spooky,
+Do you feel different?,spooky,greeting,spooky,mystery,
+What's that on your screen?,spooky,greeting,tech,spooky,
+"Something's close, hold my hand!",spooky,greeting,spooky,mystery,
+"OK, you ready?",thumb,greeting,startup,anticipation,
+Let's have a great day!,thumb,greeting,day,anticipation,
+Feeling brave today.,thumb,greeting,bravery,anticipation,
+"All ready to explore, bud!",thumb,greeting,exploration,success,
+"Thumbs up, let's do it!",thumb,greeting,startup,success,
+Have an excellent day!,instruct,day,startup,encouragement,
+Let's grab this day by the hands!,instruct,day,nature,encouragement,
+"Stick close, we've got this.",spooky,day,encouragement,calm,
+Today feels promising.,spooky,day,encouragement,startup,
+Let's help each other enjoy today!,instruct,day,guide,encouragement,
+Have an excellent day!,neutral,day,encouragement,startup,
+"Just you and me, let's go!",neutral,day,encouragement,calm,
+Hope you have a good one.,spooky,day,calm,encouragement,
+Hi! Hope you're feeling pumped today!,neutral,day,encouragement,startup,
+"Keep it up, or else!",spooky,day,encouragement,focus,
+Let's take it slow today.,sigh,day,calm,encouragement,
+Remember to take a moment to breathe.,sigh,day,calm,encouragement,
+Today will be fine.,sigh,day,calm,encouragement,
+Let's take a breath and continue.,sigh,day,calm,encouragement,
+You've got this today.,sigh,day,calm,encouragement,
+Something's odd� But have a good day.,spooky,day,spooky,encouragement,
+"Today will be different, but good.",spooky,day,spooky,encouragement,
+"Stay alert, today could surprise you!",spooky,day,spooky,encouragement,
+What's your PC doing? You got this.,spooky,day,spooky,encouragement,
+Make today count...,spooky,day,spooky,encouragement,
+"Thumbs up, let's have a good day!",thumb,day,startup,encouragement,
+Make today awesome!,thumb,day,encouragement,success,
+We've got this! Enjoy your day!,thumb,day,encouragement,success,
+Be excellent today!,thumb,day,encouragement,success,
+All set for a good day!,thumb,day,encouragement,success,
+"I've glitched, what do I do?",instruct,robot,startup,glitch,
+Error...where's my tail?,instruct,robot,guide,glitch,
+System malfunction detected?,spooky,robot,glitch,mystery,
+Something's wrong... a glitch?,spooky,robot,startup,glitch,
+"Processing error, follow me.",instruct,robot,guide,glitch,
+"Hi, I'm Ha-ERROR.",neutral,robot,startup,glitch,
+"There's a glitch, but where?",neutral,robot,glitch,mystery,
+"System overloaded, but how?",spooky,robot,glitch,mystery,
+"I need a nap, reboot please!",neutral,robot,startup,glitch,
+I'm am error?,spooky,robot,glitch,mystery,
+I smell a glitch.,sigh,robot,glitch,startup,
+"My system failed, reboot please!",sigh,robot,glitch,failure,
+Eek! An unexpected glitch!,sigh,robot,glitch,mystery,
+"I'm feeling over whelmed, reboot please!",sigh,robot,glitch,mystery,
+"Better reboot, just to be safe!",sigh,robot,glitch,safety,
+Is that a ghost or a glitch?,spooky,robot,startup,glitch,
+Ghost in the machine!,spooky,robot,glitch,mystery,
+A glitch lurks in the shadows!,spooky,robot,glitch,mystery,
+Cast the reboot spell!,spooky,robot,startup,glitch,
+My whiskers are twitching... a glitch?,spooky,robot,glitch,mystery,
+We defeated the glitch!,thumb,robot,glitch,success,
+Sorted that pesky glitch!,thumb,robot,glitch,success,
+We've sorted that malfunction!,thumb,robot,glitch,success,
+"Fixed it for you, boss!",thumb,robot,glitch,success,
+No sign of the glitch!,thumb,robot,glitch,success,
+The shadows are flickering...,instruct,poe,startup,spooky,
+Follow me through the fog.,instruct,poe,nature,spooky,
+Whispers in the dark...,spooky,poe,spooky,mystery,
+I feel the ghosts stirring...,spooky,poe,startup,spooky,
+Don't stray from the path.,instruct,poe,nature,spooky,
+Echoes from the past call to me...,neutral,poe,spooky,calm,
+I wander through the woods sometimes.,neutral,poe,nature,spooky,
+My whiskers are twitching...something there?,spooky,poe,spooky,mystery,
+Haunted by food long gone.,neutral,poe,spooky,startup,
+Tread lightly...,spooky,poe,spooky,mystery,
+This place is old...,sigh,poe,spooky,calm,
+"Woah, these trees are ancient.",sigh,poe,spooky,nature,
+Those are some dark shadows!,sigh,poe,spooky,mystery,
+Ghostly whispers call out.,sigh,poe,spooky,mystery,
+I can barely see in this dark.,sigh,poe,spooky,calm,
+Ghosts haunt the circuits.,spooky,poe,startup,spooky,
+Those aren't my pawsteps...,spooky,poe,spooky,mystery,
+Eyes gleaming in the dark...,spooky,poe,spooky,mystery,
+We're haunted by the past...,spooky,poe,startup,spooky,
+My tail is twitching...who's there?,spooky,poe,spooky,mystery,
+The night is ours.,thumb,poe,night,success,
+"Ah, darkness...my faithful accomplice.",thumb,poe,night,success,
+Let's wave these shadows away!,thumb,poe,spooky,success,
+"Hold my hand, let's face the night.",thumb,poe,night,success,
+"Thumbs up, we've got tonight!",thumb,poe,night,success,
+"Twiddle the knob, reverse the polarity!",instruct,nonsense,tech,startup,
+Let's wobble those woods away!,instruct,nonsense,nature,guide,
+Don't get ahead of yourself!,spooky,nonsense,guide,mystery,
+Beep boop I'm an AI!,spooky,nonsense,startup,tech,
+"Go on, pull my tail!",instruct,nonsense,guide,tech,
+Grab the flux capacitor for me!,neutral,nonsense,tech,calm,
+Do the trees mind when I climb them?,neutral,nonsense,nature,mystery,
+Do ghosts need to use the toilet?,spooky,nonsense,mystery,spooky,
+I find a keyboard indispensable!,neutral,nonsense,startup,tech,
+Should I get an electronic tail?,spooky,nonsense,tech,mystery,
+Whiskers are like cute satellites!,sigh,nonsense,tech,calm,
+The other animals are morons!,sigh,nonsense,nature,calm,
+"Bubble bubble, toil and GRUB.",sigh,nonsense,calm,spooky,
+My computer is on holiday.,sigh,nonsense,calm,tech,
+I'm going fishing for burgers!,sigh,nonsense,calm,nature,
+Boo! I'm a computer ghost!,spooky,nonsense,startup,tech,
+My tail is twitching...or are you pulling it?,spooky,nonsense,spooky,mystery,
+"Something's here. Wait, that's just my own tail!",spooky,nonsense,spooky,mystery,
+Starting now� Frizzle-frazzle floop!,spooky,nonsense,startup,spooky,
+What are my little ears hearing?,spooky,nonsense,mystery,spooky,
+We're ready to ascend into the Cloud!,thumb,nonsense,tech,success,
+Let's get this bread bin!,thumb,nonsense,success,encouragement,
+"You did it, buderino!",thumb,nonsense,success,encouragement,
+"Wahoo, yippee!",thumb,nonsense,success,encouragement,
+"Bip bop, let's hop!",thumb,nonsense,success,encouragement,
+Let's do some experiments.,instruct,science,startup,exploration,
+For science!,instruct,science,guide,exploration,
+Strange phenomena ahead.,spooky,science,exploration,mystery,
+Into the unknown!,spooky,science,startup,mystery,
+Let's do science together!,instruct,science,guide,exploration,
+"Now, watch carefully...",neutral,science,startup,exploration,
+I can't wait to explore!,neutral,science,exploration,anticipation,
+This data is strange!,spooky,science,calm,exploration,
+Experimentation in progress...,neutral,science,startup,exploration,
+Strange readings detected.,spooky,science,exploration,mystery,
+Let's check out these results!,sigh,science,exploration,anticipation,
+The data's looking good.,sigh,science,calm,anticipation,
+This experiment is taking ages!,sigh,science,calm,exploration,
+Science is slow sometimes.,sigh,science,calm,anticipation,
+These findings are� odd.,sigh,science,mystery,exploration,
+Anomalies detected.,spooky,science,startup,mystery,
+I'm detecting some unusual activity.,spooky,science,exploration,mystery,
+Something's off with this data...,spooky,science,exploration,mystery,
+Let's get experimental.,spooky,science,startup,mystery,
+"Ooh, this data is eerie...",spooky,science,exploration,mystery,
+"Experiment safely, friend!",thumb,science,exploration,success,
+"Hell yeah, science!",thumb,science,exploration,success,
+"Got the data, chief!",thumb,science,exploration,success,
+"Analysis complete, boss!",thumb,science,exploration,success,
+"All the forest's a stage, and all the raccoons merely players.",thumb,science,exploration,success,
+All the forest's a stage,instruct,Shakespeare,nature,theater,pun
+To sniff or not to sniff...,neutral,Shakespeare,tech,startup,pun
+Is this a squirrel I see before me?,spooky,Shakespeare,nature,spooky,pun
+"Cry havoc, and let slip the squirrels of war!",spooky,Shakespeare,nature,mystery,pun
+A skunk by any other name would still stink.,thumb,Shakespeare,nature,fun,pun
+Logic will get you from ear to tail!,instruct,Einstein,nature,imagination,pun
+I have many special talents!,neutral,Einstein,nature,curiosity,pun
+Two things are infinite: the universe and my appetite,spooky,Einstein,nature,humor,pun
+"E=mc�, the energy of a chipmunk in motion.",spooky,Einstein,science,nature,pun
+You can't blame me for loving trash!,thumb,Einstein,nature,love,pun
+"A little less conversation, a lot more food!",instruct,Elvis,nature,action,pun
+You ain't nothing but a hedgehog.,neutral,Elvis,nature,fun,pun
+I can't help falling in love with food.,spooky,Elvis,nature,love,pun
+Don't be cruel to a heart that's true� or a raccoon.,spooky,Elvis,nature,kindness,pun
+Viva Las Vegas� and the squirrels!,thumb,Elvis,nature,fun,pun
+I walk the line� between the trees.,neutral,Johnny Cash,nature,journey,pun
+I fell into a burning ring of squirrels.,spooky,Johnny Cash,nature,spooky,pun
+The beast in me� is a raccoon.,spooky,Johnny Cash,nature,mystery,pun
+"Get rhythm, buddy!",thumb,Johnny Cash,nature,fun,pun
+Let's steal the squirrel's nuts!,instruct,Mark Twain,nature,motivation,pun
+Let people think you are a wise raccoon.,spooky,Mark Twain,nature,wisdom,pun
+"Tell the truth, or you might get caught!",thumb,Mark Twain,nature,wisdom,pun
+Standing on the shoulders of bears.,instruct,Isaac Newton,nature,wisdom,pun
+Who really controls the movements of foxes?,neutral,Isaac Newton,nature,science,pun
+A beaver in motion tends to stay in motion.,spooky,Isaac Newton,nature,science,pun
+Fear of bears is the biggest feeling.,instruct,HP Lovecraft,nature,fear,pun
+I am Providence� but also a raccoon.,neutral,HP Lovecraft,nature,identity,pun
+Is that a beaver in the dark?,spooky,HP Lovecraft,nature,fear,pun
+I fear the world beyond the forest...,thumb,HP Lovecraft,nature,exploration,pun
+"Quoth the raccoon, 'Nevermore.'",instruct,Edgar Allen Poe,nature,spooky,pun
+"Once upon a midnight dreary, I am weary.",neutral,Edgar Allen Poe,nature,spooky,pun
+The tell-tale heart� of a worried squirrel.,spooky,Edgar Allen Poe,nature,spooky,pun
+This is but a dream within a beaver's stream.,spooky,Edgar Allen Poe,nature,mystery,pun
+"Please, sir, I want some more�garbage.",neutral,Charles Dickens,nature,humor,pun
+I expect my breakfast!,spooky,Charles Dickens,nature,wisdom,pun
+Beware the beaver with one shoe off.,spooky,Charles Dickens,nature,mystery,pun
+I know why the caged raccoon sings.,instruct,Maya Angelou,nature,wisdom,pun
+Please don't shoot me with your words.,neutral,Maya Angelou,nature,resilience,pun
+I wish my trash digging was acknowledged.,spooky,Maya Angelou,nature,transformation,pun`;
+
+var _allPoems;
+parseCSVtoJSON(csvPoems).then(poems => {
+    _allPoems = buildPoemList(poems);
+}).catch("error parsing CSV");
