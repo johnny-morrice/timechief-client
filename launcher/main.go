@@ -85,6 +85,12 @@ func getCLIApp() *cli.App {
 			Usage:   "Run the launcher daemon",
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:    "use-rtc-integration",
+					Usage:   "Use RTC integration on raspberry pi prior to version 5",
+					Value:   false,
+					EnvVars: []string{"TIMECHIEF_USE_RTC_INTEGRATION"},
+				},
 				&cli.StringFlag{
 					Name:  "credentials-path",
 					Usage: "path to the credentials file which the daemon may update",

@@ -252,7 +252,10 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	go timeSync.Start(ctx)
+	if ctx.Bool("use-rtc-integration") {
+		go timeSync.Start(ctx)
+	}
+
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
 	go wifiScan.Start(ctx)
