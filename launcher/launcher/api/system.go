@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 )
@@ -247,6 +248,7 @@ func (api System) HandleShutdown(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	log.Printf("Shutdown request received at %s", time.Now())
 	err := api.Service.Shutdown()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
