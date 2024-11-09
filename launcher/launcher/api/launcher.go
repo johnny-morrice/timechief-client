@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -18,6 +19,7 @@ type LauncherService interface {
 	OnLogin() error
 	RegenerateUserAPIKey() (launcher.LauncherAPIKey, error)
 	GetTargetEnv() (launcher.TargetEnv, error)
+	ChooseNetworkType(networkType string) error
 }
 
 type Launcher struct {
@@ -32,6 +34,46 @@ func (api Launcher) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/launcher/setup", api.HandlePostSetup)
 	mux.HandleFunc("/api/launcher/on-login", api.HandlePostOnLoginCallback)
 	mux.HandleFunc("/api/launcher/api-key/user", api.HandlePostRegenerateUserAPIKey)
+	mux.HandleFunc("POST /web-setup/network-type", api.HandleChooseNetworkType)
+}
+
+type chooseNetworkTypeRequest struct {
+	NetworkType string `json:"network_type"`
+}
+
+func (req chooseNetworkTypeRequest) Validate() error {
+	if req.NetworkType != "wifi" && req.NetworkType != "manual" {
+		return fmt.Errorf("unsupported network type: %s", req.NetworkType)
+	}
+	return nil
+}
+
+func (api Launcher) HandleChooseNetworkType(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req chooseNetworkTypeRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	err = req.Validate()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = api.Service.ChooseNetworkType(req.NetworkType)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 type setupRequest struct {

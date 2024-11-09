@@ -9,8 +9,7 @@ import (
 )
 
 type Service struct {
-	store   WifiNetworkStore
-	kvStore store.KeyValueStore
+	store WifiNetworkStore
 }
 
 type WifiNetworkStore interface {
@@ -18,11 +17,11 @@ type WifiNetworkStore interface {
 	List() ([]store.WifiNetwork, error)
 }
 
-func MakeService(store WifiNetworkStore, kvStore store.KeyValueStore) (Service, error) {
+func MakeService(store WifiNetworkStore) (Service, error) {
 	if store == nil {
 		return Service{}, errors.New("store cannot be nil")
 	}
-	svc := Service{store: store, kvStore: kvStore}
+	svc := Service{store: store}
 	return svc, nil
 }
 
@@ -51,14 +50,6 @@ func (svc Service) WifiSetActiveNetwork(ssid, key string) error {
 		return fmt.Errorf("error selecting network: %w", err)
 	}
 	return nil
-}
-
-func (svc Service) ChooseNetworkType(networkType string) error {
-	if networkType != "wifi" && networkType != "manual" {
-		return fmt.Errorf("unsupported network type: %s", networkType)
-	}
-
-	return svc.kvStore.Set("network-type", networkType)
 }
 
 type WifiNetwork struct {
