@@ -119,6 +119,10 @@ func (svc Service) Logout() error {
 	if err != nil {
 		return fmt.Errorf("failed to delete device UUID: %w", err)
 	}
+	err = svc.keyValueStore.Delete(store.MyDevicesKey)
+	if err != nil {
+		return fmt.Errorf("failed to delete my devices key")
+	}
 	return nil
 }
 
