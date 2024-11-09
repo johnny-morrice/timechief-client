@@ -56,8 +56,8 @@ const AccessPointIPAddress = "172.16.0.1"
 const AccessPointIPAddressWithNetmask = AccessPointIPAddress + "/24"
 const dhcpRange = "172.16.0.100,172.16.0.200,12h"
 
-const AccessPointMode = "Master"
-const InfraMode = "Managed"
+const AccessPointMode = "ap"
+const InfraMode = "infrastructure"
 
 func (card WifiInterface) Hotspot(net WifiNetwork) error {
 	err := card.netCmd().Hotspot(net.SSID, net.Key, card.Interface, AccessPointIPAddressWithNetmask, dhcpRange)
