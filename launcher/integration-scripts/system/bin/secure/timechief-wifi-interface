@@ -33,7 +33,7 @@ def get_ssid(interface):
 def get_mode(interface):
     mode = ""
     try:
-        mode_output = subprocess.check_output(['nmcli', '-g', 'GENERAL.TYPE', 'device', 'show', interface]).decode()
+        mode_output = subprocess.check_output(['nmcli', '-g', '802-11-wireless.mode', 'connection', 'show', connection_name]).decode().strip()
         mode = mode_output.strip()
     except subprocess.CalledProcessError:
         pass
