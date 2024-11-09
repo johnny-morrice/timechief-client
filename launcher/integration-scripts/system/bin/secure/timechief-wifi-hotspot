@@ -44,6 +44,8 @@ fi
 
 set -e
 
+sleep 0.5s
+
 # Create a new hotspot connection with nmcli
 nmcli device set $IFNAME managed yes
 nmcli connection add type wifi ifname $IFNAME mode ap con-name hotspot ssid "$SSID"

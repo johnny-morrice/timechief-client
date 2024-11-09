@@ -1,0 +1,30 @@
+#!/bin/bash
+set -x
+
+SSID=$1
+PASSWORD=$2
+IFNAME=$3
+
+if [ -z "$SSID" ]; then
+    echo "SSID is required"
+    exit 1
+fi
+
+if [ -z "$PASSWORD" ]; then
+    echo "PASSWORD is required"
+    exit 1
+fi
+
+if [ -z "$IFNAME" ]; then
+    echo "IFNAME is required"
+    exit 1
+fi
+
+# Check if a connection named "hotspot" exists and delete it
+EXISTING_CONNECTIONS=$(nmcli -t -f NAME connection show | grep '^hotspot$')
+if [ "$EXISTING_CONNECTIONS" ]; then
+    nmcli connection down "hotspot"
+    nmcli connection delete id "hotspot"
+fi
+
+sleep 0.5s
