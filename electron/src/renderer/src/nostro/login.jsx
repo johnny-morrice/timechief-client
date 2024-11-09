@@ -147,7 +147,7 @@ export function LoginPage(props) {
                     <div class="login-box">
                         <div>Waiting for subscription activation</div>
                         <Loading />
-                        <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>;
+                        <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
                     </div>
                 </Show>
                 <Show when={isSelectingDevice(signals)}>
@@ -156,12 +156,14 @@ export function LoginPage(props) {
                         <For each={signals.devices()}>{(device) => {
                             return <button class="action-button crt-box flex-grow" onClick={() => sendSelectMyDevice(device.uuid)}>{formatDevice(device)}</button>;
                         }}</For>
+                        <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
                     </div>
                 </Show>
                 <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>
                     <div class="login-box begin-login">
                         <div class="pairing-title">{label("title")}</div>
                         <button class="action-button crt-box flex-grow" onClick={onClickLogin}>{plainText("login-button-text")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
+                        <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
                     </div>
                 </Show>
                 <Show when={!signals.hasAccessCode() && isLoginStarted(signals)}>
@@ -176,6 +178,7 @@ export function LoginPage(props) {
                         </div>
                         <div class="data-label">{label("scan-qr")}</div>
                         <div id="pairing-qrcode-canvas-wrapper"></div>
+                        <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
                     </div>
                 </Show>
             </div>
