@@ -354,8 +354,13 @@ func (daemon Setup) handleWaitNetworkConnect() error {
 }
 
 func (daemon Setup) handleNetworkConnected() error {
+	err := daemon.StateFlagStore.CreateIfNotExists("force-internet-check")
+	if err != nil {
+		return err
+	}
 	val, err := daemon.KeyValueStore.Get(store.LastInternetCheckKey)
 	if err != nil {
+		log.Printf("cannot progress to internet connected: no internet check found")
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil
 		}
@@ -366,16 +371,24 @@ func (daemon Setup) handleNetworkConnected() error {
 	const validDuration = time.Second * 10
 	checkTime, err := time.Parse(time.RFC3339, val)
 	if err != nil {
+		log.Printf("cannot progress to internet connected: failed to parse check time")
 		return err
 	}
 	if time.Since(checkTime) < validDuration {
 		err = daemon.KeyValueStore.Set("firstTimeSetupDone", "true")
 		if err != nil {
+			log.Printf("cannot progress to internet connected: failed to set first time setup done flag")
+			return err
+		}
+		err = daemon.StateFlagStore.Delete("force-internet-check")
+		if err != nil {
+			log.Printf("cannot progress to internet connceted: failed to delete force-internet-check flag")
 			return err
 		}
 		return daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
 	}
 
+	log.Printf("cannot progress to internet connected: no internet")
 	return nil
 }
 

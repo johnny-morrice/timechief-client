@@ -355,6 +355,13 @@ func (sys System) activeCardNetworkStatus() (NetworkStatus, error) {
 }
 
 func (sys System) LoadNetworkStatus() error {
+	networkType, err := sys.KeyValueStore.Get("network-type")
+	if err != nil {
+		return fmt.Errorf("failed to find network type: %w", err)
+	}
+	if networkType != "wifi" {
+		return nil
+	}
 	status, err := sys.activeCardNetworkStatus()
 	if err != nil {
 		return fmt.Errorf("failed to load network status: %w", err)
@@ -439,20 +446,24 @@ func (check internetCheck) runCheck(nc netcmd.NetCmd, stopch <-chan struct{}) er
 }
 
 func (sys System) CheckInternet() error {
+	forceCheck, err := sys.StateFlagStore.Exists("force-internet-check")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
 	lastCheckTime, err := sys.KeyValueStore.Get(store.LastInternetCheckKey)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+	} else if lastCheckTime != "" {
+		const cacheDuration = time.Second * 120
+		checkTime, err := time.Parse(time.RFC3339, lastCheckTime)
+		if err != nil {
+			return err
+		}
+		if !forceCheck && time.Since(checkTime) < cacheDuration {
 			return nil
 		}
-		return err
-	}
-	const cacheDuration = time.Second * 120
-	checkTime, err := time.Parse(time.RFC3339, lastCheckTime)
-	if err != nil {
-		return err
-	}
-	if time.Since(checkTime) < cacheDuration {
-		return nil
 	}
 
 	networkType, err := sys.KeyValueStore.Get("network-type")
