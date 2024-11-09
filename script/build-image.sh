@@ -42,3 +42,5 @@ mkdir -p $IMAGE_OUTPUT
 cp $DEPLOY_IMAGE $IMAGE_OUTPUT/Timechief-$VERSION.img
 echo "Copied image to $IMAGE_OUTPUT/Timechief-$VERSION.img"
 popd
+
+rm -rf $BUILD_DIR
