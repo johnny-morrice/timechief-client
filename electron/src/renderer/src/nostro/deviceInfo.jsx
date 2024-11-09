@@ -8,6 +8,7 @@ import { labelMaker } from './label';
 class Signals {
     constructor() {
         [this.ipAddress, this.setIpAddress] = textTransitionSignal("");
+        [this.networkType, this.setNetworkType] = textTransitionSignal("");
         [this.activeTargetVersion, this.setActiveTargetVersion] = createSignal("");
         [this.clientVersion, this.setClientVersion] = createSignal("");
         [this.clientVersionText, this.setClientVersionText] = textTransitionSignal("");
@@ -34,6 +35,15 @@ function updateSignalsForAPIData(signals, data) {
             signals.setActiveTargetVersion(activeTargetVersion);
             signals.setActiveTargetVersionText(activeTargetVersion);
         }
+        const networkState = launcherState["network_state"];
+        if (!networkState) {
+            return;
+        }
+        const networkType = networkState["network_type"];
+        if (!networkType) {
+            return;
+        }
+        signals.setNetworkType(networkState["network_type"]);
     }
 }
 
@@ -66,6 +76,7 @@ export const DeviceInfo = () => {
             <div class="flex-row flex-grow">
                 <div class="device-info-labels flex-column flex-grow">
                     <div class="data-label flex-grow">{label("ip-address")}</div>
+                    <div class="data-label flex-grow">{label("network-type")}</div>
                     <div class="data-label flex-grow">{label("software-version")}</div>
                     <Show when={hasUpdateVersion(signals)}>
                         <div class="data-label flex-grow">{label("update-version")}</div>
@@ -73,6 +84,7 @@ export const DeviceInfo = () => {
                 </div>
                 <div class="device-info-values flex-column flex-grow">
                     <div class="data-value flex-grow">{signals.ipAddress}</div>
+                    <div class="data-value flex-grow">{signals.networkType}</div>
                     <div class="data-value flex-grow">{signals.clientVersionText}</div>
                     <Show when={hasUpdateVersion(signals)}>
                         <div class="data-value flex-grow">{signals.activeTargetVersionText}</div>

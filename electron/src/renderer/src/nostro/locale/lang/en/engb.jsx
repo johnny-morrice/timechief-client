@@ -22,6 +22,7 @@ export const Text = {
     },
     "device-info": {
         "ip-address": "IP address",
+        "network-type": "Network type",
         "software-version": "Software version",
         "update-version": "Update version",
     },
