@@ -9,7 +9,7 @@ import { labelMaker, textMaker } from './label';
 import { fadeTransition } from './fadeTransition';
 import { generateWifiQRCode } from 'wifi-qr-code-generator';
 import { NoConnection } from './noconnection';
-import { recordInteraction, sendClockDataRequest } from './ipc';
+import { recordInteraction, sendClockDataRequest, sendSetNetworkTypeManual, sendSetNetworkTypeWifi } from './ipc';
 
 class Signals {
     constructor() {
@@ -246,11 +246,11 @@ export const WebSetupPage = (props) => {
     };
 
     function onClickManualNetworkType(e) {
-
+        sendSetNetworkTypeManual();
     }
 
     function onClickWifiNetworkType(e) {
-
+        sendSetNetworkTypeWifi();
     }
 
     return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`} onClick={handleOnClickAnywhere}>

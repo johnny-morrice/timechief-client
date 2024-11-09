@@ -252,7 +252,7 @@ export class LauncherClient {
         });
     }
 
-    postSetNetworkType(networkType) {
+    postNetworkType(networkType) {
         let cfg = {
             url: this.baseURL + '/api/launcher/network-type',
             method: 'post',

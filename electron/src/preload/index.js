@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld(
             "shutdown",
             "setupBegin",
             "setupCancel",
+            "setNetworkType",
             "setupRestart",
             "loggedIn",
             "logOut",
