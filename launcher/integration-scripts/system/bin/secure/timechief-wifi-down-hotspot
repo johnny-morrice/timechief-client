@@ -9,3 +9,5 @@ if [ "$EXISTING_CONNECTIONS" ]; then
 fi
 
 sleep 0.5s
+
+exit 0

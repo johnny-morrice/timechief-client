@@ -516,6 +516,14 @@ func (sys System) CheckInternet() error {
 	return errors.New("all internet checks failed")
 }
 
+func (sys System) DownHotspot() error {
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	return sys.runScript(cfg, "timechief-wifi-down-hotspot")
+}
+
 // SyncRTC syncs the system clock with the RTC.  By running the following command:
 // bin/secure/pyrtc timesync --type rv3028
 func (sys System) SyncRTC() error {

@@ -80,6 +80,7 @@ func (daemon Setup) init() error {
 
 const (
 	SetupFlagBegin                 string = "Begin"
+	SetupFlagChooseNetworkType     string = "WaitUserChooseSetupType"
 	SetupFlagWaitHotspot           string = "WaitHotspot"
 	SetupFlagWaitUserSelectNetwork string = "WaitUserSelectNetwork"
 	SetupFlagNetworkSelected       string = "NetworkSelected"
@@ -103,6 +104,8 @@ func (daemon Setup) doTick(ctx *cli.Context) error {
 	switch state {
 	case SetupFlagBegin:
 		return daemon.handleBegin()
+	case SetupFlagChooseNetworkType:
+		return daemon.handleChooseNetworkType()
 	case SetupFlagWaitHotspot:
 		return daemon.handleHotspotWait()
 	case SetupFlagWaitUserSelectNetwork:
@@ -168,7 +171,35 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
-	return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
+	return daemon.KeyValueStore.Set("setup", SetupFlagChooseNetworkType)
+}
+
+func (daemon Setup) handleChooseNetworkType() error {
+	networkType, err := daemon.KeyValueStore.Get("network-type")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	if networkType == "" {
+		return nil
+	}
+
+	switch networkType {
+	case "wifi":
+		return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
+	case "manual":
+		return daemon.handleManualSetupCompletion()
+	default:
+		return fmt.Errorf("unknown network type: %s", networkType)
+	}
+}
+
+func (daemon Setup) handleManualSetupCompletion() error {
+	err := daemon.System.DownHotspot()
+	if err != nil {
+		return fmt.Errorf("setup failed to put down possible hotspot for manaul setup option")
+	}
+	return daemon.KeyValueStore.Set("setup", SetupFlagNetworkConnected)
 }
 
 func (daemon Setup) handleHotspotWait() error {
