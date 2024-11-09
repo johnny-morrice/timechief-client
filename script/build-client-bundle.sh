@@ -11,7 +11,7 @@ set -x
 # BUILD_DIR
 # USE_PYRTC
 
-if [ -z "$VERSION" ] || [ -z "$LAUNCHER_BIN" ] || [ -z "USE_PYRTC"] ; then
+if [ -z "$VERSION" ] || [ -z "$LAUNCHER_BIN" ] || [ -z "$USE_PYRTC"] ; then
   echo "missing parameters"
   echo "VERSION: $VERSION"
   echo "LAUNCHER_BIN: $LAUNCHER_BIN"
