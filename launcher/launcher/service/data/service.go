@@ -65,7 +65,8 @@ type FirewallState struct {
 }
 
 type NetworkState struct {
-	IPAddress string `json:"ip_address"`
+	IPAddress   string `json:"ip_address"`
+	NetworkType string `json:"network_type"`
 }
 
 type WifiState struct {
@@ -307,6 +308,11 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, fmt.Errorf("failed to get media: %w", err)
 	}
 
+	networkType, err := svc.keyValueStore.Get("network-type")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return DeviceData{}, fmt.Errorf("failed to get network-type: %w", err)
+	}
+
 	result := DeviceData{
 		Media:       media,
 		ServiceData: deviceData,
@@ -331,7 +337,8 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 			},
 			FirstTimeSetupDone: firstTimeSetupDone,
 			NetworkState: NetworkState{
-				IPAddress: ipAddress,
+				IPAddress:   ipAddress,
+				NetworkType: networkType,
 			},
 			// TODO: read the firewall state from OS somehow.
 			FirewallState: FirewallState{
