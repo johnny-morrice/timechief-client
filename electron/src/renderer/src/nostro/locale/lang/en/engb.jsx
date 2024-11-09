@@ -54,6 +54,7 @@ export const Text = {
         "enter-code": "Enter your pairing code",
         "scan-qr": "Or scan the QR code",
         "select-device": "Select a device",
+        "restart-setup": "Restart setup"
     },
     "web-setup": {
         "welcome": "Welcome to Timechief",

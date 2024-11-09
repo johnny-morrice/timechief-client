@@ -5,7 +5,7 @@ import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 import { Loading } from "./loading";
 import { labelMaker, textMaker } from "./label";
-import { recordInteraction } from "./ipc";
+import { recordInteraction, sendLogOut, sendSetupBegin } from "./ipc";
 
 class Signals {
     constructor() {
@@ -132,6 +132,11 @@ export function LoginPage(props) {
         }
     }
 
+    function onClickRestartSetup(e) {
+        sendLogOut();
+        sendSetupBegin();
+    }
+
     return <>
         <Show when={isLoggedIn(signals)}>
             {props.element}
@@ -142,6 +147,7 @@ export function LoginPage(props) {
                     <div class="login-box">
                         <div>Waiting for subscription activation</div>
                         <Loading />
+                        <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>;
                     </div>
                 </Show>
                 <Show when={isSelectingDevice(signals)}>
