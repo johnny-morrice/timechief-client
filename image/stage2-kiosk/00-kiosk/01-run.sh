@@ -12,9 +12,8 @@ echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 export DEBIAN_FRONTEND=noninteractive
 EOF
 
-mkdir -p "${ROOTFS_DIR}/boot/firmware"
-install -m 644 files/config.txt "${ROOTFS_DIR}/boot/firmware"
-install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/firmware"
+install -m 644 files/config.txt "${ROOTFS_DIR}/boot"
+install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot"
 install -m 644 files/nginx.conf "${ROOTFS_DIR}/etc/nginx/sites-available/timechief.conf"
 HOME="${ROOTFS_DIR}/home/${FIRST_USER_NAME}"
 install -m 644 -o 1000 -g 1000 files/.profile "${HOME}/"
