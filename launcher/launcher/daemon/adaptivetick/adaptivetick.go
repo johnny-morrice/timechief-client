@@ -2,6 +2,7 @@ package adaptivetick
 
 import (
 	"fmt"
+	"log"
 	"sync"
 	"time"
 )
@@ -83,7 +84,7 @@ func (t *TwoModeTicker) isFastMode() bool {
 
 func (t *TwoModeTicker) logPrintf(message string, args ...interface{}) {
 	if t.doLog {
-		t.logPrintf(message, args...)
+		log.Printf(message, args...)
 	}
 }
 
