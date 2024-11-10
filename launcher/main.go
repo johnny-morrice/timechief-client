@@ -27,6 +27,17 @@ func getCLIApp() *cli.App {
 	app.Version = "0.0.1"
 	app.Commands = []*cli.Command{
 		{
+			Name:   "brightness",
+			Usage:  "Set backlight brightness across all displays",
+			Action: cmd.Brightness,
+			Flags: []cli.Flag{
+				&cli.Float64Flag{
+					Name:  "brightness-ratio",
+					Value: 0.31372549019607843137,
+				},
+			},
+		},
+		{
 			Name:    "run-client",
 			Aliases: []string{"c"},
 			Usage:   "Launch the timechief client",
