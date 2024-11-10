@@ -29,6 +29,16 @@
     font-family: 'Noto Sans JP';
 }
 
+@font-face {
+    src: url('../webfonts/MicroKnightPlus_v1.0.ttf') format ('truetype');
+    font-family: 'MicroKnight Plus';
+}
+
+@font-face {
+    src: url('../webfonts/MicroKnight_v1.0.ttf') format ('truetype');
+    font-family: 'MicroKnight';
+}
+
 body {
     /* color: green; */
     /* background-color: black; */
