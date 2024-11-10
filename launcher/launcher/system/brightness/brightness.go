@@ -13,20 +13,42 @@ const backlightPath = "/sys/class/backlight"
 
 // FindBacklightIDs finds and returns all backlight IDs (subdirectories under backlightPath).
 func FindBacklightIDs() ([]string, error) {
-	entries, err := os.ReadDir(backlightPath)
+	// Open the backlight directory
+	dir, err := os.Open(backlightPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read backlight directory: %w", err)
+		return nil, fmt.Errorf("could not open backlight directory %s: %w", backlightPath, err)
+	}
+	defer dir.Close()
+
+	// Read directory entries
+	entries, err := dir.Readdir(-1)
+	if err != nil {
+		return nil, fmt.Errorf("could not read entries in backlight directory %s: %w", backlightPath, err)
 	}
 
 	var ids []string
 	for _, entry := range entries {
-		if entry.IsDir() {
+		// Try to resolve symlink if it's a symbolic link
+		entryPath := filepath.Join(backlightPath, entry.Name())
+		resolvedPath, err := filepath.EvalSymlinks(entryPath)
+		if err != nil {
+			return nil, fmt.Errorf("could not resolve symlink %s: %w", entryPath, err)
+		}
+
+		// Check if the resolved path is a directory and add its ID
+		info, err := os.Stat(resolvedPath)
+		if err != nil {
+			return nil, fmt.Errorf("could not stat resolved path %s: %w", resolvedPath, err)
+		}
+
+		if info.IsDir() {
 			ids = append(ids, entry.Name())
 		}
 	}
 
+	// Check if we found any backlight devices
 	if len(ids) == 0 {
-		return nil, fmt.Errorf("no backlight devices found in %s", backlightPath)
+		return nil, fmt.Errorf("no backlight devices found in %s; check if your hardware supports backlight controls", backlightPath)
 	}
 
 	return ids, nil
@@ -61,7 +83,12 @@ func SetBrightness(id string, ratio float64) error {
 
 // readMaxBrightness reads and returns the max brightness from the specified path.
 func readMaxBrightness(path string) (int, error) {
-	data, err := os.ReadFile(path)
+	resolvedPath, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return 0, fmt.Errorf("could not resolve symlink %s: %w", path, err)
+	}
+
+	data, err := os.ReadFile(resolvedPath)
 	if err != nil {
 		return 0, fmt.Errorf("failed to read max brightness file %s: %w", path, err)
 	}
@@ -77,7 +104,12 @@ func readMaxBrightness(path string) (int, error) {
 
 // writeBrightness writes the desired brightness to the specified path.
 func writeBrightness(path string, brightness int) error {
-	file, err := os.OpenFile(path, os.O_WRONLY, 0644)
+	resolvedPath, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return fmt.Errorf("could not resolve symlink %s: %w", path, err)
+	}
+
+	file, err := os.OpenFile(resolvedPath, os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to open brightness file %s: %w", path, err)
 	}
