@@ -344,7 +344,7 @@ export const HomePage = () => {
     { icon: () => <i class="fa-solid fa-calendar-days"></i>, element: () => <EventCalendar /> },
   ];
 
-  const useDebug = true;
+  const useDebug = false;
   if (useDebug) {
     switcherWidgets.push(
       { icon: () => <i class="fa-solid fa-fire"></i>, element: () => <Debug /> },
