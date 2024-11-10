@@ -11,5 +11,8 @@
 # show a splash the app boots
 # feh --bg-scale /opt/timechief-launcher/assets/images/splash.png
 
+# Wait for system to catch up.
+sleep 10s
+
 # start timechief
 /opt/timechief-launcher/bin/timechief-launcher run-client 2>&1 | multilog T s10485760 n10 /opt/timechief-launcher/logs/timechief-launcher
