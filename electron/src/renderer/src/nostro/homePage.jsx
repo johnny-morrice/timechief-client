@@ -292,7 +292,7 @@ function hasNextEvent(signals) {
 }
 
 var globalSignals = new Signals();
-const mascotHeight = 80;
+const mascotHeight = 100;
 manageMascotCanvas("event-canvas", function () { return globalSignals.emote() }, mascotHeight);
 
 export const HomePage = () => {
