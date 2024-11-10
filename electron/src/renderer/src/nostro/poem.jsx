@@ -93,6 +93,7 @@ function standardDayPoems() {
         _plainPoems = _plainPoems.removeTag("easter");
         _plainPoems = _plainPoems.removeTag("christmas");
         _plainPoems = _plainPoems.removeTag("halloween");
+        _plainPoems = _plainPoems.removeTag("glitch");
     }
     return _plainPoems;
 }
@@ -158,10 +159,10 @@ function themedPoemsCollection(isSpooky) {
 
     const minTagSize = 8;
     if (!_themedPoemsCollection) {
-        _themedPoemsCollection = nonSpookyPoems().findByMinTagPopulationSize(minTagSize);
+        _themedPoemsCollection = nonSpookyPoems().findByMinTagPopulationSize(minTagSize).map(collection => collection.removeTag("glitch"));
     }
     if (!_spookyThemedPoemsCollection) {
-        _spookyThemedPoemsCollection = standardDayPoems().findByMinTagPopulationSize(minTagSize);
+        _spookyThemedPoemsCollection = standardDayPoems().findByMinTagPopulationSize(minTagSize).map(collection => collection.removeTag("glitch"));
     }
     if (isSpooky) {
         return _spookyThemedPoemsCollection;
@@ -327,31 +328,25 @@ My tail is twitching...,thumb,space,exploration,anticipation,
 Stars guide our way!,thumb,space,exploration,success,
 Ready for stargazing!,thumb,space,calm,success,
 Hands up... The universe awaits!,thumb,space,exploration,anticipation,
-I've started... Let's debug together!,instruct,nerd,geek,startup,tech
+I've started... Let's debug together!,instruct,glitch,geek,startup,tech
 Lemme get my hands on that keyboard!,instruct,nerd,geek,guide,tech
 "Ooh, glitchy.",spooky,nerd,geek,tech,glitch
-Variables acting strange.,spooky,nerd,geek,startup,tech
 Into the hacker woods!,instruct,nerd,geek,guide,tech
 Ready to code with these hands.,neutral,nerd,geek,tech,startup
 "Let's go, nerds!",neutral,nerd,geek,anticipation,tech
 "All is well, for now.",spooky,nerd,geek,tech,calm
 Device is fully functioning!,neutral,nerd,geek,tech,success
-No bugs detected.,spooky,nerd,geek,tech,success
 Compiling impatiently.,sigh,nerd,geek,tech,waiting
 Debugging bugs me.,sigh,nerd,geek,tech,glitch
 Code's acting up again.,sigh,nerd,geek,tech,glitch
 "Infinite loops, just another day.",sigh,nerd,geek,tech,glitch
 Code's haunted. I'm on it.,sigh,nerd,geek,tech,spooky
 Ghosts in the code. Again.,spooky,nerd,geek,tech,spooky
-No errors. I think.,spooky,nerd,geek,tech,glitch
 Code's possessed. Exorcist summoned!,spooky,nerd,geek,tech,spooky
 Weird outputs detected.,spooky,nerd,geek,tech,glitch
 I feel it... The algorithm's alive.,spooky,nerd,geek,tech,spooky
-Code running smoothly!,thumb,nerd,geek,tech,success
 Let's hack away!,thumb,nerd,geek,tech,success
 "Code compiled, with these hands!",thumb,nerd,geek,tech,success
-"No bugs here, chief!",thumb,nerd,geek,tech,success
-Thumbs up... Debugging success!,thumb,nerd,geek,tech,success
 Let's explore the woods together!,instruct,ranger,nature,guide,startup
 Follow me... Nature path ahead.,instruct,ranger,nature,guide,
 Stick close... The woods are deep.,spooky,ranger,nature,guide,mystery
@@ -527,7 +522,6 @@ Make today awesome!,thumb,day,encouragement,success,
 We've got this! Enjoy your day!,thumb,day,encouragement,success,
 Be excellent today!,thumb,day,encouragement,success,
 All set for a good day!,thumb,day,encouragement,success,
-"I've glitched, what do I do?",instruct,robot,startup,glitch,
 Error...where's my tail?,instruct,robot,guide,glitch,
 System malfunction detected?,spooky,robot,glitch,mystery,
 Something's wrong... a glitch?,spooky,robot,startup,glitch,
@@ -551,7 +545,6 @@ We defeated the glitch!,thumb,robot,glitch,success,
 Sorted that pesky glitch!,thumb,robot,glitch,success,
 We've sorted that malfunction!,thumb,robot,glitch,success,
 "Fixed it for you, boss!",thumb,robot,glitch,success,
-No sign of the glitch!,thumb,robot,glitch,success,
 The shadows are flickering...,instruct,poe,startup,spooky,
 Follow me through the fog.,instruct,poe,nature,spooky,
 Whispers in the dark...,spooky,poe,spooky,mystery,
