@@ -1,6 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { Loading } from './loading';
-import { textTransitionSignal } from "./textGlitch";
+import { Video } from './video';
 import { textMaker } from './label';
 
 class Signals {
@@ -20,18 +19,25 @@ export const Debug = () => {
 
     const timeouts = [];
     function onClickPlayVideo(e) {
+        console.log("playing video");
         signals.setPlayIntroVideo(true);
         const timeout = setTimeout(() => {
+            console.log("debug video timeout")
             signals.setPlayIntroVideo(false);
-        })
+        }, timeout)
         timeouts.push(timeout);
     }
 
     onCleanup(() => {
+        console.log("cleaning up debug");
         timeouts.forEach((timeout) => {
             clearTimeout(timeout);
         });
     });
+
+    function onEnded() {
+        console.log("video ended")
+    }
 
     const plainText = textMaker("debug");
     return <div class="device-control flex-column flex-grow">

@@ -12,6 +12,8 @@
   <body>
     <div id='debug'></div>
     <div id="app"></div>
+    <!-- Preload the intro video and it so that it definitely will play and get bundled. -->
+    <video id="preload-video" style="display: none;" preload="auto"> <source src="/assets/video/timechief-intro.mp4" type="video/mp4"> </video>
     <script src="/src/main.jsx" type="module"></script>
   </body>
 </html>
