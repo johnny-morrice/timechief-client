@@ -43,6 +43,7 @@ func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, 
 
 type Ticker interface {
 	Tick() <-chan struct{}
+	Poke()
 }
 
 type SoundService interface {
@@ -113,35 +114,6 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 	}
 
 	return clockData, nil
-}
-
-func (dd DeviceData) doFetchLatestWithRetries() (v2.Data, error) {
-	const maxRetries = 3
-	const waitTime = time.Second * 2
-
-	var data v2.Data
-	var err error
-	for i := 0; i < maxRetries; i++ {
-		data, err = dd.doFetchLatest()
-		if err != nil {
-			log.Printf("error getting device data, retrying: %s", err)
-		}
-
-		hasCalendar := data.DeviceProfile.Value.Features.GoogleCalendar
-		hasWeather := data.DeviceProfile.Value.Features.OpenWeatherMap
-
-		if hasWeather && data.Owm.Dt == 0 {
-			log.Printf("expected weather on this device, retrying")
-			continue
-		}
-
-		if hasCalendar && data.GoogleCalendar.Dt == 0 {
-			log.Printf("expected calendar on this device, retrying")
-			continue
-		}
-	}
-
-	return data, err
 }
 
 func (dd DeviceData) doFetchLatest() (v2.Data, error) {
