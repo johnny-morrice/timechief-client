@@ -86,4 +86,7 @@ export const Text = {
         "is-enabled": "API Enabled",
         "is-disabled": "API Disabled",
     },
+    "debug": {
+        "play-intro-video-button": "Play intro video"
+    }
 };

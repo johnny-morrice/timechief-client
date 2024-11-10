@@ -18,6 +18,7 @@ import { fadeTransition } from './fadeTransition';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { manageMascotCanvas, scoreEmote } from './mascot';
+import { Debug } from './debugPanel';
 
 class Signals {
   constructor() {
@@ -331,21 +332,28 @@ export const HomePage = () => {
     removeDataCallback(cbName);
   });
 
+  const switcherWidgets = [
+    { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
+    { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl /> },
+    { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo /> },
+    { icon: () => <i class="fa-brands fa-linux"></i>, element: () => <SSHSecurity /> },
+    { icon: () => <i class="fa-solid fa-house-laptop"></i>, element: () => <APISecurity /> },
+    { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
+    { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
+    { icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },
+    { icon: () => <i class="fa-solid fa-calendar-days"></i>, element: () => <EventCalendar /> },
+  ];
+
+  const useDebug = true;
+  if (useDebug) {
+    switcherWidgets.push(
+      { icon: () => <i class="fa-solid fa-fire"></i>, element: () => <Debug /> },
+    )
+  }
+
   return <div class="home-screen flex-row">
     <div class="home-lhs-column flex-column flex-grow border crt-box home-box">
-      <SwitcherWidget widgets={
-        [
-          { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
-          { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl /> },
-          { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo /> },
-          { icon: () => <i class="fa-brands fa-linux"></i>, element: () => <SSHSecurity /> },
-          { icon: () => <i class="fa-solid fa-house-laptop"></i>, element: () => <APISecurity /> },
-          { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
-          { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
-          { icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },
-          { icon: () => <i class="fa-solid fa-calendar-days"></i>, element: () => <EventCalendar /> },
-        ]
-      } />
+      <SwitcherWidget widgets={switcherWidgets} />
     </div>
     <div class='home-rhs-column flex-column flex-grow'>
       <div class="home-time-wrapper flex-grow">
