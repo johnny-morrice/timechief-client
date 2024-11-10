@@ -228,6 +228,7 @@ export const WebSetupPage = (props) => {
     // When doing setup, trigger interactivity every second.
     const interactionInterval = setInterval(() => {
         if (!isDisplayStateInternet(signals)) {
+            console.log("setup process rapidly recording interaction")
             recordInteraction();
         }
     }, 1000);
@@ -243,6 +244,7 @@ export const WebSetupPage = (props) => {
     const handleOnClickAnywhere = (e) => {
         recordInteraction();
         if (e.target.classList.contains("action-button")) {
+            console.log("action button press recording interaction")
             sendClockDataRequest();
         }
     };

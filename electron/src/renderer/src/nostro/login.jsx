@@ -73,6 +73,7 @@ export function LoginPage(props) {
     // Continuously poke interaction until cleaned up.
     const interactionInterval = setInterval(() => {
         if (!isLoggedIn(signals)) {
+            console.log("login process rapidly recording interaction")
             recordInteraction();
         }
     }, 1000);
