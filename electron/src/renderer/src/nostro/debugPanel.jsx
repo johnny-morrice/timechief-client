@@ -13,7 +13,7 @@ function isPlayIntroVideo(signals) {
 }
 
 export const Debug = () => {
-    const timeout = 5000;
+    const timeoutMS = 10000;
     console.log("Debug render");
     const signals = new Signals();
 
@@ -24,7 +24,7 @@ export const Debug = () => {
         const timeout = setTimeout(() => {
             console.log("debug video timeout")
             signals.setPlayIntroVideo(false);
-        }, timeout)
+        }, timeoutMS)
         timeouts.push(timeout);
     }
 
@@ -37,6 +37,7 @@ export const Debug = () => {
 
     function onEnded() {
         console.log("video ended")
+        signals.setPlayIntroVideo(false);
     }
 
     const plainText = textMaker("debug");
@@ -45,7 +46,7 @@ export const Debug = () => {
             <button class="action-button" onClick={onClickPlayVideo}>{plainText("play-intro-video-button")}</button>
         </Show>
         <Show when={isPlayIntroVideo(signals)}>
-            <Video videoSrc="assets/video/timechief-intro.mp4" timeout={timeout} onEnded={onEnded} />
+            <Video videoSrc="assets/video/timechief-intro.mp4" timeout={timeoutMS} onEnded={onEnded} />
         </Show>
     </div>;
 };
