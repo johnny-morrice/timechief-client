@@ -86,6 +86,11 @@ func getCLIApp() *cli.App {
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
 				&cli.BoolFlag{
+					Name:    "debug-adaptive-tick",
+					Value:   false,
+					EnvVars: []string{"TIMECHIEF_DEBUG_ADAPTIVE_TICK"},
+				},
+				&cli.BoolFlag{
 					Name:    "use-rtc-integration",
 					Usage:   "Use RTC integration on raspberry pi prior to version 5",
 					Value:   false,

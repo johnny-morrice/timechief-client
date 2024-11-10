@@ -2,7 +2,6 @@ package adaptivetick
 
 import (
 	"fmt"
-	"log"
 	"sync"
 	"time"
 )
@@ -15,9 +14,10 @@ type TwoModeTicker struct {
 	mutex           *sync.RWMutex
 	pokeCount       int
 	pokes           []time.Time
+	doLog           bool
 }
 
-func NewTwoModeTicker(exceedThreshold time.Duration, underThreshold time.Duration, threshold time.Duration, timeout time.Duration, pokeCount int) (*TwoModeTicker, error) {
+func NewTwoModeTicker(doLog bool, exceedThreshold time.Duration, underThreshold time.Duration, threshold time.Duration, timeout time.Duration, pokeCount int) (*TwoModeTicker, error) {
 	if exceedThreshold <= 0 || underThreshold <= 0 || threshold <= 0 || timeout <= 0 || pokeCount <= 0 {
 		return nil, fmt.Errorf("all durations and pokeCount must be greater than 0")
 	}
@@ -29,11 +29,12 @@ func NewTwoModeTicker(exceedThreshold time.Duration, underThreshold time.Duratio
 		mutex:           &sync.RWMutex{},
 		pokeCount:       pokeCount,
 		pokes:           []time.Time{time.Now()},
+		doLog:           doLog,
 	}, nil
 }
 
 func (t *TwoModeTicker) Poke() {
-	log.Printf("ticker poked at %s", time.Now())
+	t.logPrintf("ticker poked at %s", time.Now())
 
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
@@ -48,14 +49,14 @@ func (t *TwoModeTicker) Tick() <-chan struct{} {
 	out := make(chan struct{})
 	go func() {
 		for {
-			if t.isUnderThreshold() {
-				log.Printf("ticker is under threshold")
+			if t.isFastMode() {
+				t.logPrintf("ticker is in fast mode")
 				time.Sleep(t.underThreshold)
 			} else {
-				log.Printf("ticker is over threshold")
+				t.logPrintf("ticker is in slow mode")
 				startSleep := time.Now()
-				for !t.isUnderThreshold() && time.Since(startSleep) < t.exceedThreshold {
-					log.Printf("ticker is over threshold, waiting")
+				for !t.isFastMode() && time.Since(startSleep) < t.exceedThreshold {
+					t.logPrintf("ticker is in slow mode, waiting")
 					time.Sleep(t.underThreshold)
 				}
 			}
@@ -65,7 +66,7 @@ func (t *TwoModeTicker) Tick() <-chan struct{} {
 	return out
 }
 
-func (t *TwoModeTicker) isUnderThreshold() bool {
+func (t *TwoModeTicker) isFastMode() bool {
 	t.mutex.RLock()
 	defer t.mutex.RUnlock()
 
@@ -75,9 +76,15 @@ func (t *TwoModeTicker) isUnderThreshold() bool {
 	}
 
 	average := averageDurationBetweenTimes(t.pokes)
-	log.Printf("average duration between pokes: %s", average)
-	log.Printf("pokes: %v", t.pokes)
+	t.logPrintf("average duration between pokes: %s", average)
+	t.logPrintf("pokes: %v", t.pokes)
 	return average < t.threshold
+}
+
+func (t *TwoModeTicker) logPrintf(message string, args ...interface{}) {
+	if t.doLog {
+		t.logPrintf(message, args...)
+	}
 }
 
 func averageDurationBetweenTimes(times []time.Time) time.Duration {
