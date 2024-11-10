@@ -2,6 +2,7 @@ package adaptivetick
 
 import (
 	"fmt"
+	"log"
 	"sync"
 	"time"
 )
@@ -32,7 +33,7 @@ func NewTwoModeTicker(exceedThreshold time.Duration, underThreshold time.Duratio
 }
 
 func (t *TwoModeTicker) Poke() {
-	// log.Printf("ticker poked at %s", time.Now())
+	log.Printf("ticker poked at %s", time.Now())
 
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
@@ -48,13 +49,13 @@ func (t *TwoModeTicker) Tick() <-chan struct{} {
 	go func() {
 		for {
 			if t.isUnderThreshold() {
-				// log.Printf("ticker is under threshold")
+				log.Printf("ticker is under threshold")
 				time.Sleep(t.underThreshold)
 			} else {
-				// log.Printf("ticker is over threshold")
+				log.Printf("ticker is over threshold")
 				startSleep := time.Now()
 				for !t.isUnderThreshold() && time.Since(startSleep) < t.exceedThreshold {
-					// log.Printf("ticker is over threshold, waiting")
+					log.Printf("ticker is over threshold, waiting")
 					time.Sleep(t.underThreshold)
 				}
 			}
@@ -74,8 +75,8 @@ func (t *TwoModeTicker) isUnderThreshold() bool {
 	}
 
 	average := averageDurationBetweenTimes(t.pokes)
-	// log.Printf("average duration between pokes: %s", average)
-	// log.Printf("pokes: %v", t.pokes)
+	log.Printf("average duration between pokes: %s", average)
+	log.Printf("pokes: %v", t.pokes)
 	return average < t.threshold
 }
 
