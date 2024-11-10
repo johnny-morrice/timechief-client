@@ -73,7 +73,7 @@ export const StatusNote = () => {
         removeDataCallback(cbName);
         clearInterval(ipcCheckInterval);
     });
-    const useEcoMode = false;
+    const useEcoMode = true;
 
     return <div id="status-note-content" className={`status-note flex-column ${signals.statusNoteTransition()}`}>
             <Show when={signals.isCalendarError()}>
