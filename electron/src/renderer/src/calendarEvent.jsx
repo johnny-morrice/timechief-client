@@ -111,7 +111,7 @@ export class CalendarEvent {
         const segmenter = new Intl.Segmenter("en", {granularity: 'grapheme'});
         const segItr = segmenter.segment(this.data.short_text);
         const segArr = Array.from(segItr, ({segment}) => segment);
-        const maxLen = 13;
+        const maxLen = 15;
         if (segArr.length <= maxLen) {
             return this.data.short_text;
         }
