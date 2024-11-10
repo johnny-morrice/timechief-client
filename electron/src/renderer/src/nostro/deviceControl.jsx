@@ -37,7 +37,7 @@ function getDeviceStatus(signals) {
         let activeTargetVersion = launcherState["active_target_version"];
         let currentVersion = signals.clientVersion();
         if (currentVersion && activeTargetVersion && activeTargetVersion !== currentVersion) {
-            return "needs restart"
+            return "do restart"
         }
     }
     return signals.deviceStatus();
