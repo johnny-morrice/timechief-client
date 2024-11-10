@@ -89,6 +89,23 @@ CATEND
     systemctl enable timechief-launcher
 EOF
 
+# Set screen brightness
+on_chroot << EOF
+cat > /etc/systemd/system/set-brightness.service << CATEND
+[Unit]
+Description=Set Brightness at Boot
+After=graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher brightness
+
+[Install]
+WantedBy=multi-user.target
+CATEND
+    systemctl enable set-brightness.service
+EOF
+
 # timechief-launcher sound daemon
 on_chroot << EOF
 cat > /etc/systemd/system/timechief-launcher-sound.service << CATEND
