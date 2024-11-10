@@ -349,6 +349,10 @@ div.next-event-wrapper {
     gap: 0.5em;
 }
 
+div.event-mascot-wrapper {
+    margin-left: auto;
+}
+
 #fortune-canvas {
     height: 120px;
 }
