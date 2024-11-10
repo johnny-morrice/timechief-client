@@ -355,6 +355,7 @@ export const HomePage = () => {
 
       <div class="home-action-center flex-grow border crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
+        <StatusNote />
           <Show when={hasNextEvent(signals)}>
             <div class='next-event-wrapper'>
               <div class='next-event-summary flex-column flex-grow'>
@@ -374,7 +375,6 @@ export const HomePage = () => {
           <Show when={!hasNextEvent(signals)}>
             <Fortune />
           </Show>
-          <StatusNote />
         </div>
       </div>
     </div>

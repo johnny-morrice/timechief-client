@@ -335,6 +335,11 @@ div.fortune-message {
     display: flex;
     flex-direction: row;
     gap: 0.5em;
+    justify-content: flex-end;
+}
+
+div.fortune-message-mascot-wrapper {
+    margin-left: auto;
 }
 
 div.next-event-wrapper {
