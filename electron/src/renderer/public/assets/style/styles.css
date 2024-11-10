@@ -345,6 +345,7 @@ div.fortune-message-mascot-wrapper {
 div.next-event-wrapper {
     display: flex;
     flex-direction: row;
+    justify-content: flex-end;
     gap: 0.5em;
 }
 
