@@ -12,7 +12,7 @@ export function IntroVideo(props) {
     }
     return <>
         <Show when={!ended()}>
-            <Video videoSrc="assets/video/timechief-intro.mp4" timeout={5000} onEnded={onEnded} />
+            <Video videoSrc="assets/video/timechief-intro.mp4" timeout={10000} onEnded={onEnded} />
         </Show>
         <Show when={ended()}>
             {props.element}

@@ -24,12 +24,30 @@ export function Video(props) {
     function setEndedCallback() {
         const video = document.getElementById('background-video');
         if (video) {
+            console.log("able to set video end callback");
             video.onended = onEnded;
+            return true;
         }
+        return false;
     }
-    onMount(setEndedCallback);
-    const timeout = setTimeout(onEnded, props.timeout);
-    onCleanup(() => clearTimeout(timeout));
+    var videoCallbackInterval;
+    function repeatSetEndedCallback() {
+        videoCallbackInterval = setInterval(() => {
+            const wasSet = setEndedCallback()
+            if (wasSet) {
+                clearInterval(videoCallbackInterval);
+            }
+        }, 10);
+    }
+    onMount(repeatSetEndedCallback);
+    const timeout = setTimeout(function() {
+        console.log("video end script timeout")
+        onEnded();
+    }, props.timeout);
+    onCleanup(() => {
+        clearTimeout(timeout);
+        clearInterval(videoCallbackInterval);
+    });
     return <div class='background-video-wrapper'>
         <video onClick={onClick} id="background-video" autoplay muted>
             <source src={props.videoSrc} type="video/mp4" />
