@@ -78,17 +78,17 @@ export const DeviceInfo = () => {
                     <div class="data-label flex-grow">{label("ip-address")}</div>
                     <div class="data-label flex-grow">{label("network-type")}</div>
                     <div class="data-label flex-grow">{label("software-version")}</div>
-                    <Show when={hasUpdateVersion(signals)}>
+                    {/* <Show when={hasUpdateVersion(signals)}>
                         <div class="data-label flex-grow">{label("update-version")}</div>
-                    </Show>
+                    </Show> */}
                 </div>
                 <div class="device-info-values flex-column flex-grow">
                     <div class="data-value flex-grow">{signals.ipAddress}</div>
                     <div class="data-value flex-grow">{signals.networkType}</div>
                     <div class="data-value flex-grow">{signals.clientVersionText}</div>
-                    <Show when={hasUpdateVersion(signals)}>
+                    {/* <Show when={hasUpdateVersion(signals)}>
                         <div class="data-value flex-grow">{signals.activeTargetVersionText}</div>
-                    </Show>
+                    </Show> */}
                 </div>
             </div>
         </Show>

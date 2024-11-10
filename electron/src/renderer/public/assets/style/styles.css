@@ -236,6 +236,13 @@ button.switcher-button {
     font-size: 16pt;
 }
 
+div#switcher-widget-content {
+    overflow: hidden;
+}
+
+div.switcher-widget {
+    height: 100%;
+}
 
 div.setup-wrapper {
     height: 100vh;
