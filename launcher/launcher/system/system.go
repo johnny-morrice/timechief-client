@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -368,7 +369,7 @@ func (sys System) LoadNetworkStatus() error {
 	}
 	// log.Printf("network status: %v", status)
 	if status.Mode == InfraMode && status.SSID != "" {
-		if status.State == "up" {
+		if strings.Contains(status.State, "(connected)") {
 			// log.Printf("connected to %s", status.SSID)
 			err = sys.WifiNetworkStore.MarkConnectionSuccess(status.SSID)
 			if err != nil {
