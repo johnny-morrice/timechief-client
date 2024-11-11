@@ -1,11 +1,10 @@
 import { For, Show, createSignal, onCleanup } from "solid-js";
 import { callbackName } from "./callback";
-import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, sendSelectMyDevice } from "./ipc";
+import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, sendSelectMyDevice, sendSetupBegin, sendLogOut, recordInteraction } from "./ipc";
 import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 import { Loading } from "./loading";
 import { labelMaker, textMaker } from "./label";
-import { recordInteraction, sendLogOut, sendSetupBegin } from "./ipc";
 
 class Signals {
     constructor() {
@@ -46,7 +45,7 @@ export function LoginPage(props) {
         sendRefreshMyDevices();
     }
 
-    
+
     function isLoginStarted(signals) {
         return signals.userCode().length > 0;
     }
@@ -77,7 +76,7 @@ export function LoginPage(props) {
             recordInteraction();
         }
     }, 1000);
-    
+
     onCleanup(() => {
         clearInterval(interactionInterval);
         clearInterval(pairingGetInterval);
@@ -115,7 +114,7 @@ export function LoginPage(props) {
                     canvasWrapper.appendChild(pairingQrCodeCanvas);
                     toCanvas(pairingQrCodeCanvas, qrCodeURL);
                 }
-                
+
             }
         }
         // Pairing is complete if we've got a code and the state is now none.
@@ -140,6 +139,10 @@ export function LoginPage(props) {
     function onClickRestartSetup(e) {
         sendLogOut();
         sendSetupBegin();
+    }
+
+    function onClickNewCode(e) {
+        sendPairingCreateRequest();
     }
 
     return <>
@@ -183,7 +186,10 @@ export function LoginPage(props) {
                         </div>
                         <div class="data-label">{label("scan-qr")}</div>
                         <div id="pairing-qrcode-canvas-wrapper"></div>
-                        <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
+                        <div class="login-code-buttons flex-row">
+                            <button class="action-button crt-box flex-grow" onClick={onClickNewCode}>{plainText("new-code")}</button>
+                            <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
+                        </div>
                     </div>
                 </Show>
             </div>
