@@ -90,14 +90,28 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 
 	const timeout = time.Second * 180
 
+	expectCalendar := data.DeviceProfile.Value.Features.GoogleCalendar
 	if time.Since(lastGoodData) < timeout {
-		expectCalendar := data.DeviceProfile.Value.Features.GoogleCalendar
-		expectedWeather := data.DeviceProfile.Value.Features.OpenWeatherMap
 
+		expectedWeather := data.DeviceProfile.Value.Features.OpenWeatherMap
 		badData := expectCalendar && data.GoogleCalendar.Dt == 0
 		badData = badData || (expectedWeather && data.Owm.Dt == 0)
 		if badData {
 			return fmt.Errorf("bad data from service, expected more features")
+		}
+	}
+
+	const calendarErrorTimeout = 35 * time.Minute
+	lastUpdated := time.Unix(data.GoogleCalendar.Value.Dt, 0)
+	if expectCalendar && time.Since(lastUpdated) > calendarErrorTimeout {
+		myErr := dd.stateFlagStore.CreateIfNotExists(CalendarErrorState)
+		if myErr != nil {
+			log.Printf("error setting calendar error state: %s", myErr)
+		}
+	} else {
+		myErr := dd.stateFlagStore.Delete(CalendarErrorState)
+		if myErr != nil {
+			log.Printf("error clearing calendar error state: %s", myErr)
 		}
 	}
 
@@ -131,21 +145,6 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 	myErr := dd.stateFlagStore.Delete(DeviceDataErrorState)
 	if myErr != nil {
 		log.Printf("error clearing device data error state: %s", myErr)
-	}
-
-	const calendarErrorTimeout = 30 * time.Minute
-	lastUpdated := time.Unix(clockData.GoogleCalendar.Value.Dt, 0)
-	now := time.Now()
-	if now.Sub(lastUpdated) > calendarErrorTimeout {
-		myErr := dd.stateFlagStore.CreateIfNotExists(CalendarErrorState)
-		if myErr != nil {
-			log.Printf("error setting calendar error state: %s", myErr)
-		}
-	} else {
-		myErr := dd.stateFlagStore.Delete(CalendarErrorState)
-		if myErr != nil {
-			log.Printf("error clearing calendar error state: %s", myErr)
-		}
 	}
 
 	return clockData, nil
