@@ -88,11 +88,9 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 		}
 	}
 
-	const timeout = time.Second * 180
-
+	const goodDataTimeout = time.Second * 180
 	expectCalendar := data.DeviceProfile.Value.Features.GoogleCalendar
-	if time.Since(lastGoodData) < timeout {
-
+	if time.Since(lastGoodData) < goodDataTimeout {
 		expectedWeather := data.DeviceProfile.Value.Features.OpenWeatherMap
 		badData := expectCalendar && data.GoogleCalendar.Dt == 0
 		badData = badData || (expectedWeather && data.Owm.Dt == 0)
