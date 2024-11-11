@@ -89,7 +89,7 @@ export function LoginPage(props) {
     addPairingCreateCallback(cbName, () => {
         pairingGetInterval = setInterval(() => {
             sendPairingGetRequest();
-        }, 300);
+        }, 500);
     });
     addPairingGetCallback(cbName, (data) => {
         const userCode = data["code"];
