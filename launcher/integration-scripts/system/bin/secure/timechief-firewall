@@ -2,9 +2,9 @@
 import sys
 import subprocess
 
-def validate_ports(port_list):
+def validate_ports(ports):
     """Validate each port to ensure it's an integer within the valid range."""
-    for port in port_list:
+    for port in ports:
         try:
             port = int(port)
             if port < 0 or port > 65535:
@@ -15,7 +15,7 @@ def validate_ports(port_list):
 def configure_firewall(ports):
     # Validate the ports
     ports = [port.strip() for port in ports.split(',')]
-    validate_ports(port_list)
+    validate_ports(ports)
 
     # Define the base nftables configuration template
     nftables_config = """
@@ -55,8 +55,8 @@ table inet filter {
     with open('/etc/nftables.conf', 'w') as f:
         f.write(nftables_config)
 
-    # Reload the nftables service to activate changes
-    subprocess.run(['systemctl', 'reload', 'nftables'], check=True)
+    # Restart the nftables service to activate changes
+    subprocess.run(['systemctl', 'restart', 'nftables'], check=True)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
