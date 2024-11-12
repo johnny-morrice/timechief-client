@@ -6,9 +6,7 @@ def validate_ports(port_list):
     for port in port_list:
         try:
             port = int(port)
-            if 1 <= port <= 65535:
-                valid_ports.append(port)
-            else:
+            if port < 0 or port > 65535:
                 raise Exception(f"port {port} is out of the valid range (1-65535)")
         except ValueError:
             raise Exception(f"port '{port}' is not a valid integer")
