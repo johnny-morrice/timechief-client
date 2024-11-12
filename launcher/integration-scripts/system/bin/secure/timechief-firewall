@@ -1,27 +1,56 @@
-#!/usr/bin/python
 import sys
 import subprocess
 
+def validate_ports(port_list):
+    """Validate each port to ensure it's an integer within the valid range."""
+    for port in port_list:
+        try:
+            port = int(port)
+            if 1 <= port <= 65535:
+                valid_ports.append(port)
+            else:
+                raise Exception(f"port {port} is out of the valid range (1-65535)")
+        except ValueError:
+            raise Exception(f"port '{port}' is not a valid integer")
+
 def configure_firewall(ports):
-    # Convert the comma-separated ports list into a set of individual ports
+    # Validate the ports
     ports = [port.strip() for port in ports.split(',')]
+    validate_ports(port_list)
 
     # Define the base nftables configuration template
     nftables_config = """
+#!/usr/sbin/nft -f
+
 table inet filter {
     chain input {
         type filter hook input priority 0; policy drop;
+
+        # Allow traffic on the loopback interface
         iif "lo" accept
+
+        # Allow established and related connections
         ct state established,related accept
 """
 
-    # Add rules for each port to the nftables configuration
+    # Add rules for each port to allow traffic
     for port in ports:
         nftables_config += f"        tcp dport {port} accept\n"
         nftables_config += f"        udp dport {port} accept\n"
 
-    # Close the chain
-    nftables_config += "    }\n}\n"
+    # Close the input chain and add forward/output chains with default policies
+    nftables_config += """
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+    }
+}
+"""
 
     # Write the configuration to /etc/nftables.conf
     with open('/etc/nftables.conf', 'w') as f:
@@ -30,7 +59,7 @@ table inet filter {
     # Apply the configuration immediately
     subprocess.run(['nft', '-f', '/etc/nftables.conf'], check=True)
 
-    # Reload the systemd service to ensure persistence
+    # Enable and start the nftables service to ensure persistence across reboots
     subprocess.run(['systemctl', 'enable', 'nftables'], check=True)
     subprocess.run(['systemctl', 'start', 'nftables'], check=True)
 
