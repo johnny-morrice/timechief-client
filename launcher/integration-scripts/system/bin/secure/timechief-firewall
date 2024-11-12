@@ -56,7 +56,7 @@ table inet filter {
     with open('/etc/nftables.conf', 'w') as f:
         f.write(nftables_config)
 
-    # Enable and start the nftables service to ensure persistence across reboots
+    # Reload the nftables service to activate changes
     subprocess.run(['systemctl', 'reload', 'nftables'], check=True)
 
 if __name__ == "__main__":
