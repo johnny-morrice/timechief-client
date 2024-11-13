@@ -7,7 +7,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"gorm.io/gorm"
 )
 
@@ -17,11 +16,12 @@ type FirewallDaemon struct {
 	tickInterval              time.Duration
 	isInitialFirewallUp       bool
 	isHandleForceFirewallOpen bool
-	keyValueStore             store.KeyValueStore
+	stateFlagStore            StateFlagStore
 	sys                       System
+	svc                       Service
 }
 
-func MakeFirewallDaemon(graceDuration time.Duration, tickInterval time.Duration, keyValueStore store.KeyValueStore, sys System) (FirewallDaemon, error) {
+func MakeFirewallDaemon(graceDuration time.Duration, tickInterval time.Duration, sys System, svc Service) (FirewallDaemon, error) {
 	if tickInterval == 0 {
 		return FirewallDaemon{}, fmt.Errorf("tickInterval was 0")
 	}
@@ -30,16 +30,28 @@ func MakeFirewallDaemon(graceDuration time.Duration, tickInterval time.Duration,
 		return FirewallDaemon{}, fmt.Errorf("sys was nil")
 	}
 
+	if svc == nil {
+		return FirewallDaemon{}, fmt.Errorf("svc was nil")
+	}
+
 	daemon := FirewallDaemon{
 		startTime:           time.Now(),
 		graceDuration:       graceDuration,
 		tickInterval:        tickInterval,
 		isInitialFirewallUp: false,
 
-		keyValueStore: keyValueStore,
-		sys:           sys,
+		sys: sys,
+		svc: svc,
 	}
 	return daemon, nil
+}
+
+type StateFlagStore interface {
+	Exists(state string) (bool, error)
+}
+
+type Service interface {
+	ApplyFirewallRules() error
 }
 
 type System interface {
@@ -58,51 +70,33 @@ func (daemon *FirewallDaemon) Start(ctx context.Context) {
 func (daemon *FirewallDaemon) doTick() error {
 	isPutFirewallUp := !daemon.isInitialFirewallUp && time.Since(daemon.startTime) > daemon.graceDuration
 	if isPutFirewallUp {
-		err := daemon.applyFirewallSettings()
+		err := daemon.svc.ApplyFirewallRules()
 		if err != nil {
 			return err
 		}
 		daemon.isInitialFirewallUp = true
 	}
 
-	isForceFirewallOpen, err := daemon.keyValueStore.Get("firewall-force-open")
+	isForceFirewallOpen, err := daemon.stateFlagStore.Exists("firewall-force-open")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 
-	if isForceFirewallOpen == "true" && !daemon.isHandleForceFirewallOpen {
+	if isForceFirewallOpen && !daemon.isHandleForceFirewallOpen {
 		err := daemon.sys.OpenFirewall([]string{"22", "80", "443"})
 		if err != nil {
 			return err
 		}
 		daemon.isHandleForceFirewallOpen = true
-	} else {
+	}
+
+	if !isForceFirewallOpen && daemon.isHandleForceFirewallOpen {
+		err := daemon.svc.ApplyFirewallRules()
+		if err != nil {
+			return err
+		}
 		daemon.isHandleForceFirewallOpen = false
 	}
 
 	return nil
-}
-
-func (daemon *FirewallDaemon) applyFirewallSettings() error {
-	ports := []string{}
-
-	httpAccessText, err := daemon.keyValueStore.Get("firewall-open-http")
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return err
-	}
-
-	if httpAccessText == "true" {
-		ports = append(ports, "80", "443")
-	}
-
-	sshAccessText, err := daemon.keyValueStore.Get("firewall-open-ssh")
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return err
-	}
-
-	if sshAccessText == "true" {
-		ports = append(ports, "22")
-	}
-
-	return daemon.sys.OpenFirewall(ports)
 }
