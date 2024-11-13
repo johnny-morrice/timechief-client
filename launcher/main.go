@@ -96,6 +96,11 @@ func getCLIApp() *cli.App {
 			Usage:   "Run the launcher daemon",
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
+				&cli.DurationFlag{
+					Name:    "firewall-grace-time",
+					Value:   5 * time.Minute,
+					EnvVars: []string{"TIMECHIEF_FIREWALL_GRACE_TIME"},
+				},
 				&cli.BoolFlag{
 					Name:    "debug-adaptive-tick",
 					Value:   false,
