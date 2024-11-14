@@ -14,14 +14,16 @@ type FirewallDaemon struct {
 	startTime                 time.Time
 	graceDuration             time.Duration
 	tickInterval              time.Duration
-	isInitialFirewallUp       bool
+	isGraceStarted            bool
+	isGraceEnded              bool
 	isHandleForceFirewallOpen bool
+	isGraceIncludeSSH         bool
 	stateFlagStore            StateFlagStore
 	sys                       System
 	svc                       Service
 }
 
-func MakeFirewallDaemon(graceDuration time.Duration, tickInterval time.Duration, sys System, svc Service) (FirewallDaemon, error) {
+func MakeFirewallDaemon(isGraceIncludeSSH bool, graceDuration time.Duration, tickInterval time.Duration, sys System, svc Service) (FirewallDaemon, error) {
 	if tickInterval == 0 {
 		return FirewallDaemon{}, fmt.Errorf("tickInterval was 0")
 	}
@@ -35,10 +37,12 @@ func MakeFirewallDaemon(graceDuration time.Duration, tickInterval time.Duration,
 	}
 
 	daemon := FirewallDaemon{
-		startTime:           time.Now(),
-		graceDuration:       graceDuration,
-		tickInterval:        tickInterval,
-		isInitialFirewallUp: false,
+		startTime:         time.Now(),
+		graceDuration:     graceDuration,
+		tickInterval:      tickInterval,
+		isGraceEnded:      false,
+		isGraceStarted:    false,
+		isGraceIncludeSSH: isGraceIncludeSSH,
 
 		sys: sys,
 		svc: svc,
@@ -68,13 +72,27 @@ func (daemon *FirewallDaemon) Start(ctx context.Context) {
 }
 
 func (daemon *FirewallDaemon) doTick() error {
-	isPutFirewallUp := !daemon.isInitialFirewallUp && time.Since(daemon.startTime) > daemon.graceDuration
+	gracePorts := []string{"80", "443"}
+	if daemon.isGraceIncludeSSH {
+		gracePorts = append(gracePorts, "22")
+	}
+	if !daemon.isGraceStarted {
+		if time.Since(daemon.startTime) < daemon.graceDuration {
+			err := daemon.sys.OpenFirewall(gracePorts)
+			if err != nil {
+				return err
+			}
+		}
+		daemon.isGraceStarted = true
+	}
+
+	isPutFirewallUp := daemon.isGraceStarted && !daemon.isGraceEnded && time.Since(daemon.startTime) > daemon.graceDuration
 	if isPutFirewallUp {
 		err := daemon.svc.ApplyFirewallRules()
 		if err != nil {
 			return err
 		}
-		daemon.isInitialFirewallUp = true
+		daemon.isGraceEnded = true
 	}
 
 	isForceFirewallOpen, err := daemon.stateFlagStore.Exists("firewall-force-open")
@@ -83,7 +101,7 @@ func (daemon *FirewallDaemon) doTick() error {
 	}
 
 	if isForceFirewallOpen && !daemon.isHandleForceFirewallOpen {
-		err := daemon.sys.OpenFirewall([]string{"22", "80", "443"})
+		err := daemon.sys.OpenFirewall(gracePorts)
 		if err != nil {
 			return err
 		}

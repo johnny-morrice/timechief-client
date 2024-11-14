@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/firewall"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 )
@@ -15,6 +16,12 @@ type Service struct {
 	StateFlagStore   store.StateFlagStore
 	KeyValueStore    store.KeyValueStore
 	WifiNetworkStore store.WifiNetworkStore
+	FirewallService  FirewallService
+}
+
+type FirewallService interface {
+	SetServiceState(ss firewall.ServiceState) error
+	ApplyFirewallRules() error
 }
 
 type SSHCredentials struct {
@@ -38,14 +45,25 @@ func (svc Service) RegenerateSSHPassword() (SSHCredentials, error) {
 }
 
 func (svc Service) FirewallSSHSetState(enabled bool) error {
-	// TODO: Implement SetSSHFirewallState
-	log.Printf("TODO SetSSHFirewallState: %v", enabled)
-	return nil
+	err := svc.FirewallService.SetServiceState(firewall.ServiceState{
+		Service: "ssh",
+		Open:    enabled,
+	})
+	if err != nil {
+		return err
+	}
+	return svc.FirewallService.ApplyFirewallRules()
 }
 
 func (svc Service) FirewallAPISetState(enabled bool) error {
-	// TODO: Implement SetAPIFirewallState
-	return svc.KeyValueStore.Set(store.APIAccessEnabled, fmt.Sprintf("%v", enabled))
+	err := svc.FirewallService.SetServiceState(firewall.ServiceState{
+		Service: "http",
+		Open:    enabled,
+	})
+	if err != nil {
+		return err
+	}
+	return svc.FirewallService.ApplyFirewallRules()
 }
 
 func (svc Service) Reboot() error {

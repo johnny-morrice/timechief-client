@@ -102,6 +102,11 @@ func getCLIApp() *cli.App {
 					EnvVars: []string{"TIMECHIEF_FIREWALL_GRACE_TIME"},
 				},
 				&cli.BoolFlag{
+					Name:    "firewall-grace-includes-ssh",
+					Value:   false,
+					EnvVars: []string{"TIMECHIEF_GRACE_INCLUDES_SSH"},
+				},
+				&cli.BoolFlag{
 					Name:    "debug-adaptive-tick",
 					Value:   false,
 					EnvVars: []string{"TIMECHIEF_DEBUG_ADAPTIVE_TICK"},

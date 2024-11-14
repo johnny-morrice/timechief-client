@@ -20,6 +20,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/adaptivetick"
 	datadaemon "github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/data"
+	fwdaemon "github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/firewall"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/picturedownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
@@ -27,6 +28,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 	datasvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
+	wfservice "github.com/johnny-morrice/timechief-client/launcher/launcher/service/firewall"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
 	mediasvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
@@ -256,6 +258,17 @@ func Daemon(ctx *cli.Context) error {
 		go timeSync.Start(ctx)
 	}
 
+	fwsvc, err := wfservice.MakeFirewallService(keyValueStore, system)
+	if err != nil {
+		return err
+	}
+
+	fwDaemon, err := fwdaemon.MakeFirewallDaemon(ctx.Bool("firewall-grace-includes-ssh"), ctx.Duration("firewall-grace-time"), time.Second*3, system, fwsvc)
+	if err != nil {
+		return err
+	}
+
+	go fwDaemon.Start(ctx.Context)
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
 	go wifiScan.Start(ctx)
@@ -300,6 +313,7 @@ func Daemon(ctx *cli.Context) error {
 				StateFlagStore:   flagStore,
 				KeyValueStore:    keyValueStore,
 				WifiNetworkStore: wifiNetworkStore,
+				FirewallService:  fwsvc,
 			},
 		},
 		api.MakeDataAPI(dataService),
