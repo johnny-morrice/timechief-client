@@ -12,10 +12,12 @@ def validate_ports(ports):
         except ValueError:
             raise Exception(f"port '{port}' is not a valid integer")
 
-def configure_firewall(ports):
-    # Validate the ports
-    ports = [port.strip() for port in ports.split(',')]
-    validate_ports(ports)
+def configure_firewall(portText):
+    ports = []
+    if len(portText) != 0:
+        # Validate the ports
+        ports = [port.strip() for port in portText.split(',')]
+        validate_ports(ports)
 
     # Define the base nftables configuration template
     nftables_config = """
@@ -59,8 +61,13 @@ table inet filter {
     subprocess.run(['systemctl', 'restart', 'nftables'], check=True)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) > 2:
         print("Usage: python3 set_firewall.py <port1,port2,...>")
         sys.exit(1)
 
-    configure_firewall(sys.argv[1])
+    if len(sys.argv) == 1:
+        ports = ""
+    elif len(sys.argv) == 2:
+        ports = sys.argv[1]
+
+    configure_firewall(ports)

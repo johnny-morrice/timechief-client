@@ -29,5 +29,10 @@ func (sys System) doFirewall(ports []string) error {
 		return fmt.Errorf("failed to get config: %w", err)
 	}
 	portArg := strings.Join(ports, ",")
-	return sys.runScript(cfg, "timechief-firewall", portArg)
+	if len(portArg) != 0 {
+		return sys.runScript(cfg, "timechief-firewall", portArg)
+	} else {
+		return sys.runScript(cfg, "timechief-firewall")
+	}
+
 }
