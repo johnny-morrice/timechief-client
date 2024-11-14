@@ -23,7 +23,7 @@ type FirewallDaemon struct {
 	svc                       Service
 }
 
-func MakeFirewallDaemon(isGraceIncludeSSH bool, graceDuration time.Duration, tickInterval time.Duration, sys System, svc Service) (FirewallDaemon, error) {
+func MakeFirewallDaemon(isGraceIncludeSSH bool, graceDuration time.Duration, tickInterval time.Duration, sys System, svc Service, stateFlagStore StateFlagStore) (FirewallDaemon, error) {
 	if tickInterval == 0 {
 		return FirewallDaemon{}, fmt.Errorf("tickInterval was 0")
 	}
@@ -43,6 +43,7 @@ func MakeFirewallDaemon(isGraceIncludeSSH bool, graceDuration time.Duration, tic
 		isGraceEnded:      false,
 		isGraceStarted:    false,
 		isGraceIncludeSSH: isGraceIncludeSSH,
+		stateFlagStore:    stateFlagStore,
 
 		sys: sys,
 		svc: svc,

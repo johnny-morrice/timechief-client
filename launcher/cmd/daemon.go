@@ -263,7 +263,7 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	fwDaemon, err := fwdaemon.MakeFirewallDaemon(ctx.Bool("firewall-grace-includes-ssh"), ctx.Duration("firewall-grace-time"), time.Second*3, system, fwsvc)
+	fwDaemon, err := fwdaemon.MakeFirewallDaemon(ctx.Bool("firewall-grace-includes-ssh"), ctx.Duration("firewall-grace-time"), time.Second*3, system, fwsvc, flagStore)
 	if err != nil {
 		return err
 	}

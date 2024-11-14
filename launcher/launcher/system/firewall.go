@@ -3,6 +3,7 @@ package system
 import (
 	"fmt"
 	"log"
+	"strings"
 )
 
 func (sys System) OpenFirewall(ports []string) error {
@@ -27,5 +28,6 @@ func (sys System) doFirewall(ports []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)
 	}
-	return sys.runScript(cfg, "timechief-firewall")
+	portArg := strings.Join(ports, ",")
+	return sys.runScript(cfg, "timechief-firewall", portArg)
 }
