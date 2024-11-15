@@ -341,7 +341,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		}
 	}
 
-	isSshFirewallOpen, err := strconv.ParseBool(sshFirewallOpenText)
+	isSSHFirewallOpen, err := strconv.ParseBool(sshFirewallOpenText)
 	if err != nil {
 		return DeviceData{}, fmt.Errorf("failed to parse SSH firewall open bool: %w", err)
 	}
@@ -374,7 +374,7 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 				NetworkType: networkType,
 			},
 			FirewallState: FirewallState{
-				SSHEnabled: isSshFirewallOpen,
+				SSHEnabled: isSSHFirewallOpen,
 				APIEnabled: isAPIFirewallOpen,
 			},
 		},
