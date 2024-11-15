@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/firewall"
@@ -56,14 +57,23 @@ func (svc Service) FirewallSSHSetState(enabled bool) error {
 }
 
 func (svc Service) FirewallAPISetState(enabled bool) error {
-	err := svc.FirewallService.SetServiceState(firewall.ServiceState{
+	apiAccessMode := strconv.FormatBool(enabled)
+	err := svc.KeyValueStore.Set(store.APIAccessEnabled, apiAccessMode)
+	if err != nil {
+		return fmt.Errorf("error setting API access mode: %w", err)
+	}
+	err = svc.FirewallService.SetServiceState(firewall.ServiceState{
 		Service: "http",
 		Open:    enabled,
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("error setting API firewall service state: %w", err)
 	}
-	return svc.FirewallService.ApplyFirewallRules()
+	err = svc.FirewallService.ApplyFirewallRules()
+	if err != nil {
+		return fmt.Errorf("error firewall rules after API access change: %w", err)
+	}
+	return nil
 }
 
 func (svc Service) Reboot() error {
