@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+# Check for all arguments
+if [[ -z $1 ]] || [[ -z $2 ]] ;  then
+  echo "Usage: $0 <username> <new_password>"
+  exit 1
+fi
+
+USERNAME="$1"
+PASSWD="$2"
+
+
+# Set the username and new password
+NEW_PASSWORD="$1"
+
+# Change the password using chpasswd
+echo "$USERNAME:$NEW_PASSWORD" | chpasswd
+
+# Check if the password change was successful
+if [[ $? -eq 0 ]]; then
+  echo "Password for user $USERNAME has been successfully changed."
+else
+  echo "Failed to change password for user $USERNAME."
+  exit 1
+fi

@@ -3,21 +3,40 @@ package system
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/firewall"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 )
 
 type Service struct {
-	System           system.System
-	StateFlagStore   store.StateFlagStore
-	KeyValueStore    store.KeyValueStore
-	WifiNetworkStore store.WifiNetworkStore
+	System           System
+	StateFlagStore   StateFlagStore
+	KeyValueStore    KeyValueStore
+	WifiNetworkStore WifiNetworkStore
 	FirewallService  FirewallService
+}
+
+type System interface {
+	ChangeUserPassword(username, password string) error
+	Reboot() error
+	Shutdown() error
+}
+
+type WifiNetworkStore interface {
+	SelectNetwork(ssid, key string) error
+	MarkNotReady() error
+	MarkSelectedReady() error
+}
+
+type StateFlagStore interface {
+	CreateIfNotExists(state string) error
+}
+
+type KeyValueStore interface {
+	Set(key, value string) error
+	Get(key string) (string, error)
 }
 
 type FirewallService interface {
@@ -31,13 +50,16 @@ type SSHCredentials struct {
 }
 
 func (svc Service) RegenerateSSHPassword() (SSHCredentials, error) {
-	// TODO: Implement RegenerateSSHKey
-	log.Printf("TODO RegenerateSSHKey")
 	pass, err := crypt.GenerateSSHPassword()
 	if err != nil {
 		return SSHCredentials{}, fmt.Errorf("failed to generate SSH password: %w", err)
 	}
 	const username = "timechief"
+
+	err = svc.System.ChangeUserPassword(username, pass)
+	if err != nil {
+		return SSHCredentials{}, fmt.Errorf("failed to change password for user '%s': %w", username, err)
+	}
 	result := SSHCredentials{
 		Username: username,
 		Password: pass,
