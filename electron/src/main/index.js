@@ -59,6 +59,11 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
       })
       .catch(error => {
         logger.error(`error calling ${sendChan} API: ${error}`);
+        if (error instanceof AggregateError) {
+          console.log(e.message); // "All Promises rejected"
+          console.log(e.name);
+          console.log(e.errors);
+        }
         getMainWindow().webContents.send(receiveChan, { "APIError": "error calling API" });
       });
   });
