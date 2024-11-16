@@ -222,3 +222,43 @@ systemctl disable userconfig
 rm /etc/systemd/system/multi-user.target.wants/userconfig.service -f
 sed -i '/^WantedBy=/d' /usr/lib/systemd/system/userconfig.service
 EOF
+
+# Set up nftables default
+on_chroot << EOF
+cat > /etc/nftables.conf << CATEND
+#!/usr/sbin/nft -f
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        # Allow traffic on the loopback interface
+        iif "lo" accept
+
+        # Allow established and related connections
+        ct state established,related accept
+
+        # Allow incoming SSH
+        tcp dport 22 accept
+        udp dport 22 accept
+
+        # Allow incoming HTTP
+        tcp dport 80 accept
+        udp dport 80 accept
+
+        # Allow incoming HTTPS
+        tcp dport 443 accept
+        udp dport 443 accept
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+    }
+}
+CATEND
+sudo systemctl enable nftables
+EOF

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/google/uuid"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
@@ -317,6 +318,34 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 		return DeviceData{}, fmt.Errorf("failed to get network-type: %w", err)
 	}
 
+	apiFirewallOpenText, err := svc.keyValueStore.Get("firewall-open-http")
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			apiFirewallOpenText = "false"
+		} else {
+			return DeviceData{}, fmt.Errorf("failed to get API firewall state: %w", err)
+		}
+	}
+
+	isAPIFirewallOpen, err := strconv.ParseBool(apiFirewallOpenText)
+	if err != nil {
+		return DeviceData{}, fmt.Errorf("failed to parse API firewall open bool: %w", err)
+	}
+
+	sshFirewallOpenText, err := svc.keyValueStore.Get("firewall-open-ssh")
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			sshFirewallOpenText = "false"
+		} else {
+			return DeviceData{}, fmt.Errorf("failed to get SSH firewall state: %w", err)
+		}
+	}
+
+	isSSHFirewallOpen, err := strconv.ParseBool(sshFirewallOpenText)
+	if err != nil {
+		return DeviceData{}, fmt.Errorf("failed to parse SSH firewall open bool: %w", err)
+	}
+
 	result := DeviceData{
 		Media:       media,
 		ServiceData: deviceData,
@@ -344,10 +373,9 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 				IPAddress:   ipAddress,
 				NetworkType: networkType,
 			},
-			// TODO: read the firewall state from OS somehow.
 			FirewallState: FirewallState{
-				SSHEnabled: true,
-				APIEnabled: true,
+				SSHEnabled: isSSHFirewallOpen,
+				APIEnabled: isAPIFirewallOpen,
 			},
 		},
 	}

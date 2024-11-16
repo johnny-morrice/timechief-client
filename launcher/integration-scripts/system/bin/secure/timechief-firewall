@@ -1,0 +1,73 @@
+#!/usr/bin/python
+import sys
+import subprocess
+
+def validate_ports(ports):
+    """Validate each port to ensure it's an integer within the valid range."""
+    for port in ports:
+        try:
+            port = int(port)
+            if port < 0 or port > 65535:
+                raise Exception(f"port {port} is out of the valid range (1-65535)")
+        except ValueError:
+            raise Exception(f"port '{port}' is not a valid integer")
+
+def configure_firewall(portText):
+    ports = []
+    if len(portText) != 0:
+        # Validate the ports
+        ports = [port.strip() for port in portText.split(',')]
+        validate_ports(ports)
+
+    # Define the base nftables configuration template
+    nftables_config = """
+#!/usr/sbin/nft -f
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        # Allow traffic on the loopback interface
+        iif "lo" accept
+
+        # Allow established and related connections
+        ct state established,related accept
+"""
+
+    # Add rules for each port to allow traffic
+    for port in ports:
+        nftables_config += f"        tcp dport {port} accept\n"
+        nftables_config += f"        udp dport {port} accept\n"
+
+    # Close the input chain and add forward/output chains with default policies
+    nftables_config += """
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+    }
+}
+"""
+
+    # Write the configuration to /etc/nftables.conf
+    with open('/etc/nftables.conf', 'w') as f:
+        f.write(nftables_config)
+
+    # Restart the nftables service to activate changes
+    subprocess.run(['systemctl', 'restart', 'nftables'], check=True)
+
+if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        print("Usage: python3 set_firewall.py <port1,port2,...>")
+        sys.exit(1)
+
+    if len(sys.argv) == 1:
+        ports = ""
+    elif len(sys.argv) == 2:
+        ports = sys.argv[1]
+
+    configure_firewall(ports)

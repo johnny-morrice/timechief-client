@@ -17,6 +17,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
+	"gorm.io/gorm"
 )
 
 type DeviceData struct {
@@ -43,6 +44,7 @@ func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, 
 
 type Ticker interface {
 	Tick() <-chan struct{}
+	Poke()
 }
 
 type SoundService interface {
@@ -72,6 +74,50 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	lastGoodDataText, err := dd.keyValueStore.Get("device-data-last-good")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("error reading device-data-last-good: %w", err)
+	}
+
+	var lastGoodData time.Time
+	if lastGoodDataText != "" {
+		lastGoodData, err = time.Parse(time.RFC3339, lastGoodDataText)
+		if err != nil {
+			return fmt.Errorf("error parsing device-data-last-good: %w", err)
+		}
+	}
+
+	const goodDataTimeout = time.Second * 180
+	expectCalendar := data.DeviceProfile.Value.Features.GoogleCalendar
+	if time.Since(lastGoodData) < goodDataTimeout {
+		expectedWeather := data.DeviceProfile.Value.Features.OpenWeatherMap
+		badData := expectCalendar && data.GoogleCalendar.Dt == 0
+		badData = badData || (expectedWeather && data.Owm.Dt == 0)
+		if badData {
+			return fmt.Errorf("bad data from service, expected more features")
+		}
+	}
+
+	const calendarErrorTimeout = 35 * time.Minute
+	lastUpdated := time.Unix(data.GoogleCalendar.Value.Dt, 0)
+	if expectCalendar && time.Since(lastUpdated) > calendarErrorTimeout {
+		myErr := dd.stateFlagStore.CreateIfNotExists(CalendarErrorState)
+		if myErr != nil {
+			log.Printf("error setting calendar error state: %s", myErr)
+		}
+	} else {
+		myErr := dd.stateFlagStore.Delete(CalendarErrorState)
+		if myErr != nil {
+			log.Printf("error clearing calendar error state: %s", myErr)
+		}
+	}
+
+	err = dd.keyValueStore.Set("device-data-last-good", time.Now().Format(time.RFC3339))
+	if err != nil {
+		log.Printf("error setting last good data time")
+	}
+
 	err = dd.deviceDataStore.SetDeviceData(data)
 	if err != nil {
 		return err
@@ -81,6 +127,8 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 
 var DeviceDataErrorState = "device-data-error"
 var CalendarErrorState = "calendar-error"
+
+var ErrBadData = errors.New("bad data")
 
 func (dd DeviceData) FetchLatest() (v2.Data, error) {
 	clockData, err := dd.doFetchLatest()
@@ -95,21 +143,6 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 	myErr := dd.stateFlagStore.Delete(DeviceDataErrorState)
 	if myErr != nil {
 		log.Printf("error clearing device data error state: %s", myErr)
-	}
-
-	const calendarErrorTimeout = 30 * time.Minute
-	lastUpdated := time.Unix(clockData.GoogleCalendar.Value.Dt, 0)
-	now := time.Now()
-	if now.Sub(lastUpdated) > calendarErrorTimeout {
-		myErr := dd.stateFlagStore.CreateIfNotExists(CalendarErrorState)
-		if myErr != nil {
-			log.Printf("error setting calendar error state: %s", myErr)
-		}
-	} else {
-		myErr := dd.stateFlagStore.Delete(CalendarErrorState)
-		if myErr != nil {
-			log.Printf("error clearing calendar error state: %s", myErr)
-		}
 	}
 
 	return clockData, nil

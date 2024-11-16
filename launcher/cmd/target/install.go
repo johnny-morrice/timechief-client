@@ -41,6 +41,7 @@ func Install(ctx *cli.Context) error {
 		"bin/timechief-wifi-interface",
 		"bin/timechief-wifi-scan",
 		"bin/timechief-expand-rootfs",
+		"bin/timechief-firewall",
 		"bin/secure/timechief-reboot",
 		"bin/secure/timechief-shutdown",
 		"bin/secure/timechief-wifi-connect",
@@ -51,6 +52,7 @@ func Install(ctx *cli.Context) error {
 		"bin/secure/timechief-pyrtc",
 		"bin/secure/timechief-set-system-time",
 		"bin/secure/timechief-expand-rootfs",
+		"bin/secure/timechief-firewall",
 	}
 
 	for _, script := range scripts {
