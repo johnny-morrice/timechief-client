@@ -70,16 +70,33 @@ export function LoginPage(props) {
     const plainText = textMaker("login");
 
     // Continuously poke interaction until cleaned up.
+    var isReadyForRapidPoll = false;
+    var rapidPollTimeoutReached = false;
+    var pollTimout = null;
     const interactionInterval = setInterval(() => {
-        if (!isLoggedIn(signals)) {
-            console.log("login process rapidly recording interaction")
+        if (!isLoggedIn(signals) && !rapidPollTimeoutReached) {
+            console.log("login rapidly recording interaction")
             recordInteraction();
+            if (!isReadyForRapidPoll) {
+                console.log("login rapid polling will timeout eventually");
+                pollTimout = setTimeout(() => {
+                    console.log("login timeout, no longer recording interaction rapidly");
+                    rapidPollTimeoutReached = true;
+                }, 1000 * 60 * 20); // Stop polling rapidly after 20 minutes
+            }
+            isReadyForRapidPoll = true;
+            console.log("setup process rapidly recording interaction")
+            recordInteraction();
+        } else {
+            isReadyForRapidPoll = false;
+            rapidPollTimeoutReached = false;
         }
     }, 1000);
 
     onCleanup(() => {
         clearInterval(interactionInterval);
         clearInterval(pairingGetInterval);
+        clearTimeout(pollTimout);
         removeDataCallback(cbName);
         removeDeviceStatusCallback(cbName);
         removePairingCreateCallback(cbName);
@@ -92,6 +109,14 @@ export function LoginPage(props) {
         }, 500);
     });
     addPairingGetCallback(cbName, (data) => {
+        // Pairing is complete if we've got a code and the state is now none.
+        if (data["status"] == "none" && signals.userCode().length > 0) {
+            signals.setUserCode("");
+            if (pairingGetInterval != null) {
+                clearInterval(pairingGetInterval);
+            }
+            removeQrCode();
+        }
         const userCode = data["code"];
         if (userCode && userCode.length > 0) {
             signals.setUserCode(userCode);
@@ -116,14 +141,6 @@ export function LoginPage(props) {
                 }
 
             }
-        }
-        // Pairing is complete if we've got a code and the state is now none.
-        if (data["status"] == "none" && signals.userCode().length > 0) {
-            signals.setUserCode("");
-            if (pairingGetInterval != null) {
-                clearInterval(pairingGetInterval);
-            }
-            removeQrCode();
         }
     });
     function removeQrCode() {
