@@ -116,7 +116,7 @@ func (mid authMiddleware) getDeviceMode() (string, error) {
 	apiAccess, err := mid.kvStore.Get(store.APIAccessEnabled)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", nil
+			return NoAuthMode, nil
 		}
 		return "", fmt.Errorf("error getting api access: %v", err)
 	}
