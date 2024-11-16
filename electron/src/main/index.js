@@ -58,7 +58,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
         getMainWindow().webContents.send(receiveChan, json)
       })
       .catch(error => {
-        logger.error(`error calling ${sendChan} API: ${error}`)
+        logger.error(`error calling ${sendChan} API: ${error}`);
         getMainWindow().webContents.send(receiveChan, { "APIError": "error calling API" });
       });
   });
