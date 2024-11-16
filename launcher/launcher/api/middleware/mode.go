@@ -55,12 +55,17 @@ func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	deviceMode := GetDeviceContext(r)
-	if deviceMode == NoAuthMode {
-		log.Println("no auth mode in mode middleware")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+	// Always serve to the app.
+	if authMode == AppAuthMode {
+		mid.next.ServeHTTP(w, r)
 		return
 	}
+
+	deviceMode := GetDeviceContext(r)
+
+	// Check we are handling an expected mode for this middleware.
+	// E.g. websetup only handles web setup mode.
 	modeMatch := false
 	for _, expectedMode := range mid.expectedModes {
 		if expectedMode == authMode {
@@ -68,17 +73,18 @@ func (mid modeMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+
 	// AuthMode Check is OK when
 	// The caller is the UI OR
 	// The user's auth mode matches the current device mode
 	// I.e. the user is using a web setup auth mode and the device is in web setup mode
 	// And when the API is using this middleware configured using the expected mode.
-	modeMatch = modeMatch && authMode == deviceMode
-	modeMatch = modeMatch || authMode == AppAuthMode
-	if !modeMatch {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		log.Printf("auth mode %s does not match device mode %s", authMode, deviceMode)
+	if modeMatch && authMode == deviceMode {
+		mid.next.ServeHTTP(w, r)
 		return
 	}
-	mid.next.ServeHTTP(w, r)
+
+	http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	log.Printf("auth mode '%s' does not match device mode '%s'", authMode, deviceMode)
+
 }
