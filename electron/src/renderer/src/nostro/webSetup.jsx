@@ -226,10 +226,24 @@ export const WebSetupPage = (props) => {
     const jankInterval = setInterval(applyCRTJank, 1000);
 
     // When doing setup, trigger interactivity every second.
+    var isReadyForRapidPoll = false;
+    var rapidPollTimeout = false;
+    var pollTimeout = null;
     const interactionInterval = setInterval(() => {
-        if (!isDisplayStateInternet(signals)) {
+        if (!isDisplayStateInternet(signals) && !rapidPollTimeout) {
+            if (!isReadyForRapidPoll) {
+                console.log("setup rapid polling will timeout eventually");
+                pollTimeout = setTimeout(() => {
+                    console.log("setup timeout, no longer recording interaction rapidly");
+                    rapidPollTimeout = true;
+                }, 1000 * 60 * 20); // Stop polling rapidly after 20 minutes
+            }
+            isReadyForRapidPoll = true;
             console.log("setup process rapidly recording interaction")
             recordInteraction();
+        } else {
+            isReadyForRapidPoll = false;
+            rapidPollTimeout = false;
         }
     }, 1000);
 
@@ -237,6 +251,7 @@ export const WebSetupPage = (props) => {
     onCleanup(() => {
         clearInterval(jankInterval);
         clearInterval(interactionInterval);
+        clearTimeout(pollTimeout);
     });
 
     const label = labelMaker("web-setup");

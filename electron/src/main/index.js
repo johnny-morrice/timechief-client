@@ -58,7 +58,11 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
         getMainWindow().webContents.send(receiveChan, json)
       })
       .catch(error => {
-        logger.error(`error calling ${sendChan} API: ${error}`)
+        logger.error(`error calling ${sendChan} API: ${error}`);
+        if (error.name && error.name === 'AggregateError') {
+          console.log(`${sendChan} AggregateError message: ${error.message}`);
+          console.log(`${sendChan} AggreGateError errors: ${error.errors}`);
+        }
         getMainWindow().webContents.send(receiveChan, { "APIError": "error calling API" });
       });
   });

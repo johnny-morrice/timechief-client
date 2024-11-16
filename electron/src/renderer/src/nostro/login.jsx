@@ -1,11 +1,10 @@
 import { For, Show, createSignal, onCleanup } from "solid-js";
 import { callbackName } from "./callback";
-import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, sendSelectMyDevice } from "./ipc";
+import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, sendSelectMyDevice, sendSetupBegin, sendLogOut, recordInteraction } from "./ipc";
 import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 import { Loading } from "./loading";
 import { labelMaker, textMaker } from "./label";
-import { recordInteraction, sendLogOut, sendSetupBegin } from "./ipc";
 
 class Signals {
     constructor() {
@@ -46,7 +45,7 @@ export function LoginPage(props) {
         sendRefreshMyDevices();
     }
 
-    
+
     function isLoginStarted(signals) {
         return signals.userCode().length > 0;
     }
@@ -71,16 +70,33 @@ export function LoginPage(props) {
     const plainText = textMaker("login");
 
     // Continuously poke interaction until cleaned up.
+    var isReadyForRapidPoll = false;
+    var rapidPollTimeoutReached = false;
+    var pollTimout = null;
     const interactionInterval = setInterval(() => {
-        if (!isLoggedIn(signals)) {
-            console.log("login process rapidly recording interaction")
+        if (!isLoggedIn(signals) && !rapidPollTimeoutReached) {
+            console.log("login rapidly recording interaction")
             recordInteraction();
+            if (!isReadyForRapidPoll) {
+                console.log("login rapid polling will timeout eventually");
+                pollTimout = setTimeout(() => {
+                    console.log("login timeout, no longer recording interaction rapidly");
+                    rapidPollTimeoutReached = true;
+                }, 1000 * 60 * 20); // Stop polling rapidly after 20 minutes
+            }
+            isReadyForRapidPoll = true;
+            console.log("setup process rapidly recording interaction")
+            recordInteraction();
+        } else {
+            isReadyForRapidPoll = false;
+            rapidPollTimeoutReached = false;
         }
     }, 1000);
-    
+
     onCleanup(() => {
         clearInterval(interactionInterval);
         clearInterval(pairingGetInterval);
+        clearTimeout(pollTimout);
         removeDataCallback(cbName);
         removeDeviceStatusCallback(cbName);
         removePairingCreateCallback(cbName);
@@ -90,9 +106,17 @@ export function LoginPage(props) {
     addPairingCreateCallback(cbName, () => {
         pairingGetInterval = setInterval(() => {
             sendPairingGetRequest();
-        }, 300);
+        }, 500);
     });
     addPairingGetCallback(cbName, (data) => {
+        // Pairing is complete if we've got a code and the state is now none.
+        if (data["status"] == "none" && signals.userCode().length > 0) {
+            signals.setUserCode("");
+            if (pairingGetInterval != null) {
+                clearInterval(pairingGetInterval);
+            }
+            removeQrCode();
+        }
         const userCode = data["code"];
         if (userCode && userCode.length > 0) {
             signals.setUserCode(userCode);
@@ -115,16 +139,8 @@ export function LoginPage(props) {
                     canvasWrapper.appendChild(pairingQrCodeCanvas);
                     toCanvas(pairingQrCodeCanvas, qrCodeURL);
                 }
-                
+
             }
-        }
-        // Pairing is complete if we've got a code and the state is now none.
-        if (data["status"] == "none" && signals.userCode().length > 0) {
-            signals.setUserCode("");
-            if (pairingGetInterval != null) {
-                clearInterval(pairingGetInterval);
-            }
-            removeQrCode();
         }
     });
     function removeQrCode() {
@@ -140,6 +156,10 @@ export function LoginPage(props) {
     function onClickRestartSetup(e) {
         sendLogOut();
         sendSetupBegin();
+    }
+
+    function onClickNewCode(e) {
+        sendPairingCreateRequest();
     }
 
     return <>
@@ -183,7 +203,10 @@ export function LoginPage(props) {
                         </div>
                         <div class="data-label">{label("scan-qr")}</div>
                         <div id="pairing-qrcode-canvas-wrapper"></div>
-                        <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
+                        <div class="login-code-buttons flex-row">
+                            <button class="action-button crt-box flex-grow" onClick={onClickNewCode}>{plainText("new-code")}</button>
+                            <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
+                        </div>
                     </div>
                 </Show>
             </div>

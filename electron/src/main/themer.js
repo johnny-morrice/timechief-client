@@ -7,7 +7,7 @@ export class Themer {
     }
 
     setThemeFromData(data) {
-        if (data && data.media && data.media.theme_css) {
+        if (data && data.media && data.media.theme_css && data.media.theme_css.length > 0) {
             this.setTheme(data.media.theme_css);
         }
     }
@@ -19,6 +19,8 @@ export class Themer {
     setTheme(theme) {
         if (theme !== this.lastThemeCSS) {
             console.log("changing theme");
+            console.log("previous CSS: ", this.lastThemeCSS);
+            console.log("new CSS: ", theme)
             this.lastThemeCSS = theme;
             if (this.lastThemeCssKey) {
                 getMainWindow().webContents.removeInsertedCSS(this.lastThemeCssKey);
@@ -64,9 +66,18 @@ function getDefaultThemeCSS() {
         background-color: black;
         font-family: 'Titillium Web', sans-serif;
     }
-    
+
     div.home-time {
-        font-family: 'Seven Segment', monospace;
+        font-family: 'Seven Segment';
+        color: green;
+    }
+
+    .exposed {
+        color: green;
+    }
+
+    div.home-date {
+        color: green;
     }
     
     div.home-box {
