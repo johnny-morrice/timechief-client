@@ -1,7 +1,7 @@
 package songs
 
 import (
-	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/buzzer/music"
 )
 
 func Shutdown() (music.Song, error) {

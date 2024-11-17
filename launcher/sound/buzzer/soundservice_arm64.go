@@ -1,7 +1,7 @@
 //go:build arm64
 // +build arm64
 
-package sound
+package buzzer
 
 import (
 	"log"
@@ -9,12 +9,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
-	"github.com/johnny-morrice/timechief-client/launcher/sound/rpio"
-	"github.com/johnny-morrice/timechief-client/launcher/sound/service"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/buzzer/music"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/buzzer/rpio"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/buzzer/service"
 )
 
-func initialiseSoundService(pin, duty int) (soundService, error) {
+func MakeSoundService(pin, duty int) (SoundService, error) {
 	err := rpio.InitialiseRPIO()
 	if err != nil {
 		return service.SoundService{}, err
@@ -28,13 +28,6 @@ func initialiseSoundService(pin, duty int) (soundService, error) {
 	handleSignals(machine)
 
 	return service.NewSoundService(machine)
-}
-
-func finaliseSoundService() {
-	err := rpio.ShutdownRPIO()
-	if err != nil {
-		log.Printf("error shutting down RPIO: %v", err)
-	}
 }
 
 // When we receive signterm we need to stop the machine.

@@ -114,8 +114,10 @@ Description=TimeChief Launcher Sound Service
 After=network.target
 
 [Service]
+User=$FIRST_USER_NAME
+Group=$FIRST_USER_NAME
 WorkingDirectory=/opt/timechief-launcher
-ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher-sound
 Restart=always
 KillSignal=SIGKILL
 TimeoutStopSec=5

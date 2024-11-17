@@ -145,8 +145,8 @@ func (dc DaemonClient) PostReboot() error {
 }
 
 type PlaySoundRequest struct {
-	SongName string
-	Loop     bool
+	SongName string `json:"song_name"`
+	Loop     bool   `json:"loop"`
 }
 
 func (dc DaemonClient) PostPlaySound(req PlaySoundRequest) error {

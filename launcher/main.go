@@ -76,6 +76,21 @@ func getCLIApp() *cli.App {
 					Name:  "listen-addr",
 					Value: "0.0.0.0:8081",
 				},
+				&cli.StringFlag{
+					Name:    "sound-provider",
+					Value:   "pipewire",
+					EnvVars: []string{"TIMECHIEF_SOUND_PROVIDER"},
+				},
+				&cli.Float64Flag{
+					Name:    "volume",
+					Value:   0.5,
+					EnvVars: []string{"TIMECHIEF_SOUND_VOLUME"},
+				},
+				// TODO figure out how to get this from the main daemon.
+				&cli.StringFlag{
+					Name:  "install-root",
+					Value: "/opt/timechief-launcher",
+				},
 				&cli.BoolFlag{
 					Name:  "startup-sound",
 					Value: false,

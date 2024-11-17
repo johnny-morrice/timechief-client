@@ -17,3 +17,6 @@ nginx
 zlib1g-dev
 libfuse2
 nftables
+pipewire
+wireplumber
+pipewire-audio-client-libraries
