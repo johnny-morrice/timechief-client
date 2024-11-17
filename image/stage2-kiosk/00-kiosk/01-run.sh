@@ -114,7 +114,6 @@ Description=TimeChief Launcher Sound Service
 After=network.target
 
 [Service]
-WorkingDirectory=/opt/timechief-launcher
 User=$FIRST_USER_NAME
 Group=$FIRST_USER_NAME
 WorkingDirectory=/opt/timechief-launcher
