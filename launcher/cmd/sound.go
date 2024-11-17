@@ -7,6 +7,7 @@ import (
 
 func Sound(ctx *cli.Context) error {
 	cfg := sound.Config{
+		InstallRoot:      ctx.String("install-root"),
 		ListenAddr:       ctx.String("listen-addr"),
 		SoundProvider:    ctx.String("sound-provider"),
 		PlayStartupSound: ctx.Bool("startup-sound"),

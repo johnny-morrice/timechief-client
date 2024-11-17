@@ -19,6 +19,7 @@ type Daemon struct {
 
 type Config struct {
 	ListenAddr       string
+	InstallRoot      string
 	SoundProvider    string
 	PlayStartupSound bool
 	PassiveBuzzer    PassiveBuzzerConfig
@@ -66,7 +67,7 @@ func makeSoundService(cfg Config) (soundService, error) {
 	case "buzzer":
 		return buzzer.MakeSoundService(cfg.PassiveBuzzer.PWMPin, cfg.PassiveBuzzer.Duty)
 	case "pipewire":
-		return pipewire.MakeSoundService(cfg.Pipewire.Volume)
+		return pipewire.MakeSoundService(cfg.InstallRoot, cfg.Pipewire.Volume)
 	}
 
 	return nil, fmt.Errorf("failed to create sound service")

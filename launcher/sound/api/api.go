@@ -29,8 +29,8 @@ func (api SoundAPI) AddRoutes(mux *http.ServeMux) {
 }
 
 type SongRequest struct {
-	SongName string
-	Loop     bool
+	SongName string `json:"song_name"`
+	Loop     bool   `json:"loop"`
 }
 
 func (api SoundAPI) handlePlaySong(rw http.ResponseWriter, req *http.Request) {

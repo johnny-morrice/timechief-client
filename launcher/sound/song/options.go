@@ -1,6 +1,7 @@
 package song
 
 type Options struct {
-	SongName string
-	Loop     bool
+	InstallRoot string
+	SongName    string
+	Loop        bool
 }
