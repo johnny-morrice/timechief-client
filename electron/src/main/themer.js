@@ -24,7 +24,7 @@ export class Themer {
             setTimeout(() => {
                 console.log("forcing theme change");
                 self.isForceChange = true;
-            }, 1000 * 60 * 5);
+            }, 1000 * 60 * 67);
 
             if (self.isForceChange) {
                 console.log("theme change was forced");
