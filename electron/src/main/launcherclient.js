@@ -84,6 +84,21 @@ export class LauncherClient {
         });
     }
 
+    postSetupCancelState() {
+        let cfg = {
+            url: this.baseURL + '/api/launcher/setup',
+            method: 'post',
+            data: {
+                "State": "SetupCancelled"
+            }
+        };
+        return this.axios(cfg).then(resp => {
+            if (resp.status == 200) {
+                return {};
+            }
+        });
+    }
+
     postSetupInternetConnectedState() {
         let cfg = {
             url: this.baseURL + '/api/launcher/setup',

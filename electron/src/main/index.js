@@ -87,7 +87,7 @@ handleIPCAPICall("getClockData", "clockDataResult", () => handleDataRequest());
 handleIPCAPICall("reboot", "rebootResult", () => client.reboot());
 handleIPCAPICall("shutdown", "shutdownResult", () => client.shutdown());
 handleIPCAPICall("setupBegin", "setupBeginResult", () => client.postSetupBeginState());
-handleIPCAPICall("setupCancel", "setupCancelResult", () => client.postSetupInternetConnectedState().then(() => client.postWifiMarkReady()).then(() => client.postWifiConnect()));
+handleIPCAPICall("setupCancel", "setupCancelResult", () => client.postSetupCancelState().then(() => client.postWifiMarkReady()).then(() => client.postWifiConnect()));
 handleIPCAPICall("setupRestart", "setupRestartResult", () => client.postSetupBeginState().then(() => client.postWifiMarkNotReady()));
 handleIPCAPICall("sshPasswordRegen", "sshPasswordRegenResult", () => client.postSSHRegenPassword());
 handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKey());
