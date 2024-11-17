@@ -48,10 +48,9 @@ func (mid authMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		storedKeyAuthMethod(store.APIUserAuthKey, APIAuthMode, mid.kvStore),
 		storedKeyAuthMethod(store.HotspotKey, WebSetupAuthMode, mid.kvStore),
 	}
-	for i, am := range authMethods {
+	for _, am := range authMethods {
 		authRequest, err := am.validate(r)
 		if err == nil {
-			log.Printf("DELETE ME: successful authorization on %dth auth method", i)
 			deviceRequest, err := mid.deviceModeRequest(authRequest)
 			if err != nil {
 				log.Printf("error getting device mode: %v", err)
@@ -61,8 +60,6 @@ func (mid authMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			mid.next.ServeHTTP(w, deviceRequest)
 			return
-		} else {
-			log.Printf("DELETE ME: failed authorization on %dth auth method", i)
 		}
 	}
 	log.Println("unauthorized request")
@@ -122,7 +119,6 @@ func (mid authMiddleware) getDeviceMode() (string, error) {
 	}
 
 	if apiAccess == "true" {
-		log.Printf("DELETE ME: auth API access mode")
 		return APIAuthMode, nil
 	}
 	return NoAuthMode, nil
