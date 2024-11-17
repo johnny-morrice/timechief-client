@@ -194,6 +194,7 @@ func (daemon Setup) saveCancelState() error {
 	}
 
 	if networkType != "" {
+		log.Printf("saving cancel-setup-state for network-type: %s", networkType)
 		state.NetworkType = networkType
 	}
 
@@ -220,6 +221,7 @@ func (daemon Setup) loadCancelState() error {
 	if err != nil {
 		return err
 	}
+	log.Printf("restoring cancel-setup-state for network-type: %s", state.NetworkType)
 	return daemon.KeyValueStore.Set("network-type", state.NetworkType)
 }
 
