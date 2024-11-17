@@ -61,12 +61,15 @@ function isDeviceDataError(signals) {
     return signals.isDeviceDataError() || signals.isIPCTimeout();
 }
 
-function errorCount(signals) {
+function statusCount(signals) {
     var count = 0;
     if (signals.isDeviceDataError()) {
         count++;
     }
     if (signals.isCalendarError()) {
+        count++;
+    }
+    if (signals.isUpdating()) {
         count++;
     }
     return count;
@@ -102,7 +105,7 @@ export const StatusNote = () => {
                     <i class='fa-solid fa-floppy-disk fa-fade api-error-indicator'></i>
                 </div>
             </Show>
-            <Show when={useEcoMode && signals.isEcoMode() && errorCount(signals) < 2}>
+            <Show when={useEcoMode && signals.isEcoMode() && statusCount(signals) < 2}>
                 <div class="status-note-indicator">
                     <i class='fa-solid fa-leaf'></i>
                 </div>
