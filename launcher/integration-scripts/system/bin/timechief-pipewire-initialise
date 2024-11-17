@@ -18,6 +18,7 @@ def check_and_setup_pipewire(check_file, volume):
         print(f"File {check_file} does not exist. Enabling and starting PipeWire service...")
         run_command("systemctl --user enable pipewire")
         run_command("systemctl --user start pipewire")
+        run_command("loginctl enable-linger timechief")
         
 
         # Create the file
