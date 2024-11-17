@@ -4,6 +4,7 @@ export class Themer {
     constructor() {
         this.lastThemeCssKey = null;
         this.lastThemeCSS = null;
+        this.isForceChange = false;
     }
 
     setThemeFromData(data) {
@@ -17,7 +18,18 @@ export class Themer {
     }
 
     setTheme(theme) {
-        if (theme !== this.lastThemeCSS) {
+        const self = this;
+        if (theme !== this.lastThemeCSS || self.isForceChange) {
+
+            setTimeout(() => {
+                console.log("forcing theme change");
+                self.isForceChange = true;
+            }, 1000 * 60 * 5);
+
+            if (self.isForceChange) {
+                console.log("theme change was forced");
+                self.isForceChange = false;
+            }
             console.log("changing theme");
             console.log("previous CSS: ", this.lastThemeCSS);
             console.log("new CSS: ", theme)
@@ -36,6 +48,7 @@ export class BackgroundImageThemer {
     constructor() {
         this.lastThemeCssKey = null;
         this.lastThemeCSS = null;
+        this.isForceChange = false;
     }
 
     setThemeFromData(data) {
@@ -47,7 +60,7 @@ export class BackgroundImageThemer {
     }
 
     setTheme(theme) {
-        if (theme !== this.lastThemeCSS) {
+        if (theme !== this.lastThemeCSS || this.isForceChange) {
             console.log("changing background image CSS");
             this.lastThemeCSS = theme;
             if (this.lastThemeCssKey) {
