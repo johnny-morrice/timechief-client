@@ -90,7 +90,7 @@ else
   chmod +x $BUNDLE_UNPACK/bin/secure/timechief-pyrtc
 fi
 
-# Copy images
+# Copy assets
 cp -a $BUILD_DIR/timechief-client/launcher/assets $BUNDLE_UNPACK
 
 pushd $BUNDLE_DIR
