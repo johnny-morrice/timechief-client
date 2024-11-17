@@ -69,13 +69,11 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
 }
 
 const mediaDecorator = new MediaDecorator();
-const backgroundImageThemer = new BackgroundImageThemer();
 
 function handleDataRequest() {
   return client.getDeviceData().then(data => {
     let myData = mediaDecorator.decorateData(data);
     themer.setThemeFromData(myData);
-    backgroundImageThemer.setThemeFromData(myData);
     return myData
   });
 }

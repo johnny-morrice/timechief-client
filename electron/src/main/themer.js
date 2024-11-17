@@ -8,11 +8,18 @@ export class Themer {
     }
 
     setThemeFromData(data) {
+        var theme = getDefaultThemeCSS();
         if (data && data.media && data.media.theme_css && data.media.theme_css.length > 0) {
-            this.setTheme(data.media.theme_css);
-        } else {
-            this.setTheme(getDefaultThemeCSS());
+                theme = data.media.theme_css;
         }
+
+        if (data && data.media && data.media.background_picture && data.media.background_picture.background_picture_css && data.media.background_picture.background_picture_css.length > 0) {
+            theme = theme + "\n\n" + data.media.background_picture.background_picture_css;
+        } else {
+            theme = theme + "\n\n" + getDefaultBackgroundImageCSS();
+        }
+
+        this.setTheme(theme);
     }
 
     setDefaultTheme() {
@@ -46,46 +53,6 @@ export class Themer {
     }
 }
 
-export class BackgroundImageThemer {
-    constructor() {
-        this.lastThemeCssKey = null;
-        this.lastThemeCSS = null;
-        this.isForceChange = false;
-    }
-
-    setThemeFromData(data) {
-        if (data && data.media && data.media.background_picture && data.media.background_picture.background_picture_css && data.media.background_picture.background_picture_css.length > 0) {
-            this.setTheme(data.media.background_picture.background_picture_css);
-        } else {
-            this.setTheme(getDefaultBackgroundImageCSS());
-        }
-    }
-
-    setTheme(theme) {
-        const self = this;
-        if (theme !== this.lastThemeCSS || self.isForceChange) {
-
-            setTimeout(() => {
-                console.log("forcing background theme change");
-                self.isForceChange = true;
-            }, 1000 * 60 * 67);
-
-            if (self.isForceChange) {
-                console.log("theme change was forced");
-                self.isForceChange = false;
-            }
-            console.log("changing background image CSS");
-            this.lastThemeCSS = theme;
-            if (this.lastThemeCssKey) {
-                getMainWindow().webContents.removeInsertedCSS(this.lastThemeCssKey);
-            }
-            getMainWindow().webContents.insertCSS(theme).then(key => {
-                this.lastThemeCssKey = key;
-            });
-        }
-    }
-}
-
 function getDefaultBackgroundImageCSS() {
     return `body {
         background-image: none;
@@ -93,8 +60,8 @@ function getDefaultBackgroundImageCSS() {
         background-attachment: initial;
         background-repeat: initial;
         background-position: initial;
-        background-color: initial; /* Optional: Reset background color */
-    }`
+        background-color: initial;
+    }`;
 }
 
 function getDefaultThemeCSS() {
