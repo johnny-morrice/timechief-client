@@ -115,7 +115,10 @@ After=network.target
 
 [Service]
 WorkingDirectory=/opt/timechief-launcher
-ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound
+User=$FIRST_USER_NAME
+Group=$FIRST_USER_NAME
+WorkingDirectory=/opt/timechief-launcher
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound --startup-sound
 Restart=always
 KillSignal=SIGKILL
 TimeoutStopSec=5
