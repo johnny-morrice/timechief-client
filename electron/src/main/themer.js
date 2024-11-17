@@ -10,6 +10,8 @@ export class Themer {
     setThemeFromData(data) {
         if (data && data.media && data.media.theme_css && data.media.theme_css.length > 0) {
             this.setTheme(data.media.theme_css);
+        } else {
+            this.setTheme(getDefaultThemeCSS());
         }
     }
 
@@ -55,12 +57,23 @@ export class BackgroundImageThemer {
         if (data && data.media && data.media.background_picture && data.media.background_picture.background_picture_css && data.media.background_picture.background_picture_css.length > 0) {
             this.setTheme(data.media.background_picture.background_picture_css);
         } else {
-            this.setTheme("");
+            this.setTheme(getDefaultBackgroundImageCSS());
         }
     }
 
     setTheme(theme) {
-        if (theme !== this.lastThemeCSS || this.isForceChange) {
+        const self = this;
+        if (theme !== this.lastThemeCSS || self.isForceChange) {
+
+            setTimeout(() => {
+                console.log("forcing background theme change");
+                self.isForceChange = true;
+            }, 1000 * 60 * 67);
+
+            if (self.isForceChange) {
+                console.log("theme change was forced");
+                self.isForceChange = false;
+            }
             console.log("changing background image CSS");
             this.lastThemeCSS = theme;
             if (this.lastThemeCssKey) {
@@ -71,6 +84,17 @@ export class BackgroundImageThemer {
             });
         }
     }
+}
+
+function getDefaultBackgroundImageCSS() {
+    return `body {
+        background-image: none;
+        background-size: initial;
+        background-attachment: initial;
+        background-repeat: initial;
+        background-position: initial;
+        background-color: initial; /* Optional: Reset background color */
+    }`
 }
 
 function getDefaultThemeCSS() {
