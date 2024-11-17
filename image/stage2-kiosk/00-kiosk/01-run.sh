@@ -260,5 +260,10 @@ table inet filter {
     }
 }
 CATEND
-sudo systemctl enable nftables
+systemctl enable nftables
+EOF
+
+on_chroot << EOF
+echo "0 3 * * * /bin/systemctl restart lightdm" | sudo crontab -
+systemctl enable cron
 EOF
