@@ -4,4 +4,4 @@ set -e
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
 
-/opt/timechief-launcher/bin/timechief-launcher daemon-sound --startup-sound
+/opt/timechief-launcher/bin/timechief-launcher daemon-sound
