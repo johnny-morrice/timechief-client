@@ -159,11 +159,6 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
-	err = daemon.KeyValueStore.Delete("setup-wifi-uuid")
-	if err != nil {
-		return err
-	}
-
 	err = daemon.StateFlagStore.Delete("wifi-connect")
 	if err != nil {
 		return err
@@ -184,6 +179,7 @@ func (daemon Setup) handleBegin() error {
 
 type cancelState struct {
 	NetworkType string
+	WifiActive  bool
 }
 
 func (daemon Setup) saveCancelState() error {
@@ -196,6 +192,16 @@ func (daemon Setup) saveCancelState() error {
 	if networkType != "" {
 		log.Printf("saving cancel-setup-state for network-type: %s", networkType)
 		state.NetworkType = networkType
+	}
+
+	active, err := daemon.WifiNetworkStore.GetActive()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	state.WifiActive = active.SSID != ""
+	if state.WifiActive {
+		log.Printf("saving cancel-setup-state that wifi is active")
 	}
 
 	stateText, err := json.Marshal(state)
@@ -221,8 +227,28 @@ func (daemon Setup) loadCancelState() error {
 	if err != nil {
 		return err
 	}
-	log.Printf("restoring cancel-setup-state for network-type: %s", state.NetworkType)
-	return daemon.KeyValueStore.Set("network-type", state.NetworkType)
+	if state.NetworkType != "" {
+		log.Printf("restoring cancel-setup-state for network-type: %s", state.NetworkType)
+		err = daemon.KeyValueStore.Set("network-type", state.NetworkType)
+		if err != nil {
+			return err
+		}
+	}
+
+	if state.WifiActive {
+		log.Printf("restoring cancel-setup-state that wifi was active")
+		err = daemon.WifiNetworkStore.MarkSelectedReady()
+		if err != nil {
+			return err
+		}
+
+		err = daemon.StateFlagStore.CreateIfNotExists("wifi-connect")
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (daemon Setup) handleSetupCancelled() error {
