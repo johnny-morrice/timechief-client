@@ -6,7 +6,7 @@ import winston from 'winston';
 import { baseDeviceStatus } from './status.js';
 import { startTimechiefApp, getMainWindow } from './window.js';
 import { LauncherClient } from './launcherclient.js';
-import { Themer, BackgroundImageThemer } from './themer.js';
+import { Themer } from './themer.js';
 import { MediaDecorator } from './mediadecorator.js';
 
 
