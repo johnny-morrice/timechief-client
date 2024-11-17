@@ -31,7 +31,8 @@ func MakeSoundService(installRoot string, volume float64) (Service, error) {
 }
 
 func (svc Service) Initialise() error {
-	err := svc.runScript("timechief-pipewire-initialise")
+	checkFile := path.Join(svc.installRoot, "pipewire-setup-done")
+	err := svc.runScript("timechief-pipewire-initialise", checkFile, svc.volume)
 	if err != nil {
 		return err
 	}
