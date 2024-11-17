@@ -88,9 +88,9 @@ func getCLIApp() *cli.App {
 				},
 				// TODO figure out how to get this from the main daemon.
 				&cli.StringFlag{
-					Name: "install-root",
+					Name:  "install-root",
 					Value: "/opt/timechief-launcher",
-				}
+				},
 				&cli.BoolFlag{
 					Name:  "startup-sound",
 					Value: false,
