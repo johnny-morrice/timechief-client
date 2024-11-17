@@ -3,8 +3,10 @@ package service
 import (
 	"fmt"
 
-	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
-	"github.com/johnny-morrice/timechief-client/launcher/sound/songs"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/buzzer/music"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/buzzer/rpio"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/buzzer/songs"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/song"
 )
 
 type SoundService struct {
@@ -46,7 +48,12 @@ func NewSoundService(machine MusicMachine) (SoundService, error) {
 	return svc, nil
 }
 
-func (svc SoundService) StartSong(songOpts SongOptions) error {
+func (svc SoundService) Initialise() error {
+	// Nothing to do
+	return nil
+}
+
+func (svc SoundService) StartSong(songOpts song.Options) error {
 	song, ok := svc.songDict[songOpts.SongName]
 	if !ok {
 		return fmt.Errorf("song not found: %v", songOpts.SongName)
@@ -62,9 +69,12 @@ func (svc SoundService) StopSong() error {
 	return svc.machine.StopSong()
 }
 
-type SongOptions struct {
-	SongName string
-	Loop     bool
+func (svc SoundService) Finalise() error {
+	err := rpio.ShutdownRPIO()
+	if err != nil {
+		return fmt.Errorf("error shutting down RPIO: %v", err)
+	}
+	return nil
 }
 
 type MusicMachine interface {

@@ -76,6 +76,11 @@ func getCLIApp() *cli.App {
 					Name:  "listen-addr",
 					Value: "0.0.0.0:8081",
 				},
+				&cli.StringFlag{
+					Name:    "sound-provider",
+					Value:   "pipewire",
+					EnvVars: []string{"TIMECHIEF_SOUND_PROVIDER"},
+				},
 				&cli.BoolFlag{
 					Name:  "startup-sound",
 					Value: false,

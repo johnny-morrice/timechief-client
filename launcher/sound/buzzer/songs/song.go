@@ -3,7 +3,7 @@ package songs
 import (
 	"errors"
 
-	"github.com/johnny-morrice/timechief-client/launcher/sound/music"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/buzzer/music"
 )
 
 type Song struct {
