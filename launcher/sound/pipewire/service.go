@@ -5,7 +5,7 @@ import "github.com/johnny-morrice/timechief-client/launcher/sound/song"
 type Service struct {
 }
 
-func MakeSoundService(doFirstTimeSetup bool, volume float64) (Service, error) {
+func MakeSoundService(volume float64) (Service, error) {
 	panic("not implemented")
 }
 

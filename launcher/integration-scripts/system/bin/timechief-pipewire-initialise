@@ -1,0 +1,49 @@
+#!/usr/bin/python
+import os
+import subprocess
+import sys
+import time
+
+def run_command(command, check=True):
+    """Run a shell command and return its output."""
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    if check and result.returncode != 0:
+        print(f"Error running command: {command}\n{result.stderr}")
+        sys.exit(1)
+    return result.stdout.strip()
+
+def check_and_setup_pipewire(check_file, volume):
+    # Check if the file exists
+    if not os.path.exists(check_file):
+        print(f"File {check_file} does not exist. Enabling and starting PipeWire service...")
+        run_command("systemctl --user enable pipewire")
+        run_command("systemctl --user start pipewire")
+        
+
+        # Create the file
+        with open(check_file, 'w') as f:
+            f.write("PipeWire setup completed.\n")
+        print(f"File '{check_file}' created.")
+
+        # Wait for system to catch up
+        time.sleep(0.5)
+
+    # Set the volume using wpctl
+    print(f"Setting volume to {volume}...")
+    run_command(f"wpctl set-volume @DEFAULT_AUDIO_SINK@ {volume}")
+    print("Volume set successfully.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python3 setup_pipewire.py <check_file> <volume>")
+        sys.exit(1)
+
+    check_file = sys.argv[1]
+    volume = sys.argv[2]
+
+    try:
+        # Ensure PipeWire setup and set volume
+        check_and_setup_pipewire(check_file, volume)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        sys.exit(1)

@@ -41,8 +41,7 @@ type PassiveBuzzerConfig struct {
 }
 
 type PipewireConfig struct {
-	DoFirstTimeSetup bool
-	Volume           float64
+	Volume float64
 }
 
 func MakeDaemon(cfg Config) (Daemon, error) {
@@ -67,7 +66,7 @@ func makeSoundService(cfg Config) (soundService, error) {
 	case "buzzer":
 		return buzzer.MakeSoundService(cfg.PassiveBuzzer.PWMPin, cfg.PassiveBuzzer.Duty)
 	case "pipewire":
-		return pipewire.MakeSoundService(cfg.Pipewire.DoFirstTimeSetup, cfg.Pipewire.Volume)
+		return pipewire.MakeSoundService(cfg.Pipewire.Volume)
 	}
 
 	return nil, fmt.Errorf("failed to create sound service")

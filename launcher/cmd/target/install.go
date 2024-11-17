@@ -46,6 +46,8 @@ func Install(ctx *cli.Context) error {
 		"bin/timechief-expand-rootfs",
 		"bin/timechief-firewall",
 		"bin/timechief-ssh-change-passwd",
+		"bin/timechief-pipewire-initialise",
+		"bin/timechief-pipewire-play-file",
 		"bin/secure/timechief-reboot",
 		"bin/secure/timechief-shutdown",
 		"bin/secure/timechief-wifi-connect",
