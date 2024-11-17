@@ -94,7 +94,6 @@ on_chroot << EOF
 cat > /etc/systemd/system/set-brightness.service << CATEND
 [Unit]
 Description=Set Brightness at Boot
-After=graphical.target
 
 [Service]
 Type=oneshot

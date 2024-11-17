@@ -1,6 +1,7 @@
 package daemon
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -88,6 +89,7 @@ const (
 	SetupFlagWaitNetworkConnect     string = "WaitNetworkConnect"
 	SetupFlagNetworkConnected       string = "NetworkConnected"
 	SetupFlagInternetConnected      string = "InternetConnected"
+	SetupFlagCancelled              string = "SetupCancelled"
 )
 
 // doTick is a single step in the main loop of the daemon.
@@ -121,6 +123,8 @@ func (daemon Setup) doTick(ctx *cli.Context) error {
 		return daemon.handleNetworkConnected()
 	case SetupFlagInternetConnected:
 		return daemon.handleInternetConnected()
+	case SetupFlagCancelled:
+		return daemon.handleSetupCancelled()
 	default:
 		return fmt.Errorf("unknown setup state: %s", state)
 	}
@@ -143,6 +147,12 @@ func (daemon Setup) handleBegin() error {
 	if err != nil {
 		return err
 	}
+
+	err = daemon.saveCancelState()
+	if err != nil {
+		return err
+	}
+
 	// Wipe all setup data.
 	err = daemon.WifiNetworkStore.MarkNotReady()
 	if err != nil {
@@ -170,6 +180,55 @@ func (daemon Setup) handleBegin() error {
 	}
 
 	return daemon.KeyValueStore.Set("setup", SetupFlagChooseNetworkType)
+}
+
+type cancelState struct {
+	NetworkType string
+}
+
+func (daemon Setup) saveCancelState() error {
+	state := cancelState{}
+	networkType, err := daemon.KeyValueStore.Get("network-type")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	if networkType != "" {
+		state.NetworkType = networkType
+	}
+
+	stateText, err := json.Marshal(state)
+	if err != nil {
+		return err
+	}
+
+	return daemon.KeyValueStore.Set("cancel-setup-state", string(stateText))
+}
+
+func (daemon Setup) loadCancelState() error {
+	stateText, err := daemon.KeyValueStore.Get("cancel-setup-state")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	if stateText == "" {
+		return nil
+	}
+
+	state := cancelState{}
+	err = json.Unmarshal([]byte(stateText), &state)
+	if err != nil {
+		return err
+	}
+	return daemon.KeyValueStore.Set("network-type", state.NetworkType)
+}
+
+func (daemon Setup) handleSetupCancelled() error {
+	err := daemon.loadCancelState()
+	if err != nil {
+		return err
+	}
+	return daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
 }
 
 func (daemon Setup) handleChooseNetworkType() error {
