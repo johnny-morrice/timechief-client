@@ -29,7 +29,10 @@ func Install(ctx *cli.Context) error {
 		{oldPath: targetSplash, newPath: systemSplash},
 	}
 
-	scripts := []string{
+	assets := []string{
+		"assets/sound/login.wav",
+		"assets/sound/startup.wav",
+		"assets/sound/shutdown.wav",
 		"bin/timechief-bootstrap",
 		"bin/timechief-wifi-interfaces",
 		"bin/timechief-internet-check",
@@ -57,9 +60,9 @@ func Install(ctx *cli.Context) error {
 		"bin/secure/timechief-ssh-change-passwd",
 	}
 
-	for _, script := range scripts {
-		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", script)
-		systemScript := filepath.Join(installRoot, script)
+	for _, asset := range assets {
+		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", asset)
+		systemScript := filepath.Join(installRoot, asset)
 		links = append(links, link{oldPath: targetScript, newPath: systemScript})
 	}
 
