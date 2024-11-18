@@ -47,7 +47,7 @@ export class Themer {
             getMainWindow().webContents.insertCSS(theme).then(key => {
                 const previousCSSKey = this.lastThemeCssKey;
                 if (previousCSSKey) {
-                    getMainWindow().webContents.removeInsertedCSS(this.lastThemeCssKey);
+                    getMainWindow().webContents.removeInsertedCSS(previousCSSKey);
                 }
                 this.lastThemeCssKey = key;
             });
