@@ -43,10 +43,12 @@ export class Themer {
             console.log("previous CSS: ", this.lastThemeCSS);
             console.log("new CSS: ", theme)
             this.lastThemeCSS = theme;
-            if (this.lastThemeCssKey) {
-                getMainWindow().webContents.removeInsertedCSS(this.lastThemeCssKey);
-            }
+
             getMainWindow().webContents.insertCSS(theme).then(key => {
+                const previousCSSKey = this.lastThemeCssKey;
+                if (previousCSSKey) {
+                    getMainWindow().webContents.removeInsertedCSS(this.lastThemeCssKey);
+                }
                 this.lastThemeCssKey = key;
             });
         }
