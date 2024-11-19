@@ -84,6 +84,27 @@ func defaultTheme() v2.Theme {
 		TimeFont:              timeFont,
 		TimeColor:             fgColor,
 		MainFont:              mainFont,
+		ImageFit:              "none",
+
+		LayoutType:           "seven_inch",
+		DisplayWidth:         800,
+		DisplayHeight:        480,
+		WidgetSwitcherX:      20,
+		WidgetSwitcherY:      20,
+		WidgetSwitcherWidth:  "300px",
+		WidgetSwitcherHeight: "400px",
+		DateTimeX:            340,
+		DateTimeY:            20,
+		DateTimeWidth:        "420px",
+		DateTimeHeight:       "210px",
+		ActionCenterX:        340,
+		ActionCenterY:        250,
+		ActionCenterWidth:    "420px",
+		ActionCenterHeight:   "170px",
+		PlannerX:             20,
+		PlannerY:             480,
+		PlannerWidth:         "440px",
+		PlannerHeight:        "800px",
 	}
 
 }
