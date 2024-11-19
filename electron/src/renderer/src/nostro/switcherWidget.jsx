@@ -49,7 +49,7 @@ export const SwitcherWidget = (props) => {
     const [switcherWidgetTransition, setSwitcherWidgetTransition] = createSignal("no-transition");
     const [currentIndex, setCurrentIndex] = createSignal(0);
 
-    return <div class="switcher-widget flex-column flex-grow">
+    return <div id="switcher-widget" class="switcher-widget flex-column flex-grow border crt-box home-box">
         <Show when={hasWidget(widgets)}>
             <div id="switcher-widget-content" className={switcherWidgetTransition()}>
                 {getCurrentWidget(widgets, currentIndex).element()}

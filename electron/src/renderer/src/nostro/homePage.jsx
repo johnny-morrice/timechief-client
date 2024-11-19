@@ -352,16 +352,16 @@ export const HomePage = () => {
   }
 
   return <div class="home-screen flex-row">
-    <div class="home-lhs-column flex-column flex-grow border crt-box home-box">
+    <div class="home-lhs-column flex-column flex-grow">
       <SwitcherWidget widgets={switcherWidgets} />
     </div>
     <div class='home-rhs-column flex-column flex-grow'>
-      <div class="home-time-wrapper flex-grow">
+      <div id="date-time" class="home-time-wrapper flex-grow">
         <div class="home-time">{signals.myTime}</div>
         <div class="home-date">{signals.myDate}</div>
       </div>
 
-      <div class="home-action-center flex-grow border crt-box home-box">
+      <div id="action-center" class="home-action-center flex-grow border crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
         <StatusNote />
           <Show when={hasNextEvent(signals)}>
