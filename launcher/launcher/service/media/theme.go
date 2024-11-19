@@ -106,12 +106,10 @@ func defaultTheme() v2.Theme {
 		PlannerWidth:         "440px",
 		PlannerHeight:        "800px",
 	}
-
 }
 
 func randomFont() string {
 	return randomChoice("Titillium Web", "sans-serif", "serif", "monospace", "cursive")
-
 }
 
 func boxBorderWidth() string {
