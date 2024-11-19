@@ -179,21 +179,22 @@ type Data struct {
 
 // Device defines model for Device.
 type Device struct {
-	HourCycleOption   DeviceHourCycleOption   `json:"hour_cycle_option"`
-	IsMuteRange       bool                    `json:"is_mute_range"`
-	IsMuted           bool                    `json:"is_muted"`
-	Latitude          string                  `json:"latitude"`
-	LicenseUuid       string                  `json:"license_uuid"`
-	Locale            string                  `json:"locale"`
-	Location          string                  `json:"location"`
-	Longitude         string                  `json:"longitude"`
-	MuteHourEnd       int                     `json:"mute_hour_end"`
-	MuteHourStart     int                     `json:"mute_hour_start"`
-	Nickname          string                  `json:"nickname"`
-	TemperatureOption DeviceTemperatureOption `json:"temperature_option"`
-	ThemeUuid         string                  `json:"theme_uuid"`
-	Timezone          string                  `json:"timezone"`
-	Uuid              string                  `json:"uuid"`
+	HourCycleOption     DeviceHourCycleOption   `json:"hour_cycle_option"`
+	IsMuteRange         bool                    `json:"is_mute_range"`
+	IsMuted             bool                    `json:"is_muted"`
+	Latitude            string                  `json:"latitude"`
+	LicenseUuid         string                  `json:"license_uuid"`
+	Locale              string                  `json:"locale"`
+	Location            string                  `json:"location"`
+	Longitude           string                  `json:"longitude"`
+	MuteHourEnd         int                     `json:"mute_hour_end"`
+	MuteHourStart       int                     `json:"mute_hour_start"`
+	Nickname            string                  `json:"nickname"`
+	SpookyCampaignOptIn bool                    `json:"spooky_campaign_opt_in"`
+	TemperatureOption   DeviceTemperatureOption `json:"temperature_option"`
+	ThemeUuid           string                  `json:"theme_uuid"`
+	Timezone            string                  `json:"timezone"`
+	Uuid                string                  `json:"uuid"`
 }
 
 // DeviceHourCycleOption defines model for Device.HourCycleOption.
@@ -266,6 +267,11 @@ type License struct {
 	ValidUntil    int    `json:"valid_until"`
 }
 
+// LogoutRedirect defines model for LogoutRedirect.
+type LogoutRedirect struct {
+	RedirectUrl string `json:"redirect_url"`
+}
+
 // OWMData defines model for OWMData.
 type OWMData struct {
 	Current CurrentWeather `json:"current"`
@@ -324,6 +330,10 @@ type SpookyCampaignDatum struct {
 
 // Theme defines model for Theme.
 type Theme struct {
+	ActionCenterHeight    string   `json:"action_center_height"`
+	ActionCenterWidth     string   `json:"action_center_width"`
+	ActionCenterX         int      `json:"action_center_x"`
+	ActionCenterY         int      `json:"action_center_y"`
 	BackgroundColor       string   `json:"background_color"`
 	BoxBackgroundColor    string   `json:"box_background_color"`
 	BoxBorderColor        string   `json:"box_border_color"`
@@ -334,13 +344,28 @@ type Theme struct {
 	ButtonBorderRadius    string   `json:"button_border_radius"`
 	ButtonBorderWidth     string   `json:"button_border_width"`
 	ButtonForegroundColor string   `json:"button_foreground_color"`
+	DateTimeHeight        string   `json:"date_time_height"`
+	DateTimeWidth         string   `json:"date_time_width"`
+	DateTimeX             int      `json:"date_time_x"`
+	DateTimeY             int      `json:"date_time_y"`
+	DisplayHeight         int      `json:"display_height"`
+	DisplayWidth          int      `json:"display_width"`
 	ForegroundColor       string   `json:"foreground_color"`
 	ImageFit              string   `json:"image_fit"`
 	ImageUuids            []string `json:"image_uuids"`
+	LayoutType            string   `json:"layout_type"`
 	MainFont              string   `json:"main_font"`
+	PlannerHeight         string   `json:"planner_height"`
+	PlannerWidth          string   `json:"planner_width"`
+	PlannerX              int      `json:"planner_x"`
+	PlannerY              int      `json:"planner_y"`
 	TimeColor             string   `json:"time_color"`
 	TimeFont              string   `json:"time_font"`
 	Uuid                  string   `json:"uuid"`
+	WidgetSwitcherHeight  string   `json:"widget_switcher_height"`
+	WidgetSwitcherWidth   string   `json:"widget_switcher_width"`
+	WidgetSwitcherX       int      `json:"widget_switcher_x"`
+	WidgetSwitcherY       int      `json:"widget_switcher_y"`
 }
 
 // Version defines model for Version.
@@ -600,6 +625,9 @@ type ClientInterface interface {
 	// GetAPIKeyById request
 	GetAPIKeyById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// LogoutWebSession request
+	LogoutWebSession(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListBucketFiles request
 	ListBucketFiles(ctx context.Context, params *ListBucketFilesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -799,6 +827,18 @@ func (c *Client) CreateAPIKey(ctx context.Context, body CreateAPIKeyJSONRequestB
 
 func (c *Client) GetAPIKeyById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetAPIKeyByIdRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) LogoutWebSession(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLogoutWebSessionRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -1629,6 +1669,33 @@ func NewGetAPIKeyByIdRequest(server string, id string) (*http.Request, error) {
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewLogoutWebSessionRequest generates requests for LogoutWebSession
+func NewLogoutWebSessionRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth0/logout")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -3496,6 +3563,9 @@ type ClientWithResponsesInterface interface {
 	// GetAPIKeyByIdWithResponse request
 	GetAPIKeyByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*GetAPIKeyByIdResponse, error)
 
+	// LogoutWebSessionWithResponse request
+	LogoutWebSessionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*LogoutWebSessionResponse, error)
+
 	// ListBucketFilesWithResponse request
 	ListBucketFilesWithResponse(ctx context.Context, params *ListBucketFilesParams, reqEditors ...RequestEditorFn) (*ListBucketFilesResponse, error)
 
@@ -3717,6 +3787,28 @@ func (r GetAPIKeyByIdResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetAPIKeyByIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type LogoutWebSessionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *LogoutRedirect
+}
+
+// Status returns HTTPResponse.Status
+func (r LogoutWebSessionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r LogoutWebSessionResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4719,6 +4811,15 @@ func (c *ClientWithResponses) GetAPIKeyByIdWithResponse(ctx context.Context, id 
 	return ParseGetAPIKeyByIdResponse(rsp)
 }
 
+// LogoutWebSessionWithResponse request returning *LogoutWebSessionResponse
+func (c *ClientWithResponses) LogoutWebSessionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*LogoutWebSessionResponse, error) {
+	rsp, err := c.LogoutWebSession(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseLogoutWebSessionResponse(rsp)
+}
+
 // ListBucketFilesWithResponse request returning *ListBucketFilesResponse
 func (c *ClientWithResponses) ListBucketFilesWithResponse(ctx context.Context, params *ListBucketFilesParams, reqEditors ...RequestEditorFn) (*ListBucketFilesResponse, error) {
 	rsp, err := c.ListBucketFiles(ctx, params, reqEditors...)
@@ -5295,6 +5396,32 @@ func ParseGetAPIKeyByIdResponse(rsp *http.Response) (*GetAPIKeyByIdResponse, err
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest APIKey
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseLogoutWebSessionResponse parses an HTTP response from a LogoutWebSessionWithResponse call
+func ParseLogoutWebSessionResponse(rsp *http.Response) (*LogoutWebSessionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &LogoutWebSessionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest LogoutRedirect
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

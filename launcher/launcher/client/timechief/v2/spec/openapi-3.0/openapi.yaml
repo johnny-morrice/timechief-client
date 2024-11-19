@@ -9,6 +9,19 @@ security:
   - bearerAuth: []
 
 paths:
+  /auth0/logout:
+    post:
+      operationId: "logoutWebSession"
+      summary: "Clear web session data"
+      responses:
+        "200":
+          description: "Follow returned URL for browser logout"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutRedirect"
+        "500":
+          description: "Internal server error"
   /device:
     post:
       summary: "Create a new device"
@@ -1224,6 +1237,7 @@ components:
         - mute_hour_start
         - mute_hour_end
         - theme_uuid
+        - spooky_campaign_opt_in
       properties:
         uuid:
           type: "string"
@@ -1261,6 +1275,8 @@ components:
           type: integer
         theme_uuid:
           type: "string"
+        spooky_campaign_opt_in:
+          type: boolean
 
     License:
       type: "object"
@@ -1638,6 +1654,26 @@ components:
         - button_background_color
         - image_fit
         - image_uuids
+        - display_width
+        - display_height
+        - layout_type
+        - widget_switcher_x
+        - widget_switcher_y
+        - widget_switcher_width
+        - widget_switcher_height
+        - date_time_x
+        - date_time_y
+        - date_time_width
+        - date_time_height
+        - action_center_x
+        - action_center_y
+        - action_center_width
+        - action_center_height
+        - planner_x
+        - planner_y
+        - planner_width
+        - planner_height
+
       properties:
         uuid:
           type: string
@@ -1675,6 +1711,44 @@ components:
           type: array
           items:
             type: string
+        display_width:
+          type: integer
+        display_height:
+          type: integer
+        layout_type:
+          type: string
+        widget_switcher_x:
+          type: integer
+        widget_switcher_y:
+          type: integer
+        widget_switcher_width:
+          type: string
+        widget_switcher_height:
+          type: string
+        date_time_x:
+          type: integer
+        date_time_y:
+          type: integer
+        date_time_width:
+          type: string
+        date_time_height:
+          type: string
+        action_center_x:
+          type: integer
+        action_center_y:
+          type: integer
+        action_center_width:
+          type: string
+        action_center_height:
+          type: string
+        planner_x:
+          type: integer
+        planner_y:
+          type: integer
+        planner_width:
+          type: string
+        planner_height:
+          type: string
 
     OWMDataDatum:
       type: object
@@ -1935,3 +2009,11 @@ components:
           type: string
         metadata:
           $ref: "#/components/schemas/BucketFileMetadata"
+    
+    LogoutRedirect:
+      type: object
+      required:
+        - redirect_url
+      properties:
+        redirect_url:
+          type: string
