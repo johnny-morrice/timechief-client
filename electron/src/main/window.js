@@ -19,6 +19,7 @@ function isFullScreen() {
 
 let isDevMode = process.env.devMode == 'true';
 let mainWindow;
+let windowInitialised = false;
 
 export function getMainWindow() {
     return mainWindow;
@@ -52,7 +53,21 @@ function createWindow(callback) {
             mainWindow.webContents.openDevTools();
         }
         callback();
+        windowInitialised = true;
     })
+}
+
+export function setWindowSize(width, height) {
+    if (!width || !height) {
+        console.log(`cannot change size to width ${width} height ${height}`);
+        return;
+    }
+    if (!mainWindow || !windowInitialised) {
+        console.log(`cannot change size to width ${width} height ${height}: mainWindow not initialised`);
+        return;
+    }
+
+    getMainWindow().setSize(width, height, false);
 }
 
 export function startTimechiefApp(logger, callback) {

@@ -4,7 +4,7 @@ import axios from 'axios';
 import axiosDebugLog from 'axios-debug-log';
 import winston from 'winston';
 import { baseDeviceStatus } from './status.js';
-import { startTimechiefApp, getMainWindow } from './window.js';
+import { startTimechiefApp, getMainWindow, setWindowSize } from './window.js';
 import { LauncherClient } from './launcherclient.js';
 import { Themer } from './themer.js';
 import { MediaDecorator } from './mediadecorator.js';
@@ -93,6 +93,11 @@ handleIPCAPICall("sshPasswordRegen", "sshPasswordRegenResult", () => client.post
 handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKey());
 handleIPCAPICall("selectMyDevice", "selectMyDeviceResult", (args) => client.postSelectMyDevice(args["uuid"]));
 handleIPCAPICall("setNetworkType", "setNetworkTypeResult", (args) => client.postNetworkType(args["network_type"]))
+
+ipcMain.on("resizeMainWindow", (event, args) => {
+  setWindowSize(args["width"], args["height"]);
+  getMainWindow().webContents.send("resizeMainWindowResult", { "result": "received resize request" });
+});
 
 ipcMain.on("setSSHEnabled", (event, args) => {
   client.postSSHEnabled(args["state"])
