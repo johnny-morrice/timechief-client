@@ -7,10 +7,11 @@ import { LoginPage } from './login';
 import { IntroVideo } from './introVideo';
 import { MediaVideo } from './mediavideo';
 import { WindowResizer } from './windowResizer';
+import { ElementResizer } from './elementResizer';
 
 const AppScreen = (props) => {
   console.log("AppScreen render");
-  return <WindowResizer element={<IntroVideo element={<WebSetupPage element={<LoginPage element={<MediaVideo element={props.element} />} />}/>} />} />;
+  return <ElementResizer element={<WindowResizer element={<IntroVideo element={<WebSetupPage element={<LoginPage element={<MediaVideo element={props.element} />} />}/>} />} />} />;
 };
 
 const App = () => {

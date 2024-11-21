@@ -1,5 +1,5 @@
 import { onCleanup } from "solid-js";
-import { addDataCallback, sendResizeBrowserWindow, removeDataCallback,  } from "./ipc";
+import { addServiceDataCallback, sendResizeBrowserWindow, removeDataCallback,  } from "./ipc";
 import { callbackName } from "./callback";
 
 var lastWidth;
@@ -17,7 +17,6 @@ function handleData(data) {
     if (!theme) {
         return;
     }
-
     const width = theme["display_width"];
     const height = theme["display_height"];
 
@@ -25,11 +24,11 @@ function handleData(data) {
         return;
     }
 
-    
-
     if (lastWidth == width && lastHeight == height) {
         return;
     }
+
+    console.log("changing browser window size: ", width, height);
 
     lastWidth = width;
     lastHeight = height;
@@ -38,8 +37,12 @@ function handleData(data) {
 }
 
 export function WindowResizer(props) {
+    console.log("WindowResizer render");
     const cbName = callbackName("WindowResizer");
-    addDataCallback(cbName, handleData);
-    onCleanup(() => removeDataCallback(cb));
-    return props.element;
+    addServiceDataCallback(cbName, handleData);
+    onCleanup(() => {
+        console.log("resizer removing callback");
+        removeDataCallback(cb);
+    });
+    return <>{props.element}</>;
 }
