@@ -117,6 +117,10 @@ export function removePairingGetCallback(name) {
     pairingGetReceiver.removeCallback(name);
 }
 
+export function sendResizeBrowserWindow(width, height) {
+    window.api.send("resizeBrowserWindow", {width: width, height: height});
+}
+
 export function sendSSHRegenPassword() {
     window.api.send("sshPasswordRegen");
 }
