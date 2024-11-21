@@ -2,6 +2,8 @@ import { onCleanup } from "solid-js";
 import { addDataCallback, sendResizeBrowserWindow, removeDataCallback,  } from "./ipc";
 import { callbackName } from "./callback";
 
+var lastWidth;
+var lastHeight;
 function handleData(data) {
     const deviceProfileWrapper = data["device_profile"];
     if (!deviceProfileWrapper) {
@@ -22,6 +24,15 @@ function handleData(data) {
     if (!width || !height) {
         return;
     }
+
+    
+
+    if (lastWidth == width && lastHeight == height) {
+        return;
+    }
+
+    lastWidth = width;
+    lastHeight = height;
 
     sendResizeBrowserWindow(width, height);
 }
