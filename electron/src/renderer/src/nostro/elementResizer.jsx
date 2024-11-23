@@ -72,10 +72,11 @@ function handleData(data) {
 export function ElementResizer(props) {
     console.log("ElementResizer render");
     const cbName = callbackName("ElementResizer");
-    addServiceDataCallback(cbName, handleData);
-    onCleanup(() => {
-        console.log("resizer removing callback");
-        removeDataCallback(cb);
-    });
+    // TODO take out for now.
+    // addServiceDataCallback(cbName, handleData);
+    // onCleanup(() => {
+    //     console.log("resizer removing callback");
+    //     removeDataCallback(cbName);
+    // });
     return <>{props.element}</>
 }

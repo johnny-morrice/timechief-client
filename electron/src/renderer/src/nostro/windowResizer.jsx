@@ -42,7 +42,7 @@ export function WindowResizer(props) {
     addServiceDataCallback(cbName, handleData);
     onCleanup(() => {
         console.log("resizer removing callback");
-        removeDataCallback(cb);
+        removeDataCallback(cbName);
     });
     return <>{props.element}</>;
 }

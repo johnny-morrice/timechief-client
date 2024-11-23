@@ -22,7 +22,10 @@ export class Themer {
         this.setTheme(theme);
     }
 
-    setDefaultTheme() {
+    setDefaultTheme(force) {
+        if (force) {
+            this.isForceChange = force;
+        }
         this.setTheme(getDefaultThemeCSS());
     }
 

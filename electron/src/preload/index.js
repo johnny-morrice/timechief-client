@@ -21,7 +21,8 @@ contextBridge.exposeInMainWorld(
             "apiKeyRegen",
             "setAPIEnabled",
             "selectMyDevice",
-            "resizeBrowserWindow"
+            "resizeBrowserWindow",
+            "loadDefaultCSS"
         ];
         if (validChannels.includes(channel)) {
             ipcRenderer.send(channel, ...args);

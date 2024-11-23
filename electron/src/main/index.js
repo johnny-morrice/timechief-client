@@ -94,6 +94,10 @@ handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKe
 handleIPCAPICall("selectMyDevice", "selectMyDeviceResult", (args) => client.postSelectMyDevice(args["uuid"]));
 handleIPCAPICall("setNetworkType", "setNetworkTypeResult", (args) => client.postNetworkType(args["network_type"]))
 
+ipcMain.on("loadDefaultCSS", (event, args) => {
+  themer.setDefaultTheme(true);
+});
+
 ipcMain.on("resizeBrowserWindow", (event, args) => {
   setWindowSize(args["width"], args["height"]);
   getMainWindow().webContents.send("resizeBrowserWindowResult", { "result": "received resize request" });
