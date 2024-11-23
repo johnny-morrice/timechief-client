@@ -105,6 +105,27 @@ func defaultTheme() v2.Theme {
 		PlannerY:             "480px",
 		PlannerWidth:         "440px",
 		PlannerHeight:        "800px",
+
+		BodyFontSize:                       "16pt",
+		DateFontSize:                       "36pt",
+		TimeFontSize:                       "98pt",
+		CurrentWeatherFontSize:             "18pt",
+		ActionButtonFontSize:               "18pt",
+		SwitcherButtonFontSize:             "16pt",
+		AstroFontSize:                      "16pt",
+		WeatherDataFontSize:                "32pt",
+		CurrentWeatherIconFontSize:         "28pt",
+		ForecastIconFontSize:               "32pt",
+		ForecastTableIconFontSize:          "24pt",
+		ForecastControlButtonFontSize:      "16pt",
+		ForecastControlLabelFontSize:       "16pt",
+		CalendarDayDateFontSize:            "20pt",
+		CalendarDayFontSize:                "14pt",
+		EventCalendarControlButtonFontSize: "16pt",
+		FortuneMessageFontSize:             "14pt",
+		NextEventTimeFontSize:              "18pt",
+		NextEventTextFontSize:              "16pt",
+		LoadingGridFontSize:                "16pt",
 	}
 }
 
