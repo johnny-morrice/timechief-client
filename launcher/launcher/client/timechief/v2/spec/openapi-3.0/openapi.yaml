@@ -1673,6 +1673,26 @@ components:
         - planner_y
         - planner_width
         - planner_height
+        - body_font_size
+        - date_font_size
+        - time_font_size
+        - current_weather_font_size
+        - action_button_font_size
+        - switcher_button_font_size
+        - astro_font_size
+        - weather_data_font_size
+        - current_weather_icon_font_size
+        - forecast_icon_font_size
+        - forecast_weather_table_icon_font_size
+        - forecast_control_button_font_size
+        - forecast_control_label_font_size
+        - calendar_day_date_font_size
+        - calendar_day_font_size
+        - event_calendar_control_button_font_size
+        - fortune_message_font_size
+        - next_event_time_font_size
+        - next_event_text_font_size
+        - loading_grid_font_size
 
       properties:
         uuid:
@@ -1748,6 +1768,46 @@ components:
         planner_width:
           type: string
         planner_height:
+          type: string
+        body_font_size:
+          type: string
+        date_font_size:
+          type: string
+        time_font_size:
+          type: string
+        current_weather_font_size:
+          type: string
+        action_button_font_size:
+          type: string
+        switcher_button_font_size:
+          type: string
+        astro_font_size:
+          type: string
+        weather_data_font_size:
+          type: string
+        current_weather_icon_font_size:
+          type: string
+        forecast_icon_font_size:
+          type: string
+        forecast_weather_table_icon_font_size:
+          type: string
+        forecast_control_button_font_size:
+          type: string
+        forecast_control_label_font_size:
+          type: string
+        calendar_day_date_font_size:
+          type: string
+        calendar_day_font_size:
+          type: string
+        event_calendar_control_button_font_size:
+          type: string
+        fortune_message_font_size:
+          type: string
+        next_event_time_font_size:
+          type: string
+        next_event_text_font_size:
+          type: string
+        loading_grid_font_size:
           type: string
 
     OWMDataDatum:
