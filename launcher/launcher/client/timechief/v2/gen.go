@@ -332,8 +332,8 @@ type SpookyCampaignDatum struct {
 type Theme struct {
 	ActionCenterHeight    string   `json:"action_center_height"`
 	ActionCenterWidth     string   `json:"action_center_width"`
-	ActionCenterX         int      `json:"action_center_x"`
-	ActionCenterY         int      `json:"action_center_y"`
+	ActionCenterX         string   `json:"action_center_x"`
+	ActionCenterY         string   `json:"action_center_y"`
 	BackgroundColor       string   `json:"background_color"`
 	BoxBackgroundColor    string   `json:"box_background_color"`
 	BoxBorderColor        string   `json:"box_border_color"`
@@ -346,8 +346,8 @@ type Theme struct {
 	ButtonForegroundColor string   `json:"button_foreground_color"`
 	DateTimeHeight        string   `json:"date_time_height"`
 	DateTimeWidth         string   `json:"date_time_width"`
-	DateTimeX             int      `json:"date_time_x"`
-	DateTimeY             int      `json:"date_time_y"`
+	DateTimeX             string   `json:"date_time_x"`
+	DateTimeY             string   `json:"date_time_y"`
 	DisplayHeight         int      `json:"display_height"`
 	DisplayWidth          int      `json:"display_width"`
 	ForegroundColor       string   `json:"foreground_color"`
@@ -357,15 +357,15 @@ type Theme struct {
 	MainFont              string   `json:"main_font"`
 	PlannerHeight         string   `json:"planner_height"`
 	PlannerWidth          string   `json:"planner_width"`
-	PlannerX              int      `json:"planner_x"`
-	PlannerY              int      `json:"planner_y"`
+	PlannerX              string   `json:"planner_x"`
+	PlannerY              string   `json:"planner_y"`
 	TimeColor             string   `json:"time_color"`
 	TimeFont              string   `json:"time_font"`
 	Uuid                  string   `json:"uuid"`
 	WidgetSwitcherHeight  string   `json:"widget_switcher_height"`
 	WidgetSwitcherWidth   string   `json:"widget_switcher_width"`
-	WidgetSwitcherX       int      `json:"widget_switcher_x"`
-	WidgetSwitcherY       int      `json:"widget_switcher_y"`
+	WidgetSwitcherX       string   `json:"widget_switcher_x"`
+	WidgetSwitcherY       string   `json:"widget_switcher_y"`
 }
 
 // Version defines model for Version.
