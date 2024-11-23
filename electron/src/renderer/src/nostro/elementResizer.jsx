@@ -3,7 +3,7 @@ import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { callbackName } from "./callback";
 
 const elementIDToThemePrefix = new Map([
-    ["switcher-widget", "switcher_widget"],
+    ["switcher-widget", "widget_switcher"],
     ["action-center", "action_center"],
     ["date-time", "date_time"]
 ]);
@@ -34,7 +34,7 @@ function buildThemeSettings(theme) {
 }
 
 function settingsToStyle(settings) {
-    return `position: absolute; left: ${settings.x} top: ${settings.y}; width: ${settings.width} height: ${settings.height}`;
+    return `position: absolute; left: ${settings.x}; top: ${settings.y}; width: ${settings.width}; height: ${settings.height}; overflow: hidden;`;
 }
 
 function applyThemeSettings(settings) {
@@ -44,6 +44,7 @@ function applyThemeSettings(settings) {
             return;
         }
         const css = settingsToStyle(settings);
+        console.log(`applying ${elementId} style: ${css}`);
         const currentCss = element.getAttribute("style");
         if (css != currentCss) {
             element.setAttribute("style", css);
@@ -72,11 +73,10 @@ function handleData(data) {
 export function ElementResizer(props) {
     console.log("ElementResizer render");
     const cbName = callbackName("ElementResizer");
-    // TODO take out for now.
-    // addServiceDataCallback(cbName, handleData);
-    // onCleanup(() => {
-    //     console.log("resizer removing callback");
-    //     removeDataCallback(cbName);
-    // });
+    addServiceDataCallback(cbName, handleData);
+    onCleanup(() => {
+        console.log("resizer removing callback");
+        removeDataCallback(cbName);
+    });
     return <>{props.element}</>
 }
