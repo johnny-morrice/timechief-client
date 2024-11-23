@@ -8,7 +8,7 @@ body {
 div.home-time {
     font-family: {{.TimeFont}};
     color: {{.TimeColor}};
-    font-size: {{.TimeFontSize}};
+    font-size: {{.TimeFontSize}} !important;
 }
 
 .exposed {
@@ -17,7 +17,7 @@ div.home-time {
 
 div.home-date {
     color: {{.TimeColor}};
-    font-size: {{.DateFontSize}};
+    font-size: {{.DateFontSize}} !important;
 }
 
 div.home-box {
@@ -64,105 +64,105 @@ div#theme-detection-canary {
 }
 
 div.current-weather {
-    font-size: {{.CurrentWeatherFontSize}};
+    font-size: {{.CurrentWeatherFontSize}} !important;
 }
 
 button.action-button {
-    font-size: {{.ActionButtonFontSize}};
+    font-size: {{.ActionButtonFontSize}} !important;
 }
 
 button.switcher-button {
-    font-size: {{.SwitcherButtonFontSize}};
+    font-size: {{.SwitcherButtonFontSize}} !important;
 }
 
 div.astro {
-    font-size: {{.AstroFontSize}};
+    font-size: {{.AstroFontSize}} !important;
 }
 
 div.weather-data {
-    font-size: {{.WeatherDataFontSize}};
+    font-size: {{.WeatherDataFontSize}} !important;
 }
 
 div.current-weather-icon {
-    font-size: {{.CurrentWeatherIconFontSize}};
+    font-size: {{.CurrentWeatherIconFontSize}} !important;
 }
 
 div.forecast-weather-icon {
-    font-size: {{.ForecastIconFontSize}};
+    font-size: {{.ForecastIconFontSize}} !important;
 }
 
 table.forecast-weather-table td.weather-icon {
-    font-size: {{.ForecastWeatherTableIconFontSize}};
+    font-size: {{.ForecastWeatherTableIconFontSize}} !important;
 }
 
 button.forecast-control-button {
-    font-size: {{.ForecastControlButtonFontSize}};
+    font-size: {{.ForecastControlButtonFontSize}} !important;
 }
 
 div.forecast-control-label {
-    font-size: {{.ForecastControlLabelFontSize}};
+    font-size: {{.ForecastControlLabelFontSize}} !important;
 }
 
 div.calendar-day-date {
-    font-size: {{.CalendarDayDateFontSize}};
+    font-size: {{.CalendarDayDateFontSize}} !important;
 }
 
 div.calendar-day {
-    font-size: {{.CalendarDayFontSize}};
+    font-size: {{.CalendarDayFontSize}} !important;
 }
 
 button.event-calendar-control-button {
-    font-size: {{.EventCalendarControlButtonFontSize}};
+    font-size: {{.EventCalendarControlButtonFontSize}} !important;
 }
 
 div.fortune-message {
-    font-size: {{.FortuneMessageFontSize}};
+    font-size: {{.FortuneMessageFontSize}} !important;
 }
 
 div.next-event-time {
-    font-size: {{.NextEventTimeFontSize}};
+    font-size: {{.NextEventTimeFontSize}} !important;
 }
 
 div.next-event-shorttext {
-    font-size: {{.NextEventTextFontSize}};
+    font-size: {{.NextEventTextFontSize}} !important;
 }
 
 div.loading-grid {
-    font-size: {{.LoadingGridFontSize}};
+    font-size: {{.LoadingGridFontSize}} !important;
 }
 
 div#switcher-widget {
-    position: absolute;
-    left: {{.WidgetSwitcherX}};
-    top: {{.WidgetSwitcherY}};
-    width: {{.WidgetSwitcherWidth}};
-    height: {{.WidgetSwitcherHeight}};
-    overflow: hidden;
+    position: absolute !important;
+    left: {{.WidgetSwitcherX}} !important;
+    top: {{.WidgetSwitcherY}} !important;
+    width: {{.WidgetSwitcherWidth}} !important;
+    height: {{.WidgetSwitcherHeight}} !important;
+    overflow: hidden !important;
 }
 
 div#date-time {
-    position: absolute;
-    left: {{.DateTimeX}};
-    top: {{.DateTimeY}};
-    width: {{.DateTimeWidth}};
-    height: {{.DateTimeHeight}};
-    overflow: hidden;
+    position: absolute !important;
+    left: {{.DateTimeX}} !important;
+    top: {{.DateTimeY}} !important;
+    width: {{.DateTimeWidth}} !important;
+    height: {{.DateTimeHeight}} !important;
+    overflow: hidden !important;
 }
 
 div#action-center {
-    position: absolute;
-    left: {{.ActionCenterX}};
-    top: {{.ActionCenterY}};
-    width: {{.ActionCenterWidth}};
-    height: {{.ActionCenterHeight}};
-    overflow: hidden;
+    position: absolute !important;
+    left: {{.ActionCenterX}} !important;
+    top: {{.ActionCenterY}} !important;
+    width: {{.ActionCenterWidth}} !important;
+    height: {{.ActionCenterHeight}} !important;
+    overflow: hidden !important;
 }
 
 div#planner {
-    position: absolute;
-    left: {{.PlannerX}};
-    top: {{.PlannerY}};
-    width: {{.PlannerWidth}};
-    height: {{.PlannerHeight}};
-    overflow: hidden;
+    position: absolute !important;
+    left: {{.PlannerX}} !important;
+    top: {{.PlannerY}} !important;
+    width: {{.PlannerWidth}} !important;
+    height: {{.PlannerHeight}} !important;
+    overflow: hidden !important;
 }
