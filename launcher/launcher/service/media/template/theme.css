@@ -55,3 +55,7 @@ div.inverted-color, span.inverted-color {
     color: {{.BoxBackgroundColor}};
     background-color: {{.ForegroundColor}};
 }
+
+div#theme-detection-canary {
+    color: rgb(255, 0, 0);
+}
