@@ -205,6 +205,14 @@ func getCLIApp() *cli.App {
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
 				},
+				&cli.IntFlag{
+					Name:  "width",
+					Value: 800,
+				},
+				&cli.IntFlag{
+					Name:  "height",
+					Value: 480,
+				},
 				&cli.BoolFlag{
 					Name:    "update",
 					Value:   true,

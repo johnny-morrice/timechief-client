@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
@@ -24,6 +25,8 @@ func cfgFlags(ctx *cli.Context) store.Config {
 		}
 		cfg.Config[key] = value
 	}
+	cfg.Config["width"] = strconv.Itoa(ctx.Int("width"))
+	cfg.Config["height"] = strconv.Itoa(ctx.Int("height"))
 	return cfg
 }
 

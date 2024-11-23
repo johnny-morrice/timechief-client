@@ -2,6 +2,7 @@ package launcher
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
@@ -40,9 +41,27 @@ func (svc Service) GetTargetEnv() (TargetEnv, error) {
 	if key == "" {
 		return TargetEnv{}, fmt.Errorf("no API key")
 	}
-	env := map[string]string{
-		"API_KEY": key,
+	cfg, err := svc.GetConfig()
+	if err != nil {
+		return TargetEnv{}, fmt.Errorf("failed to get config: %w", err)
 	}
+	width, height := cfg.Config["width"], cfg.Config["height"]
+
+	if width == "" {
+		log.Printf("defaulting width")
+		width = "800"
+	}
+	if height == "" {
+		log.Printf("defaulting height")
+		height = "480"
+	}
+
+	env := map[string]string{
+		"API_KEY":          key,
+		"timechief_width":  width,
+		"timechief_height": height,
+	}
+
 	return TargetEnv{Env: env}, nil
 }
 

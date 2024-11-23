@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,6 +23,7 @@ import (
 
 type DeviceData struct {
 	client          v2.ClientInterface
+	cfgStore        ConfigStore
 	deviceDataStore DeviceDataStore
 	soundService    SoundService
 	keyValueStore   store.KeyValueStore
@@ -30,12 +32,13 @@ type DeviceData struct {
 	ticker          Ticker
 }
 
-func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, ticker Ticker, requestTimeout time.Duration) DeviceData {
+func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, ticker Ticker, requestTimeout time.Duration, cfgStore ConfigStore) DeviceData {
 	return DeviceData{
 		client:          client,
 		deviceDataStore: deviceDataStore,
 		soundService:    soundService,
 		keyValueStore:   keyValueStore,
+		cfgStore:        cfgStore,
 		stateFlagStore:  stateFlagStore,
 		requestTimeout:  requestTimeout,
 		ticker:          ticker,
@@ -45,6 +48,11 @@ func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, 
 type Ticker interface {
 	Tick() <-chan struct{}
 	Poke()
+}
+
+type ConfigStore interface {
+	SetConfig(cfg store.Config) error
+	GetConfig() (store.Config, error)
 }
 
 type SoundService interface {
@@ -119,6 +127,13 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 	}
 
 	err = dd.deviceDataStore.SetDeviceData(data)
+	if err != nil {
+		return err
+	}
+
+	width := data.DeviceProfile.Value.Theme.DisplayWidth
+	height := data.DeviceProfile.Value.Theme.DisplayHeight
+	err = dd.updateDisplaySize(width, height)
 	if err != nil {
 		return err
 	}
@@ -207,6 +222,33 @@ func (dd DeviceData) getToken(authnClient *authnclient.Client, credentials strin
 	}
 
 	return tokenResp.JWT, nil
+}
+
+func (dd DeviceData) updateDisplaySize(width, height int) error {
+	if width == 0 || height == 0 {
+		log.Printf("skipping update display size due to 0 width or height")
+		return nil
+	}
+	cfg, err := dd.cfgStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config to set display size: %w", err)
+	}
+
+	widthText := strconv.Itoa(width)
+	heightText := strconv.Itoa(height)
+
+	if cfg.Config["width"] == widthText && cfg.Config["height"] == heightText {
+		return nil
+	}
+
+	cfg.Config["width"] = widthText
+	cfg.Config["height"] = heightText
+
+	err = dd.cfgStore.SetConfig(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to set config for display size change: %w", err)
+	}
+	return nil
 }
 
 func (dd DeviceData) newClientContext() (context.Context, func()) {

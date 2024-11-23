@@ -114,7 +114,7 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 	deviceDataStore := store.DeviceDataStore{DB: db}
-	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ticker, ctx.Duration("service-request-timeout"))
+	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ticker, ctx.Duration("service-request-timeout"), cfgStore)
 	// pairingDaemon := daemon.Pairing{
 	// 	ConfigStore:          cfgStore,
 	// 	StateFlagStore:       flagStore,
