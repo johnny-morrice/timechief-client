@@ -118,7 +118,7 @@ div.home-date {
 
 div.home-time {
     /* font-family: 'Seven Segment', monospace; */
-    font-size: 94pt;
+    font-size: 98pt;
 }
 
 div.home-action-center {
@@ -474,7 +474,7 @@ div.status-note {
 
 @media (min-width: 800px) {
     div.home-time {
-        font-size: 102pt;
+        font-size: 104pt;
     }
 
     div.home-date {
@@ -528,7 +528,7 @@ div.status-note {
 
 @media (min-width: 1000px) {
     div.home-time {
-        font-size: 120pt;
+        font-size: 122pt;
     }
 
     div.home-date {
