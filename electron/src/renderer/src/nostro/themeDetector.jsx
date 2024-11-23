@@ -8,16 +8,14 @@ function isCanaryThemed() {
         return;
     };
     const styles = window.getComputedStyle(canary);
-    const noStyles = {
-        'border-color': 'rgb(0, 0, 0)',
-        'color': 'rgb(0, 0, 0)',
-        'background-color': 'rgba(0, 0, 0, 0)',
+    const styleLoaded = {
+        'color': 'rgb(255, 0, 0)',
     };
-    const styleProps = ["border-color", "color", "background-color"];
+    const styleProps = ["color"];
     for (let index = 0; index < styleProps.length; index++) {
         const property = styleProps[index];
-        const noLoadValue = noStyles[property];
-        if (styles.getPropertyValue(property) !== noLoadValue) {
+        const loadValue = styleLoaded[property];
+        if (styles.getPropertyValue(property) === loadValue) {
             return true;
         }
     }
@@ -34,7 +32,7 @@ export function ThemeDetector(props) {
                 sendLoadDefaultCSS();
             }
         },
-        1000
+        500
     )
     onCleanup(() => {
         clearInterval(interval);
@@ -43,7 +41,7 @@ export function ThemeDetector(props) {
     <div id="theme-detection-canary" class="border">Should never see</div>
     <Show when={!themeDetected()}>
     <div class="system-error">
-        <div>No theme loaded</div>
+        <div>Theme loading...</div>
         <Loading />
     </div>;
     </Show>

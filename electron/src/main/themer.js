@@ -15,8 +15,6 @@ export class Themer {
 
         if (data && data.media && data.media.background_picture && data.media.background_picture.background_picture_css && data.media.background_picture.background_picture_css.length > 0) {
             theme = theme + "\n\n" + data.media.background_picture.background_picture_css;
-        } else {
-            theme = theme + "\n\n" + getDefaultBackgroundImageCSS();
         }
 
         this.setTheme(theme);
@@ -61,22 +59,28 @@ export class Themer {
     }
 }
 
-function getDefaultBackgroundImageCSS() {
-    return `body {
-        background-image: none;
-        background-size: initial;
-        background-attachment: initial;
-        background-repeat: initial;
-        background-position: initial;
-        background-color: initial;
-    }`;
-}
+// function getDefaultBackgroundImageCSS() {
+//     return `body {
+//         background-image: none;
+//         background-size: initial;
+//         background-attachment: initial;
+//         background-repeat: initial;
+//         background-position: initial;
+//         background-color: initial;
+//     }`;
+// }
 
 function getDefaultThemeCSS() {
     return `body {
         color: green;
         background-color: black;
         font-family: 'Titillium Web', sans-serif;
+        background-image: none;
+        background-size: initial;
+        background-attachment: initial;
+        background-repeat: initial;
+        background-position: initial;
+        background-color: initial;
     }
 
     div.home-time {
@@ -129,5 +133,9 @@ function getDefaultThemeCSS() {
     div.inverted-color, span.inverted-color {
         color: black;
         background-color: green;
+    }
+        
+    div#theme-detection-canary {
+        color: rgb(255, 0, 0);
     }`;
 }
