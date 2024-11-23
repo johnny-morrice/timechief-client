@@ -2,11 +2,13 @@ body {
     color: {{.ForegroundColor}};
     background-color: {{.BackgroundColor}};
     font-family: {{.MainFont}};
+    font-size: {{.BodyFontSize}};
 }
 
 div.home-time {
     font-family: {{.TimeFont}};
     color: {{.TimeColor}};
+    font-size: {{.TimeFontSize}};
 }
 
 .exposed {
@@ -15,6 +17,7 @@ div.home-time {
 
 div.home-date {
     color: {{.TimeColor}};
+    font-size: {{.DateFontSize}};
 }
 
 div.home-box {
@@ -58,4 +61,108 @@ div.inverted-color, span.inverted-color {
 
 div#theme-detection-canary {
     color: rgb(255, 0, 0);
+}
+
+div.current-weather {
+    font-size: {{.CurrentWeatherFontSize}};
+}
+
+button.action-button {
+    font-size: {{.ActionButtonFontSize}};
+}
+
+button.switcher-button {
+    font-size: {{.SwitcherButtonFontSize}};
+}
+
+div.astro {
+    font-size: {{.AstroFontSize}};
+}
+
+div.weather-data {
+    font-size: {{.WeatherDataFontSize}};
+}
+
+div.current-weather-icon {
+    font-size: {{.CurrentWeatherIconFontSize}};
+}
+
+div.forecast-weather-icon {
+    font-size: {{.ForecastIconFontSize}};
+}
+
+table.forecast-weather-table td.weather-icon {
+    font-size: {{.ForecastWeatherTableIconFontSize}};
+}
+
+button.forecast-control-button {
+    font-size: {{.ForecastControlButtonFontSize}};
+}
+
+div.forecast-control-label {
+    font-size: {{.ForecastControlLabelFontSize}};
+}
+
+div.calendar-day-date {
+    font-size: {{.CalendarDayDateFontSize}};
+}
+
+div.calendar-day {
+    font-size: {{.CalendarDayFontSize}};
+}
+
+button.event-calendar-control-button {
+    font-size: {{.EventCalendarControlButtonFontSize}};
+}
+
+div.fortune-message {
+    font-size: {{.FortuneMessageFontSize}};
+}
+
+div.next-event-time {
+    font-size: {{.NextEventTimeFontSize}};
+}
+
+div.next-event-shorttext {
+    font-size: {{.NextEventTextFontSize}};
+}
+
+div.loading-grid {
+    font-size: {{.LoadingGridFontSize}};
+}
+
+div#switcher-widget {
+    position: absolute;
+    left: {{.WidgetSwitcherX}};
+    top: {{.WidgetSwitcherY}};
+    width: {{.WidgetSwitcherWidth}};
+    height: {{.WidgetSwitcherHeight}};
+    overflow: hidden;
+}
+
+div#date-time {
+    position: absolute;
+    left: {{.DateTimeX}};
+    top: {{.DateTimeY}};
+    width: {{.DateTimeWidth}};
+    height: {{.DateTimeHeight}};
+    overflow: hidden;
+}
+
+div#action-center {
+    position: absolute;
+    left: {{.ActionCenterX}};
+    top: {{.ActionCenterY}};
+    width: {{.ActionCenterWidth}};
+    height: {{.ActionCenterHeight}};
+    overflow: hidden;
+}
+
+div#planner {
+    position: absolute;
+    left: {{.PlannerX}};
+    top: {{.PlannerY}};
+    width: {{.PlannerWidth}};
+    height: {{.PlannerHeight}};
+    overflow: hidden;
 }
