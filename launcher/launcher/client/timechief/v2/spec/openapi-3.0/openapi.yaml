@@ -1718,33 +1718,33 @@ components:
         layout_type:
           type: string
         widget_switcher_x:
-          type: integer
+          type: string
         widget_switcher_y:
-          type: integer
+          type: string
         widget_switcher_width:
           type: string
         widget_switcher_height:
           type: string
         date_time_x:
-          type: integer
+          type: string
         date_time_y:
-          type: integer
+          type: string
         date_time_width:
           type: string
         date_time_height:
           type: string
         action_center_x:
-          type: integer
+          type: string
         action_center_y:
-          type: integer
+          type: string
         action_center_width:
           type: string
         action_center_height:
           type: string
         planner_x:
-          type: integer
+          type: string
         planner_y:
-          type: integer
+          type: string
         planner_width:
           type: string
         planner_height:
