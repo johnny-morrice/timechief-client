@@ -29,6 +29,10 @@ class Signals {
     [this.googleCalendarEvents, this.setGoogleCalendarEvents] = createSignal([]);
     this.setTimeFormatter(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
     this.setDateFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
+    this.setDayOfWeekFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
+    this.setDayOfMonthFormatter(new Intl.DateTimeFormat("en-GB", { day: 'numeric' }));
+    // Show the month and year in the calendar.
+    this.setCalendarMonthFormatter(new Intl.DateTimeFormat("en-GB", { month: 'long', year: 'numeric' }));
   }
 
   timeFormatter() {
@@ -46,6 +50,38 @@ class Signals {
   setDateFormatter(formatter) {
     this._dateFormatter = formatter;
   }
+
+  setDayOfWeekFormatter(formatter) {
+    this._dayOfWeekFormatter = formatter;
+  }
+
+  dayOfWeekFormatter(formatter) {
+    return this._dayOfWeekFormatter;
+  }
+
+  setDayOfMonthFormatter(formatter) {
+    this._dayOfMonthFormatter = formatter;
+  }
+
+  dayOfMonthFormatter() {
+    return this._dayOfMonthFormatter;
+  }
+
+  setCalendarMonthFormatter(formatter) {
+    this._calendarMonthFormatter = formatter;
+  }
+
+  calendarMonthFormatter() {
+    return this._calendarMonthFormatter;
+  }
+
+}
+
+function makeDayOfMonthFormatter(homePageSignals) {
+  let options = {
+    day: "numeric"
+  };
+  return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
 }
 
 function makeTimeFormatter(homePageSignals) {
@@ -72,6 +108,20 @@ function makeDateFormatter(homePageSignals) {
   return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
 }
 
+function makeDayOfWeekFormatter(homePageSignals) {
+  // We only want the day of the week and nothing else.
+  let options = {
+    'weekday': 'short'
+  }
+  return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
+}
+
+function makeCalendarMonthFormatter(homePageSignals) {
+  let options = {
+    month: 'long', year: 'numeric'
+  };
+  return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
+}
 
 function getTimeText(homePageSignals) {
   const formatter = homePageSignals.timeFormatter();
@@ -165,6 +215,9 @@ function updateSignals(signals, data) {
   signals.setLastUpdateTime(new Date());
   signals.setTimeFormatter(makeTimeFormatter(signals));
   signals.setDateFormatter(makeDateFormatter(signals));
+  signals.setDayOfWeekFormatter(makeDayOfWeekFormatter(signals));
+  signals.setDayOfMonthFormatter(makeDayOfMonthFormatter(signals));
+  signals.setCalendarMonthFormatter(makeCalendarMonthFormatter(signals));
 
   const theme = deviceProfile["theme"];
   if (!theme) {

@@ -11,6 +11,8 @@ import { EventCalendar } from './eventCalendar';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { Debug } from './debugPanel';
+import { For } from 'solid-js';
+import { day } from '../timing';
 
 
 function getNextEventStartTime(signals) {
@@ -38,6 +40,94 @@ function hasNextEvent(signals) {
         return false;
     }
     return true;
+}
+
+// daysOfWeek gets the days of the week in appropriate order for the locale.
+function daysOfWeek(signals) {
+    // dateFormatter is a Intl.DateTimeFormat
+    const dayOfWeekFormatter = signals.dayOfWeekFormatter();
+    const locale = signals.locale();
+    // List of locales where the week starts on Sunday
+    const sundayStartLocales = ['en-US', 'ca', 'jp', 'ph', 'za', 'au', 'eg', 'sa', 'th'];
+    // Get days of week in order.  For example in North America it starts on Sunday but in most of the rest of world it starts Monday.
+    const daysOfWeekStartingMonday = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(2024, 6, i + 1);
+        daysOfWeekStartingMonday.push({
+            text: dayOfWeekFormatter.format(date),
+            number: date.getDay(),
+        });
+    }
+    if (sundayStartLocales.includes(locale)) {
+        // Shift the days to start from Sunday
+        console.log("Shirting the days");
+        const sundayStartDaysOfWeek = daysOfWeekStartingMonday.slice(-1).concat(daysOfWeekStartingMonday.slice(0, -1));
+        return sundayStartDaysOfWeek;
+    }
+    return daysOfWeekStartingMonday;
+}
+
+function calendarDays(signals) {
+    // We are looking for 5 weeks of days.
+    // The days of the week are in locale order, e.g. in UK Monday, Tuesday, ...
+    // We want to start the calendar on the appropriate day of the week given that months obviously
+    // do not always start on a Monday.
+    // We want to use the previous and next month for the overlapping days.
+    const myDaysOfWeek = daysOfWeek(signals);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+
+    // Get the first day of the month
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+
+    // Determine the day of the week the first day of the month falls on
+    // 0 always represents Sunday.
+    // myDaysOfWeek is in locale order.
+    const startDayOfWeek = firstDayOfMonth.getDay();
+    const localeStartDayOfWeek = myDaysOfWeek.findIndex((day) => day.number === startDayOfWeek);
+
+    // Determine the number of days in the current month
+    const daysInMonth = lastDayOfMonth.getDate();
+
+    // Calculate the number of days from the previous month to display
+    const daysFromPrevMonth = (localeStartDayOfWeek - myDaysOfWeek.indexOf(myDaysOfWeek[0]) + 7) % 7;
+
+    // Calculate the number of days from the next month to display
+    const totalDays = 35; // 5 weeks * 7 days
+    const daysFromNextMonth = totalDays - (daysFromPrevMonth + daysInMonth);
+
+    const calendarDays = [];
+
+    // Add days from the previous month
+    for (let i = daysFromPrevMonth - 1; i >= 0; i--) {
+        const date = new Date(year, month, -i);
+        calendarDays.push({
+            date: date,
+            isCurrentMonth: false
+        });
+    }
+
+    // Add days from the current month
+    for (let i = 1; i <= daysInMonth; i++) {
+        const date = new Date(year, month, i);
+        calendarDays.push({
+            date: date,
+            isCurrentMonth: true
+        });
+    }
+
+    // Add days from the next month
+    for (let i = 1; i <= daysFromNextMonth; i++) {
+        const date = new Date(year, month + 1, i);
+        calendarDays.push({
+            date: date,
+            isCurrentMonth: false
+        });
+    }
+
+    return calendarDays;
 }
 
 export function HomePlanner(props) {
@@ -98,20 +188,16 @@ export function HomePlanner(props) {
         </div>
         <div id="planner">
             <div class="planner-header">
-                <h2 class="planner-current-month">October 2023</h2>
+                <h2 class="planner-current-month">{signals.calendarMonthFormatter().format(new Date())}</h2>
             </div>
             <div class="planner-grid">
                 { /* Note days of week are locale dependent.*/ }
-                <div class="planner-dow">Mon</div>
-                <div class="planner-dow">Tue</div>
-                <div class="planner-dow">Wed</div>
-                <div class="planner-dow">Thu</div>
-                <div class="planner-dow">Fri</div>
-                <div class="planner-dow">Sat</div>
-                <div class="planner-dow">Sun</div>
-                {Array.from({ length: 31 }, (_, i) => (
-                    <div class="planner-date-cell">{i + 1}</div>
-                ))}
+                <For each={daysOfWeek(signals)}>{(day) => (
+                    <div class="planner-dow">{day.text}</div>
+                )}</For>
+                <For each={calendarDays(signals)}>{(calendarDay) => (
+                    <div class="planner-date-cell">{signals.dayOfMonthFormatter().format(calendarDay.date)}</div>
+                )}</For>
             </div>
         </div>
     </div>
