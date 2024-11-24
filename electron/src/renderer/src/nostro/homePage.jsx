@@ -147,15 +147,6 @@ function updateCalendarSignals(signals, data, spooky) {
 }
 
 function updateSignals(signals, data) {
-  const features = deviceProfile["features"];
-  if (!features) {
-    return;
-  }
-  const spooky = features["spooky"];
-  signals.setSpooky(spooky);
-
-  updateCalendarSignals(signals, data, spooky)
-
   let deviceProfileWrapper = data["device_profile"];
   if (!deviceProfileWrapper) {
     return;
@@ -175,7 +166,6 @@ function updateSignals(signals, data) {
   signals.setTimeFormatter(makeTimeFormatter(signals));
   signals.setDateFormatter(makeDateFormatter(signals));
 
-
   const theme = deviceProfile["theme"];
   if (!theme) {
     return;
@@ -188,6 +178,17 @@ function updateSignals(signals, data) {
   if (foregroundColor) {
     signals.setForegroundColor(foregroundColor);
   }
+
+  const features = deviceProfile["features"];
+  if (!features) {
+    return;
+  }
+  const spooky = features["spooky"];
+  signals.setSpooky(spooky);
+
+  signals.setLayout(theme["layout_type"]);
+
+  updateCalendarSignals(signals, data, spooky)
 }
 
 function getTimeZone(signals) {

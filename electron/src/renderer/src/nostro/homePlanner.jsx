@@ -96,5 +96,23 @@ export function HomePlanner(props) {
                 </div>
             </div>
         </div>
+        <div id="planner">
+            <div class="planner-header">
+                <h2 class="planner-current-month">October 2023</h2>
+            </div>
+            <div class="planner-grid">
+                { /* Note days of week are locale dependent.*/ }
+                <div class="planner-dow">Mon</div>
+                <div class="planner-dow">Tue</div>
+                <div class="planner-dow">Wed</div>
+                <div class="planner-dow">Thu</div>
+                <div class="planner-dow">Fri</div>
+                <div class="planner-dow">Sat</div>
+                <div class="planner-dow">Sun</div>
+                {Array.from({ length: 31 }, (_, i) => (
+                    <div class="planner-date-cell">{i + 1}</div>
+                ))}
+            </div>
+        </div>
     </div>
 }

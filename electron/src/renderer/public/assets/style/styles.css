@@ -471,111 +471,26 @@ div.status-note {
     flex-basis: 25px;
 }
 
-
-@media (min-width: 800px) {
-    div.home-time {
-        font-size: 104pt;
-    }
-
-    div.home-date {
-        font-size: 38pt;
-    }
-
-    div.current-weather {
-        font-size: 20pt
-    }
-
-    body {
-        font-size: 18pt;
-    }
-
-    button.forecast-control-button {
-        font-size: 18pt
-    }
-
-    button.action-button {
-        font-size: 20pt
-    }
-
-    div.setup-title {
-        font-size: 24pt;
-    }
-
-    div.astro {
-        font-size: 18pt;
-    }
-
-    div.weather-data {
-        font-size: 34pt;
-    }
-
-    div.current-weather-icon {
-        font-size: 30pt;
-    }
-
-    div.forecast-weather-icon {
-        font-size: 34pt;
-    }
-
-    div.calendar-day-date {
-        font-size: 22pt;
-    }
-
-    div.fortune-message {
-        font-size: 16pt;
-    }
+div.planner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
-@media (min-width: 1000px) {
-    div.home-time {
-        font-size: 122pt;
-    }
+div.planner-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
 
-    div.home-date {
-        font-size: 40pt;
-    }
+div.planner-dow {
+    font-weight: bold;
+    text-align: center;
+}
 
-    div.current-weather {
-        font-size: 22pt
-    }
-
-    body {
-        font-size: 22pt;
-    }
-
-    button.forecast-control-button {
-        font-size: 20pt
-    }
-
-    button.action-button {
-        font-size: 22pt
-    }
-
-    div.setup-title {
-        font-size: 28pt;
-    }
-
-    div.astro {
-        font-size: 20pt;
-    }
-
-    div.weather-data {
-        font-size: 36pt;
-    }
-
-    div.current-weather-icon {
-        font-size: 32pt;
-    }
-
-    div.forecast-weather-icon {
-        font-size: 36pt;
-    }
-
-    div.calendar-day-date {
-        font-size: 24pt;
-    }
-
-    div.fortune-message {
-        font-size: 18pt;
-    }
+div.planner-date-cell {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
 }
