@@ -12,7 +12,7 @@ import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { Debug } from './debugPanel';
 import { For } from 'solid-js';
-import { day } from '../timing';
+import { CalendarEvent, makeCanonicalDateText } from '../calendarEvent';
 
 
 function getNextEventStartTime(signals) {
@@ -21,6 +21,23 @@ function getNextEventStartTime(signals) {
         return "";
     }
     return nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
+}
+
+function getTimeZone(signals) {
+    let tz = signals.timeZone();
+    if (tz) {
+        return tz;
+    }
+    return "Europe/London";
+}
+
+
+function getLocale(signals) {
+    const locale = signals.locale();
+    if (!locale) {
+        return "en-GB";
+    }
+    return locale;
 }
 
 function getNextEventShortText(signals) {
@@ -59,12 +76,41 @@ function daysOfWeek(signals) {
         });
     }
     if (sundayStartLocales.includes(locale)) {
-        // Shift the days to start from Sunday
-        console.log("Shirting the days");
         const sundayStartDaysOfWeek = daysOfWeekStartingMonday.slice(-1).concat(daysOfWeekStartingMonday.slice(0, -1));
         return sundayStartDaysOfWeek;
     }
     return daysOfWeekStartingMonday;
+}
+
+function eventDays(signals) {
+    const myCalendarDays = calendarDays(signals);
+    const rawEvents = signals.googleCalendarEvents();
+    const dayMap = new Map();
+    for (let i = 0; i < myCalendarDays.length; i++) {
+        const myCalendarDay = myCalendarDays[i];
+        const canonicalDate = makeCanonicalDateText(myCalendarDay.date, signals.timeZone());
+        dayMap.set(canonicalDate, myCalendarDay);
+    }
+    for (let i = 0; i < rawEvents.length; i++) {
+        const rawEvent = rawEvents[i];
+        const calendarEvent = new CalendarEvent(rawEvent);
+        const day = dayMap.get(calendarEvent.canonicalStartDateText(signals.timeZone()));
+        if (!day) {
+            continue;
+        }
+        if (!day.events) {
+            day.events = [];
+        }
+        day.events.push(calendarEvent);
+        
+    }
+    for (let i = 0; i < myCalendarDays.length; i++) {
+        const myCalendarDay = myCalendarDays[i];
+        if (myCalendarDay.events === undefined) {
+            myCalendarDay.events = [];
+        }
+    }
+    return myCalendarDays;
 }
 
 function calendarDays(signals) {
@@ -105,16 +151,19 @@ function calendarDays(signals) {
         const date = new Date(year, month, -i);
         calendarDays.push({
             date: date,
-            isCurrentMonth: false
+            isCurrentMonth: false,
+            isToday: false,
         });
     }
 
     // Add days from the current month
     for (let i = 1; i <= daysInMonth; i++) {
         const date = new Date(year, month, i);
+        const isToday = date.year === now.year && date.month === now.month && date.day === now.day;
         calendarDays.push({
             date: date,
-            isCurrentMonth: true
+            isCurrentMonth: true,
+            isToday: isToday,
         });
     }
 
@@ -123,11 +172,46 @@ function calendarDays(signals) {
         const date = new Date(year, month + 1, i);
         calendarDays.push({
             date: date,
-            isCurrentMonth: false
+            isCurrentMonth: false,
+            isToday: false,
         });
     }
 
     return calendarDays;
+}
+
+function PlannerEvent(props) {
+    const event = props.event;
+    const signals = props.signals;
+    const locale = getLocale(signals);
+    const timeZone = getTimeZone(signals);
+    return <>
+        <Show when={event.isAllDay()}>
+            <div class="planner-event-short-text planner-event-all-day">{event.eventShortText()}</div>
+        </Show>
+        <Show when={!event.isAllDay()}>
+            <div class="planner-event-time">{event.formatStartTime(locale, timeZone)} - {event.formatEndTime(locale, timeZone)}</div>
+            <div class="planner-event-short-text">{event.eventShortText()}</div>
+        </Show>
+    </>
+}
+
+function PlannerDateCell(props) {
+    const day = props.day;
+    const signals = props.signals;
+    return <div class="planner-date-cell">
+        <div class="flex-column">
+            <Show when={day.events.length > 0}>
+                <div>{signals.dayOfMonthFormatter().format(day.date)}: <span class="planner-event-count">{day.events.length}</span></div>
+            </Show>
+            <Show when={day.events.length === 0}>
+                <div>{signals.dayOfMonthFormatter().format(day.date)}</div>
+            </Show>
+            <For each={day.events}>{(event) => (
+                <PlannerEvent event={event} signals={signals} />
+            )}</For>
+        </div>
+    </div>
 }
 
 export function HomePlanner(props) {
@@ -191,12 +275,12 @@ export function HomePlanner(props) {
                 <h2 class="planner-current-month">{signals.calendarMonthFormatter().format(new Date())}</h2>
             </div>
             <div class="planner-grid">
-                { /* Note days of week are locale dependent.*/ }
+                { /* Note days of week are locale dependent.*/}
                 <For each={daysOfWeek(signals)}>{(day) => (
                     <div class="planner-dow">{day.text}</div>
                 )}</For>
-                <For each={calendarDays(signals)}>{(calendarDay) => (
-                    <div class="planner-date-cell">{signals.dayOfMonthFormatter().format(calendarDay.date)}</div>
+                <For each={eventDays(signals)}>{(calendarDay) => (
+                    <PlannerDateCell day={calendarDay} signals={signals} />
                 )}</For>
             </div>
         </div>

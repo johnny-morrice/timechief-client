@@ -123,7 +123,6 @@ export class CalendarEvent {
             return this._startTime;
         }
         this._startTime = new Date(this.data.start * 1000);
-        this._startTime.getFullYear();
         return this._startTime;
     }
 

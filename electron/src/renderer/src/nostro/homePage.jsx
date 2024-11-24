@@ -181,11 +181,10 @@ function updateCalendarSignals(signals, data, spooky) {
   if (!googleCalendarEvents) {
     return;
   }
-  signals.setGoogleCalendarEvents[googleCalendarEvents];
+  signals.setGoogleCalendarEvents(googleCalendarEvents);
 
-  // setFakeEvent(signals);
   const nextEvent = findNextEvent(googleCalendarEvents);
-  signals.setNextEventBuffer(nextEvent, timezone);
+  signals.setNextEventBuffer(nextEvent, signals.timeZone());
   handleEventChange(signals);
 
   if (nextEvent) {

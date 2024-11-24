@@ -21,6 +21,23 @@ function getNextEventStartTime(signals) {
     return nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
 }
 
+function getTimeZone(signals) {
+    let tz = signals.timeZone();
+    if (tz) {
+        return tz;
+    }
+    return "Europe/London";
+}
+
+
+function getLocale(signals) {
+    const locale = signals.locale();
+    if (!locale) {
+        return "en-GB";
+    }
+    return locale;
+}
+
 function getNextEventShortText(signals) {
     const nextEvent = signals.nextEvent();
     if (!nextEvent) {
