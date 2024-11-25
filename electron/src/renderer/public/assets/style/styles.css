@@ -503,8 +503,16 @@ div.planner-date-cell {
     line-height: 1;
 }
 
-span.planner-event-count {
+div.planner-event-count {
     font-weight: bold;
     background-color: green;
     color: black;
+}
+
+div.planner-day-date {
+    font-weight: bold;
+}
+
+div.planner-event-time {
+    font-weight: bold;
 }

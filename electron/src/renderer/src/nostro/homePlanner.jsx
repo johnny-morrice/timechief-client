@@ -11,9 +11,16 @@ import { EventCalendar } from './eventCalendar';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { Debug } from './debugPanel';
-import { For } from 'solid-js';
+import { For, Show, createSignal } from 'solid-js';
 import { CalendarEvent, makeCanonicalDateText } from '../calendarEvent';
+import { Loading } from './loading';
 
+class PlannerSignals {
+    constructor() {
+        [this.isDayView, this.setIsDayView] = createSignal(false);
+        [this.selectedDay, this.setSelectedDay] = createSignal(null);
+    }
+}
 
 function getNextEventStartTime(signals) {
     const nextEvent = signals.nextEvent();
@@ -102,7 +109,7 @@ function eventDays(signals) {
             day.events = [];
         }
         day.events.push(calendarEvent);
-        
+
     }
     for (let i = 0; i < myCalendarDays.length; i++) {
         const myCalendarDay = myCalendarDays[i];
@@ -187,6 +194,7 @@ function PlannerEvent(props) {
     const timeZone = getTimeZone(signals);
     return <>
         <Show when={event.isAllDay()}>
+            <div class="planner-event-time">All day</div>
             <div class="planner-event-short-text planner-event-all-day">{event.eventShortText()}</div>
         </Show>
         <Show when={!event.isAllDay()}>
@@ -196,17 +204,24 @@ function PlannerEvent(props) {
     </>
 }
 
-function PlannerDateCell(props) {
+function DayView(props) {
     const day = props.day;
+    if (day === null) {
+        return <Loading />;
+    }
     const signals = props.signals;
-    return <div class="planner-date-cell">
-        <div class="flex-column">
-            <Show when={day.events.length > 0}>
-                <div>{signals.dayOfMonthFormatter().format(day.date)}: <span class="planner-event-count">{day.events.length}</span></div>
-            </Show>
-            <Show when={day.events.length === 0}>
-                <div>{signals.dayOfMonthFormatter().format(day.date)}</div>
-            </Show>
+    const plannerSignals = props.plannerSignals;
+
+    function onClickBack(e) {
+        plannerSignals.setIsDayView(false);
+        plannerSignals.setSelectedDay(null);
+    }
+
+    return <div class="planner-day-view flex-column">
+        <div class="planner-day-view-header">
+            <div class="planner-day-date">{signals.dateFormatter().format(day.date)} <button class="action-button" onClick={onClickBack}><i class="fa-solid fa-backward"></i></button></div>
+        </div>
+        <div class="planner-day-events flex-column border">
             <For each={day.events}>{(event) => (
                 <PlannerEvent event={event} signals={signals} />
             )}</For>
@@ -214,7 +229,30 @@ function PlannerDateCell(props) {
     </div>
 }
 
+function PlannerDateCell(props) {
+    const day = props.day;
+    const signals = props.signals;
+    const plannerSignals = props.plannerSignals;
+    function onClickCell(e) {
+        if (day.events.length === 0) {
+            return;
+        }
+
+        plannerSignals.setSelectedDay(day);
+        plannerSignals.setIsDayView(true);
+    }
+    return <div class="planner-date-cell" onClick={onClickCell}>
+        <div class="flex-column">
+            <div>{signals.dayOfMonthFormatter().format(day.date)}</div>
+            <Show when={day.events.length > 0}>
+                <div class="planner-event-count">{day.events.length} events</div>
+            </Show>
+        </div>
+    </div>
+}
+
 export function HomePlanner(props) {
+    const plannerSignals = new PlannerSignals();
     const signals = props.signals;
     const switcherWidgets = [
         { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
@@ -271,18 +309,23 @@ export function HomePlanner(props) {
             </div>
         </div>
         <div id="planner">
-            <div class="planner-header">
-                <h2 class="planner-current-month">{signals.calendarMonthFormatter().format(new Date())}</h2>
-            </div>
-            <div class="planner-grid">
-                { /* Note days of week are locale dependent.*/}
-                <For each={daysOfWeek(signals)}>{(day) => (
-                    <div class="planner-dow">{day.text}</div>
-                )}</For>
-                <For each={eventDays(signals)}>{(calendarDay) => (
-                    <PlannerDateCell day={calendarDay} signals={signals} />
-                )}</For>
-            </div>
+            <Show when={!plannerSignals.isDayView()}>
+                <div class="planner-header">
+                    <h2 class="planner-current-month">{signals.calendarMonthFormatter().format(new Date())}</h2>
+                </div>
+                <div class="planner-grid">
+                    { /* Note days of week are locale dependent.*/}
+                    <For each={daysOfWeek(signals)}>{(day) => (
+                        <div class="planner-dow">{day.text}</div>
+                    )}</For>
+                    <For each={eventDays(signals)}>{(calendarDay) => (
+                        <PlannerDateCell day={calendarDay} signals={signals} plannerSignals={plannerSignals} />
+                    )}</For>
+                </div>
+            </Show>
+            <Show when={plannerSignals.isDayView()}>
+                <DayView day={plannerSignals.selectedDay()} signals={signals} plannerSignals={plannerSignals} />
+            </Show>
         </div>
     </div>
 }
