@@ -19,6 +19,7 @@ class PlannerSignals {
     constructor() {
         [this.isDayView, this.setIsDayView] = createSignal(false);
         [this.selectedDay, this.setSelectedDay] = createSignal(null);
+        [this.monthDelta, this.setMonthDelta] = createSignal(0);
     }
 }
 
@@ -89,8 +90,8 @@ function daysOfWeek(signals) {
     return daysOfWeekStartingMonday;
 }
 
-function eventDays(signals) {
-    const myCalendarDays = calendarDays(signals);
+function eventDays(signals, plannerSignals) {
+    const myCalendarDays = calendarDays(signals, plannerSignals);
     const rawEvents = signals.googleCalendarEvents();
     const dayMap = new Map();
     for (let i = 0; i < myCalendarDays.length; i++) {
@@ -120,16 +121,16 @@ function eventDays(signals) {
     return myCalendarDays;
 }
 
-function calendarDays(signals) {
+function calendarDays(signals, plannerSignals) {
     // We are looking for 5 weeks of days.
     // The days of the week are in locale order, e.g. in UK Monday, Tuesday, ...
     // We want to start the calendar on the appropriate day of the week given that months obviously
     // do not always start on a Monday.
     // We want to use the previous and next month for the overlapping days.
     const myDaysOfWeek = daysOfWeek(signals);
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
+    const currentMonth = getDateAtMonth(plannerSignals);
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
 
     // Get the first day of the month
     const firstDayOfMonth = new Date(year, month, 1);
@@ -163,6 +164,7 @@ function calendarDays(signals) {
         });
     }
 
+    const now = new Date();
     // Add days from the current month
     for (let i = 1; i <= daysInMonth; i++) {
         const date = new Date(year, month, i);
@@ -185,6 +187,13 @@ function calendarDays(signals) {
     }
 
     return calendarDays;
+}
+
+function getDateAtMonth(plannerSignals) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + plannerSignals.monthDelta();
+    return new Date(year, month, 1);
 }
 
 function PlannerEvent(props) {
@@ -273,6 +282,14 @@ export function HomePlanner(props) {
         )
     }
 
+    const onClickNextMonth = (e) => {
+        plannerSignals.setMonthDelta(plannerSignals.monthDelta() + 1);
+    }
+
+    const onClickPrevMonth = (e) => {
+        plannerSignals.setMonthDelta(plannerSignals.monthDelta() - 1);
+    }
+
     return <div class="home-screen flex-row">
         <div class="home-lhs-column flex-column flex-grow">
             <SwitcherWidget widgets={switcherWidgets} />
@@ -311,14 +328,20 @@ export function HomePlanner(props) {
         <div id="planner">
             <Show when={!plannerSignals.isDayView()}>
                 <div class="planner-header">
-                    <h2 class="planner-current-month">{signals.calendarMonthFormatter().format(new Date())}</h2>
+                    <h2 class="planner-current-month">
+                        <button class="action-button" onClick={onClickPrevMonth}><i class="fa-solid fa-backward"></i></button>
+                        &nbsp;
+                        {signals.calendarMonthFormatter().format(getDateAtMonth(plannerSignals))}
+                        &nbsp;
+                        <button class="action-button" onClick={onClickNextMonth}><i class="fa-solid fa-forward"></i></button>
+                    </h2>
                 </div>
                 <div class="planner-grid">
                     { /* Note days of week are locale dependent.*/}
                     <For each={daysOfWeek(signals)}>{(day) => (
                         <div class="planner-dow">{day.text}</div>
                     )}</For>
-                    <For each={eventDays(signals)}>{(calendarDay) => (
+                    <For each={eventDays(signals, plannerSignals)}>{(calendarDay) => (
                         <PlannerDateCell day={calendarDay} signals={signals} plannerSignals={plannerSignals} />
                     )}</For>
                 </div>
