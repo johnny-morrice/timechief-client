@@ -137,5 +137,18 @@ function getDefaultThemeCSS() {
         
     div#theme-detection-canary {
         color: rgb(255, 0, 0);
+    }
+    
+    div.planner-date-cell {
+        border: 1px solid green;
+        font-size: 12pt;
+        width: 70px;
+        height: 50px;
+        border-color: green;
+    }
+
+    div.planner-event-count {
+        background-color: green;
+        color: black;
     }`;
 }

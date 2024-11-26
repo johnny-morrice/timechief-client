@@ -1,24 +1,14 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup, Show } from 'solid-js';
 import { addServiceDataCallback } from './ipc';
 import { second } from '../timing';
 import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
 import { removeDataCallback } from './ipc';
-import { CurrentWeather } from './currentWeather';
-import { StatusNote } from './statusNote';
-import { SwitcherWidget } from './switcherWidget';
-import { DeviceControl } from './deviceControl';
-import { Astro } from './astro';
-import { Fortune } from './fortune';
-import { DeviceInfo } from './deviceInfo';
-import { Locale } from './locale';
 import { callbackName } from "./callback";
-import { Forecast } from './forecast';
-import { EventCalendar } from './eventCalendar';
 import { fadeTransition } from './fadeTransition';
-import { SSHSecurity } from './sshSecurity';
-import { APISecurity } from './apiSecurity';
 import { manageMascotCanvas, scoreEmote } from './mascot';
-import { Debug } from './debugPanel';
+import { HomeSevenInch } from './homeSevenInch';
+import { Loading } from './loading';
+import { HomePlanner } from './homePlanner';
 
 class Signals {
   constructor() {
@@ -35,8 +25,14 @@ class Signals {
     [this.foregroundColor, this.setForegroundColor] = createSignal("green");
     [this.emote, this.setEmote] = createSignal("neutral");
     [this.isSpooky, this.setSpooky] = createSignal(false);
+    [this.layout, this.setLayout] = createSignal("seven_inch");
+    [this.googleCalendarEvents, this.setGoogleCalendarEvents] = createSignal([]);
     this.setTimeFormatter(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
     this.setDateFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
+    this.setDayOfWeekFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
+    this.setDayOfMonthFormatter(new Intl.DateTimeFormat("en-GB", { day: 'numeric' }));
+    // Show the month and year in the calendar.
+    this.setCalendarMonthFormatter(new Intl.DateTimeFormat("en-GB", { month: 'long', year: 'numeric' }));
   }
 
   timeFormatter() {
@@ -54,6 +50,38 @@ class Signals {
   setDateFormatter(formatter) {
     this._dateFormatter = formatter;
   }
+
+  setDayOfWeekFormatter(formatter) {
+    this._dayOfWeekFormatter = formatter;
+  }
+
+  dayOfWeekFormatter(formatter) {
+    return this._dayOfWeekFormatter;
+  }
+
+  setDayOfMonthFormatter(formatter) {
+    this._dayOfMonthFormatter = formatter;
+  }
+
+  dayOfMonthFormatter() {
+    return this._dayOfMonthFormatter;
+  }
+
+  setCalendarMonthFormatter(formatter) {
+    this._calendarMonthFormatter = formatter;
+  }
+
+  calendarMonthFormatter() {
+    return this._calendarMonthFormatter;
+  }
+
+}
+
+function makeDayOfMonthFormatter(homePageSignals) {
+  let options = {
+    day: "numeric"
+  };
+  return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
 }
 
 function makeTimeFormatter(homePageSignals) {
@@ -80,6 +108,20 @@ function makeDateFormatter(homePageSignals) {
   return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
 }
 
+function makeDayOfWeekFormatter(homePageSignals) {
+  // We only want the day of the week and nothing else.
+  let options = {
+    'weekday': 'short'
+  }
+  return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
+}
+
+function makeCalendarMonthFormatter(homePageSignals) {
+  let options = {
+    month: 'long', year: 'numeric'
+  };
+  return new Intl.DateTimeFormat(getLocale(homePageSignals), options);
+}
 
 function getTimeText(homePageSignals) {
   const formatter = homePageSignals.timeFormatter();
@@ -126,19 +168,34 @@ function handleEventChange(signals) {
   }
 }
 
+function updateCalendarSignals(signals, data, spooky) {
+  let googleCalendarWrapper = data["google_calendar"];
+  if (!googleCalendarWrapper) {
+    return;
+  }
+  let googleCalendar = googleCalendarWrapper["value"];
+  if (!googleCalendar) {
+    return;
+  }
+  let googleCalendarEvents = googleCalendar["events"];
+  if (!googleCalendarEvents) {
+    return;
+  }
+  signals.setGoogleCalendarEvents(googleCalendarEvents);
+
+  const nextEvent = findNextEvent(googleCalendarEvents);
+  signals.setNextEventBuffer(nextEvent, signals.timeZone());
+  handleEventChange(signals);
+
+  if (nextEvent) {
+    const emote = scoreEmote(nextEvent.eventShortText(), spooky);
+    signals.setEmote(emote);
+  } else {
+    signals.setEmote("neutral");
+  }
+}
+
 function updateSignals(signals, data) {
-  let calendarWrapper = data["google_calendar"];
-  if (!calendarWrapper) {
-    return;
-  }
-  let calendar = calendarWrapper["value"];
-  if (!calendar) {
-    return;
-  }
-  let calendarEvents = calendar["events"];
-  if (!calendarEvents) {
-    return;
-  }
   let deviceProfileWrapper = data["device_profile"];
   if (!deviceProfileWrapper) {
     return;
@@ -157,10 +214,9 @@ function updateSignals(signals, data) {
   signals.setLastUpdateTime(new Date());
   signals.setTimeFormatter(makeTimeFormatter(signals));
   signals.setDateFormatter(makeDateFormatter(signals));
-  // setFakeEvent(signals);
-  const nextEvent = findNextEvent(calendarEvents);
-  signals.setNextEventBuffer(nextEvent, timezone);
-  handleEventChange(signals);
+  signals.setDayOfWeekFormatter(makeDayOfWeekFormatter(signals));
+  signals.setDayOfMonthFormatter(makeDayOfMonthFormatter(signals));
+  signals.setCalendarMonthFormatter(makeCalendarMonthFormatter(signals));
 
   const theme = deviceProfile["theme"];
   if (!theme) {
@@ -174,63 +230,17 @@ function updateSignals(signals, data) {
   if (foregroundColor) {
     signals.setForegroundColor(foregroundColor);
   }
+
   const features = deviceProfile["features"];
   if (!features) {
     return;
   }
   const spooky = features["spooky"];
   signals.setSpooky(spooky);
-  if (nextEvent) {
-    const emote = scoreEmote(nextEvent.eventShortText(), spooky);
-    signals.setEmote(emote);
-  } else {
-    signals.setEmote("neutral");
-  }
-}
 
-// setFakeEvent is a useful test utility
-function setFakeEvent(signals) {
-  const bufEvent = signals.nextEventBuffer();
-  const isCreated = bufEvent !== null;
-  if (Math.random() < 0.1) {
-    if (isCreated) {
-      if (Math.random() < 0.2) {
-        signals.setNextEventBuffer(null);
-      } else if (Math.random() < 0.5) {
-        // Start time is now + 3 hours in unix time.
-        const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60) + (Math.random() * 1000 * 60 * 60);
-        const event = new CalendarEvent({
-          "short_text": "Fake event 🤡🤡🤡🤡🤡🤡🤡🤡",
-          "start": startTime,
-          "end": 0,
-          "all_day": true,
-        });
-        signals.setNextEventBuffer(event);
-      } else {
-        // Start time is now + 3 hours in unix time.
-        const startTime = Math.floor(Date.now() / 1000) + (3 * 60 * 60);
-        const shortRandomText = Math.random().toString(36).substring(2, 15);
-        const event = new CalendarEvent({
-          "short_text": "Fake event 🤡🤡🤡" + shortRandomText,
-          "start": startTime,
-          "end": 0,
-          "all_day": true,
-        });
-        signals.setNextEventBuffer(event);
-      }
-    }
-  } else {
-    // Start time is now + 3 hours in unix time.
-    const startTime = Math.floor(Date.now() / 1000) + 3 * 60 * 60;
-    const event = new CalendarEvent({
-      "short_text": "Fake event",
-      "start": startTime,
-      "end": 0,
-      "all_day": true,
-    });
-    signals.setNextEventBuffer(event);
-  }
-  return;
+  signals.setLayout(theme["layout_type"]);
+
+  updateCalendarSignals(signals, data, spooky)
 }
 
 function getTimeZone(signals) {
@@ -264,29 +274,25 @@ function getLocale(signals) {
   return locale;
 }
 
-function getNextEventStartTime(signals) {
-  const nextEvent = signals.nextEvent();
-  if (!nextEvent) {
-    return "";
-  }
-  return nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
+function isSevenInchLayout(signals) {
+  return signals.layout() === "seven_inch";
 }
 
-function getNextEventShortText(signals) {
-  const nextEvent = signals.nextEvent();
-  if (!nextEvent) {
-    return "";
-  }
-  return nextEvent.eventShortText();
+function isPlannerLayout(signals) {
+  return signals.layout() === "planner";
 }
 
-function hasNextEvent(signals) {
-  const nextEvent = signals.nextEvent();
-  if (!nextEvent) {
-    return false;
-  }
-  if (!nextEvent.eventShortText()) {
-    return false;
+function isUnknownLayout(signals) {
+  const knownLayouts = [
+    "seven_inch",
+    "planner"
+  ];
+  const myLayout = signals.layout();
+  for (let index = 0; index < knownLayouts.length; index++) {
+    const supported = knownLayouts[index];
+    if (supported === myLayout) {
+      return false;
+    }
   }
   return true;
 }
@@ -332,59 +338,16 @@ export const HomePage = () => {
     removeDataCallback(cbName);
   });
 
-  const switcherWidgets = [
-    { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
-    { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl /> },
-    { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo /> },
-    { icon: () => <i class="fa-brands fa-linux"></i>, element: () => <SSHSecurity /> },
-    { icon: () => <i class="fa-solid fa-house-laptop"></i>, element: () => <APISecurity /> },
-    { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
-    { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
-    { icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },
-    { icon: () => <i class="fa-solid fa-calendar-days"></i>, element: () => <EventCalendar /> },
-  ];
-
-  const useDebug = false;
-  if (useDebug) {
-    switcherWidgets.push(
-      { icon: () => <i class="fa-solid fa-fire"></i>, element: () => <Debug /> },
-    )
-  }
-
-  return <div class="home-screen flex-row">
-    <div class="home-lhs-column flex-column flex-grow">
-      <SwitcherWidget widgets={switcherWidgets} />
-    </div>
-    <div class='home-rhs-column flex-column flex-grow'>
-      <div id="date-time" class="home-time-wrapper flex-grow">
-        <div class="home-time">{signals.myTime}</div>
-        <div class="home-date">{signals.myDate}</div>
-      </div>
-
-      <div id="action-center" class="home-action-center flex-grow border crt-box home-box">
-        <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
-        <StatusNote />
-          <Show when={hasNextEvent(signals)}>
-            <div class='next-event-wrapper'>
-              <div class='next-event-summary flex-column flex-grow'>
-                <div class='next-event-time flex-row'>
-                  <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
-                  <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
-                </div>
-                <div class='next-event-shorttext'>
-                  {getNextEventShortText(signals)}
-                </div>
-              </div>
-              <div class="event-mascot-wrapper">
-                <canvas id="event-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
-              </div>
-            </div>
-          </Show>
-          <Show when={!hasNextEvent(signals)}>
-            <Fortune />
-          </Show>
-        </div>
-      </div>
-    </div>
-  </div>
+  return <>
+    <Show when={isUnknownLayout(signals)}>
+      <div class="system-error">Unknown layout: {signals.layout}</div>
+      <Loading />
+    </Show>
+    <Show when={isSevenInchLayout(signals)}>
+      <HomeSevenInch signals={signals} />
+    </Show>
+    <Show when={isPlannerLayout(signals)}>
+      <HomePlanner signals={signals} />
+    </Show>
+  </>
 };
