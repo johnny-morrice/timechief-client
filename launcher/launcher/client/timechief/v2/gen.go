@@ -372,6 +372,9 @@ type Theme struct {
 	MainFont                           string   `json:"main_font"`
 	NextEventTextFontSize              string   `json:"next_event_text_font_size"`
 	NextEventTimeFontSize              string   `json:"next_event_time_font_size"`
+	PlannerDateCellFontSize            string   `json:"planner_date_cell_font_size"`
+	PlannerDateCellHeight              string   `json:"planner_date_cell_height"`
+	PlannerDateCellWidth               string   `json:"planner_date_cell_width"`
 	PlannerHeight                      string   `json:"planner_height"`
 	PlannerWidth                       string   `json:"planner_width"`
 	PlannerX                           string   `json:"planner_x"`
