@@ -1693,7 +1693,9 @@ components:
         - next_event_time_font_size
         - next_event_text_font_size
         - loading_grid_font_size
-
+        - planner_date_cell_font_size
+        - planner_date_cell_width
+        - planner_date_cell_height
       properties:
         uuid:
           type: string
@@ -1808,6 +1810,12 @@ components:
         next_event_text_font_size:
           type: string
         loading_grid_font_size:
+          type: string
+        planner_date_cell_font_size:
+          type: string
+        planner_date_cell_width:
+          type: string
+        planner_date_cell_height:
           type: string
 
     OWMDataDatum:
