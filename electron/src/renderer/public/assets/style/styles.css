@@ -490,23 +490,14 @@ div.planner-dow {
 }
 
 div.planner-date-cell {
-    border: 1px solid #ccc;
     padding: 10px;
-    /* TODO make font-size configurable */
-    font-size: 12pt;
-    /* TODO make size configurable */
-    width: 70px;
-    height: 50px;
     overflow: hidden;
     text-overflow: ellipsis;
-    border-color: green;
     line-height: 1;
 }
 
 div.planner-event-count {
     font-weight: bold;
-    background-color: green;
-    color: black;
 }
 
 div.planner-day-date {
