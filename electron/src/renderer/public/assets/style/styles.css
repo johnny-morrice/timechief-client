@@ -490,6 +490,7 @@ div.planner-dow {
 }
 
 div.planner-date-cell {
+    border-style: solid;
     padding: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
