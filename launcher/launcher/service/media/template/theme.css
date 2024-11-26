@@ -166,3 +166,20 @@ div#planner {
     height: {{.PlannerHeight}} !important;
     overflow: hidden !important;
 }
+
+div.planner-date-cell {
+    border-radius: {{.BoxBorderRadius}};
+    border-width: {{.BoxBorderWidth}};
+    border-color: {{.BoxBorderColor}};
+    color: {{.ForegroundColor}};
+    /* TODO make font-size configurable */
+    font-size: {{.PlannerDateCellFontSize}}
+    /* TODO make size configurable */
+    width: {{.PlannerDateCellWidth}};
+    height: {{.PlannerDateCellHeight}};
+}
+
+div.planner-event-count {
+    background-color: {{.ForegroundColor}};
+    color: {{.BoxBackgroundColor}};
+}
