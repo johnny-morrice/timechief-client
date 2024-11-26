@@ -172,9 +172,7 @@ div.planner-date-cell {
     border-width: {{.BoxBorderWidth}};
     border-color: {{.BoxBorderColor}};
     color: {{.ForegroundColor}};
-    /* TODO make font-size configurable */
     font-size: {{.PlannerDateCellFontSize}}
-    /* TODO make size configurable */
     width: {{.PlannerDateCellWidth}};
     height: {{.PlannerDateCellHeight}};
 }
