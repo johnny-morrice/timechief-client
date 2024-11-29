@@ -508,3 +508,7 @@ div.planner-day-date {
 div.planner-event-time {
     font-weight: bold;
 }
+
+span.planner-event-summary-time {
+    font-weight: bold;
+}

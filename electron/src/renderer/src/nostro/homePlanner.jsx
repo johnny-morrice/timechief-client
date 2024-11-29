@@ -20,6 +20,7 @@ class PlannerSignals {
         [this.isDayView, this.setIsDayView] = createSignal(false);
         [this.selectedDay, this.setSelectedDay] = createSignal(null);
         [this.monthDelta, this.setMonthDelta] = createSignal(0);
+        [this.plannerDayEventCount, this.setPlannerDayEventCount] = createSignal(0);
     }
 }
 
@@ -213,6 +214,31 @@ function PlannerEvent(props) {
     </>
 }
 
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) {
+        return text;
+    }
+    return text.substring(0, maxLength - 3) + "...";
+}
+
+function PlannerEventSummary(props) {
+    const event = props.event;
+    const signals = props.signals;
+    const locale = getLocale(signals);
+    const timeZone = getTimeZone(signals);
+    const textLength = 9;
+    return <div class="planner-event-summary">
+        <Show when={event.isAllDay()}>
+            <span class="planner-event-summary-time">All day: </span>
+            <span class="planner-event-summary-short-text planner-event-summary-all-day">{truncateText(event.eventShortText(), textLength)}</span>
+        </Show>
+        <Show when={!event.isAllDay()}>
+            <span class="planner-event-summary-time">{event.formatStartTime(locale, timeZone)} - {event.formatEndTime(locale, timeZone)}</span>
+            <span class="planner-event-summary-short-text">{truncateText(event.eventShortText(), textLength)}</span>
+        </Show>
+    </div>
+}
+
 function DayView(props) {
     const day = props.day;
     if (day === null) {
@@ -250,11 +276,39 @@ function PlannerDateCell(props) {
         plannerSignals.setSelectedDay(day);
         plannerSignals.setIsDayView(true);
     }
+    function isShowSummary(day, myPlannerSignals) {
+        return day.events.length > 0 && myPlannerSignals.plannerDayEventCount() === 0;
+    }
+    function isShowEvents(day, myPlannerSignals) {
+        return day.events.length > 0 && myPlannerSignals.plannerDayEventCount() > 0;
+    }
+    function isShowRemainingEvents(day, myPlannerSignals) {
+        return isShowEvents(day, myPlannerSignals) && day.events.length > myPlannerSignals.plannerDayEventCount();
+    }
+    function getShownEvents(day, myPlannerSignals) {
+        let eventCount = myPlannerSignals.plannerDayEventCount();
+        if (day.events.length <= eventCount) {
+            return day.events;
+        }
+        return day.events.slice(0, eventCount);
+    }
+
     return <div class="planner-date-cell" onClick={onClickCell}>
         <div class="flex-column">
             <div>{signals.dayOfMonthFormatter().format(day.date)}</div>
-            <Show when={day.events.length > 0}>
+            <Show when={isShowSummary(day, plannerSignals)}>
                 <div class="planner-event-count">{day.events.length} events</div>
+            </Show>
+            <Show when={isShowEvents(day, plannerSignals)}>
+                <div class="planner-event-summary flex-column">
+                    <For each={getShownEvents(day, plannerSignals)}>{(event) => (
+                        <PlannerEventSummary event={event} />
+                    )}
+                    </For>
+                </div>
+            </Show>
+            <Show when={isShowRemainingEvents(day, plannerSignals)}>
+                <div class="planner-event-count">+{day.events.length - plannerSignals.plannerDayEventCount()} more</div>
             </Show>
         </div>
     </div>
