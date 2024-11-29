@@ -1,9 +1,7 @@
 import { CurrentWeather } from './currentWeather';
-import { StatusNote } from './statusNote';
 import { SwitcherWidget } from './switcherWidget';
 import { DeviceControl } from './deviceControl';
 import { Astro } from './astro';
-import { Fortune } from './fortune';
 import { DeviceInfo } from './deviceInfo';
 import { Locale } from './locale';
 import { Forecast } from './forecast';
@@ -11,51 +9,7 @@ import { EventCalendar } from './eventCalendar';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { Debug } from './debugPanel';
-
-
-function getNextEventStartTime(signals) {
-    const nextEvent = signals.nextEvent();
-    if (!nextEvent) {
-        return "";
-    }
-    return nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
-}
-
-function getTimeZone(signals) {
-    let tz = signals.timeZone();
-    if (tz) {
-        return tz;
-    }
-    return "Europe/London";
-}
-
-
-function getLocale(signals) {
-    const locale = signals.locale();
-    if (!locale) {
-        return "en-GB";
-    }
-    return locale;
-}
-
-function getNextEventShortText(signals) {
-    const nextEvent = signals.nextEvent();
-    if (!nextEvent) {
-        return "";
-    }
-    return nextEvent.eventShortText();
-}
-
-function hasNextEvent(signals) {
-    const nextEvent = signals.nextEvent();
-    if (!nextEvent) {
-        return false;
-    }
-    if (!nextEvent.eventShortText()) {
-        return false;
-    }
-    return true;
-}
+import { ActionCenter } from './actionCenter';
 
 export function HomeSevenInch(props) {
     const signals = props.signals;
@@ -88,30 +42,7 @@ export function HomeSevenInch(props) {
                 <div class="home-date">{signals.myDate}</div>
             </div>
 
-            <div id="action-center" class="home-action-center flex-grow border crt-box home-box">
-                <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
-                    <StatusNote />
-                    <Show when={hasNextEvent(signals)}>
-                        <div class='next-event-wrapper'>
-                            <div class='next-event-summary flex-column flex-grow'>
-                                <div class='next-event-time flex-row'>
-                                    <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
-                                    <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
-                                </div>
-                                <div class='next-event-shorttext'>
-                                    {getNextEventShortText(signals)}
-                                </div>
-                            </div>
-                            <div class="event-mascot-wrapper">
-                                <canvas id="event-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
-                            </div>
-                        </div>
-                    </Show>
-                    <Show when={!hasNextEvent(signals)}>
-                        <Fortune />
-                    </Show>
-                </div>
-            </div>
+           <ActionCenter signals={signals} />
         </div>
     </div>
 }

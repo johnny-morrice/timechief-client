@@ -1,9 +1,7 @@
 import { CurrentWeather } from './currentWeather';
-import { StatusNote } from './statusNote';
 import { SwitcherWidget } from './switcherWidget';
 import { DeviceControl } from './deviceControl';
 import { Astro } from './astro';
-import { Fortune } from './fortune';
 import { DeviceInfo } from './deviceInfo';
 import { Locale } from './locale';
 import { Forecast } from './forecast';
@@ -16,6 +14,7 @@ import { CalendarEvent, makeCanonicalDateText } from '../calendarEvent';
 import { Loading } from './loading';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from './callback';
+import { ActionCenter } from './actionCenter';
 
 
 class PlannerSignals {
@@ -25,14 +24,6 @@ class PlannerSignals {
         [this.monthDelta, this.setMonthDelta] = createSignal(0);
         [this.plannerDayEventCount, this.setPlannerDayEventCount] = createSignal(0);
     }
-}
-
-function getNextEventStartTime(signals) {
-    const nextEvent = signals.nextEvent();
-    if (!nextEvent) {
-        return "";
-    }
-    return nextEvent.formatStartTime(getLocale(signals), getTimeZone(signals));
 }
 
 function getTimeZone(signals) {
@@ -50,25 +41,6 @@ function getLocale(signals) {
         return "en-GB";
     }
     return locale;
-}
-
-function getNextEventShortText(signals) {
-    const nextEvent = signals.nextEvent();
-    if (!nextEvent) {
-        return "";
-    }
-    return nextEvent.eventShortText();
-}
-
-function hasNextEvent(signals) {
-    const nextEvent = signals.nextEvent();
-    if (!nextEvent) {
-        return false;
-    }
-    if (!nextEvent.eventShortText()) {
-        return false;
-    }
-    return true;
 }
 
 // daysOfWeek gets the days of the week in appropriate order for the locale.
@@ -297,7 +269,6 @@ function PlannerDateCell(props) {
     }
 
     return <div class="planner-date-cell" onClick={onClickCell}>
-        <div class="flex-column">
             <div>{signals.dayOfMonthFormatter().format(day.date)}</div>
             <div class="planner-date-cell-events flex-column">
                 <Show when={isShowSummary(day, plannerSignals)}>
@@ -315,7 +286,6 @@ function PlannerDateCell(props) {
                     <div class="planner-event-count">+{day.events.length - plannerSignals.plannerDayEventCount()} more</div>
                 </Show>
             </div>
-        </div>
     </div>
 }
 
@@ -384,30 +354,7 @@ export function HomePlanner(props) {
                 <div class="home-date">{signals.myDate}</div>
             </div>
 
-            <div id="action-center" class="home-action-center flex-grow border crt-box home-box">
-                <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
-                    <StatusNote />
-                    <Show when={hasNextEvent(signals)}>
-                        <div class='next-event-wrapper'>
-                            <div class='next-event-summary flex-column flex-grow'>
-                                <div class='next-event-time flex-row'>
-                                    <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
-                                    <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
-                                </div>
-                                <div class='next-event-shorttext'>
-                                    {getNextEventShortText(signals)}
-                                </div>
-                            </div>
-                            <div class="event-mascot-wrapper">
-                                <canvas id="event-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
-                            </div>
-                        </div>
-                    </Show>
-                    <Show when={!hasNextEvent(signals)}>
-                        <Fortune />
-                    </Show>
-                </div>
-            </div>
+            <ActionCenter signals={signals} />
         </div>
         <div id="planner">
             <Show when={!plannerSignals.isDayView()}>

@@ -371,6 +371,7 @@ div.fortune-message {
     flex-direction: row;
     gap: 0.5em;
     justify-content: flex-end;
+    flex-grow: inherit;
 }
 
 div.fortune-message-mascot-wrapper {
@@ -495,6 +496,9 @@ div.planner-date-cell {
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 div.planner-event-count {
@@ -508,7 +512,6 @@ div.planner-day-date {
 div.planner-event-time {
     font-weight: bold;
 }
-
 span.planner-event-summary-time {
     font-weight: bold;
 }
