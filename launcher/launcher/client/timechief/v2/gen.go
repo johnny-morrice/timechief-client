@@ -375,6 +375,7 @@ type Theme struct {
 	PlannerDateCellFontSize            string   `json:"planner_date_cell_font_size"`
 	PlannerDateCellHeight              string   `json:"planner_date_cell_height"`
 	PlannerDateCellWidth               string   `json:"planner_date_cell_width"`
+	PlannerDayEventCount               int      `json:"planner_day_event_count"`
 	PlannerHeight                      string   `json:"planner_height"`
 	PlannerWidth                       string   `json:"planner_width"`
 	PlannerX                           string   `json:"planner_x"`
