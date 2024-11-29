@@ -1696,6 +1696,7 @@ components:
         - planner_date_cell_font_size
         - planner_date_cell_width
         - planner_date_cell_height
+        - planner_day_event_count
       properties:
         uuid:
           type: string
@@ -1817,6 +1818,8 @@ components:
           type: string
         planner_date_cell_height:
           type: string
+        planner_day_event_count:
+          type: integer
 
     OWMDataDatum:
       type: object
