@@ -11,9 +11,12 @@ import { EventCalendar } from './eventCalendar';
 import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { Debug } from './debugPanel';
-import { For, Show, createSignal } from 'solid-js';
+import { For, Show, createSignal, onCleanup } from 'solid-js';
 import { CalendarEvent, makeCanonicalDateText } from '../calendarEvent';
 import { Loading } from './loading';
+import { addServiceDataCallback, removeDataCallback } from './ipc';
+import { callbackName } from './callback';
+
 
 class PlannerSignals {
     constructor() {
@@ -296,27 +299,54 @@ function PlannerDateCell(props) {
     return <div class="planner-date-cell" onClick={onClickCell}>
         <div class="flex-column">
             <div>{signals.dayOfMonthFormatter().format(day.date)}</div>
-            <Show when={isShowSummary(day, plannerSignals)}>
-                <div class="planner-event-count">{day.events.length} events</div>
-            </Show>
-            <Show when={isShowEvents(day, plannerSignals)}>
-                <div class="planner-event-summary flex-column">
-                    <For each={getShownEvents(day, plannerSignals)}>{(event) => (
-                        <PlannerEventSummary event={event} />
-                    )}
-                    </For>
-                </div>
-            </Show>
-            <Show when={isShowRemainingEvents(day, plannerSignals)}>
-                <div class="planner-event-count">+{day.events.length - plannerSignals.plannerDayEventCount()} more</div>
-            </Show>
+            <div class="planner-date-cell-events flex-column">
+                <Show when={isShowSummary(day, plannerSignals)}>
+                    <div class="planner-event-count">{day.events.length} events</div>
+                </Show>
+                <Show when={isShowEvents(day, plannerSignals)}>
+                    <div class="planner-event-summary flex-column">
+                        <For each={getShownEvents(day, plannerSignals)}>{(event) => (
+                            <PlannerEventSummary signals={signals} plannerSignals={plannerSignals} event={event} />
+                        )}
+                        </For>
+                    </div>
+                </Show>
+                <Show when={isShowRemainingEvents(day, plannerSignals)}>
+                    <div class="planner-event-count">+{day.events.length - plannerSignals.plannerDayEventCount()} more</div>
+                </Show>
+            </div>
         </div>
     </div>
+}
+
+function updateSignals(plannerSignals, data) {
+    const deviceProfileWrapper = data["device_profile"];
+    if (!deviceProfileWrapper) {
+        return;
+    }
+
+    const deviceProfile = deviceProfileWrapper["value"];
+    if (!deviceProfile) {
+        return;
+    }
+
+    const theme = deviceProfile["theme"];
+    if (!theme) {
+        return;
+    }
+
+    const plannerDayEventCount = theme["planner_day_event_count"];
+    plannerSignals.setPlannerDayEventCount(plannerDayEventCount);
 }
 
 export function HomePlanner(props) {
     const plannerSignals = new PlannerSignals();
     const signals = props.signals;
+
+    const cbName = callbackName("HomePlanner");
+    addServiceDataCallback(cbName, (data) => updateSignals(plannerSignals, data));
+    onCleanup(() => removeDataCallback(cbName));
+
     const switcherWidgets = [
         { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
         { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl /> },

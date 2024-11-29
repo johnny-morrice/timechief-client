@@ -141,10 +141,13 @@ function getDefaultThemeCSS() {
     
     div.planner-date-cell {
         border: 1px solid green;
-        font-size: 12pt;
         width: 70px;
         height: 50px;
         border-color: green;
+    }
+
+    div.planner-date-cell-events {
+        font-size: 12pt;
     }
 
     div.planner-event-count {
