@@ -172,9 +172,12 @@ div.planner-date-cell {
     border-width: {{.BoxBorderWidth}};
     border-color: {{.BoxBorderColor}};
     color: {{.ForegroundColor}};
-    font-size: {{.PlannerDateCellFontSize}};
     width: {{.PlannerDateCellWidth}} !important;
     height: {{.PlannerDateCellHeight}} !important;
+}
+
+div.planner-date-cell-events {
+    font-size: {{.PlannerDateCellFontSize}};
 }
 
 div.planner-event-count {
