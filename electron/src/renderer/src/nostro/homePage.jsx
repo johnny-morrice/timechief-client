@@ -28,6 +28,7 @@ class Signals {
     [this.isSpooky, this.setSpooky] = createSignal(false);
     [this.layout, this.setLayout] = createSignal("seven_inch");
     [this.googleCalendarEvents, this.setGoogleCalendarEvents] = createSignal([]);
+    [this.mascotHeight, this.setMascotHeight] = createSignal("100px");
     this.setTimeFormatter(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
     this.setDateFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
     this.setDayOfWeekFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
@@ -241,6 +242,8 @@ function updateSignals(signals, data) {
 
   signals.setLayout(theme["layout_type"]);
 
+  signals.setMascotHeight(theme["event_mascot_height"]);
+
   updateCalendarSignals(signals, data, spooky)
 }
 
@@ -304,8 +307,7 @@ function isUnknownLayout(signals) {
 }
 
 var globalSignals = new Signals();
-const mascotHeight = 100;
-manageMascotCanvas("event-canvas", function () { return globalSignals.emote() }, mascotHeight);
+manageMascotCanvas("event-canvas", function () { return globalSignals.emote() }, function globalSignals() { return globalSignals.mascotHeight() });
 
 export const HomePage = () => {
   console.log("home page render");

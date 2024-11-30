@@ -25,7 +25,7 @@ export function HomeSmall(props) {
         </div>
         <div class='home-rhs-column flex-column flex-grow'>
             <div id="date-time" class="home-time-wrapper flex-grow">
-                <div class="home-time">{signals.myTime}</div>
+                <div class="home-time home-time-small">{signals.myTime}</div>
                 <div class="home-date">{signals.myDate}</div>
             </div>
 
