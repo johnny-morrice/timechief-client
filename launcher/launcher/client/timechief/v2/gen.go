@@ -359,11 +359,13 @@ type Theme struct {
 	DisplayHeight                      int      `json:"display_height"`
 	DisplayWidth                       int      `json:"display_width"`
 	EventCalendarControlButtonFontSize string   `json:"event_calendar_control_button_font_size"`
+	EventMascotHeight                  string   `json:"event_mascot_height"`
 	ForecastControlButtonFontSize      string   `json:"forecast_control_button_font_size"`
 	ForecastControlLabelFontSize       string   `json:"forecast_control_label_font_size"`
 	ForecastIconFontSize               string   `json:"forecast_icon_font_size"`
 	ForecastWeatherTableIconFontSize   string   `json:"forecast_weather_table_icon_font_size"`
 	ForegroundColor                    string   `json:"foreground_color"`
+	FortuneMascotHeight                string   `json:"fortune_mascot_height"`
 	FortuneMessageFontSize             string   `json:"fortune_message_font_size"`
 	ImageFit                           string   `json:"image_fit"`
 	ImageUuids                         []string `json:"image_uuids"`
