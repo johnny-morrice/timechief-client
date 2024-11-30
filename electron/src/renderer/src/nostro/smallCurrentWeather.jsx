@@ -78,8 +78,7 @@ export const SmallCurrentWeather = () => {
             <Loading />
         </Show>
         <Show when={hasWeather(signals)}>
-            <div class="current-weather-location">{signals.location}</div>
-            <div class="current-weather-grid flex-grow">
+            <div class="flex-column">
                 <div class='weather-temp weather-data'>{signals.temp}</div>
                 <div class='weather-condition-current-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></div>
             </div>

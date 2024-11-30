@@ -1,5 +1,3 @@
-import { callbackName } from "./callback";
-
 function onClickSetup() {
     console.log("setup clicked")
     sendSetupBegin();
@@ -12,7 +10,6 @@ function onClickLogout() {
 
 export const SmallSetupControl = () => {
     console.log("DeviceControl render");
-    const cbName = callbackName("SmallSetupControl")
 
     return <div class="device-control flex-grow">
         <div class="flex-column flex-grow">

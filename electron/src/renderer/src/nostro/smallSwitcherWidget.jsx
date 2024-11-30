@@ -49,17 +49,17 @@ export const SmallSwitcherWidget = (props) => {
     const [switcherWidgetTransition, setSwitcherWidgetTransition] = createSignal("no-transition");
     const [currentIndex, setCurrentIndex] = createSignal(0);
 
-    return <div id="switcher-widget" class="switcher-widget flex-row flex-grow border crt-box home-box">
+    return <div id="switcher-widget" class="switcher-widget flex-row flex-grow crt-box home-box">
         <Show when={hasWidget(widgets)}>
             <div id="switcher-widget-content" className={switcherWidgetTransition()}>
                 {getCurrentWidget(widgets, currentIndex).element()}
             </div>
             <div class="switcher-widget-button-wrapper flex-coloumn flex-grow">
                 <div class="switcher-widget-button switcher-widget-next-button">
-                    <button class="action-button crt-box switcher-button" onClick={onClickNext(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>{getNextWidget(widgets, currentIndex).icon()}&nbsp;&nbsp;<i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="action-button crt-box switcher-button" onClick={onClickNext(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-up"></i></button>
                 </div>
                 <div class="switcher-widget-button switcher-widget-prev-button">
-                    <button class="action-button crt-box switcher-button" onClick={onClickPrev(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-left"></i>&nbsp;&nbsp;{getPrevWidget(widgets, currentIndex).icon()}</button>
+                    <button class="action-button crt-box switcher-button" onClick={onClickPrev(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-down"></i></button>
                 </div>
             </div>
         </Show>

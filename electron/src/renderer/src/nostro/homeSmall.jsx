@@ -2,6 +2,7 @@ import { SmallCurrentWeather } from "./smallCurrentWeather";
 import { SmallDeviceControl } from "./smallDeviceControl";
 import { SmallSwitcherWidget } from "./smallSwitcherWidget";
 import { SmallActionCenter } from "./smallActionCenter";
+import { SmallSetupControl } from "./smallSetupControl";
 
 export function HomeSmall(props) {
     const signals = props.signals;
@@ -18,8 +19,8 @@ export function HomeSmall(props) {
         )
     }
 
-    return <div class="home-screen flex-row">
-        <div class="home-lhs-column flex-column flex-grow">
+    return <div class="home-screen">
+        <div class="home-lhs-column flex-grow">
             <SmallSwitcherWidget widgets={switcherWidgets} />
         </div>
         <div class='home-rhs-column flex-column flex-grow'>
@@ -28,7 +29,7 @@ export function HomeSmall(props) {
                 <div class="home-date">{signals.myDate}</div>
             </div>
 
-           <SmallActionCenter signals={signals} />
+            <SmallActionCenter signals={signals} />
         </div>
     </div>
 }
