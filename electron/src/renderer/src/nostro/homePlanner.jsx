@@ -15,6 +15,7 @@ import { Loading } from './loading';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from './callback';
 import { ActionCenter } from './actionCenter';
+import { fadeTransition } from './fadeTransition';
 
 
 class PlannerSignals {
@@ -23,6 +24,7 @@ class PlannerSignals {
         [this.selectedDay, this.setSelectedDay] = createSignal(null);
         [this.monthDelta, this.setMonthDelta] = createSignal(0);
         [this.plannerDayEventCount, this.setPlannerDayEventCount] = createSignal(0);
+        [this.plannerTransition, this.setPlannerTransition] = createSignal("no-transition");
     }
 }
 
@@ -223,8 +225,10 @@ function DayView(props) {
     const plannerSignals = props.plannerSignals;
 
     function onClickBack(e) {
-        plannerSignals.setIsDayView(false);
-        plannerSignals.setSelectedDay(null);
+        fadeTransition(plannerSignals.setPlannerTransition, () => {
+            plannerSignals.setIsDayView(false);
+            plannerSignals.setSelectedDay(null);
+        });
     }
 
     return <div class="planner-day-view flex-column">
@@ -248,8 +252,10 @@ function PlannerDateCell(props) {
             return;
         }
 
-        plannerSignals.setSelectedDay(day);
-        plannerSignals.setIsDayView(true);
+        fadeTransition(plannerSignals.setPlannerTransition, () => {
+            plannerSignals.setSelectedDay(day);
+            plannerSignals.setIsDayView(true);
+        });
     }
     function isShowSummary(day, myPlannerSignals) {
         return day.events.length > 0 && myPlannerSignals.plannerDayEventCount() === 0;
@@ -337,11 +343,15 @@ export function HomePlanner(props) {
     }
 
     const onClickNextMonth = (e) => {
-        plannerSignals.setMonthDelta(plannerSignals.monthDelta() + 1);
+        fadeTransition(plannerSignals.setPlannerTransition, () => {
+            plannerSignals.setMonthDelta(plannerSignals.monthDelta() + 1);
+        });
     }
 
     const onClickPrevMonth = (e) => {
-        plannerSignals.setMonthDelta(plannerSignals.monthDelta() - 1);
+        fadeTransition(plannerSignals.setPlannerTransition, () => {
+            plannerSignals.setMonthDelta(plannerSignals.monthDelta() - 1);
+        });
     }
 
     return <div class="home-screen flex-row">
@@ -356,7 +366,7 @@ export function HomePlanner(props) {
 
             <ActionCenter signals={signals} />
         </div>
-        <div id="planner">
+        <div id="planner" class={plannerSignals.plannerTransition()}>
             <Show when={!plannerSignals.isDayView()}>
                 <div class="planner-header">
                     <h2 class="planner-current-month">

@@ -1,5 +1,3 @@
-import { onCleanup } from "solid-js";
-
 export const fadeTransition = (onTransition, doChange) => {
     onTransition("fade-out");
     const timerA = setTimeout(() => {

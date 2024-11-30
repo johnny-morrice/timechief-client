@@ -9,6 +9,7 @@ import { manageMascotCanvas, scoreEmote } from './mascot';
 import { HomeSevenInch } from './homeSevenInch';
 import { Loading } from './loading';
 import { HomePlanner } from './homePlanner';
+import { HomeSmall } from './homeSmall';
 
 class Signals {
   constructor() {
@@ -282,10 +283,15 @@ function isPlannerLayout(signals) {
   return signals.layout() === "planner";
 }
 
+function isSmallLayout(signals) {
+  return signals.layout() === "small";
+}
+
 function isUnknownLayout(signals) {
   const knownLayouts = [
     "seven_inch",
-    "planner"
+    "planner",
+    "small"
   ];
   const myLayout = signals.layout();
   for (let index = 0; index < knownLayouts.length; index++) {
@@ -348,6 +354,9 @@ export const HomePage = () => {
     </Show>
     <Show when={isPlannerLayout(signals)}>
       <HomePlanner signals={signals} />
+    </Show>
+    <Show when={isSmallLayout(signals)}>
+      <HomeSmall signals={signals} />
     </Show>
   </>
 };
