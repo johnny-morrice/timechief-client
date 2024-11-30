@@ -1697,6 +1697,8 @@ components:
         - planner_date_cell_width
         - planner_date_cell_height
         - planner_day_event_count
+        - fortune_mascot_height
+        - event_mascot_height
       properties:
         uuid:
           type: string
@@ -1820,6 +1822,11 @@ components:
           type: string
         planner_day_event_count:
           type: integer
+        fortune_mascot_height:
+          type: string
+        event_mascot_height:
+          type: string
+        
 
     OWMDataDatum:
       type: object
