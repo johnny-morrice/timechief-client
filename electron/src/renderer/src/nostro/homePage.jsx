@@ -9,6 +9,7 @@ import { manageMascotCanvas, scoreEmote } from './mascot';
 import { HomeSevenInch } from './homeSevenInch';
 import { Loading } from './loading';
 import { HomePlanner } from './homePlanner';
+import { HomeSmall } from './homeSmall';
 
 class Signals {
   constructor() {
@@ -27,6 +28,7 @@ class Signals {
     [this.isSpooky, this.setSpooky] = createSignal(false);
     [this.layout, this.setLayout] = createSignal("seven_inch");
     [this.googleCalendarEvents, this.setGoogleCalendarEvents] = createSignal([]);
+    [this.mascotHeight, this.setMascotHeight] = createSignal("100px");
     this.setTimeFormatter(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
     this.setDateFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
     this.setDayOfWeekFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
@@ -240,6 +242,8 @@ function updateSignals(signals, data) {
 
   signals.setLayout(theme["layout_type"]);
 
+  signals.setMascotHeight(theme["event_mascot_height"]);
+
   updateCalendarSignals(signals, data, spooky)
 }
 
@@ -282,10 +286,15 @@ function isPlannerLayout(signals) {
   return signals.layout() === "planner";
 }
 
+function isSmallLayout(signals) {
+  return signals.layout() === "small";
+}
+
 function isUnknownLayout(signals) {
   const knownLayouts = [
     "seven_inch",
-    "planner"
+    "planner",
+    "small"
   ];
   const myLayout = signals.layout();
   for (let index = 0; index < knownLayouts.length; index++) {
@@ -298,8 +307,7 @@ function isUnknownLayout(signals) {
 }
 
 var globalSignals = new Signals();
-const mascotHeight = 100;
-manageMascotCanvas("event-canvas", function () { return globalSignals.emote() }, mascotHeight);
+manageMascotCanvas("event-canvas", function () { return globalSignals.emote() }, function globalSignals() { return globalSignals.mascotHeight() });
 
 export const HomePage = () => {
   console.log("home page render");
@@ -348,6 +356,9 @@ export const HomePage = () => {
     </Show>
     <Show when={isPlannerLayout(signals)}>
       <HomePlanner signals={signals} />
+    </Show>
+    <Show when={isSmallLayout(signals)}>
+      <HomeSmall signals={signals} />
     </Show>
   </>
 };

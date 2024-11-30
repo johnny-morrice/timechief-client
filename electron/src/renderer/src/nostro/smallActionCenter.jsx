@@ -46,9 +46,9 @@ function getLocale(signals) {
     return locale;
 }
 
-export function ActionCenter(props) {
+export function SmallActionCenter(props) {
     const signals = props.signals;
-    return <div id="action-center" class="home-action-center flex-grow border crt-box home-box">
+    return <div id="action-center" class="home-action-center flex-grow crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
             <StatusNote />
             <Show when={hasNextEvent(signals)}>
@@ -63,7 +63,7 @@ export function ActionCenter(props) {
                         </div>
                     </div>
                     <div class="event-mascot-wrapper">
-                        <canvas id="event-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
+                        <canvas id="event-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
                     </div>
                 </div>
             </Show>

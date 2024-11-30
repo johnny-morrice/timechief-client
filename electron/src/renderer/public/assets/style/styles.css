@@ -121,6 +121,10 @@ div.home-time {
     font-size: 98pt;
 }
 
+div.home-time-small {
+    align-self: flex-end;
+}
+
 div.home-action-center {
     flex-basis: 40%;
 }

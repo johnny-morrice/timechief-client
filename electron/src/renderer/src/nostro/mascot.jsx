@@ -2,7 +2,7 @@ import * as fabric from 'fabric'
 import { isEcoMode } from './ipc';
 import { ecoRefreshInterval } from "../timing";
 
-export function manageMascotCanvas(canvasId, emoteSignal, height) {
+export function manageMascotCanvas(canvasId, emoteSignal, heightSignal) {
     var canvas = null;
     var lastManaged = new Date();
     setInterval(() => {
@@ -20,13 +20,21 @@ export function manageMascotCanvas(canvasId, emoteSignal, height) {
                 return;
             }
         }
-        mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height);
+        mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightSignal);
         lastManaged = new Date();
     }, 1000);
 }
 
+// heightText in format "123px"
+function parseHeight(heightText) {
+    const height = parseInt(heightText.replace("px", ""));
+    if (isNaN(height)) {
+        throw new Error(`invalid height: ${heightText}`);
+    }
+    return height;
+}
 
-function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height) {
+function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightSignal) {
     const canvasRef = document.getElementById(canvasId);
     if (!canvasRef) {
         return;
@@ -37,6 +45,9 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height)
     if (!foregroundColor || !boxBackgroundColor || !emote) {
         return;
     }
+
+    const heightText = heightSignal();
+    const height = parseHeight(heightText);
 
     var canvas = getCanvas();
     const initialised = canvasRef.getAttribute("data-initialised");
@@ -61,7 +72,8 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height)
     const renderedForeground = canvasRef.getAttribute("data-foreground-color");
     const renderedBackground = canvasRef.getAttribute("data-background-color");
     const renderedEmote = canvasRef.getAttribute("data-emote");
-    if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor && emote === renderedEmote) {
+    const renderedHeight = canvasRef.getAttribute("data-height");
+    if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor && emote === renderedEmote && renderedHeight === height) {
         // console.log("skipping canvas update");
         return;
     }
@@ -112,6 +124,7 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, height)
         canvasRef.setAttribute("data-foreground-color", foregroundColor);
         canvasRef.setAttribute("data-background-color", boxBackgroundColor);
         canvasRef.setAttribute("data-emote", emote);
+        canvasRef.setAttribute("data-height", heightText);
     }).catch((err) => {
         console.error("error adding canvas: ", err);
     });

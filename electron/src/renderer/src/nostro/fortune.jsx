@@ -12,12 +12,12 @@ class Signals {
         [this.text, this.setText] = textTransitionSignal("Hey there, I'm hands!");
         [this.emote, this.setEmote] = createSignal("neutral");
         [this.isSpooky, this.setSpooky] = createSignal(false);
+        [this.mascotHeight, this.setMascotHeight] = createSignal("120px");
     }
 }
 
 var globalSignals = new Signals();
-const mascotHeight = 120;
-manageMascotCanvas("fortune-canvas", function () { return globalSignals.emote() }, mascotHeight);
+manageMascotCanvas("fortune-canvas", () => globalSignals.emote(), () => globalSignals.mascotHeight() );
 
 function updateSignals(signals, data) {
     const deviceProfileWrapper = data["device_profile"];
@@ -40,10 +40,13 @@ function updateSignals(signals, data) {
     if (foregroundColor) {
         signals.setForegroundColor(foregroundColor);
     }
+
+    signals.setMascotHeight(theme["event_mascot_height"]);
     const features = deviceProfile["features"];
     if (!features) {
         return;
     }
+
     const spooky = features["spooky"];
     signals.setSpooky(spooky);
 }
@@ -80,7 +83,7 @@ export const Fortune = () => {
     return <div class="fortune-message">
         <div class="fortune-message-text">{signals.text()}</div>
         <div class="fortune-message-mascot-wrapper">
-            <canvas id="fortune-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
+            <canvas id="fortune-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
         </div>
     </div>;
 }
