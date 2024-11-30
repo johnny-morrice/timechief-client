@@ -49,9 +49,9 @@ export const SmallSwitcherWidget = (props) => {
     const [switcherWidgetTransition, setSwitcherWidgetTransition] = createSignal("no-transition");
     const [currentIndex, setCurrentIndex] = createSignal(0);
 
-    return <div id="switcher-widget" class="switcher-widget flex-row flex-grow crt-box home-box">
+    return <div id="switcher-widget" class="switcher-widget switcher-widget-small flex-row crt-box home-box">
         <Show when={hasWidget(widgets)}>
-            <div id="switcher-widget-content" className={switcherWidgetTransition()}>
+            <div id="switcher-widget-content" class={`${switcherWidgetTransition()} switcher-widget-content-small`}>
                 {getCurrentWidget(widgets, currentIndex).element()}
             </div>
             <div class="switcher-widget-button-wrapper flex-coloumn flex-grow">

@@ -73,7 +73,7 @@ export const SmallCurrentWeather = () => {
         removeDataCallback(cbName);
     });
 
-    return <div class="current-weather flex-grow">
+    return <div class="current-weather">
         <Show when={!hasWeather(signals)}>
             <Loading />
         </Show>
