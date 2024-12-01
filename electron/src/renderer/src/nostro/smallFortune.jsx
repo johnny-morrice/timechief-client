@@ -12,6 +12,7 @@ class Signals {
         [this.text, this.setText] = textTransitionSignal("Hey there, I'm hands!");
         [this.emote, this.setEmote] = createSignal("neutral");
         [this.isSpooky, this.setSpooky] = createSignal(false);
+        [this.mascotHeight, this.setMascotHeight] = createSignal("120px");
     }
 }
 
