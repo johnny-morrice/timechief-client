@@ -1699,6 +1699,7 @@ components:
         - planner_day_event_count
         - fortune_mascot_height
         - event_mascot_height
+        - status_note_font_size
       properties:
         uuid:
           type: string
@@ -1825,6 +1826,8 @@ components:
         fortune_mascot_height:
           type: string
         event_mascot_height:
+          type: string
+        status_note_font_size:
           type: string
         
 
