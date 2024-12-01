@@ -73,7 +73,7 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightS
     const renderedBackground = canvasRef.getAttribute("data-background-color");
     const renderedEmote = canvasRef.getAttribute("data-emote");
     const renderedHeight = canvasRef.getAttribute("data-height");
-    if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor && emote === renderedEmote && renderedHeight === height) {
+    if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor && emote === renderedEmote && renderedHeight === heightText) {
         // console.log("skipping canvas update");
         return;
     }

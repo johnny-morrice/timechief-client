@@ -186,6 +186,14 @@ div.flex-shrink {
     flex-shrink: 1;
 }
 
+div.switcher-widget-small {
+    flex-grow: inherit;
+}
+
+div.switcher-widget-content-small {
+    flex-grow: inherit;
+}
+
 div.switcher-widget-button-wrapper {
     justify-self: flex-end;
     align-items: flex-end;
