@@ -13,12 +13,22 @@ function hasNextEvent(signals) {
     return true;
 }
 
+function truncate(text, length) {
+    if (length < 3) {
+        throw new Error("truncate length must be at least 3");
+    }
+    if (text.length <= length) {
+        return text;
+    }
+    return text.substring(0, length - 3) + "...";
+}
+
 function getNextEventShortText(signals) {
     const nextEvent = signals.nextEvent();
     if (!nextEvent) {
         return "";
     }
-    return nextEvent.eventShortText();
+    return truncate(nextEvent.eventShortText(), 9);
 }
 
 function getNextEventStartTime(signals) {
@@ -50,20 +60,16 @@ export function SmallActionCenter(props) {
     const signals = props.signals;
     return <div id="action-center" class="home-action-center flex-grow crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
-            <StatusNote />
+            <SmallStatusNote />
             <Show when={hasNextEvent(signals)}>
                 <div class='next-event-wrapper'>
-                    <div class='next-event-summary flex-column flex-grow'>
+                    <div class='next-event-summary flex-row flex-grow'>
                         <div class='next-event-time flex-row'>
-                            <div class='next-event-icon'><i class="fa-solid fa-calendar-day"></i></div>
                             <div class='next-event-time'>{getNextEventStartTime(signals)}</div>
                         </div>
                         <div class='next-event-shorttext'>
                             {getNextEventShortText(signals)}
                         </div>
-                    </div>
-                    <div class="event-mascot-wrapper">
-                        <canvas id="event-canvas" class="fortune-mascot" data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
                     </div>
                 </div>
             </Show>

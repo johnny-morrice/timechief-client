@@ -153,5 +153,9 @@ function getDefaultThemeCSS() {
     div.planner-event-count {
         background-color: green;
         color: black;
+    }
+    
+    div.status-note-indicator {
+        font-size: 16pt;
     }`;
 }

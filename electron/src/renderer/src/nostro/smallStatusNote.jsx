@@ -75,10 +75,10 @@ function statusCount(signals) {
     return count;
 }
 
-export const StatusNote = () => {
-    console.log("StatusNote render");
+export const SmallStatusNote = () => {
+    console.log("SmallStatusNote render");
     const signals = new Signals();
-    const cbName = callbackName("StatusNote");
+    const cbName = callbackName("SmallStatusNote");
     addDataCallback(cbName, (data) => updateSignals(signals, data));
     const ipcCheckInterval = setInterval(() => {
         signals.setIPCTimeoutBuffer(isTimeout(signals.lastUpdateTime(), 20 * second));
@@ -89,7 +89,7 @@ export const StatusNote = () => {
     });
     const useEcoMode = true;
 
-    return <div id="status-note-content" className={`status-note flex-column ${signals.statusNoteTransition()}`}>
+    return <div id="status-note-content" class={`status-note-small flex-row ${signals.statusNoteTransition()}`}>
             <Show when={signals.isCalendarError()}>
                 <div class="status-note-indicator status-note-calendar-error-indicator">
                     <i class='fa-solid fa-calendar-xmark is-error api-error-indicator'></i>

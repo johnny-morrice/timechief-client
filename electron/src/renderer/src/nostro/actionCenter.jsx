@@ -63,7 +63,7 @@ export function ActionCenter(props) {
                         </div>
                     </div>
                     <div class="event-mascot-wrapper">
-                        <canvas id="event-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
+                        <canvas id="main-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
                     </div>
                 </div>
             </Show>

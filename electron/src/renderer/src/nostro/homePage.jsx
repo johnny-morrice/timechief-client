@@ -307,7 +307,7 @@ function isUnknownLayout(signals) {
 }
 
 var globalSignals = new Signals();
-manageMascotCanvas("event-canvas", function () { return globalSignals.emote() }, function globalSignals() { return globalSignals.mascotHeight() });
+manageMascotCanvas("main-mascot-canvas", function () { return globalSignals.emote() }, function globalSignals() { return globalSignals.mascotHeight() });
 
 export const HomePage = () => {
   console.log("home page render");
