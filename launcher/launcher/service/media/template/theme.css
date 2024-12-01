@@ -184,3 +184,7 @@ div.planner-event-count {
     background-color: {{.ForegroundColor}};
     color: {{.BoxBackgroundColor}};
 }
+
+div.status-note-indicator {
+    font-size: {{.StatusNoteFontSize}} !important;
+}
