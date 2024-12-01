@@ -382,6 +382,7 @@ type Theme struct {
 	PlannerWidth                       string   `json:"planner_width"`
 	PlannerX                           string   `json:"planner_x"`
 	PlannerY                           string   `json:"planner_y"`
+	StatusNoteFontSize                 string   `json:"status_note_font_size"`
 	SwitcherButtonFontSize             string   `json:"switcher_button_font_size"`
 	TimeColor                          string   `json:"time_color"`
 	TimeFont                           string   `json:"time_font"`
