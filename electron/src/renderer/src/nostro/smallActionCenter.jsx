@@ -1,5 +1,5 @@
-import { StatusNote } from "./statusNote";
-import { Fortune } from "./fortune";
+import { SmallStatusNote } from "./smallStatusNote";
+import { SmallFortune } from "./smallFortune";
 
 
 function hasNextEvent(signals) {
@@ -74,7 +74,7 @@ export function SmallActionCenter(props) {
                 </div>
             </Show>
             <Show when={!hasNextEvent(signals)}>
-                <Fortune />
+                <SmallFortune />
             </Show>
         </div>
     </div>;

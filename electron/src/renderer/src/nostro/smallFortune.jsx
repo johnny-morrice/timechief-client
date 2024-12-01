@@ -1,0 +1,85 @@
+import { onCleanup, createSignal } from "solid-js";
+import { textTransitionSignal } from "./textGlitch";
+import { randomPoem } from "./poem";
+import { addServiceDataCallback, removeDataCallback } from "./ipc";
+import { callbackName } from "./callback";
+import { manageMascotCanvas } from "./mascot";
+
+class Signals {
+    constructor() {
+        [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
+        [this.foregroundColor, this.setForegroundColor] = createSignal("green");
+        [this.text, this.setText] = textTransitionSignal("Hey there, I'm hands!");
+        [this.emote, this.setEmote] = createSignal("neutral");
+        [this.isSpooky, this.setSpooky] = createSignal(false);
+    }
+}
+
+var globalSignals = new Signals();
+manageMascotCanvas("fortune-canvas", () => globalSignals.emote(), () => globalSignals.mascotHeight() );
+
+function updateSignals(signals, data) {
+    const deviceProfileWrapper = data["device_profile"];
+    if (!deviceProfileWrapper) {
+        return;
+    }
+    const deviceProfile = deviceProfileWrapper["value"];
+    if (!deviceProfile) {
+        return;
+    }
+    const theme = deviceProfile["theme"];
+    if (!theme) {
+        return;
+    }
+    let boxBackgroundColor = theme["box_background_color"];
+    let foregroundColor = theme["foreground_color"];
+    if (boxBackgroundColor) {
+        signals.setBoxBackgroundColor(boxBackgroundColor);
+    }
+    if (foregroundColor) {
+        signals.setForegroundColor(foregroundColor);
+    }
+
+    signals.setMascotHeight(theme["event_mascot_height"]);
+    const features = deviceProfile["features"];
+    if (!features) {
+        return;
+    }
+
+    const spooky = features["spooky"];
+    signals.setSpooky(spooky);
+}
+
+export const SmallFortune = () => {
+    console.log("SmallFortune render");
+    const signals = new Signals();
+    globalSignals = signals;
+    const cbName = callbackName("SmallFortune");
+    addServiceDataCallback(cbName, data => updateSignals(signals, data));
+    function pickPoem() {
+        const isSpooky = signals.isSpooky();
+        const now = new Date();
+        const poem = randomPoem(now, isSpooky);
+        return poem;
+    }
+
+    let managePoem = function () {
+        const poem = pickPoem();
+        signals.setText(poem.text);
+        signals.setEmote(poem.emote);
+    }
+
+    managePoem();
+
+    const poemInterval = setInterval(() => {
+        managePoem();
+    }, 10 * 60 * 1000);
+
+    onCleanup(() => {
+        clearInterval(poemInterval);
+        removeDataCallback(cbName);
+    });
+    return <div class="fortune-message">
+        <div class="fortune-message-text">{signals.text()}</div>
+    </div>;
+}

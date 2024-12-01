@@ -4,6 +4,17 @@ import { SmallSwitcherWidget } from "./smallSwitcherWidget";
 import { SmallActionCenter } from "./smallActionCenter";
 import { SmallSetupControl } from "./smallSetupControl";
 
+function hasNextEvent(signals) {
+    const nextEvent = signals.nextEvent();
+    if (!nextEvent) {
+        return false;
+    }
+    if (!nextEvent.eventShortText()) {
+        return false;
+    }
+    return true;
+}
+
 export function HomeSmall(props) {
     const signals = props.signals;
     const switcherWidgets = [
@@ -28,6 +39,19 @@ export function HomeSmall(props) {
                 <div class="home-time home-time-small">{signals.myTime}</div>
                 <div class="home-date">{signals.myDate}</div>
             </div>
+
+            {/* When we do have an event render the main mascot, otherwise render the fortune mascot. */}
+            <Show when={hasNextEvent(signals)}>
+                <div class="event-mascot-wrapper">
+                    <canvas id="main-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
+                </div>
+            </Show>
+
+            <Show when={!hasNextEvent(signals)}>
+            <div class="fortune-message-mascot-wrapper">
+                <canvas id="fortune-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
+            </div>
+            </Show>
 
             <SmallActionCenter signals={signals} />
         </div>
