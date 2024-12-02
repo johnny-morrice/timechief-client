@@ -3,6 +3,8 @@ import { SmallDeviceControl } from "./smallDeviceControl";
 import { SmallSwitcherWidget } from "./smallSwitcherWidget";
 import { SmallActionCenter } from "./smallActionCenter";
 import { SmallSetupControl } from "./smallSetupControl";
+import { getFortuneSignals } from "./fortuneMascot";
+import { getActionCenterSignals } from "./actionCenterMascot";
 
 function hasNextEvent(signals) {
     const nextEvent = signals.nextEvent();
@@ -43,17 +45,16 @@ export function HomeSmall(props) {
             {/* When we do have an event render the main mascot, otherwise render the fortune mascot. */}
             <Show when={hasNextEvent(signals)}>
                 <div class="event-mascot-wrapper">
-                    <canvas id="main-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
+                    <canvas id="main-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={getActionCenterSignals().mascotHeight()} data-sig-fg-color={getActionCenterSignals().foregroundColor()} data-sig-bg-color={getActionCenterSignals().boxBackgroundColor()} data-sig-emote={getActionCenterSignals().emote()}></canvas>
                 </div>
             </Show>
 
             <Show when={!hasNextEvent(signals)}>
             <div class="fortune-message-mascot-wrapper">
-                <canvas id="fortune-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
+                <canvas id="fortune-canvas" class="fortune-mascot" data-sig-mascot-height={getFortuneSignals().mascotHeight()} data-sig-fg-color={getFortuneSignals().foregroundColor()} data-sig-bg-color={getFortuneSignals().boxBackgroundColor()} data-sig-emote={getFortuneSignals().emote()}></canvas>
             </div>
             </Show>
-
-            <SmallActionCenter signals={signals} />
         </div>
+        <SmallActionCenter signals={signals} />
     </div>
 }

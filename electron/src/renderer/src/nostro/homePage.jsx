@@ -5,7 +5,7 @@ import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
 import { removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { fadeTransition } from './fadeTransition';
-import { manageMascotCanvas, scoreEmote } from './mascot';
+import { scoreEmote } from './mascot';
 import { HomeSevenInch } from './homeSevenInch';
 import { Loading } from './loading';
 import { HomePlanner } from './homePlanner';
@@ -306,13 +306,9 @@ function isUnknownLayout(signals) {
   return true;
 }
 
-var globalSignals = new Signals();
-manageMascotCanvas("main-mascot-canvas", function () { return globalSignals.emote() }, function globalSignals() { return globalSignals.mascotHeight() });
-
 export const HomePage = () => {
   console.log("home page render");
   const signals = new Signals();
-  globalSignals = signals;
   const cbName = callbackName("HomePage");
   addServiceDataCallback(cbName, (data) => updateSignals(signals, data));
 

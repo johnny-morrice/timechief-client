@@ -1,6 +1,6 @@
 import { StatusNote } from "./statusNote";
 import { Fortune } from "./fortune";
-
+import { setActionCenterSignals } from "./actionCenterMascot";
 
 function hasNextEvent(signals) {
     const nextEvent = signals.nextEvent();
@@ -48,6 +48,7 @@ function getLocale(signals) {
 
 export function ActionCenter(props) {
     const signals = props.signals;
+    setActionCenterSignals(signals);
     return <div id="action-center" class="home-action-center flex-grow border crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
             <StatusNote />
@@ -63,7 +64,7 @@ export function ActionCenter(props) {
                         </div>
                     </div>
                     <div class="event-mascot-wrapper">
-                        <canvas id="main-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
+                        <canvas id="event-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
                     </div>
                 </div>
             </Show>

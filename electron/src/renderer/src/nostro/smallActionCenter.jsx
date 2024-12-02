@@ -1,5 +1,6 @@
 import { SmallStatusNote } from "./smallStatusNote";
 import { SmallFortune } from "./smallFortune";
+import { setActionCenterSignals } from "./actionCenterMascot";
 
 
 function hasNextEvent(signals) {
@@ -28,7 +29,7 @@ function getNextEventShortText(signals) {
     if (!nextEvent) {
         return "";
     }
-    return truncate(nextEvent.eventShortText(), 9);
+    return truncate(nextEvent.eventShortText(), 20);
 }
 
 function getNextEventStartTime(signals) {
@@ -58,9 +59,9 @@ function getLocale(signals) {
 
 export function SmallActionCenter(props) {
     const signals = props.signals;
+    setActionCenterSignals(signals);
     return <div id="action-center" class="home-action-center flex-grow crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
-            <SmallStatusNote />
             <Show when={hasNextEvent(signals)}>
                 <div class='next-event-wrapper'>
                     <div class='next-event-summary flex-row flex-grow'>
@@ -76,6 +77,7 @@ export function SmallActionCenter(props) {
             <Show when={!hasNextEvent(signals)}>
                 <SmallFortune />
             </Show>
+            <SmallStatusNote />
         </div>
     </div>;
 }
