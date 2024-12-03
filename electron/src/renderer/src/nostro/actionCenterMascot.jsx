@@ -34,7 +34,7 @@ export function setActionCenterSignals(signals) {
 manageMascotCanvas("event-mascot-canvas", () => getActionCenterSignals().emote(), () => getActionCenterSignals().mascotHeight());
 
 export function EventMascotCanvas() {
-    <div class="event-mascot-wrapper">
+    return <div class="event-mascot-wrapper">
         <canvas id="event-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={getActionCenterSignals().mascotHeight()} data-sig-fg-color={getActionCenterSignals().foregroundColor()} data-sig-bg-color={getActionCenterSignals().boxBackgroundColor()} data-sig-emote={getActionCenterSignals().emote()}></canvas>
     </div>
 }
