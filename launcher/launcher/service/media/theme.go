@@ -63,28 +63,39 @@ func synthwaveDemoTheme() v2.Theme {
 }
 
 func defaultTheme() v2.Theme {
-	fgColor := "#008000"
-	bgColor := "#000000"
+	fgColor := "#008000ff"
+	bgColor := "#000000ff"
+	errorColor := "#ffa500ff"
 	borderRadius := "0px"
 	timeFont := "Seven Segment"
 	mainFont := "'Titillium Web'"
 	borderWidth := "1px"
 	return v2.Theme{
-		ForegroundColor:       fgColor,
-		BackgroundColor:       bgColor,
-		BoxBackgroundColor:    bgColor,
-		ButtonBackgroundColor: bgColor,
-		BoxBorderRadius:       borderRadius,
-		BoxBorderWidth:        borderWidth,
-		BoxBorderColor:        fgColor,
+		ForegroundColor: fgColor,
+		BackgroundColor: bgColor,
+
+		BoxBackgroundColor: bgColor,
+		BoxBorderRadius:    borderRadius,
+		BoxBorderWidth:     borderWidth,
+		BoxBorderColor:     fgColor,
+
+		MainFont:  mainFont,
+		TimeFont:  timeFont,
+		TimeColor: fgColor,
+
 		ButtonBorderRadius:    borderRadius,
 		ButtonBorderWidth:     borderWidth,
 		ButtonBorderColor:     fgColor,
 		ButtonForegroundColor: fgColor,
-		TimeFont:              timeFont,
-		TimeColor:             fgColor,
-		MainFont:              mainFont,
-		ImageFit:              "none",
+		ButtonBackgroundColor: bgColor,
+
+		DisabledButtonBorderColor:     errorColor,
+		DisabledButtonForegroundColor: errorColor,
+		DisabledButtonBackgroundColor: bgColor,
+
+		ErrorColor: errorColor,
+
+		ImageFit: "none",
 
 		LayoutType:           "seven_inch",
 		DisplayWidth:         800,
@@ -126,6 +137,10 @@ func defaultTheme() v2.Theme {
 		NextEventTimeFontSize:              "18pt",
 		NextEventTextFontSize:              "16pt",
 		LoadingGridFontSize:                "16pt",
+		FortuneMascotHeight:                "120px",
+		EventMascotHeight:                  "100px",
+
+		IsDefault: true,
 	}
 }
 

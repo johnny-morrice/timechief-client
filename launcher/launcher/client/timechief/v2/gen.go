@@ -356,8 +356,12 @@ type Theme struct {
 	DateTimeWidth                      string   `json:"date_time_width"`
 	DateTimeX                          string   `json:"date_time_x"`
 	DateTimeY                          string   `json:"date_time_y"`
+	DisabledButtonBackgroundColor      string   `json:"disabled_button_background_color"`
+	DisabledButtonBorderColor          string   `json:"disabled_button_border_color"`
+	DisabledButtonForegroundColor      string   `json:"disabled_button_foreground_color"`
 	DisplayHeight                      int      `json:"display_height"`
 	DisplayWidth                       int      `json:"display_width"`
+	ErrorColor                         string   `json:"error_color"`
 	EventCalendarControlButtonFontSize string   `json:"event_calendar_control_button_font_size"`
 	EventMascotHeight                  string   `json:"event_mascot_height"`
 	ForecastControlButtonFontSize      string   `json:"forecast_control_button_font_size"`
@@ -369,6 +373,7 @@ type Theme struct {
 	FortuneMessageFontSize             string   `json:"fortune_message_font_size"`
 	ImageFit                           string   `json:"image_fit"`
 	ImageUuids                         []string `json:"image_uuids"`
+	IsDefault                          bool     `json:"is_default"`
 	LayoutType                         string   `json:"layout_type"`
 	LoadingGridFontSize                string   `json:"loading_grid_font_size"`
 	MainFont                           string   `json:"main_font"`

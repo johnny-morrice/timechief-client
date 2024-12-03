@@ -188,3 +188,13 @@ div.planner-event-count {
 div.status-note-indicator {
     font-size: {{.StatusNoteFontSize}} !important;
 }
+
+button:disabled {
+    color: {{.DisabledButtonForegroundColor}};
+    border-color: {{.DisabledButtonBorderColor}};
+    background-color: {{.DisabledButtonBackgroundColor}};
+}
+
+.is-error {
+    color: {{.ErrorColor}};
+}
