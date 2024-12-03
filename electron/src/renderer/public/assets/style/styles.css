@@ -205,15 +205,6 @@ div.switcher-widget-button-wrapper-small {
     gap: 2px;
 }
 
-/* button:disabled {
-    color: #ffa500;
-    border-color: #ffa500;
-}
-
-.is-error {
-    color: #ffa500;
-} */
-
 div.current-weather {
     font-size: 18pt;
     display: flex;
