@@ -127,7 +127,7 @@ func defaultTheme() v2.Theme {
 		WeatherDataFontSize:                "32pt",
 		CurrentWeatherIconFontSize:         "28pt",
 		ForecastIconFontSize:               "32pt",
-		ForecastTableIconFontSize:          "24pt",
+		ForecastWeatherTableIconFontSize:   "24pt",
 		ForecastControlButtonFontSize:      "16pt",
 		ForecastControlLabelFontSize:       "16pt",
 		CalendarDayDateFontSize:            "20pt",
