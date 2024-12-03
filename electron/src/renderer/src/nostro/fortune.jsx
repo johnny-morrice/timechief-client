@@ -3,7 +3,7 @@ import { textTransitionSignal } from "./textGlitch";
 import { randomPoem } from "./poem";
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { callbackName } from "./callback";
-import { setFortuneSignals } from "./fortuneMascot";
+import { FortuneMascotCanvas, setFortuneSignals } from "./fortuneMascot";
 
 class Signals {
     constructor() {
@@ -79,8 +79,6 @@ export const Fortune = () => {
     });
     return <div class="fortune-message">
         <div class="fortune-message-text">{signals.text()}</div>
-        <div class="fortune-message-mascot-wrapper">
-            <canvas id="fortune-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
-        </div>
+        <FortuneMascotCanvas />
     </div>;
 }

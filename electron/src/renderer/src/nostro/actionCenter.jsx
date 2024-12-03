@@ -1,6 +1,6 @@
 import { StatusNote } from "./statusNote";
 import { Fortune } from "./fortune";
-import { setActionCenterSignals } from "./actionCenterMascot";
+import { EventMascotCanvas, setActionCenterSignals } from "./actionCenterMascot";
 
 function hasNextEvent(signals) {
     const nextEvent = signals.nextEvent();
@@ -63,9 +63,7 @@ export function ActionCenter(props) {
                             {getNextEventShortText(signals)}
                         </div>
                     </div>
-                    <div class="event-mascot-wrapper">
-                        <canvas id="event-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={signals.mascotHeight()} data-sig-fg-color={signals.foregroundColor()} data-sig-bg-color={signals.boxBackgroundColor()} data-sig-emote={signals.emote()}></canvas>
-                    </div>
+                    <EventMascotCanvas />
                 </div>
             </Show>
             <Show when={!hasNextEvent(signals)}>
