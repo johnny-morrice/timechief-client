@@ -1652,6 +1652,10 @@ components:
         - button_border_color
         - button_foreground_color
         - button_background_color
+        - error_color
+        - disabled_button_border_color
+        - disabled_button_background_color
+        - disabled_button_color
         - image_fit
         - image_uuids
         - display_width
@@ -1700,6 +1704,7 @@ components:
         - fortune_mascot_height
         - event_mascot_height
         - status_note_font_size
+        - is_default
       properties:
         uuid:
           type: string
@@ -1730,6 +1735,12 @@ components:
         button_foreground_color:
           type: string
         button_background_color:
+          type: string
+        error_color:
+          type: string
+        disabled_button_border_color:
+          type: string
+        disabled_button_color:
           type: string
         image_fit:
           type: string
@@ -1829,7 +1840,8 @@ components:
           type: string
         status_note_font_size:
           type: string
-        
+        is_default:
+          type: boolean
 
     OWMDataDatum:
       type: object
