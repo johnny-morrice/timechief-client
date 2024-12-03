@@ -38,7 +38,7 @@ function parseHeight(heightText) {
 function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightSignal) {
     const canvasRef = document.getElementById(canvasId);
     if (!canvasRef) {
-        console.log("no canvas element found: ", canvasId);
+        // console.log("no canvas element found: ", canvasId);
         return;
     }
     const foregroundColor = canvasRef.getAttribute("data-sig-fg-color");
