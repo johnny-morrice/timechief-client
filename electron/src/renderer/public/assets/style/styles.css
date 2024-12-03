@@ -200,6 +200,11 @@ div.switcher-widget-button-wrapper {
     justify-content: space-between;
 }
 
+div.switcher-widget-button-wrapper-small {
+    align-items: flex-end;
+    gap: 2px;
+}
+
 /* TODO configure button colours */
 button:disabled {
     color: orange;
@@ -529,4 +534,8 @@ div.planner-event-time {
 }
 span.planner-event-summary-time {
     font-weight: bold;
+}
+
+div.status-note-small {
+    margin-left: auto;
 }

@@ -54,7 +54,7 @@ export const SmallSwitcherWidget = (props) => {
             <div id="switcher-widget-content" class={`${switcherWidgetTransition()} switcher-widget-content-small`}>
                 {getCurrentWidget(widgets, currentIndex).element()}
             </div>
-            <div class="switcher-widget-button-wrapper flex-coloumn flex-grow">
+            <div class="switcher-widget-button-wrapper-small flex-column flex-grow">
                 <div class="switcher-widget-button switcher-widget-next-button">
                     <button class="action-button crt-box switcher-button" onClick={onClickNext(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-up"></i></button>
                 </div>

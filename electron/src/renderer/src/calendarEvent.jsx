@@ -105,17 +105,16 @@ export class CalendarEvent {
         return makeCanonicalDateText(this.startTime(), timezone);
     }
 
-    eventShortText() {
+    eventShortText(truncateLength = 20) {
         // Truncate to 20 unicode characters.
         // TODO use configured locale.
         const segmenter = new Intl.Segmenter("en", {granularity: 'grapheme'});
         const segItr = segmenter.segment(this.data.short_text);
         const segArr = Array.from(segItr, ({segment}) => segment);
-        const maxLen = 15;
-        if (segArr.length <= maxLen) {
+        if (segArr.length <= truncateLength) {
             return this.data.short_text;
         }
-        return segArr.slice(0, maxLen).join('') + "...";
+        return segArr.slice(0, truncateLength).join('') + "...";
     }
 
     startTime() {

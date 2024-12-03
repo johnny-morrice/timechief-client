@@ -2,15 +2,16 @@ import * as fabric from 'fabric'
 import { isEcoMode } from './ipc';
 import { ecoRefreshInterval } from "../timing";
 
+const canvasses = {};
+
 export function manageMascotCanvas(canvasId, emoteSignal, heightSignal) {
-    var canvas = null;
     var lastManaged = new Date();
     setInterval(() => {
         function setCanvas(myCanvas) {
-            canvas = myCanvas;
+            canvasses[canvasId] = myCanvas;
         }
         function getCanvas() {
-            return canvas;
+            return canvasses[canvasId];
         }
         if (isEcoMode()) {
             const now = new Date();
@@ -37,6 +38,7 @@ function parseHeight(heightText) {
 function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightSignal) {
     const canvasRef = document.getElementById(canvasId);
     if (!canvasRef) {
+        // console.log("no canvas element found: ", canvasId);
         return;
     }
     const foregroundColor = canvasRef.getAttribute("data-sig-fg-color");
@@ -53,6 +55,7 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightS
     const initialised = canvasRef.getAttribute("data-initialised");
     if (!initialised) {
         if (canvas) {
+            console.log("disposing canvas: ", canvasId);
             canvas.dispose();
         }
         console.log("creating canvas")
@@ -66,8 +69,9 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightS
             height: height,
         });
         setCanvas(canvas);
+        console.log("initialising canvas: ", canvasId);
+        canvasRef.setAttribute("data-initialised", "true");
     }
-    canvasRef.setAttribute("data-initialised", "true");
 
     const renderedForeground = canvasRef.getAttribute("data-foreground-color");
     const renderedBackground = canvasRef.getAttribute("data-background-color");
@@ -79,7 +83,7 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightS
     }
     canvas = getCanvas();
     if (!canvas) {
-        console.log("no canvas, skipping mascot render")
+        console.log("no canvas, skipping mascot render: ", canvasId);
         return;
     }
     // Remove all objects from the canvas
@@ -124,6 +128,7 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightS
         canvasRef.setAttribute("data-foreground-color", foregroundColor);
         canvasRef.setAttribute("data-background-color", boxBackgroundColor);
         canvasRef.setAttribute("data-emote", emote);
+        console.log("setting height: ", heightText);
         canvasRef.setAttribute("data-height", heightText);
     }).catch((err) => {
         console.error("error adding canvas: ", err);

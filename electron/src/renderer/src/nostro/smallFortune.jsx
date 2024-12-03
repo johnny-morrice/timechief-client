@@ -3,7 +3,7 @@ import { textTransitionSignal } from "./textGlitch";
 import { randomPoem } from "./poem";
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
 import { callbackName } from "./callback";
-import { FortuneMascotCanvas, setFortuneSignals } from "./fortuneMascot";
+import { setFortuneSignals } from "./fortuneMascot";
 
 class Signals {
     constructor() {
@@ -38,7 +38,7 @@ function updateSignals(signals, data) {
         signals.setForegroundColor(foregroundColor);
     }
 
-    signals.setMascotHeight(theme["fortune_mascot_height"]);
+    signals.setMascotHeight(theme["event_mascot_height"]);
     const features = deviceProfile["features"];
     if (!features) {
         return;
@@ -48,11 +48,11 @@ function updateSignals(signals, data) {
     signals.setSpooky(spooky);
 }
 
-export const Fortune = () => {
-    console.log("Fortune render");
+export const SmallFortune = () => {
+    console.log("SmallFortune render");
     const signals = new Signals();
     setFortuneSignals(signals);
-    const cbName = callbackName("Fortune");
+    const cbName = callbackName("SmallFortune");
     addServiceDataCallback(cbName, data => updateSignals(signals, data));
     function pickPoem() {
         const isSpooky = signals.isSpooky();
@@ -79,6 +79,5 @@ export const Fortune = () => {
     });
     return <div class="fortune-message">
         <div class="fortune-message-text">{signals.text()}</div>
-        <FortuneMascotCanvas />
     </div>;
 }

@@ -3,6 +3,19 @@ import { SmallDeviceControl } from "./smallDeviceControl";
 import { SmallSwitcherWidget } from "./smallSwitcherWidget";
 import { SmallActionCenter } from "./smallActionCenter";
 import { SmallSetupControl } from "./smallSetupControl";
+import { FortuneMascotCanvas } from "./fortuneMascot";
+import { EventMascotCanvas } from "./actionCenterMascot";
+
+function hasNextEvent(signals) {
+    const nextEvent = signals.nextEvent();
+    if (!nextEvent) {
+        return false;
+    }
+    if (!nextEvent.eventShortText()) {
+        return false;
+    }
+    return true;
+}
 
 export function HomeSmall(props) {
     const signals = props.signals;
@@ -29,7 +42,15 @@ export function HomeSmall(props) {
                 <div class="home-date">{signals.myDate}</div>
             </div>
 
-            <SmallActionCenter signals={signals} />
+            {/* When we do have an event render the main mascot, otherwise render the fortune mascot. */}
+            <Show when={hasNextEvent(signals)}>
+                <EventMascotCanvas />
+            </Show>
+
+            <Show when={!hasNextEvent(signals)}>
+                <FortuneMascotCanvas />
+            </Show>
         </div>
+        <SmallActionCenter signals={signals} />
     </div>
 }
