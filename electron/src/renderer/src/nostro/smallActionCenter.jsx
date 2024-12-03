@@ -14,22 +14,12 @@ function hasNextEvent(signals) {
     return true;
 }
 
-function truncate(text, length) {
-    if (length < 3) {
-        throw new Error("truncate length must be at least 3");
-    }
-    if (text.length <= length) {
-        return text;
-    }
-    return text.substring(0, length - 3) + "...";
-}
-
 function getNextEventShortText(signals) {
     const nextEvent = signals.nextEvent();
     if (!nextEvent) {
         return "";
     }
-    return truncate(nextEvent.eventShortText(), 20);
+    return nextEvent.eventShortText(20);
 }
 
 function getNextEventStartTime(signals) {

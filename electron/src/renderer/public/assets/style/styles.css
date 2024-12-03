@@ -535,3 +535,7 @@ div.planner-event-time {
 span.planner-event-summary-time {
     font-weight: bold;
 }
+
+div.status-note-small {
+    margin-left: auto;
+}
