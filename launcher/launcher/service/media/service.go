@@ -55,7 +55,7 @@ func (svc Service) GetMedia() (Media, error) {
 	myTheme := deviceData.DeviceProfile.Value.Theme
 	// Sensible default if not initialised yet
 	if deviceData.DeviceProfile.Dt == 0 {
-		myTheme = defaultTheme()
+		myTheme = DefaultTheme()
 	}
 	themeCSS, err := renderThemeCSS(myTheme)
 	if err != nil {

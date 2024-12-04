@@ -14,26 +14,28 @@ import (
 )
 
 type Service struct {
-	mediaService       MediaService
-	deviceDataStore    DeviceDataStore
-	launchTargetStore  store.LaunchTargetStore
-	stateFlagStore     store.StateFlagStore
-	keyValueStore      store.KeyValueStore
-	wifiInterfaceStore store.WifiInterfaceStore
-	wifiNetworkStore   store.WifiNetworkStore
-	poker              Poker
+	mediaService        MediaService
+	deviceDataStore     DeviceDataStore
+	launchTargetStore   store.LaunchTargetStore
+	stateFlagStore      store.StateFlagStore
+	keyValueStore       store.KeyValueStore
+	wifiInterfaceStore  store.WifiInterfaceStore
+	wifiNetworkStore    store.WifiNetworkStore
+	poker               Poker
+	defaultThemeService DefaultThemeService
 }
 
-func MakeService(mediaService MediaService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore, poker Poker) Service {
+func MakeService(mediaService MediaService, deviceDataStore DeviceDataStore, launchTargetStore store.LaunchTargetStore, stateFlagStore store.StateFlagStore, keyValueStore store.KeyValueStore, wifiInterfaceStore store.WifiInterfaceStore, wifiNetworkStore store.WifiNetworkStore, poker Poker, defaultThemeService DefaultThemeService) Service {
 	return Service{
-		mediaService:       mediaService,
-		deviceDataStore:    deviceDataStore,
-		launchTargetStore:  launchTargetStore,
-		stateFlagStore:     stateFlagStore,
-		keyValueStore:      keyValueStore,
-		wifiInterfaceStore: wifiInterfaceStore,
-		wifiNetworkStore:   wifiNetworkStore,
-		poker:              poker,
+		mediaService:        mediaService,
+		deviceDataStore:     deviceDataStore,
+		launchTargetStore:   launchTargetStore,
+		stateFlagStore:      stateFlagStore,
+		keyValueStore:       keyValueStore,
+		wifiInterfaceStore:  wifiInterfaceStore,
+		wifiNetworkStore:    wifiNetworkStore,
+		poker:               poker,
+		defaultThemeService: defaultThemeService,
 	}
 }
 
@@ -47,6 +49,10 @@ type MediaService interface {
 
 type DeviceDataStore interface {
 	GetDeviceData() (v2.Data, error)
+}
+
+type DefaultThemeService interface {
+	GetDefaultTheme() (v2.Theme, error)
 }
 
 type LauncherState struct {
@@ -344,6 +350,14 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	isSSHFirewallOpen, err := strconv.ParseBool(sshFirewallOpenText)
 	if err != nil {
 		return DeviceData{}, fmt.Errorf("failed to parse SSH firewall open bool: %w", err)
+	}
+
+	if deviceData.DeviceProfile.Value.Theme.IsDefault {
+		defaultTheme, err := svc.defaultThemeService.GetDefaultTheme()
+		if err != nil {
+			return DeviceData{}, fmt.Errorf("failed to get default theme: %w", err)
+		}
+		deviceData.DeviceProfile.Value.Theme = defaultTheme
 	}
 
 	result := DeviceData{

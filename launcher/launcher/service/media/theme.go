@@ -62,7 +62,7 @@ func synthwaveDemoTheme() v2.Theme {
 	}
 }
 
-func defaultTheme() v2.Theme {
+func DefaultTheme() v2.Theme {
 	fgColor := "#008000ff"
 	bgColor := "#000000ff"
 	errorColor := "#ffa500ff"

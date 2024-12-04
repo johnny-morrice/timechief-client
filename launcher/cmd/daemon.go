@@ -31,6 +31,7 @@ import (
 	wfservice "github.com/johnny-morrice/timechief-client/launcher/launcher/service/firewall"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
 	mediasvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/media"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/media/layout"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
@@ -295,6 +296,11 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
+	defaultThemeService, err := layout.MakeService(mediasvc.DefaultTheme(), keyValueStore, layout.GetConfigurations())
+	if err != nil {
+		return err
+	}
+
 	dataService := datasvc.MakeService(
 		mediaService,
 		deviceDataStore,
@@ -304,6 +310,7 @@ func Daemon(ctx *cli.Context) error {
 		wifiInterfaceStore,
 		wifiNetworkStore,
 		ticker,
+		defaultThemeService,
 	)
 
 	securePackages := []apiPackage{

@@ -3,14 +3,59 @@ package layout
 import (
 	"errors"
 	"fmt"
-	"strconv"
+	"reflect"
+	"strings"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
-	"gorm.io/gorm"
 )
 
-func ApplyLayoutToTheme(theme *v2.Theme, layout v2.Theme) {
-	panic("not implemented")
+func applyLayoutToTheme(theme *v2.Theme, layout v2.Theme) error {
+	suffixes := []string{"X", "Y", "Width", "Height", "FontSize"}
+	err := copyFields(theme, layout, suffixes)
+	if err != nil {
+		return fmt.Errorf("failed to apply layout to theme: %w", err)
+	}
+	return nil
+}
+
+// Use reflection to copy fields from src to dst.
+// dst must be a pointer type to a struct type.
+// src must be a struct type.
+func copyFields(dst interface{}, src interface{}, suffixes []string) error {
+	// Validate inputs
+	dstType := reflect.TypeOf(dst)
+	if dstType.Kind() != reflect.Ptr {
+		return errors.New("dst must be a pointer to a struct type")
+	}
+
+	dstType = dstType.Elem()
+	if dstType.Kind() != reflect.Struct {
+		return errors.New("dst must be a pointer to a struct type")
+	}
+
+	srcType := reflect.TypeOf(src)
+	if srcType.Kind() != reflect.Struct {
+		return errors.New("src must be a struct type")
+	}
+
+	dstVal := reflect.ValueOf(dst).Elem()
+
+	srcVal := reflect.ValueOf(src)
+	for i := 0; i < srcType.NumField(); i++ {
+		srcField := srcType.Field(i)
+		srcFieldName := srcField.Name
+		for _, suffix := range suffixes {
+			if strings.HasSuffix(srcFieldName, suffix) {
+				dstField := dstVal.FieldByName(srcFieldName)
+				if dstField.IsValid() {
+					srcFieldVal := srcVal.Field(i)
+					dstField.Set(srcFieldVal)
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 type Configuration struct {
@@ -38,14 +83,14 @@ func (config Configuration) IsSuitableForSize(width, height int) bool {
 }
 
 func (config Configuration) ApplyToTheme(theme *v2.Theme) {
-	ApplyLayoutToTheme(theme, config.Layout)
+	applyLayoutToTheme(theme, config.Layout)
 }
 
-type Configurator struct {
+type configurator struct {
 	layouts []Configuration
 }
 
-func (c Configurator) ConfigureTheme(theme *v2.Theme, width, height int) error {
+func (c configurator) configureTheme(theme *v2.Theme, width, height int) error {
 	if !theme.IsDefault {
 		return nil
 	}
@@ -56,45 +101,4 @@ func (c Configurator) ConfigureTheme(theme *v2.Theme, width, height int) error {
 		}
 	}
 	return errors.New("no suitable layout found")
-}
-
-type DimensionsManager struct {
-	kvStore KeyValueStore
-}
-
-func (dm DimensionsManager) ApplyDefaultDisplayDimensions(theme *v2.Theme) error {
-	// The key value store contains a detected_width and detected_height for the current screen.
-	// If the theme IsDefault, the dimensions manager will apply the detected width and height.
-	// Otherwise do nothing.
-	if theme.IsDefault {
-		widthText, err := dm.kvStore.Get("detected_width")
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		heightText, err := dm.kvStore.Get("detected_height")
-		if err != nil {
-			return err
-		}
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
-		}
-		width, err := strconv.Atoi(widthText)
-		if err != nil {
-			return fmt.Errorf("failed to parse detected_width %s: %w", widthText, err)
-		}
-		height, err := strconv.Atoi(heightText)
-		if err != nil {
-			return fmt.Errorf("failed to parse detected_height %s: %w", heightText, err)
-		}
-		theme.DisplayWidth = width
-		theme.DisplayHeight = height
-		return nil
-	}
-}
-
-type KeyValueStore interface {
-	Get(key string) (string, error)
 }
