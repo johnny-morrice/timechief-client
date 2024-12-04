@@ -53,6 +53,7 @@ type DeviceDataStore interface {
 
 type DefaultThemeService interface {
 	GetDefaultTheme() (v2.Theme, error)
+	SetScreenDimensions(width, height int) error
 }
 
 type LauncherState struct {
@@ -114,6 +115,14 @@ type PairingStatus struct {
 	Code      string `json:"code"`
 	URL       string `json:"url"`
 	QRCodeURL string `json:"qr_code_url"`
+}
+
+func (svc Service) SetThemeDimensions(width, height int) error {
+	err := svc.defaultThemeService.SetScreenDimensions(width, height)
+	if err != nil {
+		return fmt.Errorf("failed to set screen dimensions: %w", err)
+	}
+	return nil
 }
 
 func (svc Service) Logout() error {
