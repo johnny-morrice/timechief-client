@@ -16,6 +16,7 @@ type DataService interface {
 	GetPairingStatus() (data.PairingStatus, error)
 	RefreshMyDevices() error
 	SetMyDevice(uuid string) error
+	SetThemeDimensions(width, height int) error
 }
 
 type Data struct {
@@ -33,6 +34,32 @@ func (api Data) AddRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/data/logout", api.HandleLogout)
 	mux.HandleFunc("/api/data/mydevice", api.HandlePostMyDevice)
 	mux.HandleFunc("/api/data/mydevice/refresh", api.RefreshMyDevices)
+	mux.HandleFunc("POST /api/data/theme-dimensions", api.HandleThemeDimensions)
+}
+
+type themeDimensionsRequest struct {
+	Width  int `json:"width"`
+	Height int `json:"height"`
+}
+
+func (api Data) HandleThemeDimensions(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var dimensions themeDimensionsRequest
+	err := json.NewDecoder(r.Body).Decode(&dimensions)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	err = api.service.SetThemeDimensions(dimensions.Width, dimensions.Height)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("failed to set theme dimensions: %v", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (api Data) HandleLogout(w http.ResponseWriter, r *http.Request) {

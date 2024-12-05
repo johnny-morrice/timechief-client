@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 
 	"github.com/google/uuid"
@@ -30,7 +31,18 @@ func (lt LaunchTarget) DeleteFiles() error {
 	system.Lock()
 	defer system.Unlock()
 	log.Printf("deleting files for launch target %s", lt.Path)
-	return os.RemoveAll(lt.Path)
+	versionPath := path.Join(lt.Path, "..")
+	// Normalise the path
+	versionPath, err := filepath.Abs(versionPath)
+	if err != nil {
+		return fmt.Errorf("failed to get absolute path for %s: %w", versionPath, err)
+	}
+	// Check last part of path (after last /) matches the version
+	if filepath.Base(versionPath) != lt.Version.Version {
+		return fmt.Errorf("BUG: expected version path base %s does not match version %s", versionPath, lt.Version.Version)
+	}
+
+	return os.RemoveAll(versionPath)
 }
 
 func (lt LaunchTarget) Run(cfg store.Config) error {
