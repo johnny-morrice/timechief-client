@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO this x related stuff needs ported to Wayland.
-
-# never blank the screen
-# xset s off -dpms
-
-# rotate to portrait mounted TV
-# xrandr --output HDMI-1 --rotate left
-
-# show a splash the app boots
-# feh --bg-scale /opt/timechief-launcher/assets/images/splash.png
-
 # Wait for system to catch up.
 sleep 10s
 
