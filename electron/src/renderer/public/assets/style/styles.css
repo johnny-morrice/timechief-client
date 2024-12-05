@@ -205,17 +205,6 @@ div.switcher-widget-button-wrapper-small {
     gap: 2px;
 }
 
-/* TODO configure button colours */
-button:disabled {
-    color: orange;
-    border-color: orange;
-}
-
-/* TODO configure error colours */
-.is-error {
-    color: orange;
-}
-
 div.current-weather {
     font-size: 18pt;
     display: flex;

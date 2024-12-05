@@ -1,6 +1,6 @@
 export class MediaDecorator {
     constructor() {
-        this.mediaRoot = `${process.env.clockAPIBaseURL}/media`;
+        this.mediaRoot = `${process.env.TIMECHIEF_LAUNCHER_API_BASE_URL}/media`;
     }
 
     makeVideoURL(fileName) {
