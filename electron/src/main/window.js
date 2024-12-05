@@ -14,7 +14,7 @@ function getHeight() {
 }
 
 function isFullScreen() {
-    return process.env.timechief_fullscreen == 'true';
+    return process.env.TIMECHIEF_FULLSCREEN == 'true';
 }
 
 let isDevMode = process.env.devMode == 'true';

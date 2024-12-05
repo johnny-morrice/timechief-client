@@ -24,7 +24,7 @@ function getClientVersion() {
 
 
 function getWwwBaseURL() {
-    return process.env.wwwBaseURL;
+    return process.env.TIMECHIEF_WWW_BASE_URL;
 }
 
 export function baseDeviceStatus() {

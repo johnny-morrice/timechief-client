@@ -282,5 +282,5 @@ export class LauncherClient {
 };
 
 function getAPIBaseURL() {
-    return process.env.clockAPIBaseURL;
+    return process.env.TIMECHIEF_LAUNCHER_API_BASE_URL;
 }
