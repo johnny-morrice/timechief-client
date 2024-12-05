@@ -49,6 +49,7 @@ func Install(ctx *cli.Context) error {
 		"bin/timechief-pipewire-initialise",
 		"bin/timechief-pipewire-play-file",
 		"bin/timechief-launcher-sound",
+		"bin/timechief-get-resolution",
 		"bin/secure/timechief-reboot",
 		"bin/secure/timechief-shutdown",
 		"bin/secure/timechief-wifi-connect",

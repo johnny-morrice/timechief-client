@@ -396,7 +396,7 @@ func Daemon(ctx *cli.Context) error {
 	rootMux.Handle("/auth/", authHandler)
 	rootMux.Handle("/", webMux)
 
-	onInitialiseComplete(soundService)
+	onInitialiseComplete(soundService, defaultThemeService, system)
 	return http.ListenAndServe(addr, rootMux)
 }
 
@@ -439,7 +439,19 @@ func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {
 	return nil
 }
 
-func onInitialiseComplete(soundService sound.Service) {
+func onInitialiseComplete(soundService sound.Service, layoutService layout.Service, sys system.System) {
+	go func() {
+		res, err := sys.GetResolution()
+		if err != nil {
+			log.Printf("failed to initialise screen resolution: %v", err)
+			return
+		}
+
+		err = layoutService.SetScreenDimensions(res.Width, res.Height)
+		if err != nil {
+			log.Printf("failed to set screen dimensions: %v", err)
+		}
+	}()
 	go func() {
 		// Let's fudge it and wait a bit for the system to settle
 		time.Sleep(5 * time.Second)
