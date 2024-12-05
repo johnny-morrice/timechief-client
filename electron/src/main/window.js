@@ -5,12 +5,22 @@ function isShowDevTools() {
     return process.env.showDevTools == 'true';
 }
 
+function getResolution() {
+    const resolution = process.env.TIMECHIEF_RESOLUTION;
+    // Validate resolution contains WIDTHxHEIGHT
+    if (!resolution || resolution.split('x').length != 2) {
+        throw new Error(`Invalid resolution: ${resolution}`);
+    }
+    return resolution;
+}
+
+// getWidth from WIDTHxHEIGHT in getResolution()
 function getWidth() {
-    return parseInt(process.env.timechief_width);
+    return parseInt(getResolution().split('x')[0]);
 }
 
 function getHeight() {
-    return parseInt(process.env.timechief_height);
+    return parseInt(getResolution().split('x')[1]);
 }
 
 function isFullScreen() {
