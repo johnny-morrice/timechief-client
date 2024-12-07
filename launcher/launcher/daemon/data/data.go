@@ -22,26 +22,28 @@ import (
 )
 
 type DeviceData struct {
-	client          v2.ClientInterface
-	cfgStore        ConfigStore
-	deviceDataStore DeviceDataStore
-	soundService    SoundService
-	keyValueStore   store.KeyValueStore
-	stateFlagStore  store.StateFlagStore
-	requestTimeout  time.Duration
-	ticker          Ticker
+	client              v2.ClientInterface
+	cfgStore            ConfigStore
+	deviceDataStore     DeviceDataStore
+	soundService        SoundService
+	keyValueStore       store.KeyValueStore
+	stateFlagStore      store.StateFlagStore
+	requestTimeout      time.Duration
+	ticker              Ticker
+	defaultThemeService DefaultThemeService
 }
 
-func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, ticker Ticker, requestTimeout time.Duration, cfgStore ConfigStore) DeviceData {
+func MakeDataDaemon(client v2.ClientInterface, deviceDataStore DeviceDataStore, soundService SoundService, keyValueStore store.KeyValueStore, stateFlagStore store.StateFlagStore, ticker Ticker, requestTimeout time.Duration, cfgStore ConfigStore, defaultThemeService DefaultThemeService) DeviceData {
 	return DeviceData{
-		client:          client,
-		deviceDataStore: deviceDataStore,
-		soundService:    soundService,
-		keyValueStore:   keyValueStore,
-		cfgStore:        cfgStore,
-		stateFlagStore:  stateFlagStore,
-		requestTimeout:  requestTimeout,
-		ticker:          ticker,
+		client:              client,
+		deviceDataStore:     deviceDataStore,
+		soundService:        soundService,
+		keyValueStore:       keyValueStore,
+		cfgStore:            cfgStore,
+		stateFlagStore:      stateFlagStore,
+		requestTimeout:      requestTimeout,
+		ticker:              ticker,
+		defaultThemeService: defaultThemeService,
 	}
 }
 
@@ -61,6 +63,11 @@ type SoundService interface {
 
 type DeviceDataStore interface {
 	SetDeviceData(data v2.Data) error
+	GetDeviceData() (v2.Data, error)
+}
+
+type DefaultThemeService interface {
+	GetDefaultTheme() (v2.Theme, error)
 }
 
 func (dd DeviceData) Start(ctx *cli.Context) {
@@ -76,7 +83,34 @@ func (dd DeviceData) Start(ctx *cli.Context) {
 	}
 }
 
+func (dd DeviceData) initialise() error {
+	deviceData, err := dd.deviceDataStore.GetDeviceData()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("error getting device data when initialising: %w", err)
+	}
+
+	if deviceData.DeviceProfile.Dt == 0 || deviceData.DeviceProfile.Value.Theme.IsDefault {
+		defaultTheme, err := dd.defaultThemeService.GetDefaultTheme()
+		if err != nil {
+			return fmt.Errorf("failed to get default theme: %w", err)
+		}
+		deviceData.DeviceProfile.Value.Theme = defaultTheme
+
+		err = dd.deviceDataStore.SetDeviceData(deviceData)
+		if err != nil {
+			return fmt.Errorf("error setting initial device data: %w", err)
+		}
+	}
+
+	return nil
+}
+
 func (dd DeviceData) doTick(_ *cli.Context) error {
+	err := dd.initialise()
+	if err != nil {
+		return fmt.Errorf("device data daemon initialisation error")
+	}
+
 	log.Println("downloading device data")
 	data, err := dd.FetchLatest()
 	if err != nil {

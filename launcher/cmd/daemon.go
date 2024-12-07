@@ -114,8 +114,14 @@ func Daemon(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	defaultThemeService, err := layout.MakeService(mediasvc.DefaultTheme(), keyValueStore, layout.GetConfigurations())
+	if err != nil {
+		return err
+	}
+
 	deviceDataStore := store.DeviceDataStore{DB: db}
-	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ticker, ctx.Duration("service-request-timeout"), cfgStore)
+	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ticker, ctx.Duration("service-request-timeout"), cfgStore, defaultThemeService)
 	// pairingDaemon := daemon.Pairing{
 	// 	ConfigStore:          cfgStore,
 	// 	StateFlagStore:       flagStore,
@@ -146,7 +152,7 @@ func Daemon(ctx *cli.Context) error {
 	wifiNetworkStore := store.WifiNetworkStore{DB: db}
 
 	wifiInterfaceStore := store.WifiInterfaceStore{DB: db}
-	system := system.System{
+	sys := system.System{
 		ConfigStore:            cfgStore,
 		KeyValueStore:          keyValueStore,
 		WifiInterfaceStore:     wifiInterfaceStore,
@@ -159,31 +165,31 @@ func Daemon(ctx *cli.Context) error {
 
 	wifiLoad := daemon.WifiLoadInterfaces{
 		StateFlagStore: flagStore,
-		System:         system,
+		System:         sys,
 	}
 	wifiConn := daemon.WifiConnect{
 		StateFlagStore: flagStore,
-		System:         system,
+		System:         sys,
 	}
 	wifiScan := daemon.WifiScan{
 		StateFlagStore: flagStore,
-		System:         system,
+		System:         sys,
 	}
 	wifiHotspot := daemon.WifiHotspot{
 		StateFlagStore: flagStore,
-		System:         system,
+		System:         sys,
 	}
 	networkStatus := daemon.NetworkStatus{
-		System: system,
+		System: sys,
 	}
 	setup := daemon.Setup{
 		KeyValueStore:    keyValueStore,
 		WifiNetworkStore: wifiNetworkStore,
 		StateFlagStore:   flagStore,
-		System:           system,
+		System:           sys,
 	}
 	internetCheck := daemon.InternetCheck{
-		System: system,
+		System: sys,
 	}
 	// TODO make this configurable
 	const videoDownloadInterval = 53 * time.Minute
@@ -223,7 +229,7 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	timeSync := daemon.TimeSync{
-		Syncer: system,
+		Syncer: sys,
 	}
 
 	licenseDaemon, err := licenseactivation.MakeLicenseActivationDaemon(timechiefClient, keyValueStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
@@ -233,7 +239,7 @@ func Daemon(ctx *cli.Context) error {
 
 	expandRootFS := task.ExpandRootFS{
 		KeyValueStore: keyValueStore,
-		System:        system,
+		System:        sys,
 	}
 
 	err = expandRootFS.RunTask(ctx)
@@ -242,7 +248,7 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	ensureAutoLogin := task.EnsureAutologin{
-		System: system,
+		System: sys,
 	}
 
 	err = ensureAutoLogin.RunTask(ctx)
@@ -259,12 +265,12 @@ func Daemon(ctx *cli.Context) error {
 		go timeSync.Start(ctx)
 	}
 
-	fwsvc, err := wfservice.MakeFirewallService(keyValueStore, system)
+	fwsvc, err := wfservice.MakeFirewallService(keyValueStore, sys)
 	if err != nil {
 		return err
 	}
 
-	fwDaemon, err := fwdaemon.MakeFirewallDaemon(ctx.Bool("firewall-grace-includes-ssh"), ctx.Duration("firewall-grace-time"), time.Second*3, system, fwsvc, flagStore)
+	fwDaemon, err := fwdaemon.MakeFirewallDaemon(ctx.Bool("firewall-grace-includes-ssh"), ctx.Duration("firewall-grace-time"), time.Second*3, sys, fwsvc, flagStore)
 	if err != nil {
 		return err
 	}
@@ -296,11 +302,6 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	defaultThemeService, err := layout.MakeService(mediasvc.DefaultTheme(), keyValueStore, layout.GetConfigurations())
-	if err != nil {
-		return err
-	}
-
 	dataService := datasvc.MakeService(
 		mediaService,
 		deviceDataStore,
@@ -310,13 +311,12 @@ func Daemon(ctx *cli.Context) error {
 		wifiInterfaceStore,
 		wifiNetworkStore,
 		ticker,
-		defaultThemeService,
 	)
 
 	securePackages := []apiPackage{
 		api.System{
 			Service: syssvc.Service{
-				System:           system,
+				System:           sys,
 				StateFlagStore:   flagStore,
 				KeyValueStore:    keyValueStore,
 				WifiNetworkStore: wifiNetworkStore,
@@ -404,10 +404,22 @@ func Daemon(ctx *cli.Context) error {
 			}
 		},
 		func() {
-			res, err := system.GetResolution()
-			if err != nil {
-				log.Printf("failed to initialise screen resolution: %v", err)
-				return
+			// Format is WIDTHxHEIGHT
+			forceResolution := ctx.String("force-resolution")
+			var res system.Resolution
+			var err error
+			if forceResolution != "" {
+				_, err = fmt.Sscanf(forceResolution, "%dx%d", &res.Width, &res.Height)
+				if err != nil {
+					log.Printf("failed to parse force-resolution: %v", err)
+					return
+				}
+			} else {
+				res, err = sys.GetResolution()
+				if err != nil {
+					log.Printf("failed to initialise screen resolution: %v", err)
+					return
+				}
 			}
 
 			err = defaultThemeService.SetScreenDimensions(res.Width, res.Height)

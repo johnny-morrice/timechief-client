@@ -111,6 +111,10 @@ func getCLIApp() *cli.App {
 			Usage:   "Run the launcher daemon",
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "force-resolution",
+					EnvVars: []string{"TIMECHIEF_FORCE_RESOLUTION"},
+				},
 				&cli.DurationFlag{
 					Name:    "firewall-grace-time",
 					Value:   5 * time.Minute,

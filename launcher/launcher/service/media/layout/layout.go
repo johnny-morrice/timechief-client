@@ -3,6 +3,7 @@ package layout
 import (
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 
@@ -22,6 +23,7 @@ func applyLayoutToTheme(theme *v2.Theme, layout v2.Theme) error {
 // dst must be a pointer type to a struct type.
 // src must be a struct type.
 func copyFields(dst interface{}, src interface{}, suffixes []string) error {
+	copyFieldCount := 0
 	// Validate inputs
 	dstType := reflect.TypeOf(dst)
 	if dstType.Kind() != reflect.Ptr {
@@ -50,15 +52,18 @@ func copyFields(dst interface{}, src interface{}, suffixes []string) error {
 				if dstField.IsValid() {
 					srcFieldVal := srcVal.Field(i)
 					dstField.Set(srcFieldVal)
+					copyFieldCount++
 				}
 			}
 		}
 	}
 
+	log.Printf("copied %d layout fields", copyFieldCount)
 	return nil
 }
 
 type Configuration struct {
+	Name      string
 	MinHeight int
 	MaxHeight int
 	MinWidth  int
@@ -96,6 +101,7 @@ func (c configurator) configureTheme(theme *v2.Theme, width, height int) error {
 	}
 	for _, layout := range c.layouts {
 		if layout.IsSuitableForSize(width, height) {
+			log.Printf("applying layout %s", layout.Name)
 			layout.ApplyToTheme(theme)
 			return nil
 		}
