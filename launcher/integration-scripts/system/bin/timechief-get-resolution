@@ -1,0 +1,15 @@
+#!/usr/bin/python
+
+import os
+
+# Read /sys/class/graphics/fb0/virtual_size and replace the ',' with 'x'
+# to get the resolution of the screen.
+def get_resolution():
+    with open('/sys/class/graphics/fb0/virtual_size', 'r') as f:
+        resolution = f.read().strip().replace(',', 'x')
+    return resolution
+
+if __name__ == '__main__':
+    print(get_resolution())
+
+

@@ -35,7 +35,7 @@ func (sys System) stopApp() error {
 	return store.CloseDB(sys.DB)
 }
 
-func (sys System) runScript(cfg store.Config, path string, args ...string) error {
+func (sys System) runScriptCaptureOutput(cfg store.Config, path string, args ...string) ([]byte, error) {
 	root := cfg.GetInstallRoot()
 	binRoot := filepath.Join(root, "bin")
 	script := filepath.Join(binRoot, path)
@@ -46,8 +46,12 @@ func (sys System) runScript(cfg store.Config, path string, args ...string) error
 		Args: args,
 	}
 
-	output, err := cmd.CombinedOutput()
-	log.Printf("system script %s output: %s", script, output)
+	return cmd.CombinedOutput()
+}
+
+func (sys System) runScript(cfg store.Config, path string, args ...string) error {
+	output, err := sys.runScriptCaptureOutput(cfg, path, args...)
+	log.Printf("system script %s output: %s", path, output)
 	if err != nil {
 		return fmt.Errorf("failed to execute system script %s: %w", path, err)
 	}

@@ -36,9 +36,9 @@ rm -f $INSTALL_ROOT/timechief-launcher.log
 cat <<EOF > $INSTALL_ROOT/client-config.json
 {
 	"Env": {
-		"clockAPIBaseURL": "http://localhost:8080",
-		"wwwBaseURL": "$WWW_BASE_URL",
-		"timechief_fullscreen": "true"
+		"TIMECHIEF_LAUNCHER_API_BASE_URL": "http://localhost:8080",
+		"TIMECHIEF_WWW_BASE_URL": "$WWW_BASE_URL",
+		"TIMECHIEF_FULLSCREEN": "true"
 	}
 }
 EOF
