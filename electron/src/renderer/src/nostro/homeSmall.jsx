@@ -33,10 +33,7 @@ export function HomeSmall(props) {
     }
 
     return <div class="home-screen">
-        <div class="home-lhs-column flex-grow">
             <SmallSwitcherWidget widgets={switcherWidgets} />
-        </div>
-        <div class='home-rhs-column flex-column flex-grow'>
             <div id="date-time" class="home-time-wrapper flex-grow">
                 <div class="home-time home-time-small">{signals.myTime}</div>
                 <div class="home-date">{signals.myDate}</div>
@@ -50,7 +47,6 @@ export function HomeSmall(props) {
             <Show when={!hasNextEvent(signals)}>
                 <FortuneMascotCanvas />
             </Show>
-        </div>
         <SmallActionCenter signals={signals} />
     </div>
 }
