@@ -1,3 +1,5 @@
+import { sendSetupBegin, sendLogOut } from "./ipc";
+
 function onClickSetup() {
     console.log("setup clicked")
     sendSetupBegin();

@@ -14,6 +14,7 @@ class Signals {
         [this.hasAccessCode, this.setHasAccessCode] = createSignal(false);
         [this.hasDeviceUUID, this.setHasDeviceUUID] = createSignal(false);
         [this.devices, this.setDevices] = createSignal([]);
+        [this.isSmallMode, this.setSmallMode] = createSignal(false);
     }
 }
 
@@ -31,6 +32,30 @@ function onDataUpdate(data, signals) {
     signals.setHasDeviceUUID(deviceUUID && deviceUUID.length > 0);
     signals.setHasAccessCode(hasAccessCode);
     signals.setDevices(devices);
+
+    
+    const serviceData = data["service_data"];
+    if (!serviceData) {
+        return;
+    }
+
+    const deviceProfileWrapper = serviceData["device_profile"];
+    if (!deviceProfileWrapper) {
+        return;
+    }
+
+    const deviceProfile = deviceProfileWrapper["value"];
+    if (!deviceProfile) {
+        return;
+    }
+
+    const theme = deviceProfile["theme"];
+    if (!theme) {
+        return;
+    }
+
+    const layoutType = theme["layout_type"];
+    signals.setSmallMode(layoutType === "small");
 }
 
 export function LoginPage(props) {
@@ -170,7 +195,12 @@ export function LoginPage(props) {
             <div class="login-screen exposed">
                 <Show when={isWaitingForSubscription(signals)}>
                     <div class="login-box">
-                        <div>Waiting for subscription activation</div>
+                        <Show when={!signals.isSmallMode()}>
+                            <div>Waiting for subscription activation</div>
+                        </Show>
+                        <Show when={signals.isSmallMode()}>
+                            <div>Loading...</div>
+                        </Show>
                         <Loading />
                         <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
                     </div>
@@ -186,7 +216,9 @@ export function LoginPage(props) {
                 </Show>
                 <Show when={!signals.hasAccessCode() && !isLoginStarted(signals)}>
                     <div class="login-box begin-login">
-                        <div class="pairing-title">{label("title")}</div>
+                        <Show when={!signals.isSmallMode()}>
+                            <div class="pairing-title">{label("title")}</div>
+                        </Show>
                         <button class="action-button crt-box flex-grow" onClick={onClickLogin}>{plainText("login-button-text")} &nbsp;&nbsp; <i class="fa-solid fa-user"></i></button>
                         <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
                     </div>
@@ -201,8 +233,10 @@ export function LoginPage(props) {
                             <div class="data-label">{label("enter-code")}</div>
                             <div class="data-value">{signals.userCode}</div>
                         </div>
-                        <div class="data-label">{label("scan-qr")}</div>
-                        <div id="pairing-qrcode-canvas-wrapper"></div>
+                        <Show when={!signals.isSmallMode()}>
+                            <div class="data-label">{label("scan-qr")}</div>
+                            <div id="pairing-qrcode-canvas-wrapper"></div>
+                        </Show>
                         <div class="login-code-buttons flex-row">
                             <button class="action-button crt-box flex-grow" onClick={onClickNewCode}>{plainText("new-code")}</button>
                             <button class="action-button crt-box flex-grow" onClick={onClickRestartSetup}>{plainText("restart-setup")}</button>
