@@ -64,6 +64,27 @@ body {
     height: 100vh;
 }
 
+
+div.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+div.flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+div.flex-grow {
+    flex-grow: 1;
+}
+
+div.flex-shrink {
+    flex-shrink: 1;
+}
+
 div.background-video-wrapper {
     position: fixed;
     top: 0;
@@ -111,6 +132,14 @@ div.home-time-wrapper {
     gap: 0.1em;
 }
 
+div.home-time-small-wrapper {
+    gap: 0;
+}
+
+div.time-mascot-small {
+    justify-content: end;
+}
+
 div.home-date {
     font-size: 36pt;
     align-self: flex-end;
@@ -119,10 +148,6 @@ div.home-date {
 div.home-time {
     /* font-family: 'Seven Segment', monospace; */
     font-size: 98pt;
-}
-
-div.home-time-small {
-    align-self: flex-end;
 }
 
 div.home-action-center {
@@ -164,26 +189,6 @@ div.system-error {
 
 div#theme-detection-canary {
     display: none;
-}
-
-div.flex-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-}
-
-div.flex-row {
-    display: flex;
-    flex-direction: row;
-    gap: 1em;
-}
-
-div.flex-grow {
-    flex-grow: 1;
-}
-
-div.flex-shrink {
-    flex-shrink: 1;
 }
 
 div.switcher-widget-small {
@@ -389,6 +394,10 @@ div.fortune-message {
 
 div.fortune-message-mascot-wrapper {
     margin-left: auto;
+}
+
+div.fortune-message-mascot-wrapper-small {
+    margin-left: 0;
 }
 
 div.next-event-wrapper {

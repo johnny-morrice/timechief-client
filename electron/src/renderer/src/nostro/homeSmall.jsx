@@ -33,20 +33,22 @@ export function HomeSmall(props) {
     }
 
     return <div class="home-screen">
-            <SmallSwitcherWidget widgets={switcherWidgets} />
-            <div id="date-time" class="home-time-wrapper flex-grow">
+        <SmallSwitcherWidget widgets={switcherWidgets} />
+        <div id="date-time" class="home-time-wrapper home-time-small-wrapper flex-column flex-grow">
+            <div class="time-mascot-small flex-grow flex-row">
                 <div class="home-time home-time-small">{signals.myTime}</div>
-                <div class="home-date">{signals.myDate}</div>
+
+                {/* When we do have an event render the main mascot, otherwise render the fortune mascot. */}
+                <Show when={hasNextEvent(signals)}>
+                    <EventMascotCanvas />
+                </Show>
+
+                <Show when={!hasNextEvent(signals)}>
+                    <FortuneMascotCanvas classes="fortune-message-mascot-wrapper-small" />
+                </Show>
             </div>
-
-            {/* When we do have an event render the main mascot, otherwise render the fortune mascot. */}
-            <Show when={hasNextEvent(signals)}>
-                <EventMascotCanvas />
-            </Show>
-
-            <Show when={!hasNextEvent(signals)}>
-                <FortuneMascotCanvas />
-            </Show>
+            <div class="home-date">{signals.myDate}</div>
+        </div>
         <SmallActionCenter signals={signals} />
     </div>
 }
