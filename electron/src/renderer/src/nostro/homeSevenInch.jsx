@@ -33,16 +33,11 @@ export function HomeSevenInch(props) {
     }
 
     return <div class="home-screen flex-row">
-        <div class="home-lhs-column flex-column flex-grow">
-            <SwitcherWidget widgets={switcherWidgets} />
+        <SwitcherWidget widgets={switcherWidgets} />
+        <div id="date-time" class="home-time-wrapper flex-grow">
+            <div class="home-time">{signals.myTime}</div>
+            <div class="home-date">{signals.myDate}</div>
         </div>
-        <div class='home-rhs-column flex-column flex-grow'>
-            <div id="date-time" class="home-time-wrapper flex-grow">
-                <div class="home-time">{signals.myTime}</div>
-                <div class="home-date">{signals.myDate}</div>
-            </div>
-
-           <ActionCenter signals={signals} />
-        </div>
+        <ActionCenter signals={signals} />
     </div>
 }

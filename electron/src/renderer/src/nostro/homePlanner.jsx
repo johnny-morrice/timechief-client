@@ -275,23 +275,23 @@ function PlannerDateCell(props) {
     }
 
     return <div class="planner-date-cell" onClick={onClickCell}>
-            <div>{signals.dayOfMonthFormatter().format(day.date)}</div>
-            <div class="planner-date-cell-events flex-column">
-                <Show when={isShowSummary(day, plannerSignals)}>
-                    <div class="planner-event-count">{day.events.length} events</div>
-                </Show>
-                <Show when={isShowEvents(day, plannerSignals)}>
-                    <div class="planner-event-summary flex-column">
-                        <For each={getShownEvents(day, plannerSignals)}>{(event) => (
-                            <PlannerEventSummary signals={signals} plannerSignals={plannerSignals} event={event} />
-                        )}
-                        </For>
-                    </div>
-                </Show>
-                <Show when={isShowRemainingEvents(day, plannerSignals)}>
-                    <div class="planner-event-count">+{day.events.length - plannerSignals.plannerDayEventCount()} more</div>
-                </Show>
-            </div>
+        <div>{signals.dayOfMonthFormatter().format(day.date)}</div>
+        <div class="planner-date-cell-events flex-column">
+            <Show when={isShowSummary(day, plannerSignals)}>
+                <div class="planner-event-count">{day.events.length} events</div>
+            </Show>
+            <Show when={isShowEvents(day, plannerSignals)}>
+                <div class="planner-event-summary flex-column">
+                    <For each={getShownEvents(day, plannerSignals)}>{(event) => (
+                        <PlannerEventSummary signals={signals} plannerSignals={plannerSignals} event={event} />
+                    )}
+                    </For>
+                </div>
+            </Show>
+            <Show when={isShowRemainingEvents(day, plannerSignals)}>
+                <div class="planner-event-count">+{day.events.length - plannerSignals.plannerDayEventCount()} more</div>
+            </Show>
+        </div>
     </div>
 }
 
@@ -355,17 +355,13 @@ export function HomePlanner(props) {
     }
 
     return <div class="home-screen flex-row">
-        <div class="home-lhs-column flex-column flex-grow">
-            <SwitcherWidget widgets={switcherWidgets} />
+        <SwitcherWidget widgets={switcherWidgets} />
+        <div id="date-time" class="home-time-wrapper flex-grow">
+            <div class="home-time">{signals.myTime}</div>
+            <div class="home-date">{signals.myDate}</div>
         </div>
-        <div class='home-rhs-column flex-column flex-grow'>
-            <div id="date-time" class="home-time-wrapper flex-grow">
-                <div class="home-time">{signals.myTime}</div>
-                <div class="home-date">{signals.myDate}</div>
-            </div>
 
-            <ActionCenter signals={signals} />
-        </div>
+        <ActionCenter signals={signals} />
         <div id="planner" class={plannerSignals.plannerTransition()}>
             <Show when={!plannerSignals.isDayView()}>
                 <div class="planner-header">
