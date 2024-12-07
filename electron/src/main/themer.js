@@ -157,5 +157,15 @@ function getDefaultThemeCSS() {
     
     div.status-note-indicator {
         font-size: 16pt;
+    }
+    
+    button:disabled {
+        color: #ffa500ff;
+        border-color: #ffa500ff;
+        background-color: #ffa500ff;
+    }
+
+    .is-error {
+        color: #ffa500ff;
     }`;
 }

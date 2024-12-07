@@ -360,7 +360,12 @@ export const WebSetupPage = (props) => {
             </Show>
             <Show when={isDisplayStateChooseNetworkType(signals)}>
                 <div class="setup-wrapper flex-column flex-grow">
-                    <div class="setup-title">Welcome to Timechief</div>
+                    <Show when={!isSmallMode(signals)}>
+                        <div class="setup-title">Welcome to Timechief</div>
+                    </Show>
+                    <Show when={isSmallMode(signals)}>
+                        <div>Choose network type</div>
+                    </Show>
                     <div class="setup-content-wrapper flex-row">
                         <div class="setup-button-box border flex-column crt-box home-box">
                             <Show when={isUpdating(signals)}>
@@ -398,7 +403,9 @@ export const WebSetupPage = (props) => {
             </Show>
             <Show when={isDisplayStateLoading(signals)}>
                 <div class="setup-wrapper flex-column flex-grow">
-                    <div class="setup-title">Welcome to Timechief</div>
+                    <Show when={!isSmallMode(signals)}>
+                        <div class="setup-title">Welcome to Timechief</div>
+                    </Show>
                     <div class="setup-action-wrapper flex-row">
                         <div class="setup-button-box border flex-column crt-box home-box">
                             <Show when={isUpdating(signals)}>
