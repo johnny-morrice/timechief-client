@@ -57,7 +57,7 @@ func (svc Service) GetTargetEnv() (TargetEnv, error) {
 	}
 
 	env := map[string]string{
-		"API_KEY":              key,
+		"TIMECHIEF_API_KEY":    key,
 		"TIMECHIEF_RESOLUTION": fmt.Sprintf("%sx%s", width, height),
 	}
 

@@ -307,7 +307,7 @@ func getCLIApp() *cli.App {
 						},
 						&cli.StringFlag{
 							Name:    "api-key",
-							EnvVars: []string{"API_KEY"},
+							EnvVars: []string{"TIMECHIEF_API_KEY"},
 						},
 						&cli.BoolFlag{
 							Name:    "reboot-on-exit",
