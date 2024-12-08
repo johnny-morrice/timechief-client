@@ -19,7 +19,7 @@ function getIpAddress() {
 }
 
 function getClientVersion() {
-    return process.env.clientVersion;
+    return process.env.TIMECHIEF_CLIENT_VERSION;
 }
 
 

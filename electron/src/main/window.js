@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import path from 'path';
 
 function isShowDevTools() {
-    return process.env.showDevTools == 'true';
+    return process.env.TIMECHIEF_SHOW_DEV_TOOLS == 'true';
 }
 
 function getResolution() {
@@ -27,7 +27,6 @@ function isFullScreen() {
     return process.env.TIMECHIEF_FULLSCREEN == 'true';
 }
 
-let isDevMode = process.env.devMode == 'true';
 let mainWindow;
 let windowInitialised = false;
 
@@ -113,7 +112,6 @@ export function startTimechiefApp(logger, callback) {
         if (process.platform !== 'darwin') app.quit()
     })
 
-    logger.info(`Starting in ${isDevMode ? 'dev' : 'prod'} mode`);
     logger.info(`Width: ${getWidth()} Height: ${getHeight()}`);
     logger.info(`Fullscreen: ${isFullScreen()}`);
 }
