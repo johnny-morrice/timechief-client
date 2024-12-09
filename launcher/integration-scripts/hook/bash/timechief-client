@@ -10,5 +10,5 @@ if [ -z "$WORK_DIR" ] || [ -z "$LOG_FILE" ] || [ -z "$CLIENT_VERSION" ] ; then
 fi
 
 cd $WORK_DIR
-export clientVersion=$CLIENT_VERSION
+export TIMECHIEF_CLIENT_VERSION=$CLIENT_VERSION
 ./timechief-client-electron . 2>&1 | multilog T s10485760 n10 $LOG_FILE
