@@ -196,5 +196,5 @@ button:disabled {
 }
 
 .is-error {
-    color: {{.ErrorColor}};
+    color: {{.ErrorColor}} !important;
 }
