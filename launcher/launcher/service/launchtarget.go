@@ -42,6 +42,15 @@ func (lt LaunchTarget) DeleteFiles() error {
 		return fmt.Errorf("BUG: expected version path base %s does not match version %s", versionPath, lt.Version.Version)
 	}
 
+	stat, err := os.Stat(versionPath)
+	if err != nil {
+		log.Printf("failed to stat version path, already deleted %s: %v", versionPath, err)
+		return nil
+	}
+	if !stat.IsDir() {
+		return fmt.Errorf("expected version path to be a directory: %s", versionPath)
+	}
+
 	return os.RemoveAll(versionPath)
 }
 
