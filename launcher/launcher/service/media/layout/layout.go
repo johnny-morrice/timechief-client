@@ -102,6 +102,8 @@ func (c configurator) configureTheme(theme *v2.Theme, width, height int) error {
 	for _, layout := range c.layouts {
 		if layout.IsSuitableForSize(width, height) {
 			log.Printf("applying layout %s", layout.Name)
+			theme.DisplayWidth = width
+			theme.DisplayHeight = height
 			layout.ApplyToTheme(theme)
 			return nil
 		}
