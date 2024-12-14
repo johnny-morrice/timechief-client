@@ -144,6 +144,15 @@ func (dc DaemonClient) PostReboot() error {
 	return nil
 }
 
+func (dc DaemonClient) PostShutdown() error {
+	resp, err := dc.post("/api/system/shutdown", "", nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
 type PlaySoundRequest struct {
 	SongName string `json:"song_name"`
 	Loop     bool   `json:"loop"`

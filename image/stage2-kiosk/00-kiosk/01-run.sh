@@ -265,6 +265,7 @@ systemctl enable nftables
 EOF
 
 on_chroot << EOF
-echo "0 3 * * * /bin/systemctl restart lightdm" | sudo crontab -
+echo "0 3 */2 * * /bin/systemctl restart lightdm" | sudo crontab -
+# echo "0 3 */14 * * /opt/timechief-launcher/bin/timechief-launcher reboot" | sudo crontab -
 systemctl enable cron
 EOF

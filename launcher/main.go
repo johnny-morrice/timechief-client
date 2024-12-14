@@ -59,6 +59,43 @@ func getCLIApp() *cli.App {
 			},
 		},
 		{
+			Name: "control",
+			Subcommands: []*cli.Command{
+				{
+					Name:   "reboot",
+					Usage:  "Reboot the system",
+					Action: cmd.Reboot,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:  "daemon-base-url",
+							Value: daemonBaseURL,
+						},
+						&cli.StringFlag{
+							Name:  "credentials-path",
+							Usage: "path to the credentials file to communicate with the daemon",
+							Value: credentialPath,
+						},
+					},
+				},
+				{
+					Name:   "shutdown",
+					Usage:  "Shutdown the system",
+					Action: cmd.Reboot,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:  "daemon-base-url",
+							Value: daemonBaseURL,
+						},
+						&cli.StringFlag{
+							Name:  "credentials-path",
+							Usage: "path to the credentials file to communicate with the daemon",
+							Value: credentialPath,
+						},
+					},
+				},
+			},
+		},
+		{
 			Name:   "console-bootstrap",
 			Action: cmd.Bootstrap,
 			Flags: []cli.Flag{
