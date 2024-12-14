@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 )
@@ -20,8 +21,10 @@ func Install(ctx *cli.Context) error {
 
 	splashWidth := ctx.Int("splash-width")
 	splashHeight := ctx.Int("splash-height")
-	targetSplash := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images",
-		fmt.Sprintf("splash-%d-%d.png", splashWidth, splashHeight))
+	targetSplash, err := getTargetSplash(targetRoot, splashWidth, splashHeight)
+	if err != nil {
+		return fmt.Errorf("failed to get target splash: %w", err)
+	}
 	systemSplash := filepath.Join(installRoot, "assets", "images", "splash.png")
 
 	links := []link{
@@ -71,6 +74,34 @@ func Install(ctx *cli.Context) error {
 	}
 
 	return installLinks(links)
+}
+
+func getTargetSplash(targetRoot string, width, height int) (string, error) {
+	mySplash := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images", fmt.Sprintf("splash-%dx%d.png", width, height))
+	if _, err := os.Stat(mySplash); err != nil {
+		// Find the first splash image in the target root.
+		splashDir := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images")
+		entries, err := os.ReadDir(splashDir)
+		if err != nil {
+			return "", fmt.Errorf("failed to read splash directory: %w", err)
+		}
+		for _, entry := range entries {
+			if entry.IsDir() {
+				continue
+			}
+			if filepath.Ext(entry.Name()) != ".png" {
+				continue
+			}
+			// Check prefix
+			if !strings.HasPrefix(filepath.Base(entry.Name()), "splash") {
+				continue
+			}
+
+			return filepath.Join(splashDir, entry.Name()), nil
+		}
+	}
+
+	return mySplash, nil
 }
 
 type link struct {

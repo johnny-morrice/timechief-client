@@ -115,9 +115,12 @@ func (lt LaunchTarget) Install(cfg store.Config, versionDownloader VersionDownlo
 		return err
 	}
 
+	width := cfg.Config["width"]
+	height := cfg.Config["height"]
+
 	if doInstallDaemon {
 		log.Println("installing daemon")
-		return lt.Execute(cfg, "target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path, "--install-root", cfg.GetInstallRoot())
+		return lt.Execute(cfg, "target", "install", "--executable", lt.targetPath(), "--target-root", lt.Path, "--install-root", cfg.GetInstallRoot(), "--splash-width", width, "--splash-height", height)
 	}
 	return nil
 }
