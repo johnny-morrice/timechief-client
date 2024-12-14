@@ -100,6 +100,13 @@ func (dd DeviceData) initialise() error {
 		if err != nil {
 			return fmt.Errorf("error setting initial device data: %w", err)
 		}
+
+		width := deviceData.DeviceProfile.Value.Theme.DisplayWidth
+		height := deviceData.DeviceProfile.Value.Theme.DisplayHeight
+		err = dd.updateDisplaySize(width, height)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
