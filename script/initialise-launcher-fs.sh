@@ -44,4 +44,4 @@ cat <<EOF > $INSTALL_ROOT/client-config.json
 EOF
 
 # TODO delete device credentials usage when we have fixed in API
-$FS_LAUNCHER_BIN initialise --install-root "$INSTALL_ROOT" --api-base-url "$API_BASE_URL" --product "$PRODUCT" --stream "$STREAM" --auth0-client-id "$AUTH0_CLIENT_ID" --auth0-audience "$AUTH0_AUDIENCE" --auth0-base-url "$AUTH0_BASE_URL" --width "$WIDTH" --height "$HEIGHT"
+$FS_LAUNCHER_BIN initialise --install-root "$INSTALL_ROOT" --api-base-url "$API_BASE_URL" --product "$PRODUCT" --stream "$STREAM" --auth0-client-id "$AUTH0_CLIENT_ID" --auth0-audience "$AUTH0_AUDIENCE" --auth0-base-url "$AUTH0_BASE_URL" --force-resolution "800x480"

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 
@@ -13,7 +14,7 @@ import (
 )
 
 // Read the given configKeys from the cli.Context and return a store.Config instance.
-func cfgFlags(ctx *cli.Context) store.Config {
+func cfgFlags(ctx *cli.Context) (store.Config, error) {
 	configKeys := []string{"install-root", "api-base-url", "product", "stream", "auth0-client-id", "auth0-audience", "auth0-base-url"}
 	cfg := store.Config{
 		Config: make(map[string]string),
@@ -25,9 +26,22 @@ func cfgFlags(ctx *cli.Context) store.Config {
 		}
 		cfg.Config[key] = value
 	}
-	cfg.Config["width"] = strconv.Itoa(ctx.Int("width"))
-	cfg.Config["height"] = strconv.Itoa(ctx.Int("height"))
-	return cfg
+	resolution := ctx.String("force-resolution")
+	if resolution != "" {
+		var width int
+		var height int
+		_, err := fmt.Sscanf(resolution, "%dx%d", &width, &height)
+		if err != nil {
+			log.Printf("failed to parse resolution %s: %v", resolution, err)
+			return store.Config{}, err
+		}
+		cfg.Config["width"] = strconv.Itoa(width)
+		cfg.Config["height"] = strconv.Itoa(height)
+	} else {
+		return store.Config{}, fmt.Errorf("TODO automatic resolution detection not implemented, use --force-resolution")
+	}
+
+	return cfg, nil
 }
 
 func Initialise(ctx *cli.Context) error {
@@ -38,7 +52,10 @@ func Initialise(ctx *cli.Context) error {
 
 	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{DB: db}
-	cfg := cfgFlags(ctx)
+	cfg, err := cfgFlags(ctx)
+	if err != nil {
+		return err
+	}
 
 	keyValueStore := store.KeyValueStore{DB: db}
 	noAuthClientFactory := func() (v2.ClientInterface, error) {

@@ -246,13 +246,8 @@ func getCLIApp() *cli.App {
 					Name:  "install-root",
 					Value: store.DefaultInstallRoot,
 				},
-				&cli.IntFlag{
-					Name:  "width",
-					Value: 800,
-				},
-				&cli.IntFlag{
-					Name:  "height",
-					Value: 480,
+				&cli.StringFlag{
+					Name: "force-resolution",
 				},
 				&cli.BoolFlag{
 					Name:    "update",
@@ -368,11 +363,11 @@ func getCLIApp() *cli.App {
 						},
 						&cli.IntFlag{
 							Name:    "splash-width",
-							EnvVars: []string{"timechief_width"},
+							EnvVars: []string{"TIMECHIEF_SPLASH_WIDTH"},
 						},
 						&cli.IntFlag{
 							Name:    "splash-height",
-							EnvVars: []string{"timechief_height"},
+							EnvVars: []string{"TIMECHIEF_SPLASH_HEIGHT"},
 						},
 					},
 				},
