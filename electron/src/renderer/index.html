@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="img-src 'self' data: http://localhost:*; default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' http://localhost:*;">
+    <link href="/assets/style/styles.css" rel="stylesheet">
+    <link href="/assets/style/crt.css" rel="stylesheet">
+    <link href="/assets/fontawesome/css/all.min.css" rel="stylesheet">
+    
+    <title>Timechief</title>
+  </head>
+  <body>
+    <div id='debug'></div>
+    <div id="app"></div>
+    <!-- Preload the intro video and it so that it definitely will play and get bundled. -->
+    <video id="preload-video" style="display: none;" preload="auto"> <source src="/assets/video/timechief-intro.mp4" type="video/mp4"> </video>
+    <script src="/src/main.jsx" type="module"></script>
+  </body>
+</html>

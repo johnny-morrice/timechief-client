@@ -29,9 +29,15 @@ func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
 			log.Printf("Invalid network: %s", validErr)
 			continue
 		}
+		mostSecureProtocol, err := nmNet.SecureProtocol()
+		if err != nil {
+			log.Printf("Failde to get secure protocol for network: %s", validErr)
+			continue
+		}
 		result = append(result, WifiNetwork{
-			SSID:   nmNet.SSID,
-			Signal: nmNet.Signal,
+			SSID:       nmNet.SSID,
+			Signal:     nmNet.Signal,
+			Encryption: mostSecureProtocol,
 		})
 	}
 	return result, nil
@@ -50,8 +56,8 @@ const AccessPointIPAddress = "172.16.0.1"
 const AccessPointIPAddressWithNetmask = AccessPointIPAddress + "/24"
 const dhcpRange = "172.16.0.100,172.16.0.200,12h"
 
-const AccessPointMode = "Master"
-const InfraMode = "Managed"
+const AccessPointMode = "ap"
+const InfraMode = "infrastructure"
 
 func (card WifiInterface) Hotspot(net WifiNetwork) error {
 	err := card.netCmd().Hotspot(net.SSID, net.Key, card.Interface, AccessPointIPAddressWithNetmask, dhcpRange)
@@ -89,9 +95,10 @@ func (status NetworkStatus) String() string {
 }
 
 type WifiNetwork struct {
-	SSID   string
-	Key    string
-	Signal int
+	SSID       string
+	Key        string
+	Signal     int
+	Encryption string
 }
 
 func ReadWifiInterfaces(cfg store.Config) ([]WifiInterface, error) {

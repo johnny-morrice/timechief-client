@@ -1,11 +1,11 @@
-xorg
-x11-xserver-utils
-xserver-xorg-video-fbdev
-xserver-xorg-video-fbturbo
+lightdm
+weston
+xwayland
+tree
 fonts-noto-color-emoji
 feh
 gjs
-gnome-themes-standard
+gnome-themes-extra
 gir1.2-webkit2-4.0
 xdotool
 vim
@@ -14,3 +14,9 @@ openssh-server
 dnsmasq
 hostapd
 nginx
+zlib1g-dev
+libfuse2
+nftables
+pipewire
+wireplumber
+pipewire-audio-client-libraries

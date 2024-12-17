@@ -1,9 +1,11 @@
 package daemon
 
 import (
+	"fmt"
 	"log"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 	"github.com/urfave/cli/v2"
 )
@@ -21,7 +23,7 @@ func (daemon InternetCheck) Start(ctx *cli.Context) {
 	if daemon.RefreshInterval == 0 {
 		daemon.RefreshInterval = 5 * time.Second
 	}
-	runEvery(daemon.RefreshInterval, func() {
+	util.RunEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
 			log.Printf("daemon tick error: %s", err)
@@ -34,5 +36,10 @@ func (daemon InternetCheck) Start(ctx *cli.Context) {
 // If the state flag is set, we synchronise the wifi cards and wifi networks using the system package.
 // We then clear the state flag.
 func (daemon InternetCheck) doTick(ctx *cli.Context) error {
-	return daemon.System.CheckInternet()
+	err := daemon.System.CheckInternet()
+	if err != nil {
+		return fmt.Errorf("failed to check internet status: %w", err)
+	}
+
+	return nil
 }

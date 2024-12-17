@@ -2,16 +2,100 @@ package system
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/firewall"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 )
 
 type Service struct {
-	System           system.System
-	StateFlagStore   store.StateFlagStore
-	KeyValueStore    store.KeyValueStore
-	WifiNetworkStore store.WifiNetworkStore
+	System           System
+	StateFlagStore   StateFlagStore
+	KeyValueStore    KeyValueStore
+	WifiNetworkStore WifiNetworkStore
+	FirewallService  FirewallService
+}
+
+type System interface {
+	ChangeUserPassword(username, password string) error
+	Reboot() error
+	Shutdown() error
+}
+
+type WifiNetworkStore interface {
+	SelectNetwork(ssid, key string) error
+	MarkNotReady() error
+	MarkSelectedReady() error
+}
+
+type StateFlagStore interface {
+	CreateIfNotExists(state string) error
+}
+
+type KeyValueStore interface {
+	Set(key, value string) error
+	Get(key string) (string, error)
+}
+
+type FirewallService interface {
+	SetServiceState(ss firewall.ServiceState) error
+	ApplyFirewallRules() error
+}
+
+type SSHCredentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (svc Service) RegenerateSSHPassword() (SSHCredentials, error) {
+	pass, err := crypt.GenerateSSHPassword()
+	if err != nil {
+		return SSHCredentials{}, fmt.Errorf("failed to generate SSH password: %w", err)
+	}
+	const username = "timechief"
+
+	err = svc.System.ChangeUserPassword(username, pass)
+	if err != nil {
+		return SSHCredentials{}, fmt.Errorf("failed to change password for user '%s': %w", username, err)
+	}
+	result := SSHCredentials{
+		Username: username,
+		Password: pass,
+	}
+	return result, nil
+}
+
+func (svc Service) FirewallSSHSetState(enabled bool) error {
+	err := svc.FirewallService.SetServiceState(firewall.ServiceState{
+		Service: "ssh",
+		Open:    enabled,
+	})
+	if err != nil {
+		return err
+	}
+	return svc.FirewallService.ApplyFirewallRules()
+}
+
+func (svc Service) FirewallAPISetState(enabled bool) error {
+	apiAccessMode := strconv.FormatBool(enabled)
+	err := svc.KeyValueStore.Set(store.APIAccessEnabled, apiAccessMode)
+	if err != nil {
+		return fmt.Errorf("error setting API access mode: %w", err)
+	}
+	err = svc.FirewallService.SetServiceState(firewall.ServiceState{
+		Service: "http",
+		Open:    enabled,
+	})
+	if err != nil {
+		return fmt.Errorf("error setting API firewall service state: %w", err)
+	}
+	err = svc.FirewallService.ApplyFirewallRules()
+	if err != nil {
+		return fmt.Errorf("error firewall rules after API access change: %w", err)
+	}
+	return nil
 }
 
 func (svc Service) Reboot() error {

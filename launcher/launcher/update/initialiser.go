@@ -11,7 +11,7 @@ import (
 type Initialiser struct {
 	DB            *gorm.DB
 	KeyValueStore store.KeyValueStore
-	Updater
+	*Updater
 }
 
 func (init Initialiser) Initialise(ctx *cli.Context, cfg store.Config) error {
@@ -19,13 +19,18 @@ func (init Initialiser) Initialise(ctx *cli.Context, cfg store.Config) error {
 	if err != nil {
 		return err
 	}
-	err = init.CfgStore.SetConfig(cfg)
+	err = init.cfgStore.SetConfig(cfg)
 	if err != nil {
 		return err
 	}
 	err = init.KeyValueStore.Set("setup", "Begin")
 	if err != nil {
 		return err
+	}
+	isUpdate := ctx.Bool("update")
+	if !isUpdate {
+		log.Print("Skipping update, initialised client OK")
+		return nil
 	}
 	err = init.FirstUpdate(ctx)
 	if err != nil {
@@ -36,6 +41,6 @@ func (init Initialiser) Initialise(ctx *cli.Context, cfg store.Config) error {
 }
 
 func (init Initialiser) IsInitialised() bool {
-	lt, err := init.LaunchTargetStore.GetActiveLaunchTarget()
+	lt, err := init.launchTargetStore.GetActiveLaunchTarget()
 	return err == nil && lt.ID != 0
 }

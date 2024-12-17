@@ -12,8 +12,9 @@ echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 export DEBIAN_FRONTEND=noninteractive
 EOF
 
-install -m 644 files/config.txt "${ROOTFS_DIR}/boot/"
-install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/"
+mkdir -p "${ROOTFS_DIR}/boot/firmware"
+install -m 644 files/config.txt "${ROOTFS_DIR}/boot/firmware"
+install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/firmware"
 install -m 644 files/nginx.conf "${ROOTFS_DIR}/etc/nginx/sites-available/timechief.conf"
 HOME="${ROOTFS_DIR}/home/${FIRST_USER_NAME}"
 install -m 644 -o 1000 -g 1000 files/.profile "${HOME}/"
@@ -30,23 +31,50 @@ if [ "$CURSOR" = "yes" ]; then
     install -m 644 -o 1000 -g 1000 files/.cursor "${HOME}/"
 fi
 
-# Autologin
-on_chroot << 'EOF'
-    systemctl --quiet set-default multi-user.target
-    cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << CATEND
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty --noissue --skip-login --autologin timechief --noclear %I $TERM
+# Set up lightdm for autologin
+on_chroot << EOF
+cat > /etc/lightdm/lightdm.conf << CATEND
+[Seat:*]
+autologin-user=timechief
+autologin-user-timeout=0
+user-session=weston
 CATEND
 EOF
 
+# Make lightdm use weston for window management
+on_chroot << EOF
+cat > /usr/share/wayland-sessions/weston.desktop << CATEND
+[Desktop Entry]
+Name=Weston
+Comment=Start Weston compositor
+Exec=weston --xwayland
+Type=Application
+CATEND
+EOF
+
+# Disable the cursor
+on_chroot << EOF
+mkdir -p /etc/xdg/weston
+cat > /etc/xdg/weston/weston.ini << CATEND
+[core]
+cursor-size=0
+idle-time=0
+
+[idle]
+idle-time=0
+
+[shell]
+client=/opt/timechief-launcher/bin/timechief-bootstrap
+CATEND
+EOF
 
 # timechief-launcher daemon.
+# Use sigkill and timeout after 5 seconds.
 on_chroot << EOF
 cat > /etc/systemd/system/timechief-launcher.service << CATEND
 [Unit]
 Description=TimeChief Launcher Service
-After=network.target
+After=network.target timechief-launcher-sound.service
 
 [Service]
 User=$FIRST_USER_NAME
@@ -61,6 +89,22 @@ CATEND
     systemctl enable timechief-launcher
 EOF
 
+# Set screen brightness
+on_chroot << EOF
+cat > /etc/systemd/system/set-brightness.service << CATEND
+[Unit]
+Description=Set Brightness at Boot
+
+[Service]
+Type=oneshot
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher brightness
+
+[Install]
+WantedBy=multi-user.target
+CATEND
+    systemctl enable set-brightness.service
+EOF
+
 # timechief-launcher sound daemon
 on_chroot << EOF
 cat > /etc/systemd/system/timechief-launcher-sound.service << CATEND
@@ -69,9 +113,13 @@ Description=TimeChief Launcher Sound Service
 After=network.target
 
 [Service]
+User=$FIRST_USER_NAME
+Group=$FIRST_USER_NAME
 WorkingDirectory=/opt/timechief-launcher
-ExecStart=/opt/timechief-launcher/bin/timechief-launcher daemon-sound
+ExecStart=/opt/timechief-launcher/bin/timechief-launcher-sound
 Restart=always
+KillSignal=SIGKILL
+TimeoutStopSec=5
 Nice=1
 
 [Install]
@@ -167,4 +215,57 @@ EOF
 # Enable i2c
 on_chroot << EOF
 raspi-config nonint do_i2c 0
+EOF
+
+# Disable username set prompt
+on_chroot << EOF
+systemctl disable userconfig
+rm /etc/systemd/system/multi-user.target.wants/userconfig.service -f
+sed -i '/^WantedBy=/d' /usr/lib/systemd/system/userconfig.service
+EOF
+
+# Set up nftables default
+on_chroot << EOF
+cat > /etc/nftables.conf << CATEND
+#!/usr/sbin/nft -f
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        # Allow traffic on the loopback interface
+        iif "lo" accept
+
+        # Allow established and related connections
+        ct state established,related accept
+
+        # Allow incoming SSH
+        tcp dport 22 accept
+        udp dport 22 accept
+
+        # Allow incoming HTTP
+        tcp dport 80 accept
+        udp dport 80 accept
+
+        # Allow incoming HTTPS
+        tcp dport 443 accept
+        udp dport 443 accept
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+    }
+}
+CATEND
+systemctl enable nftables
+EOF
+
+on_chroot << EOF
+echo "0 3 */2 * * /bin/systemctl restart lightdm" | sudo crontab -
+echo "0 3 */14 * * /opt/timechief-launcher/bin/timechief-launcher reboot" | sudo crontab -
+systemctl enable cron
 EOF

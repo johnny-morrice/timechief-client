@@ -9,6 +9,15 @@ set -x
 # BUNDLE_OUTPUT
 # BUNDLE_DIR
 # BUILD_DIR
+# USE_PYRTC
+
+if [ -z "$VERSION" ] || [ -z "$LAUNCHER_BIN" ] || [ -z "$USE_PYRTC" ] ; then
+  echo "missing parameters"
+  echo "VERSION: $VERSION"
+  echo "LAUNCHER_BIN: $LAUNCHER_BIN"
+  echo "USE_PYRTC: $USE_PYRTC"
+  exit 1
+fi
 
 # If BUNDLE_DIR is empty, then we will use a temporary directory
 if [ -z "$BUNDLE_DIR" ] ; then
@@ -49,6 +58,7 @@ cp $BUILD_DIR/timechief-client/launcher/integration-scripts/bootstrap/timechief-
 pushd $BUILD_DIR/timechief-client/launcher
 mkdir -p bin
 go build -o bin/timechief-launcher
+cp bin/timechief-launcher $LAUNCHER_BIN
 popd
 
 cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_UNPACK/timechief-launcher
@@ -56,25 +66,31 @@ cp $BUILD_DIR/timechief-client/launcher/bin/timechief-launcher $BUNDLE_UNPACK/ti
 # Build electron app
 pushd $BUILD_DIR/timechief-client/electron
   npm install
-  npm run dist
+  npm run build:linux
 popd
 
 cp $BUILD_DIR/timechief-client/electron/dist/timechief-client-electron $BUNDLE_UNPACK
 
-# Build the python RTC application
-pushd $BUILD_DIR/timechief-client/rtcutil/pyrtc
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-pip install .
-./compile.sh
-deactivate
-popd
+if [ "$USE_PYRTC" = "true" ]; then
+  # Build the python RTC application
+  pushd $BUILD_DIR/timechief-client/rtcutil/pyrtc
+  python -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+  pip install .
+  ./compile.sh
+  deactivate
+  popd
 
-mkdir -p $BUNDLE_UNPACK/bin/secure
-cp $BUILD_DIR/timechief-client/rtcutil/pyrtc/dist/pyrtc $BUNDLE_UNPACK/bin/secure/timechief-pyrtc
+  mkdir -p $BUNDLE_UNPACK/bin/secure
+  cp $BUILD_DIR/timechief-client/rtcutil/pyrtc/dist/pyrtc $BUNDLE_UNPACK/bin/secure/timechief-pyrtc
+else
+  echo "#\!/bin/bash" > $BUNDLE_UNPACK/bin/secure/timechief-pyrtc
+  echo "echo 'no rtc integration'" >> $BUNDLE_UNPACK/bin/secure/timechief-pyrtc
+  chmod +x $BUNDLE_UNPACK/bin/secure/timechief-pyrtc
+fi
 
-# Copy images
+# Copy assets
 cp -a $BUILD_DIR/timechief-client/launcher/assets $BUNDLE_UNPACK
 
 pushd $BUNDLE_DIR

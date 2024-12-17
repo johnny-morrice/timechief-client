@@ -76,6 +76,30 @@ func (cfg Config) Merge(other Config) Config {
 	return newCfg
 }
 
+func (cfg Config) GetAuthZeroBaseURL() (string, error) {
+	baseURL, ok := cfg.Config["auth0-base-url"]
+	if !ok {
+		return "", fmt.Errorf("auth0-base-url not found: %w", ErrCfgNotFound)
+	}
+	return baseURL, nil
+}
+
+func (cfg Config) GetAuthZeroClientID() (string, error) {
+	clientID, ok := cfg.Config["auth0-client-id"]
+	if !ok {
+		return "", fmt.Errorf("auth0-client-id not found: %w", ErrCfgNotFound)
+	}
+	return clientID, nil
+}
+
+func (cfg Config) GetAuthZeroAudience() (string, error) {
+	audience, ok := cfg.Config["auth0-audience"]
+	if !ok {
+		return "", fmt.Errorf("auth0-audience not found: %w", ErrCfgNotFound)
+	}
+	return audience, nil
+}
+
 func (cfg Config) GetInstallRoot() string {
 	root, ok := cfg.Config["install-root"]
 	if !ok {
@@ -93,15 +117,6 @@ func (cfg Config) GetAPIBaseURL() string {
 }
 
 var ErrCfgNotFound = fmt.Errorf("config item not found")
-
-// TODO this will potentially go away with the new API.
-func (cfg Config) GetDeviceCredentials() (string, error) {
-	credentials, ok := cfg.Config["device-credentials"]
-	if !ok {
-		return "", fmt.Errorf("device-credentials not found: %w", ErrCfgNotFound)
-	}
-	return credentials, nil
-}
 
 func (cfg Config) GetProduct() string {
 	product, ok := cfg.Config["product"]

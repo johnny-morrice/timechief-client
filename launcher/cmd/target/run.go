@@ -23,17 +23,35 @@ func Run(ctx *cli.Context) error {
 	clientExecutable := filepath.Join(targetBundle, execName)
 	cmd := exec.Command(clientExecutable, targetBundle, logFile, version)
 	baseURL := ctx.String("daemon-base-url")
-	dc := daemonclient.NewDaemonClient(baseURL)
+	dc, err := daemonclient.NewDaemonClient(baseURL, daemonclient.CredentialProvider{
+		APIKey: ctx.String("api-key"),
+	})
+	if err != nil {
+		return err
+	}
+
 	rebooter := task.RebootOnExit{
 		Command:  cmd,
 		Rebooter: clientRebooter{dc: dc},
 	}
 
-	err := rebooter.RunTask(ctx)
+	isRebootOnExit := ctx.Bool("reboot-on-exit")
+	if !isRebootOnExit {
+		rebooter.Rebooter = nopRebooter{}
+	}
+
+	err = rebooter.RunTask(ctx)
 
 	if err != nil {
 		return fmt.Errorf("failed to run client at %s: %w", clientExecutable, err)
 	}
+	return nil
+}
+
+type nopRebooter struct {
+}
+
+func (nopRebooter) Reboot() error {
 	return nil
 }
 

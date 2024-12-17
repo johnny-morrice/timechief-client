@@ -1,6 +1,10 @@
 package launcher
 
 import (
+	"fmt"
+	"log"
+
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 )
@@ -19,6 +23,57 @@ type SoundService interface {
 
 type TargetStatus struct {
 	Ready bool
+}
+
+type LauncherAPIKey struct {
+	Key string `json:"key"`
+}
+
+type TargetEnv struct {
+	Env map[string]string `json:"env"`
+}
+
+func (svc Service) GetTargetEnv() (TargetEnv, error) {
+	key, err := svc.KeyValueStore.Get(store.APIAppAuthKey)
+	if err != nil {
+		return TargetEnv{}, fmt.Errorf("failed to get API key: %w", err)
+	}
+	if key == "" {
+		return TargetEnv{}, fmt.Errorf("no API key")
+	}
+	cfg, err := svc.GetConfig()
+	if err != nil {
+		return TargetEnv{}, fmt.Errorf("failed to get config: %w", err)
+	}
+	width, height := cfg.Config["width"], cfg.Config["height"]
+
+	if width == "" {
+		log.Printf("defaulting width")
+		width = "800"
+	}
+	if height == "" {
+		log.Printf("defaulting height")
+		height = "480"
+	}
+
+	env := map[string]string{
+		"TIMECHIEF_API_KEY":    key,
+		"TIMECHIEF_RESOLUTION": fmt.Sprintf("%sx%s", width, height),
+	}
+
+	return TargetEnv{Env: env}, nil
+}
+
+func (svc Service) RegenerateUserAPIKey() (LauncherAPIKey, error) {
+	theKey, err := crypt.GenerateRandomAPIKey()
+	if err != nil {
+		return LauncherAPIKey{}, fmt.Errorf("failed to generate API key: %w", err)
+	}
+	err = svc.KeyValueStore.Set(store.APIUserAuthKey, theKey)
+	if err != nil {
+		return LauncherAPIKey{}, fmt.Errorf("failed to save API key: %w", err)
+	}
+	return LauncherAPIKey{Key: theKey}, nil
 }
 
 func (svc Service) OnLogin() error {
@@ -62,4 +117,12 @@ func (svc Service) GetConfig() (store.Config, error) {
 
 func (svc Service) RecoverTarget() (TargetStatus, error) {
 	return TargetStatus{Ready: true}, nil
+}
+
+func (svc Service) ChooseNetworkType(networkType string) error {
+	if networkType != "wifi" && networkType != "manual" {
+		return fmt.Errorf("unsupported network type: %s", networkType)
+	}
+
+	return svc.KeyValueStore.Set("network-type", networkType)
 }

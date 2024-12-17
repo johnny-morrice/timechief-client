@@ -27,6 +27,17 @@ func getCLIApp() *cli.App {
 	app.Version = "0.0.1"
 	app.Commands = []*cli.Command{
 		{
+			Name:   "brightness",
+			Usage:  "Set backlight brightness across all displays",
+			Action: cmd.Brightness,
+			Flags: []cli.Flag{
+				&cli.Float64Flag{
+					Name:  "brightness-ratio",
+					Value: 0.31372549019607843137,
+				},
+			},
+		},
+		{
 			Name:    "run-client",
 			Aliases: []string{"c"},
 			Usage:   "Launch the timechief client",
@@ -40,6 +51,58 @@ func getCLIApp() *cli.App {
 					Name:  "daemon-base-url",
 					Value: daemonBaseURL,
 				},
+				&cli.StringFlag{
+					Name:  "credentials-path",
+					Usage: "path to the credentials file to communicate with the daemon",
+					Value: credentialPath,
+				},
+			},
+		},
+		{
+			Name: "control",
+			Subcommands: []*cli.Command{
+				{
+					Name:   "reboot",
+					Usage:  "Reboot the system",
+					Action: cmd.Reboot,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:  "daemon-base-url",
+							Value: daemonBaseURL,
+						},
+						&cli.StringFlag{
+							Name:  "credentials-path",
+							Usage: "path to the credentials file to communicate with the daemon",
+							Value: credentialPath,
+						},
+					},
+				},
+				{
+					Name:   "shutdown",
+					Usage:  "Shutdown the system",
+					Action: cmd.Reboot,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:  "daemon-base-url",
+							Value: daemonBaseURL,
+						},
+						&cli.StringFlag{
+							Name:  "credentials-path",
+							Usage: "path to the credentials file to communicate with the daemon",
+							Value: credentialPath,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:   "console-bootstrap",
+			Action: cmd.Bootstrap,
+			Flags: []cli.Flag{
+				&cli.DurationFlag{
+					Name:  "timeout",
+					Value: 5 * time.Second,
+				},
 			},
 		},
 		{
@@ -50,9 +113,24 @@ func getCLIApp() *cli.App {
 					Name:  "listen-addr",
 					Value: "0.0.0.0:8081",
 				},
+				&cli.StringFlag{
+					Name:    "sound-provider",
+					Value:   "pipewire",
+					EnvVars: []string{"TIMECHIEF_SOUND_PROVIDER"},
+				},
+				&cli.Float64Flag{
+					Name:    "volume",
+					Value:   0.5,
+					EnvVars: []string{"TIMECHIEF_SOUND_VOLUME"},
+				},
+				// TODO figure out how to get this from the main daemon.
+				&cli.StringFlag{
+					Name:  "install-root",
+					Value: "/opt/timechief-launcher",
+				},
 				&cli.BoolFlag{
 					Name:  "startup-sound",
-					Value: true,
+					Value: false,
 				},
 				&cli.IntFlag{
 					Name:  "pwm-pin",
@@ -71,6 +149,45 @@ func getCLIApp() *cli.App {
 			Action:  cmd.Daemon,
 			Flags: []cli.Flag{
 				&cli.StringFlag{
+					Name:    "force-resolution",
+					EnvVars: []string{"TIMECHIEF_FORCE_RESOLUTION"},
+				},
+				&cli.DurationFlag{
+					Name:    "firewall-grace-time",
+					Value:   5 * time.Minute,
+					EnvVars: []string{"TIMECHIEF_FIREWALL_GRACE_TIME"},
+				},
+				&cli.BoolFlag{
+					Name:    "firewall-grace-includes-ssh",
+					Value:   false,
+					EnvVars: []string{"TIMECHIEF_GRACE_INCLUDES_SSH"},
+				},
+				&cli.BoolFlag{
+					Name:    "debug-adaptive-tick",
+					Value:   false,
+					EnvVars: []string{"TIMECHIEF_DEBUG_ADAPTIVE_TICK"},
+				},
+				&cli.BoolFlag{
+					Name:    "use-rtc-integration",
+					Usage:   "Use RTC integration on raspberry pi prior to version 5",
+					Value:   false,
+					EnvVars: []string{"TIMECHIEF_USE_RTC_INTEGRATION"},
+				},
+				&cli.StringFlag{
+					Name:  "credentials-path",
+					Usage: "path to the credentials file which the daemon may update",
+					Value: credentialPath,
+				},
+				&cli.StringFlag{
+					Name:  "media-file",
+					Usage: "load media settings from file",
+				},
+				&cli.DurationFlag{
+					Name:  "media-file-frequency",
+					Usage: "frequency to reload media settings from file",
+					Value: 10 * time.Second,
+				},
+				&cli.StringFlag{
 					Name:  "sound-daemon-base-url",
 					Value: "http://localhost:8081",
 				},
@@ -85,6 +202,12 @@ func getCLIApp() *cli.App {
 				&cli.BoolFlag{
 					Name:  "install-daemon",
 					Value: defaultInstallDaemon,
+				},
+				&cli.StringFlag{
+					Name:    "test-app-api-key",
+					Hidden:  true,
+					EnvVars: []string{"TEST_APP_API_KEY"},
+					Usage:   "INSECURE: API key for the timechief app.  This is intended for testing.  This is used to authenticate the timechief app to the daemon. In normal usage, allow to be empty to get a secure random key every boot.",
 				},
 				&cli.StringFlag{
 					Name:  "listen-addr",
@@ -104,7 +227,7 @@ func getCLIApp() *cli.App {
 				},
 				&cli.DurationFlag{
 					Name:  "service-refresh-interval",
-					Value: 20 * time.Second,
+					Value: 61 * time.Second,
 				},
 				&cli.DurationFlag{
 					Name:  "version-update-interval",
@@ -124,23 +247,48 @@ func getCLIApp() *cli.App {
 					Value: store.DefaultInstallRoot,
 				},
 				&cli.StringFlag{
-					Name:  "api-base-url",
-					Value: store.DefaultBaseURL,
-				},
-				&cli.StringFlag{
-					Name:  "product",
-					Value: store.DefaultProduct,
-				},
-				&cli.StringFlag{
-					Name:  "stream",
-					Value: store.DefaultStream,
+					Name: "force-resolution",
 				},
 				&cli.BoolFlag{
-					Name:  "install-daemon",
-					Value: defaultInstallDaemon,
+					Name:    "update",
+					Value:   true,
+					Usage:   "Update the client after initialisation",
+					EnvVars: []string{"UPDATE"},
 				},
 				&cli.StringFlag{
-					Name: "device-credentials",
+					Name:    "api-base-url",
+					Value:   store.DefaultBaseURL,
+					EnvVars: []string{"API_BASE_URL"},
+				},
+				&cli.StringFlag{
+					Name:    "product",
+					Value:   store.DefaultProduct,
+					EnvVars: []string{"PRODUCT"},
+				},
+				&cli.StringFlag{
+					Name:    "stream",
+					Value:   store.DefaultStream,
+					EnvVars: []string{"STREAM"},
+				},
+				&cli.StringFlag{
+					Name:     "auth0-client-id",
+					Required: true,
+					EnvVars:  []string{"AUTH0_CLIENT_ID"},
+				},
+				&cli.StringFlag{
+					Name:     "auth0-audience",
+					Required: true,
+					EnvVars:  []string{"AUTH0_AUDIENCE"},
+				},
+				&cli.StringFlag{
+					Name:     "auth0-base-url",
+					Required: true,
+					EnvVars:  []string{"AUTH0_BASE_URL"},
+				},
+				&cli.BoolFlag{
+					Name:    "install-daemon",
+					Value:   defaultInstallDaemon,
+					EnvVars: []string{"INSTALL_DAEMON"},
 				},
 				&cli.DurationFlag{
 					Name:  "service-request-timeout",
@@ -189,6 +337,15 @@ func getCLIApp() *cli.App {
 							Name:  "system-automation",
 							Value: defaultSystemAutomation,
 						},
+						&cli.StringFlag{
+							Name:    "api-key",
+							EnvVars: []string{"TIMECHIEF_API_KEY"},
+						},
+						&cli.BoolFlag{
+							Name:    "reboot-on-exit",
+							Value:   false,
+							EnvVars: []string{"TIMECHIEF_REBOOT_ON_EXIT"},
+						},
 					},
 				},
 				{
@@ -206,11 +363,11 @@ func getCLIApp() *cli.App {
 						},
 						&cli.IntFlag{
 							Name:    "splash-width",
-							EnvVars: []string{"timechief_width"},
+							EnvVars: []string{"TIMECHIEF_SPLASH_WIDTH"},
 						},
 						&cli.IntFlag{
 							Name:    "splash-height",
-							EnvVars: []string{"timechief_height"},
+							EnvVars: []string{"TIMECHIEF_SPLASH_HEIGHT"},
 						},
 					},
 				},
@@ -223,3 +380,4 @@ func getCLIApp() *cli.App {
 const defaultInstallDaemon = true
 const defaultSystemAutomation = false
 const daemonBaseURL = "http://localhost:8080"
+const credentialPath = "/opt/timechief-launcher/credentials/api.json"

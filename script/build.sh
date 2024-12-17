@@ -7,8 +7,6 @@ set -x
 # PHASE
 # VERSION
 # IMAGE_OUTPUT
-# weatherclock_client_security_apikey
-# weatherclock_client_core_baseurl
 # BUCKET_NAME
 # PRODUCT
 # STREAM
@@ -16,7 +14,6 @@ set -x
 # WIDTH
 # HEIGHT
 # API_BASE_URL
-# LAUNCHER_DEVICE_CREDENTIALS
 # INSTALL_ROOT
 
 # If $1 is set, it's the phase, otherwise use the env var PHASE
@@ -28,9 +25,11 @@ fi
 # bundle - build the client bundle and exit
 # upload - upload the client bundle and exit
 # init-fs - initialise the launcher filesystem and exit
-# all - do all of the above and build the image
+# build-iso - build the image
+# upload-iso - upload the image
+# all - do all of the above
 # Validate this:
-if [ "$PHASE" = "bundle" ] || [ "$PHASE" = "upload" ] || [ "$PHASE" = "init-fs" ] || [ "$PHASE" = "all" ] ; then
+if [ "$PHASE" = "bundle" ] || [ "$PHASE" = "upload" ] || [ "$PHASE" = "init-fs" ] || [ "$PHASE" = "build-iso" ] || [ "$PHASE" = "upload-iso" ] || [ "$PHASE" = "all" ] ; then
   echo "PHASE is $PHASE"
 else
   echo "PHASE must be one of: bundle, upload, init-fs, all"
@@ -69,3 +68,13 @@ if [ "$PHASE" = "init-fs" ] ; then
 fi
 
 ./script/build-image.sh
+
+if [ "$PHASE" = "build-iso" ] ; then
+  exit 0
+fi
+
+./script/upload-iso.sh
+
+if [ "$PHASE" = "upload-iso" ] ; then
+  exit 0
+fi

@@ -1,12 +1,14 @@
 package daemon
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 	"github.com/urfave/cli/v2"
@@ -35,7 +37,7 @@ func (daemon Setup) Start(ctx *cli.Context) {
 		log.Printf("setup daemon init error: %s", err)
 	}
 
-	runEvery(daemon.RefreshInterval, func() {
+	util.RunEvery(daemon.RefreshInterval, func() {
 		err := daemon.doTick(ctx)
 		if err != nil {
 			log.Printf("setup daemon tick error: %s", err)
@@ -78,13 +80,16 @@ func (daemon Setup) init() error {
 }
 
 const (
-	SetupFlagBegin                 string = "Begin"
-	SetupFlagWaitHotspot           string = "WaitHotspot"
-	SetupFlagWaitUserSelectNetwork string = "WaitUserSelectNetwork"
-	SetupFlagNetworkSelected       string = "NetworkSelected"
-	SetupFlagWaitNetworkConnect    string = "WaitNetworkConnect"
-	SetupFlagNetworkConnected      string = "NetworkConnected"
-	SetupFlagInternetConnected     string = "InternetConnected"
+	SetupFlagBegin                  string = "Begin"
+	SetupFlagChooseNetworkType      string = "WaitUserChooseSetupType"
+	SetupFlagWaitNetworkTypeApplied string = "WaitNetworkTypeApplied"
+	SetupFlagWaitHotspot            string = "WaitHotspot"
+	SetupFlagWaitUserSelectNetwork  string = "WaitUserSelectNetwork"
+	SetupFlagNetworkSelected        string = "NetworkSelected"
+	SetupFlagWaitNetworkConnect     string = "WaitNetworkConnect"
+	SetupFlagNetworkConnected       string = "NetworkConnected"
+	SetupFlagInternetConnected      string = "InternetConnected"
+	SetupFlagCancelled              string = "SetupCancelled"
 )
 
 // doTick is a single step in the main loop of the daemon.
@@ -102,6 +107,10 @@ func (daemon Setup) doTick(ctx *cli.Context) error {
 	switch state {
 	case SetupFlagBegin:
 		return daemon.handleBegin()
+	case SetupFlagChooseNetworkType:
+		return daemon.handleChooseNetworkType()
+	case SetupFlagWaitNetworkTypeApplied:
+		return daemon.handleWaitNetworkTypeApplied()
 	case SetupFlagWaitHotspot:
 		return daemon.handleHotspotWait()
 	case SetupFlagWaitUserSelectNetwork:
@@ -114,19 +123,38 @@ func (daemon Setup) doTick(ctx *cli.Context) error {
 		return daemon.handleNetworkConnected()
 	case SetupFlagInternetConnected:
 		return daemon.handleInternetConnected()
+	case SetupFlagCancelled:
+		return daemon.handleSetupCancelled()
 	default:
 		return fmt.Errorf("unknown setup state: %s", state)
 	}
 }
 
+func (daemon Setup) setInitialSoundState() error {
+	err := daemon.KeyValueStore.Set("mute", "false")
+	if err != nil {
+		return err
+	}
+	err = daemon.KeyValueStore.Set("unmute-range", "9-21")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (daemon Setup) handleBegin() error {
-	// Wipe all setup data.
-	err := daemon.WifiNetworkStore.MarkNotReady()
+	err := daemon.setInitialSoundState()
 	if err != nil {
 		return err
 	}
 
-	err = daemon.KeyValueStore.Delete("setup-wifi-uuid")
+	err = daemon.saveCancelState()
+	if err != nil {
+		return err
+	}
+
+	// Wipe all setup data.
+	err = daemon.WifiNetworkStore.MarkNotReady()
 	if err != nil {
 		return err
 	}
@@ -136,12 +164,132 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
-	err = daemon.StateFlagStore.CreateIfNotExists("wifi-load-interfaces")
+	err = daemon.KeyValueStore.Delete(store.LastInternetCheckKey)
 	if err != nil {
 		return err
 	}
 
-	err = daemon.StateFlagStore.CreateIfNotExists("wifi-scan")
+	err = daemon.KeyValueStore.Delete(("network-type"))
+	if err != nil {
+		return err
+	}
+
+	return daemon.KeyValueStore.Set("setup", SetupFlagChooseNetworkType)
+}
+
+type cancelState struct {
+	NetworkType string
+	WifiActive  bool
+}
+
+func (daemon Setup) saveCancelState() error {
+	state := cancelState{}
+	networkType, err := daemon.KeyValueStore.Get("network-type")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	if networkType != "" {
+		log.Printf("saving cancel-setup-state for network-type: %s", networkType)
+		state.NetworkType = networkType
+	}
+
+	active, err := daemon.WifiNetworkStore.GetActive()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	state.WifiActive = active.SSID != ""
+	if state.WifiActive {
+		log.Printf("saving cancel-setup-state that wifi is active")
+	}
+
+	stateText, err := json.Marshal(state)
+	if err != nil {
+		return err
+	}
+
+	return daemon.KeyValueStore.Set("cancel-setup-state", string(stateText))
+}
+
+func (daemon Setup) loadCancelState() error {
+	stateText, err := daemon.KeyValueStore.Get("cancel-setup-state")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	if stateText == "" {
+		return nil
+	}
+
+	state := cancelState{}
+	err = json.Unmarshal([]byte(stateText), &state)
+	if err != nil {
+		return err
+	}
+	if state.NetworkType != "" {
+		log.Printf("restoring cancel-setup-state for network-type: %s", state.NetworkType)
+		err = daemon.KeyValueStore.Set("network-type", state.NetworkType)
+		if err != nil {
+			return err
+		}
+	}
+
+	if state.WifiActive {
+		log.Printf("restoring cancel-setup-state that wifi was active")
+		err = daemon.WifiNetworkStore.MarkSelectedReady()
+		if err != nil {
+			return err
+		}
+
+		err = daemon.StateFlagStore.CreateIfNotExists("wifi-connect")
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (daemon Setup) handleSetupCancelled() error {
+	err := daemon.loadCancelState()
+	if err != nil {
+		return err
+	}
+	return daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
+}
+
+func (daemon Setup) handleChooseNetworkType() error {
+	networkType, err := daemon.KeyValueStore.Get("network-type")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	if networkType == "wifi" || networkType == "manual" {
+		return daemon.KeyValueStore.Set("setup", SetupFlagWaitNetworkTypeApplied)
+	}
+
+	return nil
+}
+
+func (daemon Setup) handleWaitNetworkTypeApplied() error {
+	networkType, err := daemon.KeyValueStore.Get("network-type")
+	if err != nil {
+		return err
+	}
+
+	switch networkType {
+	case "wifi":
+		return daemon.handleChooseWifiNetworkType()
+	case "manual":
+		return daemon.handleChooseManualNetworkType()
+	default:
+		return fmt.Errorf("unknown network type: %s", networkType)
+	}
+}
+
+func (daemon Setup) handleChooseWifiNetworkType() error {
+	err := daemon.StateFlagStore.CreateIfNotExists("wifi-scan")
 	if err != nil {
 		return err
 	}
@@ -151,7 +299,20 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
+	err = daemon.StateFlagStore.CreateIfNotExists("wifi-load-interfaces")
+	if err != nil {
+		return err
+	}
+
 	return daemon.KeyValueStore.Set("setup", SetupFlagWaitHotspot)
+}
+
+func (daemon Setup) handleChooseManualNetworkType() error {
+	err := daemon.System.DownHotspot()
+	if err != nil {
+		return fmt.Errorf("setup failed to put down possible hotspot for manaul setup option")
+	}
+	return daemon.KeyValueStore.Set("setup", SetupFlagNetworkConnected)
 }
 
 func (daemon Setup) handleHotspotWait() error {
@@ -297,8 +458,13 @@ func (daemon Setup) handleWaitNetworkConnect() error {
 }
 
 func (daemon Setup) handleNetworkConnected() error {
+	err := daemon.StateFlagStore.CreateIfNotExists("force-internet-check")
+	if err != nil {
+		return err
+	}
 	val, err := daemon.KeyValueStore.Get(store.LastInternetCheckKey)
 	if err != nil {
+		log.Printf("cannot progress to internet connected: no internet check found")
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil
 		}
@@ -309,16 +475,24 @@ func (daemon Setup) handleNetworkConnected() error {
 	const validDuration = time.Second * 10
 	checkTime, err := time.Parse(time.RFC3339, val)
 	if err != nil {
+		log.Printf("cannot progress to internet connected: failed to parse check time")
 		return err
 	}
 	if time.Since(checkTime) < validDuration {
 		err = daemon.KeyValueStore.Set("firstTimeSetupDone", "true")
 		if err != nil {
+			log.Printf("cannot progress to internet connected: failed to set first time setup done flag")
+			return err
+		}
+		err = daemon.StateFlagStore.Delete("force-internet-check")
+		if err != nil {
+			log.Printf("cannot progress to internet connceted: failed to delete force-internet-check flag")
 			return err
 		}
 		return daemon.KeyValueStore.Set("setup", SetupFlagInternetConnected)
 	}
 
+	log.Printf("cannot progress to internet connected: no internet")
 	return nil
 }
 

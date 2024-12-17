@@ -5,20 +5,27 @@
   "scripts": {
     "build-local": "vite build",
     "build-dev": "vite build --mode dev",
-    "build-prod": "vite build --mode prod",
+    "build-qa": "vite build --mode qa",
+    "gen-api-bindings": "npx openapi -i ../../api/v2/spec/openapi-3.0/api_spec.yaml -o ./src/api --client fetch --name TimechiefClient",
     "serve": "vite --host"
   },
   "browser": "src/web/index.js",
   "author": "GitHub",
   "license": "all-rights-reserved",
   "dependencies": {
-    "solid-app-router": "^0.3.3",
+    "@googlemaps/js-api-loader": "^1.16.2",
+    "@solidjs/router": "^0.8.3",
+    "google-maps": "^4.3.3",
+    "locale-codes": "^1.3.1",
+    "solid-bootstrap": "^1.0.18",
     "solid-js": "^1.3.15",
+    "timezones-list": "^3.0.2",
     "vite": "^3.0.3",
     "vite-plugin-solid": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.2",
+    "openapi-typescript-codegen": "^0.25.0",
     "vite-plugin-html": "^3.2.0"
   }
 }

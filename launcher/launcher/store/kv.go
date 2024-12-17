@@ -21,13 +21,29 @@ type KeyValueStore struct {
 	DB *gorm.DB
 }
 
-const PairingCodeKey = "pairing-code"
+const MyDevicesKey = "mydevices"
+const DeviceUUIDKey = "device-uuid"
+const PairingURLKey = "pairing-url"
+const PairingQRCodeURLKey = "pairing-url-complete"
+const PairingDeviceCodeKey = "pairing-device-code"
+const PairingUserCodeKey = "pairing-user-code"
+const LicenseActivationCodeKey = "license-activation-code"
 const AccessTokenKey = "access-token"
+const TokenExpiryKey = "token-expiry"
 const HotspotSSID = "hotspot-ssid"
 const HotspotKey = "hotspot-key"
 const IPAddressKey = "ip-address"
 const InterfaceModeKey = "interface-mode"
 const LastInternetCheckKey = "last-internet-check"
+const APIUserAuthKey = "api-user-auth"
+const APIAppAuthKey = "app-user-auth"
+const VideoContentFrequencyKey = "video-content-frequency"
+const VideoContentHourRangeKey = "video-content-hour-range"
+const VideoContentLastUpdateKey = "video-content-last-update"
+const VideoContentLastViewedKey = "video-content-last-viewed"
+const VideoDescriptorKey = "video-descriptor"
+const BackgroundPictureDescriptor = "background-picture-descriptor"
+const APIAccessEnabled = "api-access-enabled"
 
 // Set a key-value pair in the store.
 func (store KeyValueStore) Set(key string, value string) error {

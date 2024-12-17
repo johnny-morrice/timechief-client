@@ -25,16 +25,3 @@ alias la='ls -AF'
 alias l='ls -CF'
 alias s='sudo'
 alias sus='sudo -s'
-
-# silent startx on video console
-
-if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
-
-    # If the .cursor file is present in the user's home directory, then startx normally, otherwise use the -nocursor parameter.
-    if [ -f "$HOME/.cursor" ]; then
-          startx > /dev/null 2>&1
-    else
-          startx -- -nocursor > /dev/null 2>&1
-    fi
-  exit
-fi

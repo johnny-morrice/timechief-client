@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/johnny-morrice/timechief-client/launcher/sound/service"
+	"github.com/johnny-morrice/timechief-client/launcher/sound/song"
 )
 
 type SoundAPI struct {
@@ -19,7 +19,7 @@ func NewSoundAPI(svc MusicService) SoundAPI {
 }
 
 type MusicService interface {
-	StartSong(songOpts service.SongOptions) error
+	StartSong(songOpts song.Options) error
 	StopSong() error
 }
 
@@ -29,8 +29,8 @@ func (api SoundAPI) AddRoutes(mux *http.ServeMux) {
 }
 
 type SongRequest struct {
-	SongName string
-	Loop     bool
+	SongName string `json:"song_name"`
+	Loop     bool   `json:"loop"`
 }
 
 func (api SoundAPI) handlePlaySong(rw http.ResponseWriter, req *http.Request) {
@@ -46,7 +46,7 @@ func (api SoundAPI) handlePlaySong(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = api.svc.StartSong(service.SongOptions{
+	err = api.svc.StartSong(song.Options{
 		SongName: param.SongName,
 		Loop:     param.Loop,
 	})

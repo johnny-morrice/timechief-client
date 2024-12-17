@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 )
@@ -20,8 +21,10 @@ func Install(ctx *cli.Context) error {
 
 	splashWidth := ctx.Int("splash-width")
 	splashHeight := ctx.Int("splash-height")
-	targetSplash := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images",
-		fmt.Sprintf("splash-%d-%d.png", splashWidth, splashHeight))
+	targetSplash, err := getTargetSplash(targetRoot, splashWidth, splashHeight)
+	if err != nil {
+		return fmt.Errorf("failed to get target splash: %w", err)
+	}
 	systemSplash := filepath.Join(installRoot, "assets", "images", "splash.png")
 
 	links := []link{
@@ -29,7 +32,10 @@ func Install(ctx *cli.Context) error {
 		{oldPath: targetSplash, newPath: systemSplash},
 	}
 
-	scripts := []string{
+	assets := []string{
+		"assets/sound/login.wav",
+		"assets/sound/startup.wav",
+		"assets/sound/shutdown.wav",
 		"bin/timechief-bootstrap",
 		"bin/timechief-wifi-interfaces",
 		"bin/timechief-internet-check",
@@ -37,27 +43,65 @@ func Install(ctx *cli.Context) error {
 		"bin/timechief-shutdown",
 		"bin/timechief-wifi-connect",
 		"bin/timechief-wifi-hotspot",
+		"bin/timechief-wifi-down-hotspot",
 		"bin/timechief-wifi-interface",
 		"bin/timechief-wifi-scan",
 		"bin/timechief-expand-rootfs",
+		"bin/timechief-firewall",
+		"bin/timechief-ssh-change-passwd",
+		"bin/timechief-pipewire-initialise",
+		"bin/timechief-pipewire-play-file",
+		"bin/timechief-launcher-sound",
+		"bin/timechief-get-resolution",
 		"bin/secure/timechief-reboot",
 		"bin/secure/timechief-shutdown",
 		"bin/secure/timechief-wifi-connect",
 		"bin/secure/timechief-wifi-hotspot",
+		"bin/secure/timechief-wifi-down-hotspot",
 		"bin/secure/timechief-wifi-interface",
 		"bin/secure/timechief-wifi-scan",
 		"bin/secure/timechief-pyrtc",
 		"bin/secure/timechief-set-system-time",
 		"bin/secure/timechief-expand-rootfs",
+		"bin/secure/timechief-firewall",
+		"bin/secure/timechief-ssh-change-passwd",
 	}
 
-	for _, script := range scripts {
-		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", script)
-		systemScript := filepath.Join(installRoot, script)
+	for _, asset := range assets {
+		targetScript := filepath.Join(targetRoot, "timechief-client-bundle", asset)
+		systemScript := filepath.Join(installRoot, asset)
 		links = append(links, link{oldPath: targetScript, newPath: systemScript})
 	}
 
 	return installLinks(links)
+}
+
+func getTargetSplash(targetRoot string, width, height int) (string, error) {
+	mySplash := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images", fmt.Sprintf("splash-%dx%d.png", width, height))
+	if _, err := os.Stat(mySplash); err != nil {
+		// Find the first splash image in the target root.
+		splashDir := filepath.Join(targetRoot, "timechief-client-bundle", "assets", "images")
+		entries, err := os.ReadDir(splashDir)
+		if err != nil {
+			return "", fmt.Errorf("failed to read splash directory: %w", err)
+		}
+		for _, entry := range entries {
+			if entry.IsDir() {
+				continue
+			}
+			if filepath.Ext(entry.Name()) != ".png" {
+				continue
+			}
+			// Check prefix
+			if !strings.HasPrefix(filepath.Base(entry.Name()), "splash") {
+				continue
+			}
+
+			return filepath.Join(splashDir, entry.Name()), nil
+		}
+	}
+
+	return mySplash, nil
 }
 
 type link struct {

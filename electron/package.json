@@ -1,50 +1,46 @@
 {
   "name": "timechief",
   "version": "1.0.0",
-  "description": "Timechief smart clock",
-  "main": "src/main/main.js",
+  "description": "An Electron application with Solid",
+  "main": "./out/main/index.js",
+  "author": "example.com",
+  "homepage": "https://electron-vite.org",
   "scripts": {
-    "build": "vite build",
-    "start": "electron .",
-    "dist-debug": "vite build && electron-builder --dir --config.asar=false",
-    "dist-dir": "vite build && electron-builder --dir",
-    "dist": "vite build && electron-builder"
-  },
-  "build": {
-    "directories": {
-      "output": "dist",
-      "buildResources": "buildResources"
-    },
-    "appId": "io.timechief.app",
-    "files": [
-      "src/main/main.js",
-      "src/preload/preload.js",
-      "frontend-dist/**",
-      "package.json"
-    ],
-    "win": {
-      "artifactName": "timechief-client-${arch}.${ext}"
-    },
-    "linux": {
-      "artifactName": "timechief-client-electron",
-      "target": "AppImage"
-    }
-  },
-  "author": "GitHub",
-  "license": "all-rights-reserved",
-  "devDependencies": {
-    "electron": "^19.0.6",
-    "electron-builder": "^23.6.0"
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "start": "electron-vite preview",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "postinstall": "electron-builder install-app-deps",
+    "build:bundle": "npm run build && electron-builder --publish never",
+    "build:unpack": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:linux": "npm run build && electron-builder --linux"
   },
   "dependencies": {
-    "@solidjs/router": "^0.8.2",
-    "axios": "^0.27.2",
-    "axios-debug-log": "^0.8.4",
-    "qrcode": "^1.5.0",
-    "solid-js": "^1.7.1",
-    "uuid": "^8.3.2",
-    "vite": "^4.2.1",
-    "vite-plugin-solid": "^2.6.1",
-    "winston": "^3.8.0"
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^3.0.0",
+    "@solidjs/router": "^0.14.7",
+    "axios": "^1.7.7",
+    "axios-debug-log": "^1.0.0",
+    "fabric": "^6.4.2",
+    "papaparse": "^5.4.1",
+    "qrcode": "^1.5.4",
+    "wifi-qr-code-generator": "^1.1.1",
+    "winston": "^3.14.2"
+  },
+  "devDependencies": {
+    "@electron-toolkit/eslint-config": "^1.0.2",
+    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
+    "electron": "^31.0.2",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-solid": "^0.14.1",
+    "prettier": "^3.3.2",
+    "solid-js": "^1.8.17",
+    "vite": "^5.3.1",
+    "vite-plugin-solid": "^2.10.2"
   }
 }

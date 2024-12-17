@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -34,7 +35,7 @@ func (sys System) stopApp() error {
 	return store.CloseDB(sys.DB)
 }
 
-func (sys System) runScript(cfg store.Config, path string, args ...string) error {
+func (sys System) runScriptCaptureOutput(cfg store.Config, path string, args ...string) ([]byte, error) {
 	root := cfg.GetInstallRoot()
 	binRoot := filepath.Join(root, "bin")
 	script := filepath.Join(binRoot, path)
@@ -45,8 +46,12 @@ func (sys System) runScript(cfg store.Config, path string, args ...string) error
 		Args: args,
 	}
 
-	output, err := cmd.CombinedOutput()
-	log.Printf("system script %s output: %s", script, output)
+	return cmd.CombinedOutput()
+}
+
+func (sys System) runScript(cfg store.Config, path string, args ...string) error {
+	output, err := sys.runScriptCaptureOutput(cfg, path, args...)
+	log.Printf("system script %s output: %s", path, output)
 	if err != nil {
 		return fmt.Errorf("failed to execute system script %s: %w", path, err)
 	}
@@ -138,24 +143,29 @@ func toStoreCards(cards []WifiInterface) []*store.WifiInterface {
 }
 
 func toStoreNetworks(nets []WifiNetwork) []*store.WifiNetwork {
-	dedupe := make(map[string]int, len(nets))
+	dedupe := make(map[string]WifiNetwork, len(nets))
 
 	for i := 0; i < len(nets); i++ {
 		net := nets[i]
-		signal, ok := dedupe[net.SSID]
+		dedupeNet, ok := dedupe[net.SSID]
 		if ok {
-			if net.Signal < signal {
+			if net.Signal < dedupeNet.Signal {
 				continue
 			}
 		}
-		dedupe[net.SSID] = net.Signal
+		dedupe[net.SSID] = WifiNetwork{
+			SSID:       net.SSID,
+			Signal:     net.Signal,
+			Encryption: net.Encryption,
+		}
 	}
 
 	storeNets := make([]*store.WifiNetwork, 0, len(dedupe))
-	for ssid, signal := range dedupe {
+	for ssid, net := range dedupe {
 		storeNet := &store.WifiNetwork{
-			SSID:   ssid,
-			Signal: signal,
+			SSID:       ssid,
+			Signal:     net.Signal,
+			Encryption: net.Encryption,
 		}
 		storeNets = append(storeNets, storeNet)
 	}
@@ -256,10 +266,6 @@ func (sys System) WifiConnect() error {
 	}
 	err = card.Connect(network)
 	if err != nil {
-		return fmt.Errorf("failed to connect to wifi network: %w", err)
-	}
-
-	if err != nil {
 		log.Printf("failed to connect to wifi network: %s", network.SSID)
 		err = sys.WifiNetworkStore.MarkConnectionFailure(network.SSID)
 		if err != nil {
@@ -350,13 +356,20 @@ func (sys System) activeCardNetworkStatus() (NetworkStatus, error) {
 }
 
 func (sys System) LoadNetworkStatus() error {
+	networkType, err := sys.KeyValueStore.Get("network-type")
+	if err != nil {
+		return fmt.Errorf("failed to find network type: %w", err)
+	}
+	if networkType != "wifi" {
+		return nil
+	}
 	status, err := sys.activeCardNetworkStatus()
 	if err != nil {
 		return fmt.Errorf("failed to load network status: %w", err)
 	}
 	// log.Printf("network status: %v", status)
 	if status.Mode == InfraMode && status.SSID != "" {
-		if status.State == "up" {
+		if strings.Contains(status.State, "(connected)") {
 			// log.Printf("connected to %s", status.SSID)
 			err = sys.WifiNetworkStore.MarkConnectionSuccess(status.SSID)
 			if err != nil {
@@ -434,16 +447,48 @@ func (check internetCheck) runCheck(nc netcmd.NetCmd, stopch <-chan struct{}) er
 }
 
 func (sys System) CheckInternet() error {
-	// Check network status
-	status, err := sys.activeCardNetworkStatus()
+	forceCheck, err := sys.StateFlagStore.Exists("force-internet-check")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+	lastCheckTime, err := sys.KeyValueStore.Get(store.LastInternetCheckKey)
 	if err != nil {
-		return fmt.Errorf("failed to load network status: %w", err)
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+	} else if lastCheckTime != "" {
+		const cacheDuration = time.Second * 120
+		checkTime, err := time.Parse(time.RFC3339, lastCheckTime)
+		if err != nil {
+			return err
+		}
+		if !forceCheck && time.Since(checkTime) < cacheDuration {
+			return nil
+		}
 	}
 
-	if status.Mode != InfraMode {
-		// log.Printf("not checking internet, network mode is %s", status.Mode)
-		return nil
+	networkType, err := sys.KeyValueStore.Get("network-type")
+	if err != nil {
+		return err
 	}
+
+	switch networkType {
+	case "manual":
+	case "wifi":
+		// Check network status
+		status, err := sys.activeCardNetworkStatus()
+		if err != nil {
+			return fmt.Errorf("failed to load network status: %w", err)
+		}
+
+		if status.Mode != InfraMode {
+			log.Printf("not checking internet, network mode is %s", status.Mode)
+			return nil
+		}
+	default:
+		return fmt.Errorf("unknown network type: %s", networkType)
+	}
+
 	const timeout = 15 * time.Second
 	const interval = time.Second
 	addresses := []string{
@@ -509,6 +554,14 @@ func (sys System) CheckInternet() error {
 	}
 
 	return errors.New("all internet checks failed")
+}
+
+func (sys System) DownHotspot() error {
+	cfg, err := sys.ConfigStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	return sys.runScript(cfg, "timechief-wifi-down-hotspot")
 }
 
 // SyncRTC syncs the system clock with the RTC.  By running the following command:

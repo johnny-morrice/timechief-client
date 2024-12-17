@@ -1,0 +1,2114 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: "Timechief API"
+servers:
+  - url: "https://api.timechief.com/api/v2"
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth0/logout:
+    post:
+      operationId: "logoutWebSession"
+      summary: "Clear web session data"
+      responses:
+        "200":
+          description: "Follow returned URL for browser logout"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutRedirect"
+        "500":
+          description: "Internal server error"
+  /device:
+    post:
+      summary: "Create a new device"
+      operationId: "createDevice"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Device"
+      responses:
+        "200":
+          description: "Device created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    put:
+      summary: "Update device"
+      operationId: "updateDevice"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Device"
+      responses:
+        "204":
+          description: "Device updated successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+    get:
+      summary: "Get a list of devices"
+      operationId: "listDevices"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of devices to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of devices retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Device"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /device/{id}:
+    get:
+      summary: "Get a device by ID"
+      operationId: "getDeviceById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the device to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Device retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /apikey:
+    post:
+      summary: "Create a new API key"
+      operationId: "createAPIKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/APIKey"
+      responses:
+        "200":
+          description: "APIKey created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIKey"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+    get:
+      summary: "Get a list of API keys"
+      operationId: "listAPIKeys"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of API keys to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of API keys retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/APIKey"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /apikey/{id}:
+    get:
+      summary: "Get a API key by ID"
+      operationId: "getAPIKeyById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the API key to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "API key retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIKey"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /license:
+    post:
+      summary: "Create a new license"
+      operationId: "createLicense"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/License"
+      responses:
+        "200":
+          description: "License created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/License"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    put:
+      summary: "Update a new license"
+      operationId: "updateLicense"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/License"
+      responses:
+        "204":
+          description: "License updated successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    get:
+      summary: "Get a list of licenses"
+      operationId: "listLicenses"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of licenses to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of licenses retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/License"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /license/{id}:
+    get:
+      summary: "Get a license by ID"
+      operationId: "getLicenseById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the license to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "License retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/License"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /principal:
+    post:
+      summary: "Create a new principal"
+      operationId: "createPrincipal"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Principal"
+      responses:
+        "200":
+          description: "Principal created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Principal"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    put:
+      summary: "Update a new principal"
+      operationId: "updatePrincipal"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Principal"
+      responses:
+        "204":
+          description: "Principal updated successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+    get:
+      summary: "Get a list of principals"
+      operationId: "listPrincipals"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of principals to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of principals retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Principal"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /principal/{id}:
+    get:
+      summary: "Get a principal by ID"
+      operationId: "getPrincipalById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the principal to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Principal retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Principal"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /principal/me:
+    get:
+      summary: "Get the current principal"
+      operationId: "getCurrentPrincipal"
+      responses:
+        "200":
+          description: "Current principal retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Principal"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /version:
+    post:
+      summary: "Create a new version"
+      operationId: "createVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Version"
+      responses:
+        "200":
+          description: "Version created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Version"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+    get:
+      summary: "Get a list of versions"
+      operationId: "listVersions"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of versions to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of versions retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Version"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /version/{id}:
+    get:
+      summary: "Get a version by ID"
+      operationId: "getVersionById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the version to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Version retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Version"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /version/{id}/download:
+    get:
+      summary: "Get a version download by ID"
+      operationId: "getVersionDownloadById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the version to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Version download retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VersionDownload"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /version/latest/{product}/{stream}:
+    get:
+      summary: "Get latest versions"
+      operationId: "listLatestVersions"
+      parameters:
+        - in: "path"
+          name: "product"
+          description: "Version product"
+          required: true
+          schema:
+            type: "string"
+        - in: "path"
+          name: "stream"
+          description: "Version stream"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "List of versions retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Version"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /googleprofile:
+    post:
+      summary: "Create a new principal google account"
+      operationId: "createPrincipalGoogleAccount"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PrincipalGoogleAccount"
+      responses:
+        "200":
+          description: "Principal google account created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrincipalGoogleAccount"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+    get:
+      summary: "Get a list of principal google accounts"
+      operationId: "listPrincipalGoogleAccounts"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of principal google accounts to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of principal google accounts retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PrincipalGoogleAccount"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /googleprofile/{id}:
+    get:
+      summary: "Get a principal google account by ID"
+      operationId: "getPrincipalGoogleAccountById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the principal google account to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Principal google account retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrincipalGoogleAccount"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /googleprofile/{id}/profile:
+    get:
+      summary: "Get the Google Profile for a principal google account by ID"
+      operationId: "getGoogleProfileByPrincipalGoogleAccountId"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the principal google account to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Google Profile retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoogleProfile"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+    delete:
+      summary: "Delete a principal google account by ID"
+      operationId: "deletePrincipalGoogleAccountById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the principal google account to delete"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Principal google account deleted successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /googleprofile/by-principal-uuid/{principal_uuid}:
+    get:
+      summary: "Get a principal google account by principal UUID"
+      operationId: "getPrincipalGoogleAccountByPrincipalUUID"
+      parameters:
+        - in: "path"
+          name: "principal_uuid"
+          description: "Principal UUID of the principal google account to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Principal google account retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrincipalGoogleAccount"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /googleprofile/me:
+    get:
+      summary: "Get the principal google account for the current user"
+      operationId: "getMyPrincipalGoogleAccount"
+      responses:
+        "200":
+          description: "Principal google account retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrincipalGoogleAccount"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+    delete:
+      summary: "Delete the principal google account for the current user"
+      operationId: "deleteMyPrincipalGoogleAccount"
+      responses:
+        "204":
+          description: "Principal google account deleted successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /googleprofile/me/profile:
+    get:
+      summary: "Get the Google Profile for the current user"
+      operationId: "getMyGoogleProfile"
+      responses:
+        "200":
+          description: "Google Profile retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoogleProfile"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /googleprofile/me/auth-url:
+    get:
+      summary: "Get the Google OAuth URL for the current user"
+      operationId: "getMyGoogleAuthUrl"
+      responses:
+        "200":
+          description: "Google OAuth URL retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  url:
+                    type: "string"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /googleprofile/me/oauth2-callback:
+    get:
+      summary: "Google OAuth2 callback endpoint"
+      operationId: "googleOAuth2Callback"
+      parameters:
+        - in: "query"
+          name: "code"
+          description: "Google OAuth2 code"
+          required: true
+          schema:
+            type: "string"
+        - in: "query"
+          name: "state"
+          description: "Google OAuth2 state"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "307":
+          description: "Redirect to the frontend"
+          headers:
+            Location:
+              schema:
+                type: "string"
+                format: "uri"
+                description: "Redirect URL"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /data/{device_uuid}:
+    get:
+      summary: "Get data for the given device UUID"
+      operationId: "getDataByDeviceUUID"
+      parameters:
+        - in: "path"
+          name: "device_uuid"
+          description: "Device UUID"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Data retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Data"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /order:
+    get:
+      summary: "Get a list of orders"
+      operationId: "listOrders"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of orders to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of orders retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Order"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+    post:
+      summary: "Create a new order"
+      operationId: "createOrder"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      responses:
+        "200":
+          description: "Order created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: "Bad request - Invalid input"
+        "500":
+          description: "Internal server error"
+
+    put:
+      summary: "Update an order"
+      operationId: "updateOrder"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      responses:
+        "204":
+          description: "Order updated successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "500":
+          description: "Internal server error"
+
+  /order/{uuid}:
+    get:
+      summary: "Get an order by UUID"
+      operationId: "getOrderByUUID"
+      parameters:
+        - in: "path"
+          name: "uuid"
+          description: "UUID of the order to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Order retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+
+  /order/activate:
+    post:
+      summary: "Activate an order"
+      operationId: "activateOrder"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderActivation"
+      responses:
+        "204":
+          description: "Order activated successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "500":
+          description: "Internal server error"
+
+  /world/geocode:
+    get:
+      summary: "Geocode a location"
+      operationId: "geocode"
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: string
+            format: latitude
+        - name: lng
+          in: query
+          required: true
+          schema:
+            type: string
+            format: longitude
+        - name: term
+          in: query
+          required: true
+          schema:
+            type: string
+            maxLength: 1024
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeocodeResult"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+
+  /theme:
+    post:
+      summary: "Create a new theme"
+      operationId: "createTheme"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Theme"
+      responses:
+        "200":
+          description: "Theme created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    put:
+      summary: "Update a theme"
+      operationId: "updateTheme"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Theme"
+      responses:
+        "204":
+          description: "Theme updated successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+    get:
+      summary: "Get a list of themes"
+      operationId: "listThemes"
+      parameters:
+        - in: "query"
+          name: "limit"
+          description: "Number of themes to return"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "offset"
+          description: "Offset for paginated results (optional)"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "List of themes retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+  /theme/{id}:
+    get:
+      summary: "Get a theme by ID"
+      operationId: "getThemeById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the theme to retrieve"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Theme retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Theme"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+  /bucketfile:
+    get:
+      operationId: "listBucketFiles"
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: tag
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+    post:
+      operationId: "createBucketFile"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BucketFile'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+  /bucketfile/{uuid}:
+    get:
+      operationId: "getBucketFileByID"
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFile'
+  /bucketfile/{uuid}/download:
+    get:
+      operationId: "getBucketFileDownload"
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketFileDownload'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Access token
+  schemas:
+    GeocodeResult:
+      type: object
+      required:
+        - lat
+        - lng
+        - timezone
+        - address
+        - location
+        - culture
+      properties:
+        lat:
+          type: string
+        lng:
+          type: string
+        timezone:
+          type: string
+        address:
+          type: string
+        location:
+          type: string
+        culture:
+          type: object
+          required:
+            - country_code
+            - default_locale
+            - default_temperature_option
+            - default_hour_cycle_option
+          properties:
+            country_code:
+              type: string
+            default_locale:
+              type: string
+            default_temperature_option:
+              type: string
+            default_hour_cycle_option:
+              type: string
+
+    APIKey:
+      type: object
+      required:
+        - uuid
+        - principal_uuid
+        - name
+        - scopes
+        - is_admin
+      properties:
+        uuid:
+          type: string
+        name:
+          type: string
+        is_admin:
+          type: boolean
+        principal_uuid:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+    Device:
+      type: "object"
+      required:
+        - uuid
+        - nickname
+        - latitude
+        - longitude
+        - timezone
+        - location
+        - locale
+        - hour_cycle_option
+        - temperature_option
+        - license_uuid
+        - is_muted
+        - is_mute_range
+        - mute_hour_start
+        - mute_hour_end
+        - theme_uuid
+        - spooky_campaign_opt_in
+      properties:
+        uuid:
+          type: "string"
+        nickname:
+          type: "string"
+        latitude:
+          type: "string"
+        longitude:
+          type: "string"
+        timezone:
+          type: "string"
+        location:
+          type: "string"
+        locale:
+          type: "string"
+        hour_cycle_option:
+          type: "string"
+          enum:
+            - "12h"
+            - "24h"
+        temperature_option:
+          type: "string"
+          enum:
+            - "c"
+            - "f"
+        license_uuid:
+          type: "string"
+        is_muted:
+          type: boolean
+        is_mute_range:
+          type: boolean
+        mute_hour_start:
+          type: integer
+        mute_hour_end:
+          type: integer
+        theme_uuid:
+          type: "string"
+        spooky_campaign_opt_in:
+          type: boolean
+
+    License:
+      type: "object"
+      required:
+        - uuid
+        - principal_uuid
+        - valid_until
+        - premium
+      properties:
+        uuid:
+          type: "string"
+        principal_uuid:
+          type: "string"
+        valid_until:
+          type: "integer"
+        premium:
+          type: "boolean"
+
+    Principal:
+      type: "object"
+      required:
+        - uuid
+        - auth_zero_sub
+      properties:
+        uuid:
+          type: "string"
+        auth_zero_sub:
+          type: "string"
+
+    PrincipalGoogleAccount:
+      type: "object"
+      required:
+        - uuid
+        - principal_uuid
+        - token
+      properties:
+        uuid:
+          type: "string"
+        principal_uuid:
+          type: "string"
+        token:
+          type: "string"
+
+    GoogleProfile:
+      type: "object"
+      required:
+        - uuid
+        - email_address
+        - dt
+      properties:
+        uuid:
+          type: "string"
+        email_address:
+          type: "string"
+        dt:
+          type: "integer"
+
+    Version:
+      type: "object"
+      required:
+        - uuid
+        - version
+        - product
+        - stream
+        - bucket
+        - object
+        - sha256
+        - command
+        - filename
+        - size
+      properties:
+        uuid:
+          type: "string"
+        version:
+          type: "string"
+        product:
+          type: "string"
+        stream:
+          type: "string"
+        bucket:
+          type: "string"
+        object:
+          type: "string"
+        sha256:
+          type: "string"
+        command:
+          type: "string"
+        filename:
+          type: "string"
+        size:
+          type: "integer"
+
+    VersionDownload:
+      type: "object"
+      required:
+        - uuid
+        - version
+        - product
+        - stream
+        - sha256
+        - command
+        - download_url
+        - filename
+        - size
+      properties:
+        uuid:
+          type: "string"
+        version:
+          type: "string"
+        product:
+          type: "string"
+        stream:
+          type: "string"
+        sha256:
+          type: "string"
+        command:
+          type: "string"
+        download_url:
+          type: "string"
+        filename:
+          type: "string"
+        size:
+          type: "integer"
+
+    WeatherCondition:
+      type: object
+      required:
+        - condition_code
+        - warning
+      properties:
+        condition_code:
+          type: string
+        warning:
+          type: boolean
+
+    CurrentWeather:
+      type: object
+      required:
+        - temp
+        - feels_like
+        - weather_conditions
+      properties:
+        temp:
+          type: string
+        feels_like:
+          type: string
+        weather_conditions:
+          $ref: "#/components/schemas/WeatherCondition"
+
+    DailyTemperature:
+      type: object
+      required:
+        - morn
+        - day
+        - eve
+        - night
+      properties:
+        morn:
+          type: string
+        day:
+          type: string
+        eve:
+          type: string
+        night:
+          type: string
+
+    DailyWeather:
+      type: object
+      required:
+        - dt
+        - temp
+        - feels_like
+        - weather_conditions
+        - sunrise
+        - sunset
+        - moonrise
+        - moonset
+        - moon_phase
+      properties:
+        dt:
+          type: integer
+        temp:
+          $ref: "#/components/schemas/DailyTemperature"
+        feels_like:
+          $ref: "#/components/schemas/DailyTemperature"
+        weather_conditions:
+          $ref: "#/components/schemas/WeatherCondition"
+        sunrise:
+          type: integer
+        sunset:
+          type: integer
+        moonrise:
+          type: integer
+        moonset:
+          type: integer
+        moon_phase:
+          type: string
+
+    OWMData:
+      type: object
+      required:
+        - current
+        - daily
+      properties:
+        current:
+          $ref: "#/components/schemas/CurrentWeather"
+        daily:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyWeather"
+
+    BucketFileMetadata:
+        type: object
+        properties:
+          duration:
+            type: integer
+            format: int64
+          link:
+            type: string
+          theme:
+            type: object
+            required:
+              - foreground_color
+              - background_color
+              - box_background_color
+              - box_border_radius
+              - box_border_width
+              - box_border_color
+              - main_font
+              - time_font
+              - time_color
+              - button_border_radius
+              - button_border_width
+              - button_border_color
+              - button_foreground_color
+              - button_background_color
+              - image_fit
+              - image_uuids
+            properties:
+              foreground_color:
+                type: string
+              background_color:
+                type: string
+              box_background_color:
+                type: string
+              box_border_radius:
+                type: string
+              box_border_width:
+                type: string
+              box_border_color:
+                type: string
+              main_font:
+                type: string
+              time_font:
+                type: string
+              time_color:
+                type: string
+              button_border_radius:
+                type: string
+              button_border_width:
+                type: string
+              button_border_color:
+                type: string
+              button_foreground_color:
+                type: string
+              button_background_color:
+                type: string
+              image_fit:
+                type: string
+              image_uuids:
+                type: array
+                items:
+                  type: string
+
+    BucketFileLinks:
+      type: object
+      required:
+        - files
+      properties:
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/BucketFileLink"
+
+    BucketFileLink:
+      type: object
+      required:
+        - uuid
+        - sha256
+        - size
+        - filename
+        - mimetype
+        - url
+        - metadata
+      properties:
+        uuid:
+          type: string
+        sha256:
+          type: string
+        size:
+          type: integer
+        filename:
+          type: string
+        mimetype:
+          type: string
+        url:
+          type: string
+        metadata:
+          $ref: "#/components/schemas/BucketFileMetadata"
+
+    BucketFilesDatum:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        value:
+          $ref: "#/components/schemas/BucketFileLinks"
+        dt:
+          type: integer
+
+    DeviceProfile:
+      type: object
+      required:
+        - principal_uuid
+        - device
+        - theme
+        - features
+      properties:
+        principal_uuid:
+          type: string
+        device:
+          $ref: "#/components/schemas/Device"
+        theme:
+          $ref: "#/components/schemas/Theme"
+        features:
+          $ref: "#/components/schemas/Features"
+        profile_create_dt:
+          type: integer
+
+    Features:
+      type: object
+      required:
+        - open_weather_map
+        - google_calendar
+        - google_profile
+        - spooky_campaign
+      properties:
+        open_weather_map:
+          type: boolean
+        google_calendar:
+          type: boolean
+        google_profile:
+          type: boolean
+        spooky_campaign:
+          type: boolean
+
+    Theme:
+      type: object
+      required:
+        - uuid
+        - foreground_color
+        - background_color
+        - box_background_color
+        - box_border_radius
+        - box_border_width
+        - box_border_color
+        - main_font
+        - time_font
+        - time_color
+        - button_border_radius
+        - button_border_width
+        - button_border_color
+        - button_foreground_color
+        - button_background_color
+        - error_color
+        - disabled_button_border_color
+        - disabled_button_background_color
+        - disabled_button_foreground_color
+        - image_fit
+        - image_uuids
+        - display_width
+        - display_height
+        - layout_type
+        - widget_switcher_x
+        - widget_switcher_y
+        - widget_switcher_width
+        - widget_switcher_height
+        - date_time_x
+        - date_time_y
+        - date_time_width
+        - date_time_height
+        - action_center_x
+        - action_center_y
+        - action_center_width
+        - action_center_height
+        - planner_x
+        - planner_y
+        - planner_width
+        - planner_height
+        - body_font_size
+        - date_font_size
+        - time_font_size
+        - current_weather_font_size
+        - action_button_font_size
+        - switcher_button_font_size
+        - astro_font_size
+        - weather_data_font_size
+        - current_weather_icon_font_size
+        - forecast_icon_font_size
+        - forecast_weather_table_icon_font_size
+        - forecast_control_button_font_size
+        - forecast_control_label_font_size
+        - calendar_day_date_font_size
+        - calendar_day_font_size
+        - event_calendar_control_button_font_size
+        - fortune_message_font_size
+        - next_event_time_font_size
+        - next_event_text_font_size
+        - loading_grid_font_size
+        - planner_date_cell_font_size
+        - planner_date_cell_width
+        - planner_date_cell_height
+        - planner_day_event_count
+        - fortune_mascot_height
+        - event_mascot_height
+        - status_note_font_size
+        - is_default
+      properties:
+        uuid:
+          type: string
+        foreground_color:
+          type: string
+        background_color:
+          type: string
+        box_background_color:
+          type: string
+        box_border_radius:
+          type: string
+        box_border_width:
+          type: string
+        box_border_color:
+          type: string
+        main_font:
+          type: string
+        time_font:
+          type: string
+        time_color:
+          type: string
+        button_border_radius:
+          type: string
+        button_border_width:
+          type: string
+        button_border_color:
+          type: string
+        button_foreground_color:
+          type: string
+        button_background_color:
+          type: string
+        error_color:
+          type: string
+        disabled_button_border_color:
+          type: string
+        disabled_button_foreground_color:
+          type: string
+        disabled_button_background_color:
+          type: string
+        image_fit:
+          type: string
+        image_uuids:
+          type: array
+          items:
+            type: string
+        display_width:
+          type: integer
+        display_height:
+          type: integer
+        layout_type:
+          type: string
+        widget_switcher_x:
+          type: string
+        widget_switcher_y:
+          type: string
+        widget_switcher_width:
+          type: string
+        widget_switcher_height:
+          type: string
+        date_time_x:
+          type: string
+        date_time_y:
+          type: string
+        date_time_width:
+          type: string
+        date_time_height:
+          type: string
+        action_center_x:
+          type: string
+        action_center_y:
+          type: string
+        action_center_width:
+          type: string
+        action_center_height:
+          type: string
+        planner_x:
+          type: string
+        planner_y:
+          type: string
+        planner_width:
+          type: string
+        planner_height:
+          type: string
+        body_font_size:
+          type: string
+        date_font_size:
+          type: string
+        time_font_size:
+          type: string
+        current_weather_font_size:
+          type: string
+        action_button_font_size:
+          type: string
+        switcher_button_font_size:
+          type: string
+        astro_font_size:
+          type: string
+        weather_data_font_size:
+          type: string
+        current_weather_icon_font_size:
+          type: string
+        forecast_icon_font_size:
+          type: string
+        forecast_weather_table_icon_font_size:
+          type: string
+        forecast_control_button_font_size:
+          type: string
+        forecast_control_label_font_size:
+          type: string
+        calendar_day_date_font_size:
+          type: string
+        calendar_day_font_size:
+          type: string
+        event_calendar_control_button_font_size:
+          type: string
+        fortune_message_font_size:
+          type: string
+        next_event_time_font_size:
+          type: string
+        next_event_text_font_size:
+          type: string
+        loading_grid_font_size:
+          type: string
+        planner_date_cell_font_size:
+          type: string
+        planner_date_cell_width:
+          type: string
+        planner_date_cell_height:
+          type: string
+        planner_day_event_count:
+          type: integer
+        fortune_mascot_height:
+          type: string
+        event_mascot_height:
+          type: string
+        status_note_font_size:
+          type: string
+        is_default:
+          type: boolean
+
+    OWMDataDatum:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        value:
+          $ref: "#/components/schemas/OWMData"
+        dt:
+          type: integer
+
+    DeviceProfileDatum:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        value:
+          $ref: "#/components/schemas/DeviceProfile"
+        dt:
+          type: integer
+
+    GoogleProfileData:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        email_address:
+          type: string
+
+    GoogleProfileDatum:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        value:
+          $ref: "#/components/schemas/GoogleProfileData"
+        dt:
+          type: integer
+
+    Calendar:
+      type: object
+      required:
+        - events
+        - min_dt
+        - max_dt
+        - dt
+      properties:
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/CalendarEvent"
+        min_dt:
+          type: integer
+          format: int64
+        max_dt:
+          type: integer
+          format: int64
+        dt:
+          type: integer
+          format: int64
+
+    CalendarEvent:
+      type: object
+      required:
+        - id
+        - short_text
+        - all_day
+        - start
+        - end
+      properties:
+        id:
+          type: string
+        short_text:
+          type: string
+        all_day:
+          type: boolean
+        start:
+          type: integer
+          format: int64
+        end:
+          type: integer
+          format: int64
+
+    CalendarDatum:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        value:
+          $ref: "#/components/schemas/Calendar"
+        dt:
+          type: integer
+
+    SpookyCampaign:
+      type: object
+      required:
+        - video_uuid
+      properties:
+        video_uuid:
+          type: string
+
+    SpookyCampaignDatum:
+      type: object
+      required:
+        - value
+        - dt
+      properties:
+        value:
+          $ref: "#/components/schemas/SpookyCampaign"
+        dt:
+          type: integer
+
+    Data:
+      type: object
+      required:
+        - device_profile
+        - owm
+        - google_calendar
+        - google_profile
+        - spooky_campaign
+        - bucket_files
+        - dt
+      properties:
+        device_profile:
+          $ref: "#/components/schemas/DeviceProfileDatum"
+        owm:
+          $ref: "#/components/schemas/OWMDataDatum"
+        google_calendar:
+          $ref: "#/components/schemas/CalendarDatum"
+        google_profile:
+          $ref: "#/components/schemas/GoogleProfileDatum"
+        spooky_campaign:
+          $ref: "#/components/schemas/SpookyCampaignDatum"
+        bucket_files:
+          $ref: "#/components/schemas/BucketFilesDatum"
+        dt:
+          type: integer
+
+    Order:
+      type: object
+      required:
+        - uuid
+        - incoming_sheet_id
+        - order_system_uuid
+        - customer_identifier
+        - product_name
+        - activation_code
+        - ordered_at
+        - info
+      properties:
+        uuid:
+          type: string
+        incoming_sheet_id:
+          type: integer
+        order_system_uuid:
+          type: string
+        customer_identifier:
+          type: string
+        product_name:
+          type: string
+        activation_code:
+          type: string
+        ordered_at:
+          type: integer
+        info:
+          type: object
+          required:
+            - license_count
+          properties:
+            license_count:
+              type: integer
+            valid_until:
+              type: integer
+
+    OrderActivation:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+
+    BucketFile:
+      type: object
+      required:
+        - uuid
+        - bucket
+        - object
+        - sha256
+        - size
+        - filename
+        - mimeType
+        - tag
+        - metadata
+      properties:
+        uuid:
+          type: string
+        bucket:
+          type: string
+        object:
+          type: string
+        sha256:
+          type: string
+          format: sha256
+        size:
+          type: integer
+          format: int64
+        filename:
+          type: string
+        mimetype:
+          type: string
+        tag:
+          type: string
+        metadata:
+          $ref: "#/components/schemas/BucketFileMetadata"
+
+    BucketFileDownload:
+      type: object
+      required:
+        - uuid
+        - bucket
+        - object
+        - sha256
+        - size
+        - filename
+        - mimeType
+        - tag
+        - url
+        - download_url
+        - metadata
+      properties:
+        uuid:
+          type: string
+        bucket:
+          type: string
+        object:
+          type: string
+        sha256:
+          type: string
+          format: sha256
+        size:
+          type: integer
+          format: int64
+        filename:
+          type: string
+        mimetype:
+          type: string
+        tag:
+          type: string
+        url:
+          type: string
+        download_url:
+          type: string
+        metadata:
+          $ref: "#/components/schemas/BucketFileMetadata"
+    
+    LogoutRedirect:
+      type: object
+      required:
+        - redirect_url
+      properties:
+        redirect_url:
+          type: string

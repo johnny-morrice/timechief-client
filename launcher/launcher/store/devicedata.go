@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/johnny-morrice/timechief-client/client/viewmodel"
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"gorm.io/gorm"
 )
 
@@ -21,24 +21,24 @@ type DeviceDataStore struct {
 	DB *gorm.DB
 }
 
-func (store DeviceDataStore) GetDeviceData() (viewmodel.ClockData, error) {
+func (store DeviceDataStore) GetDeviceData() (v2.Data, error) {
 	var data DeviceData
 	result := store.DB.First(&data)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return viewmodel.ClockData{}, nil
+			return v2.Data{}, nil
 		}
-		return viewmodel.ClockData{}, fmt.Errorf("error getting cached device data: %w", result.Error)
+		return v2.Data{}, fmt.Errorf("error getting cached device data: %w", result.Error)
 	}
-	var deviceData viewmodel.ClockData
+	var deviceData v2.Data
 	err := json.Unmarshal(data.DeviceJSON, &deviceData)
 	if err != nil {
-		return viewmodel.ClockData{}, fmt.Errorf("error unmarshaling device data: %w", err)
+		return v2.Data{}, fmt.Errorf("error unmarshaling device data: %w", err)
 	}
 	return deviceData, nil
 }
 
-func (store DeviceDataStore) SetDeviceData(clockData viewmodel.ClockData) error {
+func (store DeviceDataStore) SetDeviceData(clockData v2.Data) error {
 	deviceJSON, err := json.Marshal(clockData)
 	if err != nil {
 		return fmt.Errorf("error marshaling device data: %w", err)

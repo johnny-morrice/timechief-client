@@ -1,17 +1,16 @@
 import { render } from "solid-js/web";
-import { Home } from "./home";
-import { Router, Routes, Route } from "solid-app-router";
+import { Router, Routes, Route, hashIntegration } from "@solidjs/router";
+import { WebSetupRoute } from "./components/dashboard/websetup";
 
 const App = () => {
   return <Routes>
-      <Route path="/" element={<Home/>} />
+      <Route path="/" component={WebSetupRoute} />
     </Routes>
 }
 
 
 export function attachApp() {
-  render(() => <Router><App /></Router>, document.getElementById('app'));
+  render(() => <Router source={hashIntegration()}><App /></Router>, document.getElementById('app'));
 }
 
 attachApp();
-

@@ -1,16 +1,42 @@
 package cmd
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/api"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/auth"
+	mediaapi "github.com/johnny-morrice/timechief-client/launcher/launcher/api/media"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/middleware"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/api/websetup"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/daemonclient"
-	client "github.com/johnny-morrice/timechief-client/launcher/launcher/client/serviceclient"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/clientbuilder"
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/credfile"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/crypt"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/adaptivetick"
+	datadaemon "github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/data"
+	fwdaemon "github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/firewall"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/picturedownload"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/videodownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
+	datasvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/data"
+	wfservice "github.com/johnny-morrice/timechief-client/launcher/launcher/service/firewall"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
+	mediasvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/media"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/media/layout"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	syssvc "github.com/johnny-morrice/timechief-client/launcher/launcher/service/system"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
+	websetupservice "github.com/johnny-morrice/timechief-client/launcher/launcher/service/websetup"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
@@ -50,26 +76,33 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	cfgStore := store.ConfigStore{DB: db}
-	cfg, err := cfgStore.GetConfig()
-	if err != nil {
-		return err
-	}
-	clnt, err := client.MakePublicClient(cfg)
-	if err != nil {
-		return err
-	}
-	soundClient := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"))
-	soundService := sound.NewSoundService(soundClient)
+
 	launchTargetStore := store.LaunchTargetStore{DB: db}
-	up := update.Updater{
-		VersionStore:      store.VersionStore{DB: db},
-		LaunchTargetStore: launchTargetStore,
-		CfgStore:          cfgStore,
-		Client:            clnt,
-		RequestTimeout:    ctx.Duration("service-request-timeout"),
-	}
 
 	keyValueStore := store.KeyValueStore{DB: db}
+
+	// TODO bit weird that daemon client is for sound daemon and this daemon.
+	soundClient, err := daemonclient.NewDaemonClient(ctx.String("sound-daemon-base-url"), daemonclient.CredentialProvider{})
+	if err != nil {
+		return err
+	}
+	soundService, err := sound.NewSoundService(soundClient, keyValueStore)
+	if err != nil {
+		return err
+	}
+
+	timechiefClient, err := clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).Build()
+	if err != nil {
+		return err
+	}
+	noAuthClientFactory := func() (v2.ClientInterface, error) {
+		return clientbuilder.Builder{}.CfgStore(cfgStore).KVStore(keyValueStore).UseAuth(false).Build()
+	}
+
+	versionDownloader := versiondownload.MakeVersionDownloader(cfgStore, noAuthClientFactory)
+	up := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, launchTargetStore, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout"))
+
+	myDevices := daemon.MakeMyDevices(timechiefClient, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), time.Second*2)
 
 	updateDaemon := daemon.Update{
 		Updater:               up,
@@ -77,26 +110,49 @@ func Daemon(ctx *cli.Context) error {
 		KeyValueStore:         keyValueStore,
 		VersionUpdateInterval: ctx.Duration("version-update-interval"),
 	}
-	deviceDataDaemon := daemon.DeviceData{
-		StateFlagStore:  flagStore,
-		DeviceDataStore: store.DeviceDataStore{DB: db},
-		CfgStore:        cfgStore,
-		KeyValueStore:   keyValueStore,
-		RequestTimeout:  ctx.Duration("service-request-timeout"),
-		RefreshInterval: ctx.Duration("service-refresh-interval"),
+	ticker, err := adaptivetick.NewTwoModeTicker(ctx.Bool("debug-adaptive-tick"), ctx.Duration("service-refresh-interval"), time.Second*2, time.Second*5, time.Second*15, 2)
+	if err != nil {
+		return err
 	}
-	pairingDaemon := daemon.Pairing{
-		ConfigStore:          cfgStore,
-		StateFlagStore:       flagStore,
-		KeyValueStore:        keyValueStore,
-		PairingCheckInterval: ctx.Duration("pairing-check-interval"),
-		RequestTimeout:       ctx.Duration("service-request-timeout"),
+
+	defaultThemeService, err := layout.MakeService(mediasvc.DefaultTheme(), keyValueStore, layout.GetConfigurations())
+	if err != nil {
+		return err
+	}
+
+	deviceDataStore := store.DeviceDataStore{DB: db}
+	deviceDataDaemon := datadaemon.MakeDataDaemon(timechiefClient, deviceDataStore, soundService, keyValueStore, flagStore, ticker, ctx.Duration("service-request-timeout"), cfgStore, defaultThemeService)
+	// pairingDaemon := daemon.Pairing{
+	// 	ConfigStore:          cfgStore,
+	// 	StateFlagStore:       flagStore,
+	// 	KeyValueStore:        keyValueStore,
+	// 	PairingCheckInterval: ctx.Duration("pairing-check-interval"),
+	// 	RequestTimeout:       ctx.Duration("service-request-timeout"),
+	// }
+	cfg, err := cfgStore.GetConfig()
+	if err != nil {
+		return err
+	}
+	authZeroBaseURL, err := cfg.GetAuthZeroBaseURL()
+	if err != nil {
+		return err
+	}
+	authZeroClient, err := authzero.MakeAuthZeroClient(authZeroBaseURL)
+	if err != nil {
+		return err
+	}
+	pairingDaemon := daemon.MakePairingDaemon(cfgStore, keyValueStore, flagStore, authZeroClient, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
+
+	// TODO don't use the pairing parameter.  Or do?!
+	refreshTokenDaemon, err := refreshtoken.MakeRefreshTokenDaemon(cfgStore, authZeroClient, keyValueStore, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
+	if err != nil {
+		return err
 	}
 
 	wifiNetworkStore := store.WifiNetworkStore{DB: db}
 
 	wifiInterfaceStore := store.WifiInterfaceStore{DB: db}
-	system := system.System{
+	sys := system.System{
 		ConfigStore:            cfgStore,
 		KeyValueStore:          keyValueStore,
 		WifiInterfaceStore:     wifiInterfaceStore,
@@ -109,40 +165,81 @@ func Daemon(ctx *cli.Context) error {
 
 	wifiLoad := daemon.WifiLoadInterfaces{
 		StateFlagStore: flagStore,
-		System:         system,
+		System:         sys,
 	}
 	wifiConn := daemon.WifiConnect{
 		StateFlagStore: flagStore,
-		System:         system,
+		System:         sys,
 	}
 	wifiScan := daemon.WifiScan{
 		StateFlagStore: flagStore,
-		System:         system,
+		System:         sys,
 	}
 	wifiHotspot := daemon.WifiHotspot{
 		StateFlagStore: flagStore,
-		System:         system,
+		System:         sys,
 	}
 	networkStatus := daemon.NetworkStatus{
-		System: system,
+		System: sys,
 	}
 	setup := daemon.Setup{
 		KeyValueStore:    keyValueStore,
 		WifiNetworkStore: wifiNetworkStore,
 		StateFlagStore:   flagStore,
-		System:           system,
+		System:           sys,
 	}
 	internetCheck := daemon.InternetCheck{
-		System: system,
+		System: sys,
+	}
+	// TODO make this configurable
+	const videoDownloadInterval = 53 * time.Minute
+	videoSource, err := video.MakeDeviceVideoSource(deviceDataStore)
+	if err != nil {
+		return err
+	}
+	mediaFilesystem, err := media.MakeMediaFS(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to make video filesystem: %v", err)
+	}
+	// TODO make downloader duration configurable.
+	downloader, err := media.MakeMediaDownloader(time.Minute * 10)
+	if err != nil {
+		return err
+	}
+	const pictureInterval = time.Minute
+	pictureSource, err := picture.MakeDevicePictureSource(deviceDataStore)
+	if err != nil {
+		return err
+	}
+	pictureService, err := picture.MakeService(keyValueStore, mediaFilesystem, downloader, deviceDataStore)
+	if err != nil {
+		return err
+	}
+	pictureDownloader, err := picturedownload.MakeDaemon(pictureInterval, pictureSource, pictureService)
+	if err != nil {
+		return err
+	}
+	videoService, err := video.MakeService(keyValueStore, mediaFilesystem, downloader, deviceDataStore)
+	if err != nil {
+		return err
+	}
+	videoDownload, err := videodownload.MakeDaemon(videoDownloadInterval, videoSource, videoService)
+	if err != nil {
+		return err
 	}
 
 	timeSync := daemon.TimeSync{
-		Syncer: system,
+		Syncer: sys,
+	}
+
+	licenseDaemon, err := licenseactivation.MakeLicenseActivationDaemon(timechiefClient, keyValueStore, ctx.Duration("service-request-timeout"), ctx.Duration("service-refresh-interval"))
+	if err != nil {
+		return err
 	}
 
 	expandRootFS := task.ExpandRootFS{
 		KeyValueStore: keyValueStore,
-		System:        system,
+		System:        sys,
 	}
 
 	err = expandRootFS.RunTask(ctx)
@@ -151,7 +248,7 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	ensureAutoLogin := task.EnsureAutologin{
-		System: system,
+		System: sys,
 	}
 
 	err = ensureAutoLogin.RunTask(ctx)
@@ -159,7 +256,26 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	go timeSync.Start(ctx)
+	videoApi, err := mediaapi.NewMediaAPI(videoService, pictureService)
+	if err != nil {
+		return err
+	}
+
+	if ctx.Bool("use-rtc-integration") {
+		go timeSync.Start(ctx)
+	}
+
+	fwsvc, err := wfservice.MakeFirewallService(keyValueStore, sys)
+	if err != nil {
+		return err
+	}
+
+	fwDaemon, err := fwdaemon.MakeFirewallDaemon(ctx.Bool("firewall-grace-includes-ssh"), ctx.Duration("firewall-grace-time"), time.Second*3, sys, fwsvc, flagStore)
+	if err != nil {
+		return err
+	}
+
+	go fwDaemon.Start(ctx.Context)
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
 	go wifiScan.Start(ctx)
@@ -170,28 +286,44 @@ func Daemon(ctx *cli.Context) error {
 	go networkStatus.Start(ctx)
 	go setup.Start(ctx)
 	go internetCheck.Start(ctx)
+	go myDevices.Start(ctx)
+	go licenseDaemon.Start(ctx)
+	go refreshTokenDaemon.Start(ctx)
+	go videoDownload.Start(ctx)
+	go pictureDownloader.Start(ctx)
 
 	addr := ctx.String("listen-addr")
-	mux := http.NewServeMux()
-	packages := []apiPackage{
+	rootMux := http.NewServeMux()
+	apiMux := http.NewServeMux()
+	mediaMux := http.NewServeMux()
+
+	mediaService, err := makeMediaService(ctx, videoService, pictureService, deviceDataStore)
+	if err != nil {
+		return err
+	}
+
+	dataService := datasvc.MakeService(
+		mediaService,
+		deviceDataStore,
+		launchTargetStore,
+		flagStore,
+		keyValueStore,
+		wifiInterfaceStore,
+		wifiNetworkStore,
+		ticker,
+	)
+
+	securePackages := []apiPackage{
 		api.System{
 			Service: syssvc.Service{
-				System:           system,
+				System:           sys,
 				StateFlagStore:   flagStore,
 				KeyValueStore:    keyValueStore,
 				WifiNetworkStore: wifiNetworkStore,
+				FirewallService:  fwsvc,
 			},
 		},
-		api.Data{
-			Service: data.Service{
-				DeviceDataStore:    store.DeviceDataStore{DB: db},
-				LaunchTargetStore:  launchTargetStore,
-				StateFlagStore:     flagStore,
-				WifiInterfaceStore: wifiInterfaceStore,
-				WifiNetworkStore:   wifiNetworkStore,
-				KeyValueStore:      keyValueStore,
-			},
-		},
+		api.MakeDataAPI(dataService),
 		api.Launcher{
 			Service: launcher.Service{
 				LaunchTargetStore: launchTargetStore,
@@ -201,12 +333,149 @@ func Daemon(ctx *cli.Context) error {
 				SoundService:      soundService,
 			},
 		},
-		fileserver.NewStaticFileHandler(),
 	}
-	for _, pkg := range packages {
-		pkg.AddRoutes(mux)
+	for _, pkg := range securePackages {
+		pkg.AddRoutes(apiMux)
 	}
-	return http.ListenAndServe(addr, mux)
+	mediaPackages := []apiPackage{
+		videoApi,
+	}
+	for _, pkg := range mediaPackages {
+		pkg.AddRoutes(mediaMux)
+	}
+	err = regenerateAppAPIKey(ctx, keyValueStore)
+	if err != nil {
+		return err
+	}
+	apiModeHandler, err := middleware.MakeAuthModeMiddleware(keyValueStore, apiMux, middleware.APIAuthMode)
+	if err != nil {
+		return err
+	}
+	apiHandler, err := middleware.NewAuthMiddleware(keyValueStore, apiModeHandler)
+	if err != nil {
+		return err
+	}
+
+	webMux := http.NewServeMux()
+	fileServer := fileserver.NewStaticFileHandler()
+	fileServer.AddRoutes(webMux)
+
+	webSetupMux := http.NewServeMux()
+	webSetupService, err := websetupservice.MakeService(wifiNetworkStore)
+	if err != nil {
+		return err
+	}
+	webSetupAPI, err := websetup.MakeWebSetupAPI(webSetupService)
+	if err != nil {
+		return err
+	}
+	webSetupAPI.AddRoutes(webSetupMux)
+	webSetupMode, err := middleware.MakeAuthModeMiddleware(keyValueStore, webSetupMux, middleware.WebSetupAuthMode)
+	if err != nil {
+		return err
+	}
+	webSetupHandler, err := middleware.NewAuthMiddleware(keyValueStore, webSetupMode)
+	if err != nil {
+		return err
+	}
+
+	authMux := http.NewServeMux()
+	authAPI, err := auth.MakeAuthAPI()
+	if err != nil {
+		return err
+	}
+	authAPI.AddRoutes(authMux)
+	authHandler, err := middleware.NewAuthMiddleware(keyValueStore, authMux)
+	if err != nil {
+		return err
+	}
+
+	rootMux.Handle("/api/", apiHandler)
+	rootMux.Handle("/media/", mediaMux)
+	rootMux.Handle("/web-setup/", webSetupHandler)
+	rootMux.Handle("/auth/", authHandler)
+	rootMux.Handle("/", webMux)
+
+	onInitialiseComplete(
+		func() {
+			err := soundService.PlayStartup()
+			if err != nil {
+				log.Printf("Failed to play startup sound: %v", err)
+			}
+		},
+		func() {
+			// Format is WIDTHxHEIGHT
+			forceResolution := ctx.String("force-resolution")
+			var res system.Resolution
+			var err error
+			if forceResolution != "" {
+				_, err = fmt.Sscanf(forceResolution, "%dx%d", &res.Width, &res.Height)
+				if err != nil {
+					log.Printf("failed to parse force-resolution: %v", err)
+					return
+				}
+			} else {
+				res, err = sys.GetResolution()
+				if err != nil {
+					log.Printf("failed to initialise screen resolution: %v", err)
+					return
+				}
+			}
+
+			err = defaultThemeService.SetScreenDimensions(res.Width, res.Height)
+			if err != nil {
+				log.Printf("failed to set screen dimensions: %v", err)
+			}
+		},
+	)
+	return http.ListenAndServe(addr, rootMux)
+}
+
+func makeMediaService(ctx *cli.Context, videoService mediasvc.VideoService, pictureService mediasvc.PictureService, deviceDataStore store.DeviceDataStore) (datasvc.MediaService, error) {
+	mediaFilePath := ctx.String("media-file")
+	if mediaFilePath == "" {
+		return mediasvc.MakeService(videoService, pictureService, deviceDataStore)
+	}
+	return mediasvc.MakeFileService(mediaFilePath, ctx.Duration("media-file-frequency"))
+}
+
+func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {
+	credentialsPath := ctx.String("credentials-path")
+	ctxApiKey := ctx.String("test-app-api-key")
+	if ctxApiKey != "" {
+		err := kvStore.Set(store.APIAppAuthKey, ctxApiKey)
+		if err != nil {
+			return fmt.Errorf("failed to set app API key from command line parameter: %v", err)
+		}
+		log.Println("INSECURE: using app API key from command line")
+		err = credfile.WriteCredentials(credentialsPath, ctxApiKey)
+		if err != nil {
+			return fmt.Errorf("failed to write app API key to credentials file: %v", err)
+		}
+		return nil
+	}
+
+	apiKey, err := crypt.GenerateRandomAPIKey()
+	if err != nil {
+		return fmt.Errorf("failed to generate app API key: %v", err)
+	}
+	err = kvStore.Set(store.APIAppAuthKey, apiKey)
+	if err != nil {
+		return fmt.Errorf("failed to set app API key: %v", err)
+	}
+	err = credfile.WriteCredentials(credentialsPath, apiKey)
+	if err != nil {
+		return fmt.Errorf("failed to write app API key to credentials file: %v", err)
+	}
+	return nil
+}
+
+func onInitialiseComplete(inits ...func()) {
+	// Let's fudge it and wait a bit for the system to settle
+	time.Sleep(5 * time.Second)
+	for _, init := range inits {
+		go init()
+	}
 }
 
 type apiPackage interface {

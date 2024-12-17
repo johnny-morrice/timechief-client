@@ -1,0 +1,200 @@
+body {
+    color: {{.ForegroundColor}};
+    background-color: {{.BackgroundColor}};
+    font-family: {{.MainFont}};
+    font-size: {{.BodyFontSize}};
+}
+
+div.home-time {
+    font-family: {{.TimeFont}};
+    color: {{.TimeColor}};
+    font-size: {{.TimeFontSize}} !important;
+}
+
+.exposed {
+    color: {{.TimeColor}};
+}
+
+div.home-date {
+    color: {{.TimeColor}};
+    font-size: {{.DateFontSize}} !important;
+}
+
+div.home-box {
+    background-color: {{.BoxBackgroundColor}};
+}
+
+div.border {
+    border-radius: {{.BoxBorderRadius}};
+    border-width: {{.BoxBorderWidth}};
+    border-color: {{.BoxBorderColor}};
+}
+
+button.action-button {
+    border-radius: {{.ButtonBorderRadius}};
+    border-width: {{.ButtonBorderWidth}};
+    border-color: {{.ButtonBorderColor}};
+    background-color: {{.ButtonBackgroundColor}};
+    color: {{.ButtonForegroundColor}};
+}
+
+button.forecast-control-button {
+    border-radius: {{.ButtonBorderRadius}};
+    border-width: {{.ButtonBorderWidth}};
+    border-color: {{.ButtonBorderColor}};
+    background-color: {{.ButtonBackgroundColor}};
+    color: {{.ButtonForegroundColor}};
+}
+
+button.event-calendar-control-button {
+    border-radius: {{.ButtonBorderRadius}};
+    border-width: {{.ButtonBorderWidth}};
+    border-color: {{.ButtonBorderColor}};
+    background-color: {{.ButtonBackgroundColor}};
+    color: {{.ButtonForegroundColor}};
+}
+
+div.inverted-color, span.inverted-color {
+    color: {{.BoxBackgroundColor}};
+    background-color: {{.ForegroundColor}};
+}
+
+div#theme-detection-canary {
+    color: rgb(255, 0, 0);
+}
+
+div.current-weather {
+    font-size: {{.CurrentWeatherFontSize}} !important;
+}
+
+button.action-button {
+    font-size: {{.ActionButtonFontSize}} !important;
+}
+
+button.switcher-button {
+    font-size: {{.SwitcherButtonFontSize}} !important;
+}
+
+div.astro {
+    font-size: {{.AstroFontSize}} !important;
+}
+
+div.weather-data {
+    font-size: {{.WeatherDataFontSize}} !important;
+}
+
+div.current-weather-icon {
+    font-size: {{.CurrentWeatherIconFontSize}} !important;
+}
+
+div.forecast-weather-icon {
+    font-size: {{.ForecastIconFontSize}} !important;
+}
+
+table.forecast-weather-table td.weather-icon {
+    font-size: {{.ForecastWeatherTableIconFontSize}} !important;
+}
+
+button.forecast-control-button {
+    font-size: {{.ForecastControlButtonFontSize}} !important;
+}
+
+div.forecast-control-label {
+    font-size: {{.ForecastControlLabelFontSize}} !important;
+}
+
+div.calendar-day-date {
+    font-size: {{.CalendarDayDateFontSize}} !important;
+}
+
+div.calendar-day {
+    font-size: {{.CalendarDayFontSize}} !important;
+}
+
+button.event-calendar-control-button {
+    font-size: {{.EventCalendarControlButtonFontSize}} !important;
+}
+
+div.fortune-message {
+    font-size: {{.FortuneMessageFontSize}} !important;
+}
+
+div.next-event-time {
+    font-size: {{.NextEventTimeFontSize}} !important;
+}
+
+div.next-event-shorttext {
+    font-size: {{.NextEventTextFontSize}} !important;
+}
+
+div.loading-grid {
+    font-size: {{.LoadingGridFontSize}} !important;
+}
+
+div#switcher-widget {
+    position: absolute !important;
+    left: {{.WidgetSwitcherX}} !important;
+    top: {{.WidgetSwitcherY}} !important;
+    width: {{.WidgetSwitcherWidth}} !important;
+    height: {{.WidgetSwitcherHeight}} !important;
+    overflow: hidden !important;
+}
+
+div#date-time {
+    position: absolute !important;
+    left: {{.DateTimeX}} !important;
+    top: {{.DateTimeY}} !important;
+    width: {{.DateTimeWidth}} !important;
+    height: {{.DateTimeHeight}} !important;
+    overflow: hidden !important;
+}
+
+div#action-center {
+    position: absolute !important;
+    left: {{.ActionCenterX}} !important;
+    top: {{.ActionCenterY}} !important;
+    width: {{.ActionCenterWidth}} !important;
+    height: {{.ActionCenterHeight}} !important;
+    overflow: hidden !important;
+}
+
+div#planner {
+    position: absolute !important;
+    left: {{.PlannerX}} !important;
+    top: {{.PlannerY}} !important;
+    width: {{.PlannerWidth}} !important;
+    height: {{.PlannerHeight}} !important;
+    overflow: hidden !important;
+}
+
+div.planner-date-cell {
+    border-radius: {{.BoxBorderRadius}};
+    border-width: {{.BoxBorderWidth}};
+    border-color: {{.BoxBorderColor}};
+    color: {{.ForegroundColor}};
+    width: {{.PlannerDateCellWidth}} !important;
+    height: {{.PlannerDateCellHeight}} !important;
+}
+
+div.planner-date-cell-events {
+    font-size: {{.PlannerDateCellFontSize}};
+}
+
+div.planner-event-count {
+    background-color: {{.ForegroundColor}};
+    color: {{.BoxBackgroundColor}};
+}
+
+div.status-note-indicator {
+    font-size: {{.StatusNoteFontSize}} !important;
+}
+
+button:disabled {
+    color: {{.DisabledButtonForegroundColor}};
+    border-color: {{.DisabledButtonBorderColor}};
+    background-color: {{.DisabledButtonBackgroundColor}};
+}
+
+.is-error {
+    color: {{.ErrorColor}} !important;
+}

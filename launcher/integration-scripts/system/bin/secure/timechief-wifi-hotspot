@@ -5,7 +5,6 @@ set -x
 SSID=$1
 PASSWORD=$2
 IFNAME=$3
-# AP_IP is IP address in form 192.168.0.1/24.
 AP_IP=$4
 DHCP_RANGE=$5
 
@@ -34,49 +33,26 @@ if [ -z "$DHCP_RANGE" ]; then
     exit 1
 fi
 
-# This script is to configure a wifi hotspot on raspberry pi.
+set +e
 
-# Disable dhcpcd on the interface.
-systemctl stop dhcpcd
+# Check if a connection named "hotspot" exists and delete it
+EXISTING_CONNECTIONS=$(nmcli -t -f NAME connection show | grep '^hotspot$')
+if [ "$EXISTING_CONNECTIONS" ]; then
+    nmcli connection down "hotspot"
+    nmcli connection delete id "hotspot"
+fi
 
-# Create dnsmasq config file.
-cat > /tmp/dnsmasq.conf <<EOF
-interface=$IFNAME
-dhcp-range=$DHCP_RANGE
-EOF
+set -e
 
-# Create hostapd config file.
-cat > /tmp/hostapd.conf <<EOF
-interface=$IFNAME
-driver=nl80211
-ssid=$SSID
-hw_mode=g
-channel=6
-macaddr_acl=0
-auth_algs=1
-ignore_broadcast_ssid=0
-wpa=2
-wpa_passphrase=$PASSWORD
-wpa_key_mgmt=WPA-PSK
-wpa_pairwise=TKIP
-rsn_pairwise=CCMP
-EOF
+sleep 0.5s
 
-# Disable wpa_supplicant on the interface.
-killall wpa_supplicant || true
-systemctl stop dnsmasq-timechief 
-systemctl stop hostapd-timechief
+# Create a new hotspot connection with nmcli
+nmcli device set $IFNAME managed yes
+nmcli connection add type wifi ifname $IFNAME mode ap con-name hotspot ssid "$SSID"
+nmcli connection modify hotspot 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.addresses $AP_IP ipv4.method shared
+nmcli connection modify hotspot wifi-sec.key-mgmt wpa-psk
+nmcli connection modify "hotspot" wifi-sec.proto rsn
+nmcli connection modify hotspot wifi-sec.psk "$PASSWORD"
 
-# Configure the interface.
-ip addr flush dev $IFNAME
-ip link set $IFNAME down
-ip link set $IFNAME up
-ip addr add $AP_IP dev $IFNAME
-
-# Start dnsmasq with systemd.
-systemctl start dnsmasq-timechief
-
-# Start hostapd with systemd.
-systemctl start hostapd-timechief
-
-
+# Start the hotspot
+nmcli connection up hotspot

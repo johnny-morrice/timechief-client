@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/util"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/urfave/cli/v2"
 )
@@ -23,7 +24,7 @@ func (daemon onFlag) start(ctx *cli.Context, action func(ctx *cli.Context) error
 	if daemon.refreshInterval == 0 {
 		daemon.refreshInterval = time.Second
 	}
-	runEvery(daemon.refreshInterval, func() {
+	util.RunEvery(daemon.refreshInterval, func() {
 		err := daemon.doTick(ctx, action)
 		if err != nil {
 			log.Printf("daemon tick error: %s", err)

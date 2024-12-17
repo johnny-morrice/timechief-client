@@ -4,27 +4,77 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/credfile"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/launcher"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 )
 
 type DaemonClient struct {
-	BaseURL string
+	baseURL string
+	apiKey  string
 }
 
-func NewDaemonClient(baseURL string) DaemonClient {
-	return DaemonClient{BaseURL: baseURL}
+type CredentialProvider struct {
+	CredentialPath string
+	APIKey         string
+}
+
+func NewDaemonClient(baseURL string, creds CredentialProvider) (DaemonClient, error) {
+	if baseURL == "" {
+		return DaemonClient{}, fmt.Errorf("baseURL is required")
+	}
+	apiKey := creds.APIKey
+	var err error
+	if creds.CredentialPath != "" {
+		apiKey, err = credfile.ReadCredentials(creds.CredentialPath)
+		if err != nil {
+			return DaemonClient{}, fmt.Errorf("error reading credentials: %w", err)
+		}
+	}
+
+	dc := DaemonClient{
+		baseURL: baseURL,
+		apiKey:  apiKey,
+	}
+	return dc, nil
 }
 
 func (dc DaemonClient) makeURL(path string) string {
-	return dc.BaseURL + path
+	return dc.baseURL + path
+}
+
+func (dc DaemonClient) get(path string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", dc.makeURL(path), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+dc.apiKey)
+	return http.DefaultClient.Do(req)
+}
+
+func (dc DaemonClient) post(path, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest("POST", dc.makeURL(path), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+dc.apiKey)
+	if contentType != "" {
+		req.Header.Add("Content-Type", contentType)
+	}
+	if body != nil {
+		nopCloser := io.NopCloser(body)
+		req.Body = nopCloser
+	}
+
+	return http.DefaultClient.Do(req)
 }
 
 func (dc DaemonClient) GetConfig() (store.Config, error) {
-	resp, err := http.Get(dc.makeURL("/api/launcher/config"))
+	resp, err := dc.get("/api/launcher/config")
 	if err != nil {
 		return store.Config{}, err
 	}
@@ -39,8 +89,22 @@ func (dc DaemonClient) GetConfig() (store.Config, error) {
 	return result, nil
 }
 
+func (dc DaemonClient) GetTargetEnv() (launcher.TargetEnv, error) {
+	resp, err := dc.get("/api/launcher/target/env")
+	if err != nil {
+		return launcher.TargetEnv{}, err
+	}
+	defer resp.Body.Close()
+	result := launcher.TargetEnv{}
+	err = unmarsalJSON(resp, &result)
+	if err != nil {
+		return launcher.TargetEnv{}, err
+	}
+	return result, nil
+}
+
 func (dc DaemonClient) GetTarget() (service.LaunchTarget, error) {
-	resp, err := http.Get(dc.makeURL("/api/launcher/target"))
+	resp, err := dc.get("/api/launcher/target")
 	if err != nil {
 		return service.LaunchTarget{}, err
 	}
@@ -56,7 +120,7 @@ func (dc DaemonClient) GetTarget() (service.LaunchTarget, error) {
 }
 
 func (dc DaemonClient) PostTargetRecover() (launcher.TargetStatus, error) {
-	resp, err := http.Post(dc.makeURL("/api/launcher/target/recover"), "", nil)
+	resp, err := dc.post("/api/launcher/target/recover", "", nil)
 	if err != nil {
 		return launcher.TargetStatus{}, err
 	}
@@ -72,7 +136,16 @@ func (dc DaemonClient) PostTargetRecover() (launcher.TargetStatus, error) {
 }
 
 func (dc DaemonClient) PostReboot() error {
-	resp, err := http.Post(dc.makeURL("/api/system/reboot"), "", nil)
+	resp, err := dc.post("/api/system/reboot", "", nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
+func (dc DaemonClient) PostShutdown() error {
+	resp, err := dc.post("/api/system/shutdown", "", nil)
 	if err != nil {
 		return err
 	}
@@ -81,8 +154,8 @@ func (dc DaemonClient) PostReboot() error {
 }
 
 type PlaySoundRequest struct {
-	SongName string
-	Loop     bool
+	SongName string `json:"song_name"`
+	Loop     bool   `json:"loop"`
 }
 
 func (dc DaemonClient) PostPlaySound(req PlaySoundRequest) error {
@@ -91,7 +164,7 @@ func (dc DaemonClient) PostPlaySound(req PlaySoundRequest) error {
 	if err != nil {
 		return err
 	}
-	resp, err := http.Post(dc.makeURL("/api/sound/play"), "application/json", &buf)
+	resp, err := dc.post("/api/sound/play", "application/json", &buf)
 	if err != nil {
 		return err
 	}
