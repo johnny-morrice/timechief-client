@@ -91,10 +91,15 @@ function makeTimeFormatter(homePageSignals) {
     hour: "numeric", minute: "2-digit", "second": "2-digit"
   };
   let hourCycleOption = homePageSignals.hourCycleOption();
+  if (!hourCycleOption) {
+    hourCycleOption = "h23";
+  }
   options["hourCycle"] = hourCycleOption;
   if (hourCycleOption === "h23") {
     options["hour"] = "2-digit";
   }
+
+ 
 
   let timeZone = homePageSignals.timeZone();
   if (timeZone) {

@@ -302,7 +302,7 @@ export const WebSetupPage = (props) => {
         if (isSmallMode(signals)) {
             return "";
         }
-        return plainText(buttonName) + " &nbsp;&nbsp; ";
+        return plainText(buttonName);
     }
 
     return <div id="crt-root" className={`crt ${signals.crtRootTransition()}`} onClick={handleOnClickAnywhere}>
@@ -315,15 +315,15 @@ export const WebSetupPage = (props) => {
                     <div class="setup-content-wrapper flex-row">
                         <div class="setup-button-box border flex-column crt-box home-box">
                             <Show when={isUpdating(signals)}>
-                                <button class='action-button crt-box' disabled>{buttonPrefixText(signals, "reboot")}<i class='fa-solid fa-refresh'></i></button>
-                                <button class='action-button crt-box' disabled>{buttonPrefixText(signals, "shutdown")}<i class='fa-solid fa-power-off'></i></button>
+                                <button class='action-button crt-box' disabled>{buttonPrefixText(signals, "reboot")} <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' disabled>{buttonPrefixText(signals, "shutdown")} <i class='fa-solid fa-power-off'></i></button>
                             </Show>
                             <Show when={!isUpdating(signals)}>
-                                <button class='action-button crt-box' onClick={onClickReboot}>{buttonPrefixText(signals, "reboot")}<i class='fa-solid fa-refresh'></i></button>
-                                <button class='action-button crt-box' onClick={onClickShutdown}>{buttonPrefixText(signals, "shutdown")}<i class='fa-solid fa-power-off'></i></button>
+                                <button class='action-button crt-box' onClick={onClickReboot}>{buttonPrefixText(signals, "reboot")} <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' onClick={onClickShutdown}>{buttonPrefixText(signals, "shutdown")} <i class='fa-solid fa-power-off'></i></button>
                             </Show>
                             <Show when={isDisplayBackButton(signals)}>
-                                <button class='action-button crt-box' onClick={onClickBack}>{buttonPrefixText(signals, "cancel-setup")}<i class="fa-solid fa-xmark"></i></button>
+                                <button class='action-button crt-box' onClick={onClickBack}>{buttonPrefixText(signals, "cancel-setup")} <i class="fa-solid fa-xmark"></i></button>
                             </Show>
                             <Show when={isUpdating(signals)}>
                                 <div class="setup-button-box-isUpdating">
@@ -369,15 +369,15 @@ export const WebSetupPage = (props) => {
                     <div class="setup-content-wrapper flex-row">
                         <div class="setup-button-box border flex-column crt-box home-box">
                             <Show when={isUpdating(signals)}>
-                                <button class='action-button crt-box' disabled>{buttonPrefixText(signals, "reboot")}<i class='fa-solid fa-refresh'></i></button>
-                                <button class='action-button crt-box' disabled>{buttonPrefixText(signals, "shutdown")}<i class='fa-solid fa-power-off'></i></button>
+                                <button class='action-button crt-box' disabled>{buttonPrefixText(signals, "reboot")} <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' disabled>{buttonPrefixText(signals, "shutdown")} <i class='fa-solid fa-power-off'></i></button>
                             </Show>
                             <Show when={!isUpdating(signals)}>
-                                <button class='action-button crt-box' onClick={onClickReboot}>{buttonPrefixText(signals, "reboot")}<i class='fa-solid fa-refresh'></i></button>
-                                <button class='action-button crt-box' onClick={onClickShutdown}>{buttonPrefixText(signals, "shutdown")}<i class='fa-solid fa-power-off'></i></button>
+                                <button class='action-button crt-box' onClick={onClickReboot}>{buttonPrefixText(signals, "reboot")} <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' onClick={onClickShutdown}>{buttonPrefixText(signals, "shutdown")} <i class='fa-solid fa-power-off'></i></button>
                             </Show>
                             <Show when={isDisplayBackButton(signals)}>
-                                <button class='action-button crt-box' onClick={onClickBack}>{buttonPrefixText(signals, "cancel-setup")}<i class="fa-solid fa-xmark"></i></button>
+                                <button class='action-button crt-box' onClick={onClickBack}>{buttonPrefixText(signals, "cancel-setup")} <i class="fa-solid fa-xmark"></i></button>
                             </Show>
                             <Show when={isUpdating(signals)}>
                                 <div class="setup-button-box-isUpdating">
@@ -387,10 +387,10 @@ export const WebSetupPage = (props) => {
                         </div>
                         <div class="setup-instructions flex-column exposed">
                             <div class='flex-row'>
-                                <button class="action-button crt-box" onClick={onClickWifiNetworkType}>{buttonPrefixText(signals, "wifi-network-button")}<i class="fa-solid fa-wifi"></i></button>
+                                <button class="action-button crt-box" onClick={onClickWifiNetworkType}>{buttonPrefixText(signals, "wifi-network-button")} <i class="fa-solid fa-wifi"></i></button>
                             </div>
                             <div class='flex-row'>
-                            <button class="action-button crt-box" onClick={onClickManualNetworkType}>{buttonPrefixText(signals, "manual-network-button")}<i class="fa-solid fa-network-wired"></i></button>
+                            <button class="action-button crt-box" onClick={onClickManualNetworkType}>{buttonPrefixText(signals, "manual-network-button")} <i class="fa-solid fa-network-wired"></i></button>
                             </div>
                             <Show when={isConnectionError(signals)}>
                                 <div class='flex-row'>
@@ -409,16 +409,16 @@ export const WebSetupPage = (props) => {
                     <div class="setup-action-wrapper flex-row">
                         <div class="setup-button-box border flex-column crt-box home-box">
                             <Show when={isUpdating(signals)}>
-                                <button disabled class='action-button crt-box'>{buttonPrefixText(signals, "reboot")}<i class='fa-solid fa-refresh'></i></button>
-                                <button disabled class='action-button crt-box'>{buttonPrefixText(signals, "shutdown")}<i class='fa-solid fa-power-off'></i></button>
+                                <button disabled class='action-button crt-box'>{buttonPrefixText(signals, "reboot")} <i class='fa-solid fa-refresh'></i></button>
+                                <button disabled class='action-button crt-box'>{buttonPrefixText(signals, "shutdown")} <i class='fa-solid fa-power-off'></i></button>
                             </Show>
                             <Show when={!isUpdating(signals)}>
-                                <button class='action-button crt-box' onClick={onClickReboot}>{buttonPrefixText(signals, "reboot")}<i class='fa-solid fa-refresh'></i></button>
-                                <button class='action-button crt-box' onClick={onClickShutdown}>{buttonPrefixText(signals, "shutdown")}<i class='fa-solid fa-power-off'></i></button>
+                                <button class='action-button crt-box' onClick={onClickReboot}>{buttonPrefixText(signals, "reboot")} <i class='fa-solid fa-refresh'></i></button>
+                                <button class='action-button crt-box' onClick={onClickShutdown}>{buttonPrefixText(signals, "shutdown")} <i class='fa-solid fa-power-off'></i></button>
                             </Show>
-                            <button class='action-button crt-box' onClick={onClickRestartSetup}>{buttonPrefixText(signals, "restart-setup")}<i class='fa-solid fa-backward'></i></button>
+                            <button class='action-button crt-box' onClick={onClickRestartSetup}>{buttonPrefixText(signals, "restart-setup")} <i class='fa-solid fa-backward'></i></button>
                             <Show when={isDisplayBackButton(signals)}>
-                                <button class='action-button crt-box' onClick={onClickBack}>{buttonPrefixText(signals, "cancel-setup")}<i class="fa-solid fa-xmark"></i></button>
+                                <button class='action-button crt-box' onClick={onClickBack}>{buttonPrefixText(signals, "cancel-setup")} <i class="fa-solid fa-xmark"></i></button>
                             </Show>
                             <Show when={isUpdating(signals)}>
                                 <div class="setup-button-box-isUpdating">
