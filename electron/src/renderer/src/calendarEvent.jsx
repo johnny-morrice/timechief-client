@@ -138,7 +138,7 @@ export class CalendarEvent {
     formatStartTime(locale, timeZone) {
         if (this.isAllDay()) {
             let dateOpts = {dateStyle: 'short', timeZone: timeZone};
-            return "All day " + this.startTime().toLocaleDateString(locale, dateOpts); 
+            return this.startTime().toLocaleDateString(locale, dateOpts); 
         }
         return this.formatTime(this.startTime(), locale, timeZone);
     }
