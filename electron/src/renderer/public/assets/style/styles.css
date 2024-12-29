@@ -25,14 +25,6 @@
 }
 
 @font-face {
-    src: url('../webfonts/NotoSansJP-VariableFont_wght.ttf') format('truetype');
-    font-family: 'Noto Sans JP';
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
     font-family: 'MicroKnight Plus';
     src: url('../webfonts/MicroKnightPlus.ttf') format('truetype');
     font-weight: normal;
@@ -43,6 +35,39 @@
 @font-face {
     font-family: 'MicroKnight';
     src: url('../webfonts/MicroKnight.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Chicago FLF";
+    src: url('../webfonts/ChicagoFLF.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Good Old DOS";
+    src: url("../webfonts/GoodOldDOS.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ZXDTPAc";
+    src: url("../webfonts/ZXDTPAc.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "W95 FA";
+    src: url("../webfonts/w95fa.woff2") format("woff2"),
+        url("../webfonts/w95fa.woff") format("woff");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
