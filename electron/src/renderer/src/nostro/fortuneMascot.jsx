@@ -1,7 +1,7 @@
 import { manageMascotCanvas } from "./mascot";
 
 var globalSignals = null;
-manageMascotCanvas("fortune-canvas", () => getFortuneSignals().emote(), () => getFortuneSignals().mascotHeight());
+manageMascotCanvas("fortune-canvas", () => getFortuneSignals().mascotType(), () => getFortuneSignals().emote(), () => getFortuneSignals().mascotHeight());
 
 class FakeSignals {
     mascotHeight() {
@@ -18,6 +18,10 @@ class FakeSignals {
 
     boxBackgroundColor() {
         return "black";
+    }
+
+    mascotType() {
+        return "dark";
     }
 }
 

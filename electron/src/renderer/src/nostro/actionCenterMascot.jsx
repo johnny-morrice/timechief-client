@@ -18,6 +18,10 @@ class FakeSignals {
     boxBackgroundColor() {
         return "black";
     }
+
+    mascotType() {
+        return "dark";
+    }
 }
 
 export function getActionCenterSignals() {
@@ -31,7 +35,7 @@ export function setActionCenterSignals(signals) {
     globalSignals = signals;
 }
 
-manageMascotCanvas("event-mascot-canvas", () => getActionCenterSignals().emote(), () => getActionCenterSignals().mascotHeight());
+manageMascotCanvas("event-mascot-canvas", () => getActionCenterSignals().mascotType(), () => getActionCenterSignals().emote(), () => getActionCenterSignals().mascotHeight());
 
 export function EventMascotCanvas() {
     return <div class="event-mascot-wrapper">

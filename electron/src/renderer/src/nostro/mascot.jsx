@@ -4,7 +4,7 @@ import { ecoRefreshInterval } from "../timing";
 
 const canvasses = {};
 
-export function manageMascotCanvas(canvasId, emoteSignal, heightSignal) {
+export function manageMascotCanvas(canvasId, typeSignal, emoteSignal, heightSignal) {
     var lastManaged = new Date();
     setInterval(() => {
         function setCanvas(myCanvas) {
@@ -21,7 +21,7 @@ export function manageMascotCanvas(canvasId, emoteSignal, heightSignal) {
                 return;
             }
         }
-        mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightSignal);
+        mascotCanvasUpdate(setCanvas, getCanvas, canvasId, typeSignal, emoteSignal, heightSignal);
         lastManaged = new Date();
     }, 1000);
 }
@@ -35,7 +35,7 @@ function parseHeight(heightText) {
     return height;
 }
 
-function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightSignal) {
+function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, typeSignal, emoteSignal, heightSignal) {
     const canvasRef = document.getElementById(canvasId);
     if (!canvasRef) {
         // console.log("no canvas element found: ", canvasId);
@@ -90,7 +90,7 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightS
     canvas.clear();
     canvas.set("backgroundColor", boxBackgroundColor);
     console.log("adding canvas image fg: ", foregroundColor, " bg: ", boxBackgroundColor);
-    fabric.FabricImage.fromURL(mascotPath(emoteSignal())).then((img) => {
+    fabric.FabricImage.fromURL(mascotPath(typeSignal(), emoteSignal())).then((img) => {
         console.log("fromURL start");
         img.filters.push(replaceColorFilter({
             chromakeys: [{
@@ -135,9 +135,22 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, emoteSignal, heightS
     });
 };
 
-function mascotPath(emote) {
+function mascotPath(mascotType, emote) {
+    validateType(mascotType);
     validateEmote(emote);
-    return `assets/image/mascot/mascot-${emote}.png`;
+    return `assets/image/mascot/${mascotType}/mascot-${emote}.png`;
+}
+
+const validTypes = [
+    "light",
+    "dark"
+]
+
+function validateType(mascotType) {
+    const isValid = validTypes.filter(myType => myType === mascotType).length > 0;
+    if (!isValid) {
+        throw new Error(`invalid mascot type: ${mascotType}`);
+    }
 }
 
 const validEmotes = [

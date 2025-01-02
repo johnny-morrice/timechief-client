@@ -29,6 +29,7 @@ class Signals {
     [this.layout, this.setLayout] = createSignal("seven_inch");
     [this.googleCalendarEvents, this.setGoogleCalendarEvents] = createSignal([]);
     [this.mascotHeight, this.setMascotHeight] = createSignal("100px");
+    [this.mascotType, this.setMascotType] = createSignal("dark");
     this.setTimeFormatter(new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", "second": "2-digit" }));
     this.setDateFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
     this.setDayOfWeekFormatter(new Intl.DateTimeFormat("en-GB", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }));
@@ -237,6 +238,7 @@ function updateSignals(signals, data) {
   if (foregroundColor) {
     signals.setForegroundColor(foregroundColor);
   }
+  signals.setMascotType(theme["mascot_type"]);
 
   const features = deviceProfile["features"];
   if (!features) {
