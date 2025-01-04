@@ -38,6 +38,6 @@ export function setFortuneSignals(signals) {
 
 export function FortuneMascotCanvas(props) {
     return <div class={"fortune-message-mascot-wrapper" + " " + props.classes }>
-        <canvas id="fortune-canvas" class="fortune-mascot" data-sig-mascot-height={getFortuneSignals().mascotHeight()} data-sig-fg-color={getFortuneSignals().foregroundColor()} data-sig-bg-color={getFortuneSignals().boxBackgroundColor()} data-sig-emote={getFortuneSignals().emote()}></canvas>
+        <canvas id="fortune-canvas" class="fortune-mascot" data-sig-mascot-height={getFortuneSignals().mascotHeight()} data-sig-fg-color={getFortuneSignals().foregroundColor()} data-sig-bg-color={getFortuneSignals().boxBackgroundColor()} data-sig-emote={getFortuneSignals().emote()} data-sig-mascot-type={getFortuneSignals().mascotType()}></canvas>
     </div>
 }

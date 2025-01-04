@@ -44,11 +44,13 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, typeSignal, emoteSig
     const foregroundColor = canvasRef.getAttribute("data-sig-fg-color");
     const boxBackgroundColor = canvasRef.getAttribute("data-sig-bg-color");
     const emote = canvasRef.getAttribute("data-sig-emote");
-    if (!foregroundColor || !boxBackgroundColor || !emote) {
+    const mascotType = canvasRef.getAttribute("data-sig-mascot-type");
+    if (!foregroundColor || !boxBackgroundColor || !emote || !mascotType) {
         return;
     }
 
     const heightText = heightSignal();
+    const mascotTypeFromSignal = typeSignal();
     const height = parseHeight(heightText);
 
     var canvas = getCanvas();
@@ -77,7 +79,8 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, typeSignal, emoteSig
     const renderedBackground = canvasRef.getAttribute("data-background-color");
     const renderedEmote = canvasRef.getAttribute("data-emote");
     const renderedHeight = canvasRef.getAttribute("data-height");
-    if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor && emote === renderedEmote && renderedHeight === heightText) {
+    const renderedType = canvasRef.getAttribute("data-mascot-type");
+    if (renderedForeground === foregroundColor && renderedBackground === boxBackgroundColor && emote === renderedEmote && renderedHeight === heightText && renderedType === mascotTypeFromSignal) {
         // console.log("skipping canvas update");
         return;
     }
@@ -128,8 +131,8 @@ function mascotCanvasUpdate(setCanvas, getCanvas, canvasId, typeSignal, emoteSig
         canvasRef.setAttribute("data-foreground-color", foregroundColor);
         canvasRef.setAttribute("data-background-color", boxBackgroundColor);
         canvasRef.setAttribute("data-emote", emote);
-        console.log("setting height: ", heightText);
         canvasRef.setAttribute("data-height", heightText);
+        canvasRef.setAttribute("data-mascot-type", mascotTypeFromSignal);
     }).catch((err) => {
         console.error("error adding canvas: ", err);
     });
