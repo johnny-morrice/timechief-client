@@ -104,6 +104,7 @@ type BucketFileMetadata struct {
 		ImageFit              string   `json:"image_fit"`
 		ImageUuids            []string `json:"image_uuids"`
 		MainFont              string   `json:"main_font"`
+		MascotType            string   `json:"mascot_type"`
 		TimeColor             string   `json:"time_color"`
 		TimeFont              string   `json:"time_font"`
 	} `json:"theme,omitempty"`
@@ -377,6 +378,7 @@ type Theme struct {
 	LayoutType                         string   `json:"layout_type"`
 	LoadingGridFontSize                string   `json:"loading_grid_font_size"`
 	MainFont                           string   `json:"main_font"`
+	MascotType                         string   `json:"mascot_type"`
 	NextEventTextFontSize              string   `json:"next_event_text_font_size"`
 	NextEventTimeFontSize              string   `json:"next_event_time_font_size"`
 	PlannerDateCellFontSize            string   `json:"planner_date_cell_font_size"`

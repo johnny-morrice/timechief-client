@@ -63,6 +63,7 @@ func sevenInchLayout() Configuration {
 			"disabled_button_foreground_color": "#ffa500ff",
 			"disabled_button_background_color": "#ffa500ff",
 			"error_color": "#ffa500ff",
+			"mascot_type": "dark",
 			"fortune_mascot_height": "120px",
 			"event_mascot_height": "100px",
 			"status_note_font_size": "16pt"

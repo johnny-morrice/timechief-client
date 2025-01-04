@@ -1515,6 +1515,7 @@ components:
               - button_background_color
               - image_fit
               - image_uuids
+              - mascot_type
             properties:
               foreground_color:
                 type: string
@@ -1550,6 +1551,8 @@ components:
                 type: array
                 items:
                   type: string
+              mascot_type:
+                type: string
 
     BucketFileLinks:
       type: object
@@ -1701,6 +1704,7 @@ components:
         - planner_date_cell_width
         - planner_date_cell_height
         - planner_day_event_count
+        - mascot_type
         - fortune_mascot_height
         - event_mascot_height
         - status_note_font_size
@@ -1836,6 +1840,8 @@ components:
           type: string
         planner_day_event_count:
           type: integer
+        mascot_type:
+          type: string
         fortune_mascot_height:
           type: string
         event_mascot_height:
