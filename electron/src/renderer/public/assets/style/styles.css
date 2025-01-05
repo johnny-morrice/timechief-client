@@ -239,12 +239,12 @@ div.current-weather {
     font-size: 18pt;
     display: flex;
     flex-direction: column;
-    gap: 0.2em;
+    gap: 1em;
 }
 
 div.current-weather-location {
     align-self: center;
-    font-weight: 500;
+    font-weight: bold;
 }
 
 div.current-weather-grid {

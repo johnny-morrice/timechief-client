@@ -5,6 +5,10 @@ body {
     font-size: {{.BodyFontSize}};
 }
 
+button {
+    font-family: {{.MainFont}};
+}
+
 div.home-time {
     font-family: {{.TimeFont}};
     color: {{.TimeColor}};
