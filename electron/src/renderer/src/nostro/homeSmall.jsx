@@ -5,6 +5,7 @@ import { SmallActionCenter } from "./smallActionCenter";
 import { SmallSetupControl } from "./smallSetupControl";
 import { FortuneMascotCanvas } from "./fortuneMascot";
 import { EventMascotCanvas } from "./actionCenterMascot";
+import { Debug } from "./debugPanel";
 
 function hasNextEvent(signals) {
     const nextEvent = signals.nextEvent();

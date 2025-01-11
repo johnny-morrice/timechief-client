@@ -44,5 +44,5 @@ export function WindowResizer(props) {
         console.log("resizer removing callback");
         removeDataCallback(cbName);
     });
-    return <>{props.element}</>;
+    return <>{props.element}</>
 }
