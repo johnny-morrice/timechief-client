@@ -13,6 +13,7 @@ class Signals {
         [this.emote, this.setEmote] = createSignal("neutral");
         [this.isSpooky, this.setSpooky] = createSignal(false);
         [this.mascotHeight, this.setMascotHeight] = createSignal("120px");
+        [this.mascotType, this.setMascotType] = createSignal("dark");
     }
 }
 
@@ -39,6 +40,9 @@ function updateSignals(signals, data) {
     }
 
     signals.setMascotHeight(theme["event_mascot_height"]);
+    signals.setMascotType(theme["event_mascot_type"]);
+
+
     const features = deviceProfile["features"];
     if (!features) {
         return;
