@@ -40,7 +40,7 @@ function updateSignals(signals, data) {
     }
 
     signals.setMascotHeight(theme["event_mascot_height"]);
-    signals.setMascotType(theme["event_mascot_type"]);
+    signals.setMascotType(theme["mascot_type"]);
 
 
     const features = deviceProfile["features"];
