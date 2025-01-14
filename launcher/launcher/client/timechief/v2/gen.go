@@ -170,6 +170,7 @@ type DailyWeather struct {
 // Data defines model for Data.
 type Data struct {
 	BucketFiles    BucketFilesDatum    `json:"bucket_files"`
+	DataVersion    string              `json:"data_version"`
 	DeviceProfile  DeviceProfileDatum  `json:"device_profile"`
 	Dt             int                 `json:"dt"`
 	GoogleCalendar CalendarDatum       `json:"google_calendar"`
@@ -451,6 +452,12 @@ type ListBucketFilesParams struct {
 	Tag    string `form:"tag" json:"tag"`
 }
 
+// GetDataByDeviceUUIDParams defines parameters for GetDataByDeviceUUID.
+type GetDataByDeviceUUIDParams struct {
+	// DataVersion Data version
+	DataVersion *string `form:"data_version,omitempty" json:"data_version,omitempty"`
+}
+
 // ListDevicesParams defines parameters for ListDevices.
 type ListDevicesParams struct {
 	// Limit Number of devices to return
@@ -677,7 +684,7 @@ type ClientInterface interface {
 	GetBucketFileDownload(ctx context.Context, uuid string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetDataByDeviceUUID request
-	GetDataByDeviceUUID(ctx context.Context, deviceUuid string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetDataByDeviceUUID(ctx context.Context, deviceUuid string, params *GetDataByDeviceUUIDParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListDevices request
 	ListDevices(ctx context.Context, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -943,8 +950,8 @@ func (c *Client) GetBucketFileDownload(ctx context.Context, uuid string, reqEdit
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetDataByDeviceUUID(ctx context.Context, deviceUuid string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetDataByDeviceUUIDRequest(c.Server, deviceUuid)
+func (c *Client) GetDataByDeviceUUID(ctx context.Context, deviceUuid string, params *GetDataByDeviceUUIDParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetDataByDeviceUUIDRequest(c.Server, deviceUuid, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1915,7 +1922,7 @@ func NewGetBucketFileDownloadRequest(server string, uuid string) (*http.Request,
 }
 
 // NewGetDataByDeviceUUIDRequest generates requests for GetDataByDeviceUUID
-func NewGetDataByDeviceUUIDRequest(server string, deviceUuid string) (*http.Request, error) {
+func NewGetDataByDeviceUUIDRequest(server string, deviceUuid string, params *GetDataByDeviceUUIDParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1938,6 +1945,28 @@ func NewGetDataByDeviceUUIDRequest(server string, deviceUuid string) (*http.Requ
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.DataVersion != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "data_version", runtime.ParamLocationQuery, *params.DataVersion); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -3615,7 +3644,7 @@ type ClientWithResponsesInterface interface {
 	GetBucketFileDownloadWithResponse(ctx context.Context, uuid string, reqEditors ...RequestEditorFn) (*GetBucketFileDownloadResponse, error)
 
 	// GetDataByDeviceUUIDWithResponse request
-	GetDataByDeviceUUIDWithResponse(ctx context.Context, deviceUuid string, reqEditors ...RequestEditorFn) (*GetDataByDeviceUUIDResponse, error)
+	GetDataByDeviceUUIDWithResponse(ctx context.Context, deviceUuid string, params *GetDataByDeviceUUIDParams, reqEditors ...RequestEditorFn) (*GetDataByDeviceUUIDResponse, error)
 
 	// ListDevicesWithResponse request
 	ListDevicesWithResponse(ctx context.Context, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*ListDevicesResponse, error)
@@ -4899,8 +4928,8 @@ func (c *ClientWithResponses) GetBucketFileDownloadWithResponse(ctx context.Cont
 }
 
 // GetDataByDeviceUUIDWithResponse request returning *GetDataByDeviceUUIDResponse
-func (c *ClientWithResponses) GetDataByDeviceUUIDWithResponse(ctx context.Context, deviceUuid string, reqEditors ...RequestEditorFn) (*GetDataByDeviceUUIDResponse, error) {
-	rsp, err := c.GetDataByDeviceUUID(ctx, deviceUuid, reqEditors...)
+func (c *ClientWithResponses) GetDataByDeviceUUIDWithResponse(ctx context.Context, deviceUuid string, params *GetDataByDeviceUUIDParams, reqEditors ...RequestEditorFn) (*GetDataByDeviceUUIDResponse, error) {
+	rsp, err := c.GetDataByDeviceUUID(ctx, deviceUuid, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

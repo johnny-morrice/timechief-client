@@ -819,6 +819,12 @@ paths:
           required: true
           schema:
             type: "string"
+        - in: "query"
+          name: "data_version"
+          description: "Data version"
+          required: false
+          schema:
+            type: "string"
       responses:
         "200":
           description: "Data retrieved successfully"
@@ -1970,6 +1976,7 @@ components:
     Data:
       type: object
       required:
+        - data_version
         - device_profile
         - owm
         - google_calendar
@@ -1978,6 +1985,8 @@ components:
         - bucket_files
         - dt
       properties:
+        data_version:
+          type: string
         device_profile:
           $ref: "#/components/schemas/DeviceProfileDatum"
         owm:
