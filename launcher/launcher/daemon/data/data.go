@@ -201,6 +201,10 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		return v2.Data{}, err
 	}
 
+	if newDeviceData.DataVersion == lastDeviceData.DataVersion {
+		return lastDeviceData, nil
+	}
+
 	myErr := dd.stateFlagStore.Delete(DeviceDataErrorState)
 	if myErr != nil {
 		log.Printf("error clearing device data error state: %s", myErr)
@@ -236,6 +240,7 @@ func (dd DeviceData) doFetchLatest(dataVersion string) (v2.Data, error) {
 	if err != nil {
 		return v2.Data{}, fmt.Errorf("error decoding device data: %w", err)
 	}
+
 	return result, nil
 }
 
