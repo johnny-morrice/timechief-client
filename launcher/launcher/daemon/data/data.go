@@ -187,7 +187,12 @@ var CalendarErrorState = "calendar-error"
 var ErrBadData = errors.New("bad data")
 
 func (dd DeviceData) FetchLatest() (v2.Data, error) {
-	clockData, err := dd.doFetchLatest()
+	lastDeviceData, err := dd.deviceDataStore.GetDeviceData()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return v2.Data{}, fmt.Errorf("error getting device data when for fetch: %w", err)
+	}
+
+	newDeviceData, err := dd.doFetchLatest(lastDeviceData.DataVersion)
 	if err != nil {
 		myErr := dd.stateFlagStore.CreateIfNotExists(DeviceDataErrorState)
 		if myErr != nil {
@@ -201,10 +206,10 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		log.Printf("error clearing device data error state: %s", myErr)
 	}
 
-	return clockData, nil
+	return newDeviceData, nil
 }
 
-func (dd DeviceData) doFetchLatest() (v2.Data, error) {
+func (dd DeviceData) doFetchLatest(dataVersion string) (v2.Data, error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, dd.requestTimeout)
 	defer cancel()
@@ -212,7 +217,13 @@ func (dd DeviceData) doFetchLatest() (v2.Data, error) {
 	if err != nil {
 		return v2.Data{}, fmt.Errorf("error getting device uuid: %w", err)
 	}
-	resp, err := dd.client.GetDataByDeviceUUID(ctx, deviceUUID)
+
+	params := v2.GetDataByDeviceUUIDParams{}
+	if dataVersion != "" {
+		params.DataVersion = &dataVersion
+	}
+
+	resp, err := dd.client.GetDataByDeviceUUID(ctx, deviceUUID, &params)
 	if err != nil {
 		return v2.Data{}, fmt.Errorf("error getting device data: %w", err)
 	}
