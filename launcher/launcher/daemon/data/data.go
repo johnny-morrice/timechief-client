@@ -201,6 +201,11 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		return v2.Data{}, err
 	}
 
+	myErr := dd.stateFlagStore.Delete(DeviceDataErrorState)
+	if myErr != nil {
+		log.Printf("error clearing device data error state: %s", myErr)
+	}
+
 	if newDeviceData.DataVersion == lastDeviceData.DataVersion {
 		smuggledTime := int(time.Now().Unix())
 		if lastDeviceData.GoogleCalendar.Dt != 0 {
@@ -223,11 +228,6 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		}
 
 		return lastDeviceData, nil
-	}
-
-	myErr := dd.stateFlagStore.Delete(DeviceDataErrorState)
-	if myErr != nil {
-		log.Printf("error clearing device data error state: %s", myErr)
 	}
 
 	return newDeviceData, nil
