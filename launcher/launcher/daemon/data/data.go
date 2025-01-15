@@ -202,6 +202,17 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 	}
 
 	if newDeviceData.DataVersion == lastDeviceData.DataVersion {
+		smuggledTime := int(time.Now().Unix())
+		if lastDeviceData.GoogleCalendar.Dt != 0 {
+			lastDeviceData.GoogleCalendar.Dt = smuggledTime
+		}
+		if lastDeviceData.Owm.Dt != 0 {
+			lastDeviceData.Owm.Dt = smuggledTime
+		}
+		if lastDeviceData.DeviceProfile.Dt != 0 {
+			lastDeviceData.DeviceProfile.Dt = smuggledTime
+		}
+
 		return lastDeviceData, nil
 	}
 
