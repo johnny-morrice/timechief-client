@@ -39,6 +39,6 @@ manageMascotCanvas("event-mascot-canvas", () => getActionCenterSignals().mascotT
 
 export function EventMascotCanvas() {
     return <div class="event-mascot-wrapper">
-        <canvas id="event-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={getActionCenterSignals().mascotHeight()} data-sig-fg-color={getActionCenterSignals().foregroundColor()} data-sig-bg-color={getActionCenterSignals().boxBackgroundColor()} data-sig-emote={getActionCenterSignals().emote()}></canvas>
+        <canvas id="event-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={getActionCenterSignals().mascotHeight()} data-sig-fg-color={getActionCenterSignals().foregroundColor()} data-sig-bg-color={getActionCenterSignals().boxBackgroundColor()} data-sig-emote={getActionCenterSignals().emote()} data-sig-mascot-type={getActionCenterSignals().mascotType()}></canvas>
     </div>
 }
