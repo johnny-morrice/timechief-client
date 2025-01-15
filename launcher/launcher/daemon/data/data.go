@@ -212,6 +212,15 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		if lastDeviceData.DeviceProfile.Dt != 0 {
 			lastDeviceData.DeviceProfile.Dt = smuggledTime
 		}
+		if lastDeviceData.BucketFiles.Dt != 0 {
+			lastDeviceData.BucketFiles.Dt = smuggledTime
+		}
+		if lastDeviceData.GoogleProfile.Dt != 0 {
+			lastDeviceData.GoogleProfile.Dt = smuggledTime
+		}
+		if lastDeviceData.SpookyCampaign.Dt != 0 {
+			lastDeviceData.SpookyCampaign.Dt = smuggledTime
+		}
 
 		return lastDeviceData, nil
 	}
