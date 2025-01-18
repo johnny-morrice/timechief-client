@@ -8,12 +8,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/johnny-morrice/timechief-client/client/apiclient"
-	"github.com/johnny-morrice/timechief-client/client/authnclient"
-	"github.com/johnny-morrice/timechief-client/client/viewmodel"
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
@@ -178,6 +174,11 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	err = dd.setSoundOptions(data)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -264,43 +265,6 @@ func (dd DeviceData) doFetchLatest(dataVersion string) (v2.Data, error) {
 	return result, nil
 }
 
-func (dd DeviceData) getClockData(apiClient *apiclient.Client) (*viewmodel.ClockData, error) {
-	ctx, cancel := dd.newClientContext()
-	defer cancel()
-	clockData, err := apiClient.ClockData.GetClockData(ctx)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return clockData, nil
-}
-
-func (dd DeviceData) getToken(authnClient *authnclient.Client, credentials string) (string, error) {
-	credentialParts := strings.Split(credentials, ":")
-	if len(credentialParts) != 2 {
-		return "", errors.New("expected device credentials to be in form serial:secret")
-	}
-
-	serial := credentialParts[0]
-	secret := credentialParts[1]
-
-	ctx, cancel := dd.newClientContext()
-	defer cancel()
-	tokenResp, err := authnClient.Token.CreateToken(ctx, &viewmodel.TokenRequest{
-		DeviceSerial: serial,
-		DeviceSecret: secret,
-		Scopes:       []string{"clock-data:read", "pairing:get", "pairing:create", "pairing:complete"},
-		TokenPolicy:  viewmodel.DevicePolicy,
-	})
-
-	if err != nil {
-		return "", err
-	}
-
-	return tokenResp.JWT, nil
-}
-
 func (dd DeviceData) updateDisplaySize(width, height int) error {
 	if width == 0 || height == 0 {
 		log.Printf("skipping update display size due to 0 width or height")
@@ -328,12 +292,7 @@ func (dd DeviceData) updateDisplaySize(width, height int) error {
 	return nil
 }
 
-func (dd DeviceData) newClientContext() (context.Context, func()) {
-	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, dd.requestTimeout)
-	return ctx, cancel
-}
-
+// TODO These are unused but muting is working.. what is happening?
 func (dd DeviceData) setSoundOptions(data v2.Data) error {
 	muteOptions, err := makeSoundOptions(data.DeviceProfile.Value)
 	if err != nil {
