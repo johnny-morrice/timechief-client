@@ -43,4 +43,6 @@ cp $DEPLOY_IMAGE $IMAGE_OUTPUT/Timechief-$VERSION.img
 echo "Copied image to $IMAGE_OUTPUT/Timechief-$VERSION.img"
 popd
 
-rm -rf $BUILD_DIR
+# TODO tidy up
+echo "You need to manually tidy up $BUILD_DIR"
+# rm -rf $BUILD_DIR
