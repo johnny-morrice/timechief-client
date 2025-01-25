@@ -64,7 +64,8 @@ func (svc FirewallService) SetServiceState(ss ServiceState) error {
 }
 
 func (svc FirewallService) ApplyFirewallRules() error {
-	ports := []string{}
+	// Default open DHCP and DNS
+	ports := []string{"53", "67"}
 
 	httpAccessText, err := svc.keyValueStore.Get("firewall-open-http")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {

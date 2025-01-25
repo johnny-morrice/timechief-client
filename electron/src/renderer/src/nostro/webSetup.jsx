@@ -130,7 +130,7 @@ function generateHotspotQRCode(hotspotSSID, hotspotKey) {
     return generateWifiQRCode({
         ssid: hotspotSSID,
         password: hotspotKey,
-        encryption: 'WPA2',
+        encryption: 'WPA',
         hiddenSSID: false,
         outputFormat: { type: 'image/png' }
     });

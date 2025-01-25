@@ -6,7 +6,6 @@ SSID=$1
 PASSWORD=$2
 IFNAME=$3
 AP_IP=$4
-DHCP_RANGE=$5
 
 if [ -z "$SSID" ]; then
     echo "SSID is required"
@@ -25,11 +24,6 @@ fi
 
 if [ -z "$AP_IP" ]; then
     echo "AP_IP is required"
-    exit 1
-fi
-
-if [ -z "$DHCP_RANGE" ]; then
-    echo "DHCP_RANGE is required"
     exit 1
 fi
 

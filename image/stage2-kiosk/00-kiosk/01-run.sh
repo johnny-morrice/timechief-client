@@ -250,6 +250,12 @@ table inet filter {
         # Allow incoming HTTPS
         tcp dport 443 accept
         udp dport 443 accept
+
+        # Allow DNS and DHCP
+        tcp dport 53 accept
+        udp dport 53 accept
+        udp dport 67 accept
+        
     }
 
     chain forward {
