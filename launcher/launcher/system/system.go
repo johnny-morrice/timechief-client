@@ -266,7 +266,7 @@ func (sys System) WifiConnect() error {
 	}
 	err = card.Connect(network)
 	if err != nil {
-		log.Printf("failed to connect to wifi network: %s", network.SSID)
+		log.Printf("failed to connect to wifi network %s: %s", network.SSID, err)
 		err = sys.WifiNetworkStore.MarkConnectionFailure(network.SSID)
 		if err != nil {
 			return fmt.Errorf("failed to mark wifi network as not found: %w", err)
