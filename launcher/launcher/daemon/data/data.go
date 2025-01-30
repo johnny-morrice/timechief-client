@@ -86,11 +86,13 @@ func (dd DeviceData) initialise() error {
 	}
 
 	if deviceData.DeviceProfile.Dt == 0 || deviceData.DeviceProfile.Value.Theme.IsDefault {
+		log.Printf("setting default theme on initialisation")
 		defaultTheme, err := dd.defaultThemeService.GetDefaultTheme()
 		if err != nil {
 			return fmt.Errorf("failed to get default theme: %w", err)
 		}
 		deviceData.DeviceProfile.Value.Theme = defaultTheme
+		deviceData.DataVersion = ""
 
 		err = dd.deviceDataStore.SetDeviceData(deviceData)
 		if err != nil {
@@ -125,9 +127,9 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 		return fmt.Errorf("error reading device-data-last-good: %w", err)
 	}
 
-	var lastGoodData time.Time
+	var lastGoodDataTime time.Time
 	if lastGoodDataText != "" {
-		lastGoodData, err = time.Parse(time.RFC3339, lastGoodDataText)
+		lastGoodDataTime, err = time.Parse(time.RFC3339, lastGoodDataText)
 		if err != nil {
 			return fmt.Errorf("error parsing device-data-last-good: %w", err)
 		}
@@ -135,7 +137,7 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 
 	const goodDataTimeout = time.Second * 180
 	expectCalendar := data.DeviceProfile.Value.Features.GoogleCalendar
-	if time.Since(lastGoodData) < goodDataTimeout {
+	if time.Since(lastGoodDataTime) < goodDataTimeout {
 		expectedWeather := data.DeviceProfile.Value.Features.OpenWeatherMap
 		badData := expectCalendar && data.GoogleCalendar.Dt == 0
 		badData = badData || (expectedWeather && data.Owm.Dt == 0)
@@ -198,6 +200,12 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		myErr := dd.stateFlagStore.CreateIfNotExists(DeviceDataErrorState)
 		if myErr != nil {
 			log.Printf("error setting device data error state: %s", myErr)
+		}
+		lastDeviceData.DataVersion = ""
+
+		err = dd.deviceDataStore.SetDeviceData(lastDeviceData)
+		if err != nil {
+			log.Printf("error wiping data version after error: %s", err)
 		}
 		return v2.Data{}, err
 	}
