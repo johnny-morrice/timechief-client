@@ -94,7 +94,7 @@ func (dd DeviceData) initialise() error {
 		deviceData.DeviceProfile.Value.Theme = defaultTheme
 		deviceData.DataVersion = ""
 
-		err = dd.deviceDataStore.SetDeviceData(deviceData)
+		err = dd.setDeviceData(deviceData)
 		if err != nil {
 			return fmt.Errorf("error setting initial device data: %w", err)
 		}
@@ -165,7 +165,7 @@ func (dd DeviceData) doTick(_ *cli.Context) error {
 		log.Printf("error setting last good data time")
 	}
 
-	err = dd.deviceDataStore.SetDeviceData(data)
+	err = dd.setDeviceData(data)
 	if err != nil {
 		return err
 	}
@@ -203,7 +203,7 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 		}
 		lastDeviceData.DataVersion = ""
 
-		err = dd.deviceDataStore.SetDeviceData(lastDeviceData)
+		err = dd.setDeviceData(lastDeviceData)
 		if err != nil {
 			log.Printf("error wiping data version after error: %s", err)
 		}
@@ -240,6 +240,17 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 	}
 
 	return newDeviceData, nil
+}
+
+func (dd DeviceData) setDeviceData(data v2.Data) error {
+	if data.DeviceProfile.Value.Theme.LayoutType == "" {
+		theme, err := dd.defaultThemeService.GetDefaultTheme()
+		if err != nil {
+			return fmt.Errorf("error getting default theme: %w", err)
+		}
+		data.DeviceProfile.Value.Theme = theme
+	}
+	return dd.deviceDataStore.SetDeviceData(data)
 }
 
 func (dd DeviceData) doFetchLatest(dataVersion string) (v2.Data, error) {

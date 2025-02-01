@@ -16,6 +16,7 @@ func applyLayoutToTheme(theme *v2.Theme, layout v2.Theme) error {
 	if err != nil {
 		return fmt.Errorf("failed to apply layout to theme: %w", err)
 	}
+	theme.LayoutType = layout.LayoutType
 	return nil
 }
 
