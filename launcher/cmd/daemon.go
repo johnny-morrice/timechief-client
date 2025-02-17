@@ -115,7 +115,38 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	defaultThemeService, err := layout.MakeService(mediasvc.DefaultTheme(), keyValueStore, layout.GetConfigurations())
+	// Format is WIDTHxHEIGHT
+	forceResolutionFlag := ctx.String("force-resolution")
+	var forcedSystemResolution system.Resolution
+	if forceResolutionFlag != "" {
+		_, err = fmt.Sscanf(forceResolutionFlag, "%dx%d", &forcedSystemResolution.Width, &forcedSystemResolution.Height)
+		if err != nil {
+			return fmt.Errorf("failed to parse force-resolution flag: %v", err)
+		}
+	}
+
+	wifiNetworkStore := store.WifiNetworkStore{DB: db}
+
+	wifiInterfaceStore := store.WifiInterfaceStore{DB: db}
+
+	sys := system.System{
+		ConfigStore:            cfgStore,
+		KeyValueStore:          keyValueStore,
+		WifiInterfaceStore:     wifiInterfaceStore,
+		WifiNetworkStore:       wifiNetworkStore,
+		StateFlagStore:         flagStore,
+		DB:                     db,
+		EnableSystemAutomation: ctx.Bool("system-automation"),
+		ShutdownCallback:       sound.NewShutdownCallback(soundService),
+	}
+
+	defaultThemeOptions := layout.Options{
+		ForceResolution: forceResolutionFlag != "",
+		Width:           forcedSystemResolution.Width,
+		Height:          forcedSystemResolution.Height,
+		Configurations:  layout.GetConfigurations(),
+	}
+	defaultThemeService, err := layout.MakeService(keyValueStore, sys, defaultThemeOptions)
 	if err != nil {
 		return err
 	}
@@ -147,20 +178,6 @@ func Daemon(ctx *cli.Context) error {
 	refreshTokenDaemon, err := refreshtoken.MakeRefreshTokenDaemon(cfgStore, authZeroClient, keyValueStore, ctx.Duration("pairing-check-interval"), ctx.Duration("service-request-timeout"))
 	if err != nil {
 		return err
-	}
-
-	wifiNetworkStore := store.WifiNetworkStore{DB: db}
-
-	wifiInterfaceStore := store.WifiInterfaceStore{DB: db}
-	sys := system.System{
-		ConfigStore:            cfgStore,
-		KeyValueStore:          keyValueStore,
-		WifiInterfaceStore:     wifiInterfaceStore,
-		WifiNetworkStore:       wifiNetworkStore,
-		StateFlagStore:         flagStore,
-		DB:                     db,
-		EnableSystemAutomation: ctx.Bool("system-automation"),
-		ShutdownCallback:       sound.NewShutdownCallback(soundService),
 	}
 
 	wifiLoad := daemon.WifiLoadInterfaces{
@@ -297,7 +314,7 @@ func Daemon(ctx *cli.Context) error {
 	apiMux := http.NewServeMux()
 	mediaMux := http.NewServeMux()
 
-	mediaService, err := makeMediaService(ctx, videoService, pictureService, deviceDataStore)
+	mediaService, err := makeMediaService(ctx, defaultThemeService, videoService, pictureService, deviceDataStore)
 	if err != nil {
 		return err
 	}
@@ -403,38 +420,14 @@ func Daemon(ctx *cli.Context) error {
 				log.Printf("Failed to play startup sound: %v", err)
 			}
 		},
-		func() {
-			// Format is WIDTHxHEIGHT
-			forceResolution := ctx.String("force-resolution")
-			var res system.Resolution
-			var err error
-			if forceResolution != "" {
-				_, err = fmt.Sscanf(forceResolution, "%dx%d", &res.Width, &res.Height)
-				if err != nil {
-					log.Printf("failed to parse force-resolution: %v", err)
-					return
-				}
-			} else {
-				res, err = sys.GetResolution()
-				if err != nil {
-					log.Printf("failed to initialise screen resolution: %v", err)
-					return
-				}
-			}
-
-			err = defaultThemeService.SetScreenDimensions(res.Width, res.Height)
-			if err != nil {
-				log.Printf("failed to set screen dimensions: %v", err)
-			}
-		},
 	)
 	return http.ListenAndServe(addr, rootMux)
 }
 
-func makeMediaService(ctx *cli.Context, videoService mediasvc.VideoService, pictureService mediasvc.PictureService, deviceDataStore store.DeviceDataStore) (datasvc.MediaService, error) {
+func makeMediaService(ctx *cli.Context, defaultThemeService layout.Service, videoService mediasvc.VideoService, pictureService mediasvc.PictureService, deviceDataStore store.DeviceDataStore) (datasvc.MediaService, error) {
 	mediaFilePath := ctx.String("media-file")
 	if mediaFilePath == "" {
-		return mediasvc.MakeService(videoService, pictureService, deviceDataStore)
+		return mediasvc.MakeService(defaultThemeService, videoService, pictureService, deviceDataStore)
 	}
 	return mediasvc.MakeFileService(mediaFilePath, ctx.Duration("media-file-frequency"))
 }

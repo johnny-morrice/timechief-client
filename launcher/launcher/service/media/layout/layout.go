@@ -1,67 +1,8 @@
 package layout
 
 import (
-	"errors"
-	"fmt"
-	"log"
-	"reflect"
-	"strings"
-
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 )
-
-func applyLayoutToTheme(theme *v2.Theme, layout v2.Theme) error {
-	suffixes := []string{"X", "Y", "Width", "Height", "FontSize"}
-	err := copyFields(theme, layout, suffixes)
-	if err != nil {
-		return fmt.Errorf("failed to apply layout to theme: %w", err)
-	}
-	theme.LayoutType = layout.LayoutType
-	return nil
-}
-
-// Use reflection to copy fields from src to dst.
-// dst must be a pointer type to a struct type.
-// src must be a struct type.
-func copyFields(dst interface{}, src interface{}, suffixes []string) error {
-	copyFieldCount := 0
-	// Validate inputs
-	dstType := reflect.TypeOf(dst)
-	if dstType.Kind() != reflect.Ptr {
-		return errors.New("dst must be a pointer to a struct type")
-	}
-
-	dstType = dstType.Elem()
-	if dstType.Kind() != reflect.Struct {
-		return errors.New("dst must be a pointer to a struct type")
-	}
-
-	srcType := reflect.TypeOf(src)
-	if srcType.Kind() != reflect.Struct {
-		return errors.New("src must be a struct type")
-	}
-
-	dstVal := reflect.ValueOf(dst).Elem()
-
-	srcVal := reflect.ValueOf(src)
-	for i := 0; i < srcType.NumField(); i++ {
-		srcField := srcType.Field(i)
-		srcFieldName := srcField.Name
-		for _, suffix := range suffixes {
-			if strings.HasSuffix(srcFieldName, suffix) {
-				dstField := dstVal.FieldByName(srcFieldName)
-				if dstField.IsValid() {
-					srcFieldVal := srcVal.Field(i)
-					dstField.Set(srcFieldVal)
-					copyFieldCount++
-				}
-			}
-		}
-	}
-
-	log.Printf("copied %d layout fields", copyFieldCount)
-	return nil
-}
 
 type Configuration struct {
 	Name      string
@@ -72,42 +13,23 @@ type Configuration struct {
 	Layout    v2.Theme
 }
 
-func (config Configuration) IsSuitableForSize(width, height int) bool {
-	if config.MinWidth >= 0 && width < config.MinWidth {
+type Criteria struct {
+	Width  int
+	Height int
+}
+
+func (config Configuration) IsSuitable(criteria Criteria) bool {
+	if config.MinWidth >= 0 && criteria.Width < config.MinWidth {
 		return false
 	}
-	if config.MaxWidth >= 0 && width > config.MaxWidth {
+	if config.MaxWidth >= 0 && criteria.Width > config.MaxWidth {
 		return false
 	}
-	if config.MinHeight >= 0 && height < config.MinHeight {
+	if config.MinHeight >= 0 && criteria.Height < config.MinHeight {
 		return false
 	}
-	if config.MaxHeight >= 0 && height > config.MaxHeight {
+	if config.MaxHeight >= 0 && criteria.Height > config.MaxHeight {
 		return false
 	}
 	return true
-}
-
-func (config Configuration) ApplyToTheme(theme *v2.Theme) {
-	applyLayoutToTheme(theme, config.Layout)
-}
-
-type configurator struct {
-	layouts []Configuration
-}
-
-func (c configurator) configureTheme(theme *v2.Theme, width, height int) error {
-	if !theme.IsDefault {
-		return nil
-	}
-	for _, layout := range c.layouts {
-		if layout.IsSuitableForSize(width, height) {
-			log.Printf("applying layout %s", layout.Name)
-			theme.DisplayWidth = width
-			theme.DisplayHeight = height
-			layout.ApplyToTheme(theme)
-			return nil
-		}
-	}
-	return errors.New("no suitable layout found")
 }

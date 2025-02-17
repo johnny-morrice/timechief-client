@@ -85,7 +85,7 @@ func (dd DeviceData) initialise() error {
 		return fmt.Errorf("error getting device data when initialising: %w", err)
 	}
 
-	if deviceData.DeviceProfile.Dt == 0 || deviceData.DeviceProfile.Value.Theme.IsDefault {
+	if deviceData.DeviceProfile.Dt == 0 || !deviceData.DeviceProfile.Value.Theme.IsUserSetTheme {
 		log.Printf("setting default theme on initialisation")
 		defaultTheme, err := dd.defaultThemeService.GetDefaultTheme()
 		if err != nil {

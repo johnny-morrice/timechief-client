@@ -375,7 +375,7 @@ type Theme struct {
 	FortuneMessageFontSize             string   `json:"fortune_message_font_size"`
 	ImageFit                           string   `json:"image_fit"`
 	ImageUuids                         []string `json:"image_uuids"`
-	IsDefault                          bool     `json:"is_default"`
+	IsUserSetTheme                     bool     `json:"is_user_set_theme"`
 	LayoutType                         string   `json:"layout_type"`
 	LoadingGridFontSize                string   `json:"loading_grid_font_size"`
 	MainFont                           string   `json:"main_font"`

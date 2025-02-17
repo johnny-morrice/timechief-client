@@ -1714,7 +1714,7 @@ components:
         - fortune_mascot_height
         - event_mascot_height
         - status_note_font_size
-        - is_default
+        - is_user_set_theme
       properties:
         uuid:
           type: string
@@ -1854,7 +1854,7 @@ components:
           type: string
         status_note_font_size:
           type: string
-        is_default:
+        is_user_set_theme:
           type: boolean
 
     OWMDataDatum:
