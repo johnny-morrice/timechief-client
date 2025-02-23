@@ -2149,6 +2149,8 @@ components:
       required:
         - device_uuid
         - telemetry
+        - screen_width
+        - screen_height
       properties:
         principal_uuid:
           type: string

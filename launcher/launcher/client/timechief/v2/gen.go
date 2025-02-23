@@ -224,8 +224,8 @@ type DeviceProfileDatum struct {
 type DeviceTelemetry struct {
 	DeviceUuid    string  `json:"device_uuid"`
 	PrincipalUuid *string `json:"principal_uuid,omitempty"`
-	ScreenHeight  *int    `json:"screen_height,omitempty"`
-	ScreenWidth   *int    `json:"screen_width,omitempty"`
+	ScreenHeight  int     `json:"screen_height"`
+	ScreenWidth   int     `json:"screen_width"`
 }
 
 // Features defines model for Features.
