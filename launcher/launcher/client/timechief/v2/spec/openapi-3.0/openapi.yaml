@@ -1159,6 +1159,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BucketFileDownload'
+  /telemetry/device:
+    post:
+      operationId: "createDeviceTelemetry"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceTelemetry'
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 
 components:
   securitySchemes:
@@ -2127,3 +2143,18 @@ components:
       properties:
         redirect_url:
           type: string
+          
+    DeviceTelemetry:
+      type: object
+      required:
+        - device_uuid
+        - telemetry
+      properties:
+        principal_uuid:
+          type: string
+        device_uuid:
+          type: string
+        screen_width:
+          type: integer
+        screen_height:
+          type: integer
