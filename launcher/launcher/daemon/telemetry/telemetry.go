@@ -44,6 +44,7 @@ func MakeTelemetryDaemon(api v2.ClientInterface, deviceDataStore DeviceDataStore
 	d := &TelemetryDaemon{
 		api:             api,
 		deviceDataStore: deviceDataStore,
+		sys:             sys,
 	}
 	return d, nil
 }
@@ -67,6 +68,7 @@ func (d *TelemetryDaemon) doTick() error {
 	}
 
 	if !ready {
+		log.Printf("not ready to send telemetry")
 		return nil
 	}
 
@@ -98,7 +100,7 @@ func (d *TelemetryDaemon) isReadyToSend(ctx context.Context) (bool, error) {
 	}
 
 	if myDeviceUUID == "" {
-		return false, nil
+		return false, fmt.Errorf("my device uuid is empty")
 	}
 
 	myPrincipalUUID, err := d.getPrinicpalUUID()
@@ -107,7 +109,7 @@ func (d *TelemetryDaemon) isReadyToSend(ctx context.Context) (bool, error) {
 	}
 
 	if myPrincipalUUID == "" {
-		return false, nil
+		return false, fmt.Errorf("my principal uuid is empty")
 	}
 
 	successTimeout := time.Hour * 6
