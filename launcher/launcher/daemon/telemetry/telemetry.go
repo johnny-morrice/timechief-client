@@ -9,15 +9,14 @@ import (
 	"time"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
-	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 	"gorm.io/gorm"
 )
 
 type TelemetryDaemon struct {
-	keyValueStore KeyValueStore
-	api           v2.ClientWithResponsesInterface
-	sys           System
+	deviceDataStore DeviceDataStore
+	api             v2.ClientWithResponsesInterface
+	sys             System
 
 	lastSuccessfulUpdateAt time.Time
 	lastAttemptTimeAt      time.Time
@@ -28,8 +27,8 @@ type System interface {
 	GetResolution() (system.Resolution, error)
 }
 
-type KeyValueStore interface {
-	Get(key string) (string, error)
+type DeviceDataStore interface {
+	GetDeviceData() (v2.Data, error)
 }
 
 func MakeTelemetryDaemon() (TelemetryDaemon, error) {
@@ -61,13 +60,40 @@ func (d *TelemetryDaemon) doTick() error {
 	return d.sendTelemetry(ctx)
 }
 
+func (d *TelemetryDaemon) getDeviceUUID() (string, error) {
+	data, err := d.deviceDataStore.GetDeviceData()
+	if err != nil {
+		return "", fmt.Errorf("failed to get device data: %w", err)
+	}
+
+	return data.DeviceProfile.Value.Device.Uuid, nil
+}
+
+func (d *TelemetryDaemon) getPrinicpalUUID() (string, error) {
+	data, err := d.deviceDataStore.GetDeviceData()
+	if err != nil {
+		return "", fmt.Errorf("failed to get device data: %w", err)
+	}
+
+	return data.DeviceProfile.Value.PrincipalUuid, nil
+}
+
 func (d *TelemetryDaemon) isReadyToSend(ctx context.Context) (bool, error) {
-	myDeviceUUID, err := d.keyValueStore.Get(store.DeviceUUIDKey)
+	myDeviceUUID, err := d.getDeviceUUID()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, fmt.Errorf("failed to get my device uuid: %w", err)
 	}
 
 	if myDeviceUUID == "" {
+		return false, nil
+	}
+
+	myPrincipalUUID, err := d.getPrinicpalUUID()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, fmt.Errorf("failed to get my principal uuid: %w", err)
+	}
+
+	if myPrincipalUUID == "" {
 		return false, nil
 	}
 
@@ -85,9 +111,14 @@ func (d *TelemetryDaemon) isReadyToSend(ctx context.Context) (bool, error) {
 }
 
 func (d *TelemetryDaemon) sendTelemetry(ctx context.Context) error {
-	myDeviceUUID, err := d.keyValueStore.Get(store.DeviceUUIDKey)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("failed to get my device uuid: %w", err)
+	myDeviceUUID, err := d.getDeviceUUID()
+	if err != nil {
+		return fmt.Errorf("failed to get device uuid: %w", err)
+	}
+
+	myPrincipalUUID, err := d.getPrinicpalUUID()
+	if err != nil {
+		return fmt.Errorf("failed to get principal uuid: %w", err)
 	}
 
 	if myDeviceUUID == "" {
@@ -101,12 +132,11 @@ func (d *TelemetryDaemon) sendTelemetry(ctx context.Context) error {
 
 	d.lastAttemptTimeAt = time.Now()
 
-	// TODO where is the principal UUID?
 	request := v2.CreateDeviceTelemetryJSONRequestBody{
-		// PrincipalUuid: "",
-		DeviceUuid:   myDeviceUUID,
-		ScreenWidth:  resolution.Width,
-		ScreenHeight: resolution.Height,
+		PrincipalUuid: myPrincipalUUID,
+		DeviceUuid:    myDeviceUUID,
+		ScreenWidth:   resolution.Width,
+		ScreenHeight:  resolution.Height,
 	}
 	resp, err := d.api.CreateDeviceTelemetryWithResponse(nil, request)
 	if err != nil {

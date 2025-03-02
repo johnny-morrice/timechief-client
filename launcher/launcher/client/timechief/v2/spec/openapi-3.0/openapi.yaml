@@ -2147,6 +2147,7 @@ components:
     DeviceTelemetry:
       type: object
       required:
+        - principal_uuid
         - device_uuid
         - telemetry
         - screen_width
