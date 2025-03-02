@@ -8,6 +8,10 @@ type Resolution struct {
 }
 
 func (sys System) GetResolution() (Resolution, error) {
+	if sys.IsForceResolution {
+		return sys.ForcedResolution, nil
+	}
+
 	cfg, err := sys.ConfigStore.GetConfig()
 	if err != nil {
 		return Resolution{}, fmt.Errorf("failed to get config: %w", err)

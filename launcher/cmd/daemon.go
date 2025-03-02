@@ -139,6 +139,11 @@ func Daemon(ctx *cli.Context) error {
 		DB:                     db,
 		EnableSystemAutomation: ctx.Bool("system-automation"),
 		ShutdownCallback:       sound.NewShutdownCallback(soundService),
+		IsForceResolution:      forceResolutionFlag != "",
+		ForcedResolution: system.Resolution{
+			Width:  forcedSystemResolution.Width,
+			Height: forcedSystemResolution.Height,
+		},
 	}
 
 	defaultThemeOptions := layout.Options{
