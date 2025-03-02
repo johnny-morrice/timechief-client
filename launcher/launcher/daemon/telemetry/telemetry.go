@@ -151,13 +151,16 @@ func (d *TelemetryDaemon) sendTelemetry(ctx context.Context) error {
 		ScreenWidth:   resolution.Width,
 		ScreenHeight:  resolution.Height,
 	}
+
+	log.Printf("sending device telemetry")
+
 	resp, err := d.api.CreateDeviceTelemetry(ctx, request)
 	if err != nil {
 		return fmt.Errorf("failed to create device telemetry: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected status code: %d", resp)
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	d.lastSuccessfulUpdateAt = time.Now()
