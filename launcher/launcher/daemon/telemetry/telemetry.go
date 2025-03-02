@@ -14,8 +14,8 @@ import (
 )
 
 type TelemetryDaemon struct {
+	api             v2.ClientInterface
 	deviceDataStore DeviceDataStore
-	api             v2.ClientWithResponsesInterface
 	sys             System
 
 	lastSuccessfulUpdateAt time.Time
@@ -31,11 +31,24 @@ type DeviceDataStore interface {
 	GetDeviceData() (v2.Data, error)
 }
 
-func MakeTelemetryDaemon() (TelemetryDaemon, error) {
-	return TelemetryDaemon{}, nil
+func MakeTelemetryDaemon(api v2.ClientInterface, deviceDataStore DeviceDataStore, sys System) (*TelemetryDaemon, error) {
+	if api == nil {
+		return nil, errors.New("api was nil")
+	}
+	if deviceDataStore == nil {
+		return nil, errors.New("deviceDataStore was nil")
+	}
+	if sys == nil {
+		return nil, errors.New("sys was nil")
+	}
+	d := &TelemetryDaemon{
+		api:             api,
+		deviceDataStore: deviceDataStore,
+	}
+	return d, nil
 }
 
-func (d *TelemetryDaemon) Start() {
+func (d *TelemetryDaemon) Start(ctx context.Context) {
 	for range time.Tick(time.Second) {
 		err := d.doTick()
 		if err != nil {
@@ -138,13 +151,13 @@ func (d *TelemetryDaemon) sendTelemetry(ctx context.Context) error {
 		ScreenWidth:   resolution.Width,
 		ScreenHeight:  resolution.Height,
 	}
-	resp, err := d.api.CreateDeviceTelemetryWithResponse(nil, request)
+	resp, err := d.api.CreateDeviceTelemetry(ctx, request)
 	if err != nil {
 		return fmt.Errorf("failed to create device telemetry: %w", err)
 	}
 
-	if resp.StatusCode() != http.StatusNoContent {
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode())
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected status code: %d", resp)
 	}
 
 	d.lastSuccessfulUpdateAt = time.Now()

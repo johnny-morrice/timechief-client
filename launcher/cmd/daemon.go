@@ -24,6 +24,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/licenseactivation"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/picturedownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/refreshtoken"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/telemetry"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon/videodownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/fileserver"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
@@ -292,6 +293,11 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
+	telemetryDaemon, err := telemetry.MakeTelemetryDaemon(timechiefClient, deviceDataStore, sys)
+	if err != nil {
+		return err
+	}
+
 	go fwDaemon.Start(ctx.Context)
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
@@ -308,6 +314,7 @@ func Daemon(ctx *cli.Context) error {
 	go refreshTokenDaemon.Start(ctx)
 	go videoDownload.Start(ctx)
 	go pictureDownloader.Start(ctx)
+	go telemetryDaemon.Start(ctx.Context)
 
 	addr := ctx.String("listen-addr")
 	rootMux := http.NewServeMux()
