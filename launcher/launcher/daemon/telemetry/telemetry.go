@@ -68,7 +68,7 @@ func (d *TelemetryDaemon) doTick() error {
 	}
 
 	if !ready {
-		log.Printf("not ready to send telemetry")
+		// log.Printf("not ready to send telemetry")
 		return nil
 	}
 
