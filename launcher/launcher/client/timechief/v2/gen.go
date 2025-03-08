@@ -220,6 +220,14 @@ type DeviceProfileDatum struct {
 	Value DeviceProfile `json:"value"`
 }
 
+// DeviceTelemetry defines model for DeviceTelemetry.
+type DeviceTelemetry struct {
+	DeviceUuid    string `json:"device_uuid"`
+	PrincipalUuid string `json:"principal_uuid"`
+	ScreenHeight  int    `json:"screen_height"`
+	ScreenWidth   int    `json:"screen_width"`
+}
+
 // Features defines model for Features.
 type Features struct {
 	GoogleCalendar bool `json:"google_calendar"`
@@ -375,7 +383,7 @@ type Theme struct {
 	FortuneMessageFontSize             string   `json:"fortune_message_font_size"`
 	ImageFit                           string   `json:"image_fit"`
 	ImageUuids                         []string `json:"image_uuids"`
-	IsDefault                          bool     `json:"is_default"`
+	IsUserSetTheme                     bool     `json:"is_user_set_theme"`
 	LayoutType                         string   `json:"layout_type"`
 	LoadingGridFontSize                string   `json:"loading_grid_font_size"`
 	MainFont                           string   `json:"main_font"`
@@ -572,6 +580,9 @@ type CreatePrincipalJSONRequestBody = Principal
 
 // UpdatePrincipalJSONRequestBody defines body for UpdatePrincipal for application/json ContentType.
 type UpdatePrincipalJSONRequestBody = Principal
+
+// CreateDeviceTelemetryJSONRequestBody defines body for CreateDeviceTelemetry for application/json ContentType.
+type CreateDeviceTelemetryJSONRequestBody = DeviceTelemetry
 
 // CreateThemeJSONRequestBody defines body for CreateTheme for application/json ContentType.
 type CreateThemeJSONRequestBody = Theme
@@ -792,6 +803,11 @@ type ClientInterface interface {
 
 	// GetPrincipalById request
 	GetPrincipalById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateDeviceTelemetryWithBody request with any body
+	CreateDeviceTelemetryWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateDeviceTelemetry(ctx context.Context, body CreateDeviceTelemetryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListThemes request
 	ListThemes(ctx context.Context, params *ListThemesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1420,6 +1436,30 @@ func (c *Client) GetCurrentPrincipal(ctx context.Context, reqEditors ...RequestE
 
 func (c *Client) GetPrincipalById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPrincipalByIdRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateDeviceTelemetryWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDeviceTelemetryRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateDeviceTelemetry(ctx context.Context, body CreateDeviceTelemetryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDeviceTelemetryRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3126,6 +3166,46 @@ func NewGetPrincipalByIdRequest(server string, id string) (*http.Request, error)
 	return req, nil
 }
 
+// NewCreateDeviceTelemetryRequest calls the generic CreateDeviceTelemetry builder with application/json body
+func NewCreateDeviceTelemetryRequest(server string, body CreateDeviceTelemetryJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateDeviceTelemetryRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateDeviceTelemetryRequestWithBody generates requests for CreateDeviceTelemetry with any type of body
+func NewCreateDeviceTelemetryRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/telemetry/device")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewListThemesRequest generates requests for ListThemes
 func NewListThemesRequest(server string, params *ListThemesParams) (*http.Request, error) {
 	var err error
@@ -3752,6 +3832,11 @@ type ClientWithResponsesInterface interface {
 
 	// GetPrincipalByIdWithResponse request
 	GetPrincipalByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*GetPrincipalByIdResponse, error)
+
+	// CreateDeviceTelemetryWithBodyWithResponse request with any body
+	CreateDeviceTelemetryWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDeviceTelemetryResponse, error)
+
+	CreateDeviceTelemetryWithResponse(ctx context.Context, body CreateDeviceTelemetryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDeviceTelemetryResponse, error)
 
 	// ListThemesWithResponse request
 	ListThemesWithResponse(ctx context.Context, params *ListThemesParams, reqEditors ...RequestEditorFn) (*ListThemesResponse, error)
@@ -4620,6 +4705,27 @@ func (r GetPrincipalByIdResponse) StatusCode() int {
 	return 0
 }
 
+type CreateDeviceTelemetryResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateDeviceTelemetryResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateDeviceTelemetryResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListThemesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5275,6 +5381,23 @@ func (c *ClientWithResponses) GetPrincipalByIdWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseGetPrincipalByIdResponse(rsp)
+}
+
+// CreateDeviceTelemetryWithBodyWithResponse request with arbitrary body returning *CreateDeviceTelemetryResponse
+func (c *ClientWithResponses) CreateDeviceTelemetryWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDeviceTelemetryResponse, error) {
+	rsp, err := c.CreateDeviceTelemetryWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateDeviceTelemetryResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateDeviceTelemetryWithResponse(ctx context.Context, body CreateDeviceTelemetryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDeviceTelemetryResponse, error) {
+	rsp, err := c.CreateDeviceTelemetry(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateDeviceTelemetryResponse(rsp)
 }
 
 // ListThemesWithResponse request returning *ListThemesResponse
@@ -6296,6 +6419,22 @@ func ParseGetPrincipalByIdResponse(rsp *http.Response) (*GetPrincipalByIdRespons
 		}
 		response.JSON200 = &dest
 
+	}
+
+	return response, nil
+}
+
+// ParseCreateDeviceTelemetryResponse parses an HTTP response from a CreateDeviceTelemetryWithResponse call
+func ParseCreateDeviceTelemetryResponse(rsp *http.Response) (*CreateDeviceTelemetryResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateDeviceTelemetryResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
 	}
 
 	return response, nil

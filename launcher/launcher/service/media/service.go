@@ -10,9 +10,10 @@ import (
 )
 
 type Service struct {
-	videoService    VideoService
-	pictureService  PictureService
-	deviceDataStore DeviceDataStore
+	defaultThemeService DefaultThemeService
+	videoService        VideoService
+	pictureService      PictureService
+	deviceDataStore     DeviceDataStore
 }
 
 type VideoService interface {
@@ -29,7 +30,15 @@ type DeviceDataStore interface {
 	GetDeviceData() (v2.Data, error)
 }
 
-func MakeService(videoService VideoService, pictureService PictureService, deviceDataStore DeviceDataStore) (Service, error) {
+type DefaultThemeService interface {
+	GetDefaultTheme() (v2.Theme, error)
+}
+
+func MakeService(defaultThemeService DefaultThemeService, videoService VideoService, pictureService PictureService, deviceDataStore DeviceDataStore) (Service, error) {
+	if defaultThemeService == nil {
+		return Service{}, errors.New("defaultThemeService is nil")
+	}
+
 	if videoService == nil {
 		return Service{}, errors.New("videoService is nil")
 	}
@@ -40,22 +49,26 @@ func MakeService(videoService VideoService, pictureService PictureService, devic
 		return Service{}, errors.New("deviceDataStore is nil")
 	}
 	svc := Service{
-		videoService:    videoService,
-		pictureService:  pictureService,
-		deviceDataStore: deviceDataStore,
+		defaultThemeService: defaultThemeService,
+		videoService:        videoService,
+		pictureService:      pictureService,
+		deviceDataStore:     deviceDataStore,
 	}
 	return svc, nil
 }
 
 func (svc Service) GetMedia() (Media, error) {
 	deviceData, err := svc.deviceDataStore.GetDeviceData()
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return Media{}, err
 	}
 	myTheme := deviceData.DeviceProfile.Value.Theme
-	// Sensible default if not initialised yet
-	if deviceData.DeviceProfile.Dt == 0 {
-		myTheme = DefaultTheme()
+	if deviceData.DeviceProfile.Dt == 0 || deviceData.DeviceProfile.Value.Theme.LayoutType == "" {
+		defaultTheme, err := svc.defaultThemeService.GetDefaultTheme()
+		if err != nil {
+			return Media{}, err
+		}
+		myTheme = defaultTheme
 	}
 	themeCSS, err := renderThemeCSS(myTheme)
 	if err != nil {

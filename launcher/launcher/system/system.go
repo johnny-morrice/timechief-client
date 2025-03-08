@@ -25,6 +25,8 @@ type System struct {
 	WifiNetworkStore       store.WifiNetworkStore
 	ShutdownCallback       ShutdownCallback
 	EnableSystemAutomation bool
+	IsForceResolution      bool
+	ForcedResolution       Resolution
 }
 
 type ShutdownCallback interface {

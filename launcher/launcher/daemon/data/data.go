@@ -85,7 +85,7 @@ func (dd DeviceData) initialise() error {
 		return fmt.Errorf("error getting device data when initialising: %w", err)
 	}
 
-	if deviceData.DeviceProfile.Dt == 0 || deviceData.DeviceProfile.Value.Theme.IsDefault {
+	if deviceData.DeviceProfile.Dt == 0 || !deviceData.DeviceProfile.Value.Theme.IsUserSetTheme {
 		log.Printf("setting default theme on initialisation")
 		defaultTheme, err := dd.defaultThemeService.GetDefaultTheme()
 		if err != nil {
@@ -286,9 +286,10 @@ func (dd DeviceData) doFetchLatest(dataVersion string) (v2.Data, error) {
 
 func (dd DeviceData) updateDisplaySize(width, height int) error {
 	if width == 0 || height == 0 {
-		log.Printf("skipping update display size due to 0 width or height")
+		// log.Printf("skipping update display size due to 0 width or height")
 		return nil
 	}
+	// log.Printf("setting display size to %dx%d", width, height)
 	cfg, err := dd.cfgStore.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get config to set display size: %w", err)

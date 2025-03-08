@@ -1,18 +1,19 @@
 package layout
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
+	"log"
+	"sync"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
-	"gorm.io/gorm"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
 )
 
 type Service struct {
-	configurator configurator
-	kvStore      KeyValueStore
-	defaultTheme v2.Theme
+	kvStore KeyValueStore
+	sys     System
+	options *Options
+	once    *sync.Once
 }
 
 type KeyValueStore interface {
@@ -20,62 +21,73 @@ type KeyValueStore interface {
 	Set(key, value string) error
 }
 
-func MakeService(defaultTheme v2.Theme, keyValueStore KeyValueStore, configurations []Configuration) (Service, error) {
+type System interface {
+	GetResolution() (system.Resolution, error)
+}
+
+type Options struct {
+	ForceResolution bool
+	Width           int
+	Height          int
+	Configurations  []Configuration `validate:"required"`
+}
+
+func (opt Options) validate() error {
+	if opt.ForceResolution && (opt.Width == 0 || opt.Height == 0) {
+		return errors.New("width and height must be set when forcing resolution")
+	}
+
+	if len(opt.Configurations) == 0 {
+		return errors.New("configurations is empty")
+	}
+
+	return nil
+}
+
+func MakeService(keyValueStore KeyValueStore, sys System, options Options) (Service, error) {
 	if keyValueStore == nil {
 		return Service{}, errors.New("keyValueStore is nil")
 	}
-	if len(configurations) == 0 {
-		return Service{}, errors.New("configurations is empty")
+	if sys == nil {
+		return Service{}, errors.New("sys is nil")
+	}
+	err := options.validate()
+	if err != nil {
+		return Service{}, err
 	}
 	svc := Service{
-		configurator: configurator{
-			layouts: configurations,
-		},
-		kvStore:      keyValueStore,
-		defaultTheme: defaultTheme,
+		kvStore: keyValueStore,
+		sys:     sys,
+		options: &options,
+		once:    &sync.Once{},
 	}
 	return svc, nil
 }
 
 func (svc Service) GetDefaultTheme() (v2.Theme, error) {
-	const defaultWidth = 800
-	const defaultHeight = 480
-	defaultThemeText, err := svc.kvStore.Get("default_theme")
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		err = svc.SetScreenDimensions(defaultWidth, defaultHeight)
-		if err != nil {
-			return v2.Theme{}, fmt.Errorf("failed to set screen dimensions: %w", err)
+	svc.once.Do(func() {
+		if !svc.options.ForceResolution {
+			resolution, err := svc.sys.GetResolution()
+			if err != nil {
+				log.Printf("Failed to get resolution, falling back to 800x480: %s", err)
+				svc.options.Width = 800
+				svc.options.Height = 480
+				return
+			}
+			log.Printf("system resolution: %dx%d", resolution.Width, resolution.Height)
+			svc.options.Width = resolution.Width
+			svc.options.Height = resolution.Height
 		}
-		defaultThemeText, err = svc.kvStore.Get("default_theme")
-		if err != nil {
-			return v2.Theme{}, fmt.Errorf("failed to get default theme: %w", err)
+	})
+
+	for _, layout := range svc.options.Configurations {
+		criteria := Criteria{
+			Width:  svc.options.Width,
+			Height: svc.options.Height,
 		}
-	} else if err != nil {
-		return v2.Theme{}, fmt.Errorf("failed to get default theme: %w", err)
+		if layout.IsSuitable(criteria) {
+			return layout.Layout, nil
+		}
 	}
-
-	var defaultTheme v2.Theme
-	err = json.Unmarshal([]byte(defaultThemeText), &defaultTheme)
-	if err != nil {
-		return v2.Theme{}, fmt.Errorf("failed to unmarshal default theme: %w", err)
-	}
-
-	return defaultTheme, nil
-}
-
-func (svc Service) SetScreenDimensions(width, height int) error {
-	myTheme := svc.defaultTheme
-	err := svc.configurator.configureTheme(&myTheme, width, height)
-	if err != nil {
-		return err
-	}
-	textTheme, err := json.MarshalIndent(myTheme, "", "    ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal theme: %w", err)
-	}
-	err = svc.kvStore.Set("default_theme", string(textTheme))
-	if err != nil {
-		return fmt.Errorf("failed to set default theme: %w", err)
-	}
-	return nil
+	return v2.Theme{}, errors.New("no suitable layout")
 }

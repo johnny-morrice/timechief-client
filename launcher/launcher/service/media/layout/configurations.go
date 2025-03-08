@@ -1,83 +1,263 @@
 package layout
 
-import (
-	"encoding/json"
-	"fmt"
+import v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 
-	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
-)
-
-// TODO implement me
 func GetConfigurations() []Configuration {
 	return []Configuration{
-		sevenInchLayout(),
+		{
+			MinWidth:  0,
+			MaxWidth:  799,
+			MinHeight: 0,
+			MaxHeight: 479,
+			Layout:    DefaultSmallLayout(),
+		},
+		{
+			MinWidth:  800,
+			MaxWidth:  -1,
+			MinHeight: 480,
+			MaxHeight: 1023,
+			Layout:    DefaultSevenInchLayout(),
+		},
+		{
+			MinWidth:  800,
+			MaxWidth:  -1,
+			MinHeight: 1024,
+			MaxHeight: -1,
+			Layout:    DefaultPlannerLayout(),
+		},
 	}
 }
 
-func sevenInchLayout() Configuration {
-	var theme v2.Theme
-	const themeJson = `{
-			"display_width": 800,
-			"display_height": 480,
-			"layout_type": "seven_inch",
-			"widget_switcher_x": "20px",
-			"widget_switcher_y": "20px",
-			"widget_switcher_width": "240px",
-			"widget_switcher_height": "360px",
-			"date_time_x": "320px",
-			"date_time_y": "20px",
-			"date_time_width": "410px",
-			"date_time_height": "220px",
-			"action_center_x": "320px",
-			"action_center_y": "260px",
-			"action_center_width": "370px",
-			"action_center_height": "120px",
-			"planner_x": "20px",
-			"planner_y": "440px",
-			"planner_width": "710px",
-			"planner_height": "800px",
-			"body_font_size": "16pt",
-			"date_font_size": "36pt",
-			"time_font_size": "86pt",
-			"current_weather_font_size": "18pt",
-			"action_button_font_size": "18pt",
-			"switcher_button_font_size": "16pt",
-			"astro_font_size": "16pt",
-			"weather_data_font_size": "32pt",
-			"current_weather_icon_font_size": "28pt",
-			"forecast_icon_font_size": "32pt",
-			"forecast_table_icon_font_size": "24pt",
-			"forecast_control_button_font_size": "16pt",
-			"forecast_control_label_font_size": "16pt",
-			"calendar_day_date_font_size": "20pt",
-			"calendar_day_font_size": "14pt",
-			"event_calendar_control_button_font_size": "16pt",
-			"fortune_message_font_size": "14pt",
-			"next_event_time_font_size": "18pt",
-			"next_event_text_font_size": "16pt",
-			"loading_grid_font_size": "16pt",
-			"planner_date_cell_font_size": "8pt",
-			"planner_date_cell_width": "70px",
-			"planner_date_cell_height": "50px",
-			"disabled_button_border_color": "#ffa500ff",
-			"disabled_button_foreground_color": "#ffa500ff",
-			"disabled_button_background_color": "#ffa500ff",
-			"error_color": "#ffa500ff",
-			"mascot_type": "dark",
-			"fortune_mascot_height": "120px",
-			"event_mascot_height": "100px",
-			"status_note_font_size": "16pt"
-		}`
-	err := json.Unmarshal([]byte(themeJson), &theme)
-	if err != nil {
-		panic(fmt.Sprintf("BUG in default theme: %s", err))
+const fgColor = "#008000ff"
+const bgColor = "#000000ff"
+const errorColor = "#ffa500ff"
+const borderRadius = "0px"
+const timeFont = "Seven Segment"
+const mainFont = "'Titillium Web'"
+const borderWidth = "1px"
+
+func DefaultSevenInchLayout() v2.Theme {
+	return v2.Theme{
+		ForegroundColor: fgColor,
+		BackgroundColor: bgColor,
+
+		BoxBackgroundColor: bgColor,
+		BoxBorderRadius:    borderRadius,
+		BoxBorderWidth:     borderWidth,
+		BoxBorderColor:     fgColor,
+
+		MainFont:  mainFont,
+		TimeFont:  timeFont,
+		TimeColor: fgColor,
+
+		ButtonBorderRadius:    borderRadius,
+		ButtonBorderWidth:     borderWidth,
+		ButtonBorderColor:     fgColor,
+		ButtonForegroundColor: fgColor,
+		ButtonBackgroundColor: bgColor,
+
+		DisabledButtonBorderColor:     errorColor,
+		DisabledButtonForegroundColor: errorColor,
+		DisabledButtonBackgroundColor: bgColor,
+
+		ErrorColor: errorColor,
+
+		ImageFit: "none",
+
+		LayoutType:           "seven_inch",
+		DisplayWidth:         800,
+		DisplayHeight:        480,
+		WidgetSwitcherX:      "20px",
+		WidgetSwitcherY:      "20px",
+		WidgetSwitcherWidth:  "260px",
+		WidgetSwitcherHeight: "380px",
+		DateTimeX:            "340px",
+		DateTimeY:            "20px",
+		DateTimeWidth:        "440px",
+		DateTimeHeight:       "210px",
+		ActionCenterX:        "350px",
+		ActionCenterY:        "260px",
+		ActionCenterWidth:    "380px",
+		ActionCenterHeight:   "140px",
+		PlannerX:             "20px",
+		PlannerY:             "480px",
+		PlannerWidth:         "440px",
+		PlannerHeight:        "800px",
+
+		BodyFontSize:                       "16pt",
+		DateFontSize:                       "36pt",
+		TimeFontSize:                       "102pt",
+		CurrentWeatherFontSize:             "18pt",
+		ActionButtonFontSize:               "18pt",
+		SwitcherButtonFontSize:             "16pt",
+		AstroFontSize:                      "16pt",
+		WeatherDataFontSize:                "32pt",
+		CurrentWeatherIconFontSize:         "28pt",
+		ForecastIconFontSize:               "32pt",
+		ForecastWeatherTableIconFontSize:   "24pt",
+		ForecastControlButtonFontSize:      "16pt",
+		ForecastControlLabelFontSize:       "16pt",
+		CalendarDayDateFontSize:            "20pt",
+		CalendarDayFontSize:                "14pt",
+		EventCalendarControlButtonFontSize: "16pt",
+		FortuneMessageFontSize:             "14pt",
+		NextEventTimeFontSize:              "18pt",
+		NextEventTextFontSize:              "16pt",
+		LoadingGridFontSize:                "16pt",
+		FortuneMascotHeight:                "120px",
+		EventMascotHeight:                  "100px",
+		MascotType:                         "dark",
+		StatusNoteFontSize:                 "16pt",
+
+		PlannerDayEventCount: 0,
 	}
-	return Configuration{
-		Name:      "default_seven_inch",
-		MinHeight: -1,
-		MaxHeight: -1,
-		MinWidth:  -1,
-		MaxWidth:  -1,
-		Layout:    theme,
+}
+
+func DefaultSmallLayout() v2.Theme {
+	return v2.Theme{
+		ForegroundColor: fgColor,
+		BackgroundColor: bgColor,
+
+		BoxBackgroundColor: bgColor,
+		BoxBorderRadius:    borderRadius,
+		BoxBorderWidth:     borderWidth,
+		BoxBorderColor:     fgColor,
+
+		MainFont:  mainFont,
+		TimeFont:  timeFont,
+		TimeColor: fgColor,
+
+		ButtonBorderRadius:    borderRadius,
+		ButtonBorderWidth:     borderWidth,
+		ButtonBorderColor:     fgColor,
+		ButtonForegroundColor: fgColor,
+		ButtonBackgroundColor: bgColor,
+
+		DisabledButtonBorderColor:     errorColor,
+		DisabledButtonForegroundColor: errorColor,
+		DisabledButtonBackgroundColor: bgColor,
+
+		ErrorColor: errorColor,
+
+		LayoutType:                         "small",
+		DisplayWidth:                       480,
+		DisplayHeight:                      320,
+		WidgetSwitcherX:                    "20px",
+		WidgetSwitcherY:                    "20px",
+		WidgetSwitcherWidth:                "140px",
+		WidgetSwitcherHeight:               "80px",
+		DateTimeX:                          "150px",
+		DateTimeY:                          "20px",
+		DateTimeWidth:                      "200px",
+		DateTimeHeight:                     "80px",
+		ActionCenterX:                      "20px",
+		ActionCenterY:                      "100px",
+		ActionCenterWidth:                  "400px",
+		ActionCenterHeight:                 "100px",
+		PlannerX:                           "20px",
+		PlannerY:                           "440px",
+		PlannerWidth:                       "710px",
+		PlannerHeight:                      "800px",
+		BodyFontSize:                       "14pt",
+		DateFontSize:                       "8pt",
+		TimeFontSize:                       "32pt",
+		CurrentWeatherFontSize:             "14pt",
+		ActionButtonFontSize:               "14pt",
+		SwitcherButtonFontSize:             "14pt",
+		AstroFontSize:                      "14pt",
+		WeatherDataFontSize:                "14pt",
+		CurrentWeatherIconFontSize:         "14pt",
+		ForecastIconFontSize:               "14pt",
+		ForecastWeatherTableIconFontSize:   "14pt",
+		ForecastControlButtonFontSize:      "16pt",
+		ForecastControlLabelFontSize:       "16pt",
+		CalendarDayDateFontSize:            "20pt",
+		CalendarDayFontSize:                "14pt",
+		EventCalendarControlButtonFontSize: "14pt",
+		FortuneMessageFontSize:             "8pt",
+		NextEventTimeFontSize:              "8pt",
+		NextEventTextFontSize:              "8pt",
+		LoadingGridFontSize:                "14pt",
+		PlannerDateCellFontSize:            "8pt",
+		PlannerDateCellWidth:               "70px",
+		PlannerDateCellHeight:              "50px",
+		PlannerDayEventCount:               0,
+		FortuneMascotHeight:                "50px",
+		EventMascotHeight:                  "50px",
+		StatusNoteFontSize:                 "8pt",
+	}
+}
+
+func DefaultPlannerLayout() v2.Theme {
+	return v2.Theme{
+		ForegroundColor: fgColor,
+		BackgroundColor: bgColor,
+
+		BoxBackgroundColor: bgColor,
+		BoxBorderRadius:    borderRadius,
+		BoxBorderWidth:     borderWidth,
+		BoxBorderColor:     fgColor,
+
+		MainFont:  mainFont,
+		TimeFont:  timeFont,
+		TimeColor: fgColor,
+
+		ButtonBorderRadius:    borderRadius,
+		ButtonBorderWidth:     borderWidth,
+		ButtonBorderColor:     fgColor,
+		ButtonForegroundColor: fgColor,
+		ButtonBackgroundColor: bgColor,
+
+		DisabledButtonBorderColor:     errorColor,
+		DisabledButtonForegroundColor: errorColor,
+		DisabledButtonBackgroundColor: bgColor,
+
+		ErrorColor:                         errorColor,
+		DisplayWidth:                       800,
+		DisplayHeight:                      1024,
+		LayoutType:                         "planner",
+		WidgetSwitcherX:                    "20px",
+		WidgetSwitcherY:                    "20px",
+		WidgetSwitcherWidth:                "260px",
+		WidgetSwitcherHeight:               "380px",
+		DateTimeX:                          "340px",
+		DateTimeY:                          "20px",
+		DateTimeWidth:                      "440px",
+		DateTimeHeight:                     "200px",
+		ActionCenterX:                      "350px",
+		ActionCenterY:                      "260px",
+		ActionCenterWidth:                  "380px",
+		ActionCenterHeight:                 "140px",
+		PlannerX:                           "20px",
+		PlannerY:                           "480px",
+		PlannerWidth:                       "760px",
+		PlannerHeight:                      "400px",
+		BodyFontSize:                       "16pt",
+		DateFontSize:                       "36pt",
+		TimeFontSize:                       "98pt",
+		CurrentWeatherFontSize:             "18pt",
+		ActionButtonFontSize:               "18pt",
+		SwitcherButtonFontSize:             "16pt",
+		AstroFontSize:                      "16pt",
+		WeatherDataFontSize:                "32pt",
+		CurrentWeatherIconFontSize:         "28pt",
+		ForecastIconFontSize:               "32pt",
+		ForecastWeatherTableIconFontSize:   "24pt",
+		ForecastControlButtonFontSize:      "16pt",
+		ForecastControlLabelFontSize:       "16pt",
+		CalendarDayDateFontSize:            "20pt",
+		CalendarDayFontSize:                "14pt",
+		EventCalendarControlButtonFontSize: "16pt",
+		FortuneMessageFontSize:             "14pt",
+		NextEventTimeFontSize:              "18pt",
+		NextEventTextFontSize:              "16pt",
+		LoadingGridFontSize:                "16pt",
+		PlannerDateCellFontSize:            "6pt",
+		PlannerDateCellWidth:               "50px",
+		PlannerDateCellHeight:              "20px",
+		PlannerDayEventCount:               0,
+		FortuneMascotHeight:                "120px",
+		EventMascotHeight:                  "100px",
+		StatusNoteFontSize:                 "14pt",
 	}
 }
