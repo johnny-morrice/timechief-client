@@ -235,13 +235,22 @@ func (sys System) WifiScan() error {
 	if len(networks) == 0 {
 		return ErrNoWifiNetworks
 	}
+	if len(networks) == 1 {
+		hotspot, err := sys.getHotspotCredentials()
+		if err != nil {
+			return fmt.Errorf("failed to get hotspot credentials for scan fail check: %w", err)
+		}
+		if networks[0].SSID == hotspot.SSID {
+			log.Printf("only found our own hotspot network: %s", hotspot.SSID)
+			return ErrNoWifiNetworks
+		}
+	}
 	err = sys.WifiNetworkStore.MarkAllNotFound()
 	if err != nil {
 		return fmt.Errorf("failed to delete all wifi networks: %w", err)
 	}
 	storeNets := toStoreNetworks(networks)
-	for i := 0; i < len(storeNets); i++ {
-		net := storeNets[i]
+	for _, net := range storeNets {
 		err = sys.WifiNetworkStore.Save(net)
 		if err != nil {
 			return fmt.Errorf("failed to create wifi network: %w", err)

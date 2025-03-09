@@ -24,9 +24,10 @@ func (card WifiInterface) ScanWifiNetworks() ([]WifiNetwork, error) {
 	}
 	result := make([]WifiNetwork, 0, len(nmNets))
 	for _, nmNet := range nmNets {
+		log.Printf("found wifi network: %s", nmNet.SSID)
 		validErr := nmNet.Validate()
 		if validErr != nil {
-			log.Printf("Invalid network: %s", validErr)
+			log.Printf("invalid network: %s", validErr)
 			continue
 		}
 		mostSecureProtocol, err := nmNet.SecureProtocol()
