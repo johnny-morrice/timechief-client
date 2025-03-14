@@ -167,7 +167,7 @@ const validEmotes = [
 function validateEmote(emote) {
     const isValid = validEmotes.filter(myEmote => myEmote === emote).length > 0;
     if (!isValid) {
-        throw new Error(`invalid mascot nickname: ${emote}`);
+        throw new Error(`invalid mascot emote: ${emote}`);
     }
 }
 
