@@ -36,7 +36,6 @@ type MuteOptions struct {
 
 func (svc Service) SetMuteOptions(option MuteOptions) error {
 	var err error
-	log.Printf("setting mute: %v", option.IsMute)
 	if option.IsMute {
 		err = svc.kv.Set("mute", "true")
 	} else {
@@ -47,8 +46,7 @@ func (svc Service) SetMuteOptions(option MuteOptions) error {
 	}
 	if option.IsMuteRange {
 		// Swap mute start and mute end hours.
-		muteText := fmt.Sprintf("%d,%d", option.MuteEndHour, option.MuteStartHour)
-		log.Printf("Setting mute range to %s", muteText)
+		muteText := fmt.Sprintf("%d-%d", option.MuteEndHour, option.MuteStartHour)
 		err = svc.kv.Set("unmute-range", muteText)
 	} else {
 		err = svc.kv.Set("unmute-range", "")
