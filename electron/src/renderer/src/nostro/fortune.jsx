@@ -47,7 +47,7 @@ function updateSignals(signals, data) {
         return;
     }
 
-    const spooky = features["spooky"];
+    const spooky = features["spooky_campaign"];
     signals.setSpooky(spooky);
 }
 
