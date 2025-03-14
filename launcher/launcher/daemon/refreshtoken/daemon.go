@@ -125,7 +125,7 @@ func (d Daemon) isReadyForRenewal() (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("error parsing token expiry")
 	}
-	const readyInterval = time.Minute * 10
+	const readyInterval = time.Minute * 60
 	ready := time.Until(expiredDate) <= readyInterval
 	return ready, nil
 }

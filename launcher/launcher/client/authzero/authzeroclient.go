@@ -86,7 +86,7 @@ func (clnt AuthZeroClient) RefreshAccessToken(ctx context.Context, clientID, ref
 	tokenURL := clnt.BaseURL + "/oauth/token"
 
 	refreshToken = url.QueryEscape(refreshToken)
-	payload := strings.NewReader("grant_type=refresh_token" + "&client_id=" + clientID + "&refresh_token=" + refreshToken)
+	payload := strings.NewReader("grant_type=refresh_token" + "&client_id=" + clientID + "&refresh_token=" + refreshToken + "&scope=offline_access")
 
 	req, err := http.NewRequest("POST", tokenURL, payload)
 
