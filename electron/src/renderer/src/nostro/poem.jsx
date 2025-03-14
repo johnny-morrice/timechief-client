@@ -249,12 +249,23 @@ function parseCSVToJSON(csvString, callback) {
                     "thumb"
                 ];
 
+                if (!text) {
+                    throw new Error("missing text");
+                }
+
                 if (!validEmotes.includes(emote)) {
                     throw new Error(`invalid mascot emote: ${emote}`);
                 }
 
                 // Collect non-empty tags into an array
                 const tagsArray = Object.values(tags).filter(tag => tag);
+
+                if (tagsArray.length != 1) {
+                    throw new Error(`expected 1 tag for poem text ${text} but got ${tagsArray}`);
+                }
+                if (tagsArray[0] === "" || !tagsArray[0]) {
+                    throw new Error("empty tag");
+                }
 
                 // Push formatted object into results array
                 results.push({
