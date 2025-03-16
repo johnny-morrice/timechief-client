@@ -68,6 +68,10 @@ func (d Daemon) Start(ctx *cli.Context) {
 }
 
 func (d Daemon) doTick() error {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, d.requestTimeout)
+	defer cancel()
+
 	ready, err := d.isReadyForRenewal()
 	if err != nil {
 		return err
@@ -82,9 +86,7 @@ func (d Daemon) doTick() error {
 		if err != nil {
 			return fmt.Errorf("error decoding access token: %s", err)
 		}
-		ctx := context.Background()
-		ctx, cancel := context.WithTimeout(ctx, d.requestTimeout)
-		defer cancel()
+
 		cfg, err := d.cfgStore.GetConfig()
 		if err != nil {
 			return err

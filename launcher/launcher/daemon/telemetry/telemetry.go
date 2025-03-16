@@ -50,7 +50,7 @@ func MakeTelemetryDaemon(api v2.ClientInterface, deviceDataStore DeviceDataStore
 }
 
 func (d *TelemetryDaemon) Start(ctx context.Context) {
-	for range time.Tick(time.Second) {
+	for range time.Tick(time.Second * 60) {
 		err := d.doTick()
 		if err != nil {
 			log.Printf("telemetry daemon error: %v", err)
