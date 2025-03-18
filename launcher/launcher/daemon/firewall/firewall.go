@@ -11,16 +11,16 @@ import (
 )
 
 type FirewallDaemon struct {
-	startTime                 time.Time
-	graceDuration             time.Duration
-	tickInterval              time.Duration
-	isGraceStartHandled       bool
-	isHandleForceFirewallOpen bool
-	isGraceIncludeSSH         bool
-	isFirewallUpHandled       bool
-	stateFlagStore            StateFlagStore
-	sys                       System
-	svc                       Service
+	startTime                  time.Time
+	graceDuration              time.Duration
+	tickInterval               time.Duration
+	isGraceStartHandled        bool
+	isForceFirewallOpenHandled bool
+	isGraceIncludeSSH          bool
+	isFirewallUpHandled        bool
+	stateFlagStore             StateFlagStore
+	sys                        System
+	svc                        Service
 }
 
 func MakeFirewallDaemon(isGraceIncludeSSH bool, graceDuration time.Duration, tickInterval time.Duration, sys System, svc Service, stateFlagStore StateFlagStore) (FirewallDaemon, error) {
@@ -37,12 +37,14 @@ func MakeFirewallDaemon(isGraceIncludeSSH bool, graceDuration time.Duration, tic
 	}
 
 	daemon := FirewallDaemon{
-		startTime:           time.Now(),
-		graceDuration:       graceDuration,
-		tickInterval:        tickInterval,
-		isGraceStartHandled: false,
-		isGraceIncludeSSH:   isGraceIncludeSSH,
-		stateFlagStore:      stateFlagStore,
+		startTime:                  time.Now(),
+		graceDuration:              graceDuration,
+		tickInterval:               tickInterval,
+		isGraceStartHandled:        false,
+		isForceFirewallOpenHandled: false,
+		isFirewallUpHandled:        false,
+		isGraceIncludeSSH:          isGraceIncludeSSH,
+		stateFlagStore:             stateFlagStore,
 
 		sys: sys,
 		svc: svc,
@@ -84,21 +86,21 @@ func (daemon *FirewallDaemon) doTick() error {
 
 	isInGracePeriod := time.Since(daemon.startTime) < daemon.graceDuration
 
-	if isForceFirewallOpen && !daemon.isHandleForceFirewallOpen {
+	if isForceFirewallOpen && !daemon.isForceFirewallOpenHandled {
 		err := daemon.sys.OpenFirewall(gracePorts)
 		if err != nil {
 			return err
 		}
-		daemon.isHandleForceFirewallOpen = true
+		daemon.isForceFirewallOpenHandled = true
 		daemon.isFirewallUpHandled = false
 		return nil
 	}
 
 	if !isForceFirewallOpen {
-		daemon.isHandleForceFirewallOpen = false
+		daemon.isForceFirewallOpenHandled = false
 	}
 
-	if isInGracePeriod && !daemon.isGraceStartHandled && !daemon.isHandleForceFirewallOpen {
+	if isInGracePeriod && !daemon.isGraceStartHandled && !daemon.isForceFirewallOpenHandled {
 		err := daemon.sys.OpenFirewall(gracePorts)
 		if err != nil {
 			return err
