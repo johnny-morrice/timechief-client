@@ -174,11 +174,6 @@ func (daemon Setup) handleBegin() error {
 		return err
 	}
 
-	err = daemon.StateFlagStore.CreateIfNotExists("firewall-force-open")
-	if err != nil {
-		return err
-	}
-
 	return daemon.KeyValueStore.Set("setup", SetupFlagChooseNetworkType)
 }
 
@@ -309,6 +304,11 @@ func (daemon Setup) handleChooseWifiNetworkType() error {
 	}
 
 	err = daemon.StateFlagStore.CreateIfNotExists("wifi-load-interfaces")
+	if err != nil {
+		return err
+	}
+
+	err = daemon.StateFlagStore.CreateIfNotExists("run-captive-portal")
 	if err != nil {
 		return err
 	}
@@ -467,7 +467,12 @@ func (daemon Setup) handleWaitNetworkConnect() error {
 }
 
 func (daemon Setup) handleNetworkConnected() error {
-	err := daemon.StateFlagStore.CreateIfNotExists("force-internet-check")
+	err := daemon.StateFlagStore.Delete("run-captive-portal")
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	err = daemon.StateFlagStore.CreateIfNotExists("force-internet-check")
 	if err != nil {
 		return err
 	}
@@ -506,9 +511,5 @@ func (daemon Setup) handleNetworkConnected() error {
 }
 
 func (daemon Setup) handleInternetConnected() error {
-	err := daemon.StateFlagStore.Delete("firewall-force-open")
-	if err != nil {
-		return err
-	}
 	return nil
 }

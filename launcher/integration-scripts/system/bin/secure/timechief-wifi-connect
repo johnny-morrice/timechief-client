@@ -30,6 +30,10 @@ if [ "$EXISTING_CONNECTIONS" ]; then
     nmcli connection delete id "hotspot"
 fi
 
+# Disable captive‑portal DNS
+rm -f /etc/dnsmasq.d/timechief-hotspot.conf
+systemctl restart dnsmasq
+
 sleep 0.5s
 
 set -e
