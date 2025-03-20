@@ -224,6 +224,25 @@ rm /etc/systemd/system/multi-user.target.wants/userconfig.service -f
 sed -i '/^WantedBy=/d' /usr/lib/systemd/system/userconfig.service
 EOF
 
+# Set up dnsmasq and disable systemd-resolved.
+on_chroot << EOF
+apt-get install -y dnsmasq
+
+systemctl disable --now systemd-resolved
+
+rm -f /etc/resolv.conf
+echo "nameserver 127.0.0.1" > /etc/resolv.conf
+
+# Base dnsmasq config: upstream DNS servers
+cat <<MYEOF > /etc/dnsmasq.conf
+no-resolv
+server=1.1.1.1
+server=8.8.8.8
+MYEOF
+
+systemctl enable dnsmasq
+EOF
+
 # Set up nftables default
 on_chroot << EOF
 cat > /etc/nftables.conf << CATEND
