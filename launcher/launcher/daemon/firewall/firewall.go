@@ -75,7 +75,7 @@ func (daemon *FirewallDaemon) Start(ctx context.Context) {
 }
 
 func (daemon *FirewallDaemon) doTick() error {
-	gracePorts := []string{"80", "443", "53", "67"}
+	gracePorts := []string{"80", "443"}
 	if daemon.isGraceIncludeSSH {
 		gracePorts = append(gracePorts, "22")
 	}
