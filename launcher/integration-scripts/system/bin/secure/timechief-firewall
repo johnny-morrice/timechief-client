@@ -55,7 +55,7 @@ table inet filter {
 """
 
     if captive_iface:
-        config += f"""
+        nftables_config += f"""
     table ip nat {{
         chain prerouting {{
             type nat hook prerouting priority -100; policy accept;
@@ -63,6 +63,9 @@ table inet filter {
         }}
     }}
     """
+    
+    # Restart the nftables service to activate changes
+    subprocess.run(['systemctl', 'restart', 'nftables'], check=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
