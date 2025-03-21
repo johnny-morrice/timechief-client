@@ -56,7 +56,7 @@ interface=$IFNAME
 bind-dynamic
 dhcp-range=${NETWORK_PREFIX}.2,${NETWORK_PREFIX}.100,24h
 address=/#/$AP_IP
-listen-address=127.0.0.1
+listen-address=127.0.0.1,$AP_IP
 filter-AAAA
 EOF
 
