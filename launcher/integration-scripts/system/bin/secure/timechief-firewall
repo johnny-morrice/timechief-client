@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 import subprocess
+import argparse
 
 def validate_ports(ports):
     """Validate each port to ensure it's an integer within the valid range."""
@@ -12,11 +13,11 @@ def validate_ports(ports):
         except ValueError:
             raise Exception(f"port '{port}' is not a valid integer")
 
-def configure_firewall(portText):
+def configure_firewall(captive_iface, port_text):
     ports = []
-    if len(portText) != 0:
+    if len(port_text) != 0:
         # Validate the ports
-        ports = [port.strip() for port in portText.split(',')]
+        ports = [port.strip() for port in port_text.split(',')]
         validate_ports(ports)
 
     # Define the base nftables configuration template
@@ -33,6 +34,19 @@ table inet filter {
         # Allow established and related connections
         ct state established,related accept
 """
+    if captive_iface:
+        nftables_config += """
+        
+        # Allow DNS and DHCP for captive portal.
+        tcp dport 53 accept
+        udp dport 53 accept
+        udp dport 67 accept
+"""
+
+    nftables_config += """
+        
+        # Any other allowed ports will be added here...
+"""
 
     # Add rules for each port to allow traffic
     for port in ports:
@@ -41,6 +55,7 @@ table inet filter {
 
     # Close the input chain and add forward/output chains with default policies
     nftables_config += """
+        # End of other allowed ports.
     }
 
     chain forward {
@@ -53,21 +68,27 @@ table inet filter {
 }
 """
 
+    if captive_iface:
+        nftables_config += f"""
+table ip nat {{
+    chain prerouting {{
+        type nat hook prerouting priority -100; policy accept;
+        iifname "{captive_iface}" tcp dport {{80,443}} redirect to 80
+    }}
+}}
+    """
+    
     # Write the configuration to /etc/nftables.conf
     with open('/etc/nftables.conf', 'w') as f:
         f.write(nftables_config)
-
+    
     # Restart the nftables service to activate changes
     subprocess.run(['systemctl', 'restart', 'nftables'], check=True)
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2:
-        print("Usage: python3 set_firewall.py <port1,port2,...>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--captive', metavar='IFACE', help='Enable captive portal NAT on interface')
+    parser.add_argument('ports', nargs='?', default='', help='Comma-separated ports to allow inbound')
+    args = parser.parse_args()
 
-    if len(sys.argv) == 1:
-        ports = ""
-    elif len(sys.argv) == 2:
-        ports = sys.argv[1]
-
-    configure_firewall(ports)
+    configure_firewall(args.captive, args.ports)

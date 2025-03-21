@@ -128,24 +128,6 @@ CATEND
     systemctl enable timechief-launcher-sound
 EOF
 
-# DNSMasq unit file.
-on_chroot << EOF
-cat > /etc/systemd/system/dnsmasq-timechief.service << CATEND
-[Unit]
-Description=DNSmasq DNS and DHCP server
-After=syslog.target network.target
-
-[Service]
-ExecStart=/usr/sbin/dnsmasq -k -C /tmp/dnsmasq.conf
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-CATEND
-    systemctl disable dnsmasq-timechief
-    systemctl disable dnsmasq
-EOF
-
 # Hostapd unit file.
 on_chroot << 'EOF'
 cat > /etc/systemd/system/hostapd-timechief.service << CATEND
@@ -222,6 +204,25 @@ on_chroot << EOF
 systemctl disable userconfig
 rm /etc/systemd/system/multi-user.target.wants/userconfig.service -f
 sed -i '/^WantedBy=/d' /usr/lib/systemd/system/userconfig.service
+EOF
+
+# Set up dnsmasq and disable systemd-resolved.
+on_chroot << EOF
+apt-get install -y dnsmasq
+
+systemctl disable --now systemd-resolved
+
+rm -f /etc/resolv.conf
+echo "nameserver 127.0.0.1" > /etc/resolv.conf
+
+# Base dnsmasq config: upstream DNS servers
+cat <<MYEOF > /etc/dnsmasq.conf
+no-resolv
+server=1.1.1.1
+server=8.8.8.8
+MYEOF
+
+systemctl enable dnsmasq
 EOF
 
 # Set up nftables default

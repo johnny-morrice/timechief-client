@@ -41,12 +41,26 @@ set -e
 sleep 0.5s
 
 # Create a new hotspot connection with nmcli
-nmcli device set $IFNAME managed yes
-nmcli connection add type wifi ifname $IFNAME mode ap con-name hotspot ssid "$SSID"
-nmcli connection modify hotspot 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.addresses $AP_IP ipv4.method shared
+
+nmcli device set "$IFNAME" managed yes
+nmcli connection add type wifi ifname "$IFNAME" mode ap con-name hotspot ssid "$SSID"
+nmcli connection modify hotspot 802-11-wireless.mode ap 802-11-wireless.band bg
+nmcli connection modify hotspot ipv4.method manual ipv4.addresses "${AP_IP}/24"
 nmcli connection modify hotspot wifi-sec.key-mgmt wpa-psk
-nmcli connection modify "hotspot" wifi-sec.proto rsn
+nmcli connection modify hotspot wifi-sec.proto rsn
 nmcli connection modify hotspot wifi-sec.psk "$PASSWORD"
+
+NETWORK_PREFIX="${AP_IP%.*}"
+cat <<EOF > /etc/dnsmasq.d/timechief-hotspot.conf
+interface=$IFNAME
+bind-dynamic
+dhcp-range=${NETWORK_PREFIX}.2,${NETWORK_PREFIX}.100,24h
+address=/#/$AP_IP
+listen-address=127.0.0.1,$AP_IP
+filter-AAAA
+EOF
+
+systemctl restart dnsmasq
 
 # Start the hotspot
 nmcli connection up hotspot
