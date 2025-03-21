@@ -33,6 +33,11 @@ table inet filter {
 
         # Allow established and related connections
         ct state established,related accept
+        
+        # Allow DNS and DHCP
+        tcp dport 53 accept
+        udp dport 53 accept
+        udp dport 67 accept
 """
 
     # Add rules for each port to allow traffic
