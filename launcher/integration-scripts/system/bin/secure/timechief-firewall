@@ -33,11 +33,18 @@ table inet filter {
 
         # Allow established and related connections
         ct state established,related accept
+"""
+    if captive_iface:
+        nftables_config +=
+"""
         
-        # Allow DNS and DHCP
+        # Allow DNS and DHCP for captive portal.
         tcp dport 53 accept
         udp dport 53 accept
         udp dport 67 accept
+"""
+
+    nftables_config += """
         
         # Any other allowed ports will be added here...
 """
