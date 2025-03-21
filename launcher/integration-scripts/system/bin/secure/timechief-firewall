@@ -56,12 +56,12 @@ table inet filter {
 
     if captive_iface:
         nftables_config += f"""
-    table ip nat {{
-        chain prerouting {{
-            type nat hook prerouting priority -100; policy accept;
-            iifname "{captive_iface}" tcp dport {{80,443}} redirect to 80
-        }}
+table ip nat {{
+    chain prerouting {{
+        type nat hook prerouting priority -100; policy accept;
+        iifname "{captive_iface}" tcp dport {{80,443}} redirect to 80
     }}
+}}
     """
     
     # Write the configuration to /etc/nftables.conf
