@@ -38,6 +38,8 @@ table inet filter {
         tcp dport 53 accept
         udp dport 53 accept
         udp dport 67 accept
+        
+        # Any other allowed ports will be added here...
 """
 
     # Add rules for each port to allow traffic
@@ -47,6 +49,7 @@ table inet filter {
 
     # Close the input chain and add forward/output chains with default policies
     nftables_config += """
+        # End of other allowed ports.
     }
 
     chain forward {
