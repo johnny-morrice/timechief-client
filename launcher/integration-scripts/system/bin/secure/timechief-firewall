@@ -64,6 +64,10 @@ table inet filter {
     }}
     """
     
+    # Write the configuration to /etc/nftables.conf
+    with open('/etc/nftables.conf', 'w') as f:
+        f.write(nftables_config)
+    
     # Restart the nftables service to activate changes
     subprocess.run(['systemctl', 'restart', 'nftables'], check=True)
 
