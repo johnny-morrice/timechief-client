@@ -53,7 +53,7 @@ nmcli connection modify hotspot wifi-sec.psk "$PASSWORD"
 NETWORK_PREFIX="${AP_IP%.*}"
 cat <<EOF > /etc/dnsmasq.d/timechief-hotspot.conf
 interface=$IFNAME
-bind-interfaces
+bind-dynamic
 dhcp-range=${NETWORK_PREFIX}.2,${NETWORK_PREFIX}.100,24h
 address=/#/$AP_IP
 EOF
