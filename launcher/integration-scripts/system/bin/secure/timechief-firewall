@@ -35,8 +35,7 @@ table inet filter {
         ct state established,related accept
 """
     if captive_iface:
-        nftables_config +=
-"""
+        nftables_config += """
         
         # Allow DNS and DHCP for captive portal.
         tcp dport 53 accept
