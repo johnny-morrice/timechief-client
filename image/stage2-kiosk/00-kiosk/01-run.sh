@@ -128,24 +128,6 @@ CATEND
     systemctl enable timechief-launcher-sound
 EOF
 
-# DNSMasq unit file.
-on_chroot << EOF
-cat > /etc/systemd/system/dnsmasq-timechief.service << CATEND
-[Unit]
-Description=DNSmasq DNS and DHCP server
-After=syslog.target network.target
-
-[Service]
-ExecStart=/usr/sbin/dnsmasq -k -C /tmp/dnsmasq.conf
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-CATEND
-    systemctl disable dnsmasq-timechief
-    systemctl disable dnsmasq
-EOF
-
 # Hostapd unit file.
 on_chroot << 'EOF'
 cat > /etc/systemd/system/hostapd-timechief.service << CATEND
