@@ -210,8 +210,6 @@ EOF
 on_chroot << EOF
 apt-get install -y dnsmasq
 
-systemctl disable --now systemd-resolved
-
 rm -f /etc/resolv.conf
 echo "nameserver 127.0.0.1" > /etc/resolv.conf
 
