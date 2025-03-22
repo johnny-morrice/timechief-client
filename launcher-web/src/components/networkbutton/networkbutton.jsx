@@ -1,10 +1,12 @@
 import { Accordion, Form, Button } from "solid-bootstrap";
 import { createSignal, Show } from "solid-js";
 import { postNetworkSelect } from "../../api/api";
+import { ShowHidePasswordButton } from "../showhidepasswordbutton/showhidepasswordbutton";
 
 export function NetworkButton(props) {
     const inputID = `wifiKey-${props.eventKey}`;
     const [isError, setIsError] = createSignal(false);
+    const [fieldType, setFieldType] = createSignal("password");
     function connectToNetwork(event) {
         event.preventDefault();
         setIsError(false);
@@ -17,6 +19,7 @@ export function NetworkButton(props) {
             setIsError(true);
         });
     }
+
     return <Accordion.Item eventKey={props.eventKey}>
         <Accordion.Header>{props.ssid}&nbsp;<i class="fa-solid fa-wifi"></i>&nbsp;{props.signal}</Accordion.Header>
         <Accordion.Body>
@@ -24,15 +27,16 @@ export function NetworkButton(props) {
                 <Form.Group class="mb-3" controlId={inputID}>
                         <Form.Label>Network key: ({props.encryption})</Form.Label>
                         <Show when={isError()}>
-                            <Form.Control type="password" placeholder="Key" autocomplete="on" required isInvalid/>
+                            <Form.Control type={fieldType()} placeholder="Key" autocomplete="on" required isInvalid/>
                             <Form.Control.Feedback type="invalid">Invalid key</Form.Control.Feedback>
                         </Show>
                         <Show when={!isError()}>
-                            <Form.Control type="password" placeholder="Key" autocomplete="on" required/>
+                            <Form.Control type={fieldType()} placeholder="Key" autocomplete="on" required/>
                         </Show>
                         <Form.Text>Enter your home WiFi key.  This will enable the Timechief to connect to your local network.</Form.Text>
                     </Form.Group>
                     <Button variant="primary" type="submit">Connect to network</Button>
+                    <ShowHidePasswordButton fieldType={fieldType} setFieldType={setFieldType} />
             </Form>
         </Accordion.Body>
     </Accordion.Item>
