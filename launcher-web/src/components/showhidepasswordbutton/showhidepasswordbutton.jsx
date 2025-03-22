@@ -1,8 +1,10 @@
+import { Button } from "solid-bootstrap";
+
 export function ShowHidePasswordButton(props) {
     const fieldType = props.fieldType;
     const setFieldType = props.setFieldType;
     function getShowHideLabel(fieldType) {
-        return fieldType === "password" ? "Show password" : "Hide password";
+        return fieldType === "password" ? <i class="fa-solid fa-eye"></i> : <i class="fa-solid fa-eye-slash"></i>;
     }
     function toggleFieldType() {
         if (fieldType() === "password") {
@@ -11,5 +13,5 @@ export function ShowHidePasswordButton(props) {
             setFieldType("password");
         }
     }
-    return <Button variant="secondary" onClick={toggleFieldType}>{getShowHideLabel(fieldType())}</Button>
+    return <Button variant="outline-secondary" onClick={toggleFieldType}>{getShowHideLabel(fieldType())}</Button>
 }

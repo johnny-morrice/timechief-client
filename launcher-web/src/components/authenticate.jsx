@@ -24,23 +24,39 @@ function WebSetupLoginCard(props) {
         <Card.Body>
             <Card.Title>Log in to your Timechief device</Card.Title>
             <Card.Text>
-                <Form onSubmit={onClickLogin}>
-                    <Form.Group class="mb-3" controlId="hotspotKey">
-                        <Form.Label>Hotspot Key</Form.Label>
-                        <Show when={props.isError()}>
-                            <Form.Control type={fieldType()} placeholder="Password" autocomplete="on" required isInvalid />
-                            <Form.Control.Feedback type="invalid">{props.errorMessage}</Form.Control.Feedback>
-                        </Show>
-                        <Show when={!props.isError()}>
-                            <Form.Control type={fieldType()} placeholder="Password" autocomplete="on" required />
-                        </Show>
-                        <Form.Text>The hotspot key is your password.  It should be displayed on your Timechief when in web setup mode.</Form.Text>
-                    </Form.Group>
-
-                    <Button variant="primary" type="submit">Log in</Button>
-                    <ShowHidePasswordButton fieldType={fieldType} setFieldType={setFieldType} />
-
-                </Form>
+                
+                    <Form onSubmit={onClickLogin}>
+                        <Form.Group class="mb-3" controlId="hotspotKey">
+                            <Form.Label>Hotspot Key</Form.Label>
+                            <Show when={props.isError()}>
+                                <Row class="g-3">
+                                    <Col xs={12} md={6} lg={3}>
+                                        <Form.Control type={fieldType()} placeholder="Password" autocomplete="on" required isInvalid />
+                                    </Col>
+                                    <Col xs={12} md={6} lg={3}>
+                                        <ShowHidePasswordButton fieldType={fieldType} setFieldType={setFieldType} />
+                                    </Col>
+                                </Row>
+                                <Form.Control.Feedback type="invalid">{props.errorMessage}</Form.Control.Feedback>
+                            </Show>
+                            <Show when={!props.isError()}>
+                                <Row class="g-3">
+                                    <Col xs={12} md={6} lg={3}>
+                                        <Form.Control type={fieldType()} placeholder="Password" autocomplete="on" required />
+                                    </Col>
+                                    <Col xs={12} md={6} lg={3}>
+                                        <ShowHidePasswordButton fieldType={fieldType} setFieldType={setFieldType} />
+                                    </Col>
+                                </Row>
+                            </Show>
+                            <Form.Text>The hotspot key is your password.  It should be displayed on your Timechief when in web setup mode.</Form.Text>
+                            
+                        </Form.Group>
+                        
+                        <Button variant="primary" type="submit">Log in</Button>
+                        
+                    </Form>
+                
             </Card.Text>
         </Card.Body>
     </Card>

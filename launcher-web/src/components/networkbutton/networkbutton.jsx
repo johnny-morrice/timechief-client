@@ -23,21 +23,32 @@ export function NetworkButton(props) {
     return <Accordion.Item eventKey={props.eventKey}>
         <Accordion.Header>{props.ssid}&nbsp;<i class="fa-solid fa-wifi"></i>&nbsp;{props.signal}</Accordion.Header>
         <Accordion.Body>
+        <Row class="g-3">
             <Form onSubmit={connectToNetwork}>
                 <Form.Group class="mb-3" controlId={inputID}>
                         <Form.Label>Network key: ({props.encryption})</Form.Label>
                         <Show when={isError()}>
-                            <Form.Control type={fieldType()} placeholder="Key" autocomplete="on" required isInvalid/>
+                            <Col xs={12} md={6} lg={3}>
+                                <Form.Control type={fieldType()} placeholder="Key" autocomplete="on" required isInvalid/>
+                            </Col>
+                            <Col xs={12} md={6} lg={3}>
+                                <ShowHidePasswordButton fieldType={fieldType} setFieldType={setFieldType} />
+                            </Col>
                             <Form.Control.Feedback type="invalid">Invalid key</Form.Control.Feedback>
                         </Show>
                         <Show when={!isError()}>
-                            <Form.Control type={fieldType()} placeholder="Key" autocomplete="on" required/>
+                            <Col xs={12} md={6} lg={3}>
+                                <Form.Control type={fieldType()} placeholder="Key" autocomplete="on" required/>
+                            </Col>
+                            <Col xs={12} md={6} lg={3}>
+                                <ShowHidePasswordButton fieldType={fieldType} setFieldType={setFieldType} />
+                            </Col>
                         </Show>
                         <Form.Text>Enter your home WiFi key.  This will enable the Timechief to connect to your local network.</Form.Text>
                     </Form.Group>
                     <Button variant="primary" type="submit">Connect to network</Button>
-                    <ShowHidePasswordButton fieldType={fieldType} setFieldType={setFieldType} />
             </Form>
+        </Row>
         </Accordion.Body>
     </Accordion.Item>
 }
