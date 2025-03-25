@@ -152,16 +152,6 @@ func getCLIApp() *cli.App {
 					Name:    "force-resolution",
 					EnvVars: []string{"TIMECHIEF_FORCE_RESOLUTION"},
 				},
-				&cli.DurationFlag{
-					Name:    "firewall-grace-time",
-					Value:   5 * time.Minute,
-					EnvVars: []string{"TIMECHIEF_FIREWALL_GRACE_TIME"},
-				},
-				&cli.BoolFlag{
-					Name:    "firewall-grace-includes-ssh",
-					Value:   false,
-					EnvVars: []string{"TIMECHIEF_GRACE_INCLUDES_SSH"},
-				},
 				&cli.BoolFlag{
 					Name:    "debug-adaptive-tick",
 					Value:   false,
