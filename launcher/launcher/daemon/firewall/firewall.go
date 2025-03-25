@@ -11,25 +11,16 @@ import (
 )
 
 type FirewallDaemon struct {
-	startTime              time.Time
-	graceDuration          time.Duration
 	tickInterval           time.Duration
-	isGraceStartHandled    bool
 	isCaptivePortalRunning bool
-	isGraceIncludeSSH      bool
 	isFirewallUpHandled    bool
 	stateFlagStore         StateFlagStore
-	sys                    System
 	svc                    Service
 }
 
-func MakeFirewallDaemon(isGraceIncludeSSH bool, graceDuration time.Duration, tickInterval time.Duration, sys System, svc Service, stateFlagStore StateFlagStore) (FirewallDaemon, error) {
+func MakeFirewallDaemon(tickInterval time.Duration, svc Service, stateFlagStore StateFlagStore) (FirewallDaemon, error) {
 	if tickInterval == 0 {
 		return FirewallDaemon{}, fmt.Errorf("tickInterval was 0")
-	}
-
-	if sys == nil {
-		return FirewallDaemon{}, fmt.Errorf("sys was nil")
 	}
 
 	if svc == nil {
@@ -37,16 +28,11 @@ func MakeFirewallDaemon(isGraceIncludeSSH bool, graceDuration time.Duration, tic
 	}
 
 	daemon := FirewallDaemon{
-		startTime:              time.Now(),
-		graceDuration:          graceDuration,
 		tickInterval:           tickInterval,
-		isGraceStartHandled:    false,
 		isCaptivePortalRunning: false,
 		isFirewallUpHandled:    false,
-		isGraceIncludeSSH:      isGraceIncludeSSH,
 		stateFlagStore:         stateFlagStore,
 
-		sys: sys,
 		svc: svc,
 	}
 	return daemon, nil
@@ -58,11 +44,7 @@ type StateFlagStore interface {
 
 type Service interface {
 	ApplyFirewallRules() error
-}
-
-type System interface {
-	OpenFirewall(ports []string) error
-	RunCaptivePortal(ports []string) error
+	RunCaptivePortal() error
 }
 
 func (daemon *FirewallDaemon) Start(ctx context.Context) {
@@ -75,20 +57,13 @@ func (daemon *FirewallDaemon) Start(ctx context.Context) {
 }
 
 func (daemon *FirewallDaemon) doTick() error {
-	gracePorts := []string{"80", "443"}
-	if daemon.isGraceIncludeSSH {
-		gracePorts = append(gracePorts, "22")
-	}
-
 	isRunCaptivePortal, err := daemon.stateFlagStore.Exists("run-captive-portal")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 
-	isInGracePeriod := time.Since(daemon.startTime) < daemon.graceDuration
-
 	if isRunCaptivePortal && !daemon.isCaptivePortalRunning {
-		err := daemon.sys.RunCaptivePortal(gracePorts)
+		err := daemon.svc.RunCaptivePortal()
 		if err != nil {
 			return err
 		}
@@ -101,17 +76,7 @@ func (daemon *FirewallDaemon) doTick() error {
 		daemon.isCaptivePortalRunning = false
 	}
 
-	if isInGracePeriod && !daemon.isGraceStartHandled && !daemon.isCaptivePortalRunning {
-		err := daemon.sys.OpenFirewall(gracePorts)
-		if err != nil {
-			return err
-		}
-		daemon.isGraceStartHandled = true
-		daemon.isFirewallUpHandled = false
-		return nil
-	}
-
-	isPutFirewallUp := !isRunCaptivePortal && !isInGracePeriod && !daemon.isFirewallUpHandled
+	isPutFirewallUp := !isRunCaptivePortal && !daemon.isFirewallUpHandled
 	if isPutFirewallUp {
 		err := daemon.svc.ApplyFirewallRules()
 		if err != nil {
