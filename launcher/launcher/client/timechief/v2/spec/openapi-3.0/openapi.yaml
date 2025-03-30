@@ -398,6 +398,25 @@ paths:
           description: "Unauthorized - Invalid or missing access token"
         "500":
           description: "Internal server error"
+    delete:
+      summary: "Delete a principal by ID"
+      operationId: "deletePrincipalById"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "ID of the principal to delete"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Principal deleted successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
 
   /principal/me:
     get:
@@ -1322,11 +1341,17 @@ components:
       required:
         - uuid
         - auth_zero_sub
+        - email
+        - email_verified
       properties:
         uuid:
           type: "string"
         auth_zero_sub:
           type: "string"
+        email:
+          type: "string"
+        email_verified:
+          type: "boolean"
 
     PrincipalGoogleAccount:
       type: "object"
@@ -1369,6 +1394,7 @@ components:
         - command
         - filename
         - size
+        - active
       properties:
         uuid:
           type: "string"
@@ -1390,6 +1416,8 @@ components:
           type: "string"
         size:
           type: "integer"
+        active:
+          type: "boolean"
 
     VersionDownload:
       type: "object"
