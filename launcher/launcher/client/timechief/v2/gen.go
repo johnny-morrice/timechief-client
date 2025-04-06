@@ -316,8 +316,10 @@ type OrderActivation struct {
 
 // Principal defines model for Principal.
 type Principal struct {
-	AuthZeroSub string `json:"auth_zero_sub"`
-	Uuid        string `json:"uuid"`
+	AuthZeroSub   string `json:"auth_zero_sub"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+	Uuid          string `json:"uuid"`
 }
 
 // PrincipalGoogleAccount defines model for PrincipalGoogleAccount.
@@ -413,6 +415,7 @@ type Theme struct {
 
 // Version defines model for Version.
 type Version struct {
+	Active   bool   `json:"active"`
 	Bucket   string `json:"bucket"`
 	Command  string `json:"command"`
 	Filename string `json:"filename"`
@@ -800,6 +803,9 @@ type ClientInterface interface {
 
 	// GetCurrentPrincipal request
 	GetCurrentPrincipal(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeletePrincipalById request
+	DeletePrincipalById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetPrincipalById request
 	GetPrincipalById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1424,6 +1430,18 @@ func (c *Client) UpdatePrincipal(ctx context.Context, body UpdatePrincipalJSONRe
 
 func (c *Client) GetCurrentPrincipal(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetCurrentPrincipalRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeletePrincipalById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeletePrincipalByIdRequest(c.Server, id)
 	if err != nil {
 		return nil, err
 	}
@@ -3132,6 +3150,40 @@ func NewGetCurrentPrincipalRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewDeletePrincipalByIdRequest generates requests for DeletePrincipalById
+func NewDeletePrincipalByIdRequest(server string, id string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/principal/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetPrincipalByIdRequest generates requests for GetPrincipalById
 func NewGetPrincipalByIdRequest(server string, id string) (*http.Request, error) {
 	var err error
@@ -3829,6 +3881,9 @@ type ClientWithResponsesInterface interface {
 
 	// GetCurrentPrincipalWithResponse request
 	GetCurrentPrincipalWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCurrentPrincipalResponse, error)
+
+	// DeletePrincipalByIdWithResponse request
+	DeletePrincipalByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeletePrincipalByIdResponse, error)
 
 	// GetPrincipalByIdWithResponse request
 	GetPrincipalByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*GetPrincipalByIdResponse, error)
@@ -4683,6 +4738,27 @@ func (r GetCurrentPrincipalResponse) StatusCode() int {
 	return 0
 }
 
+type DeletePrincipalByIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r DeletePrincipalByIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeletePrincipalByIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetPrincipalByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5372,6 +5448,15 @@ func (c *ClientWithResponses) GetCurrentPrincipalWithResponse(ctx context.Contex
 		return nil, err
 	}
 	return ParseGetCurrentPrincipalResponse(rsp)
+}
+
+// DeletePrincipalByIdWithResponse request returning *DeletePrincipalByIdResponse
+func (c *ClientWithResponses) DeletePrincipalByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeletePrincipalByIdResponse, error) {
+	rsp, err := c.DeletePrincipalById(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeletePrincipalByIdResponse(rsp)
 }
 
 // GetPrincipalByIdWithResponse request returning *GetPrincipalByIdResponse
@@ -6393,6 +6478,22 @@ func ParseGetCurrentPrincipalResponse(rsp *http.Response) (*GetCurrentPrincipalR
 		}
 		response.JSON200 = &dest
 
+	}
+
+	return response, nil
+}
+
+// ParseDeletePrincipalByIdResponse parses an HTTP response from a DeletePrincipalByIdWithResponse call
+func ParseDeletePrincipalByIdResponse(rsp *http.Response) (*DeletePrincipalByIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeletePrincipalByIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
 	}
 
 	return response, nil
