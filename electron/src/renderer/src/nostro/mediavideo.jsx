@@ -2,6 +2,7 @@ import { Show, createSignal, onCleanup } from "solid-js";
 import { Video } from "./video";
 import { callbackName } from "./callback";
 import { addDataCallback, removeDataCallback } from "./ipc";
+import { FeatureForceSpooky } from "./features";
 
 class Signals {
     constructor() {
@@ -45,10 +46,9 @@ export function MediaVideo(props) {
     }
     console.log("MediaVideo render");
     const delay = 53 * 1000 * 60;
-    const chance = 1.0 / 53.0;
+    const chance = 0.07;
     const signals = new Signals();
-    const forceVideo = false;
-    if (forceVideo) {
+    if (FeatureForceSpooky) {
         signals.setShowVideo(true);
     }
     const interval = setInterval(() => {
