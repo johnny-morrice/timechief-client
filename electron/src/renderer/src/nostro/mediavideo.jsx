@@ -32,6 +32,9 @@ function updateSignals(signals, data) {
 }
 
 function isHourInRange(hour, start, end) {
+    if (FeatureForceSpooky) {
+        return true;
+    }
     if (start < end) {
         return hour >= start && hour < end;
     }
