@@ -1,1 +1,1 @@
-export const FeatureForceSpooky = true;
+export const FeatureForceSpooky = false;
