@@ -179,6 +179,12 @@ div.home-action-center {
     flex-basis: 40%;
 }
 
+div.home-action-center-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3em;
+}
+
 div.home-lhs-column {
     flex-basis: 45%;
 }
@@ -417,9 +423,7 @@ div.fortune-message {
     flex-grow: inherit;
 }
 
-div.fortune-message-mascot-wrapper {
-    margin-left: auto;
-}
+/* div.fortune-message-mascot-wrapper {} */
 
 div.fortune-message-mascot-wrapper-small {
     margin-left: 0;
@@ -429,12 +433,12 @@ div.next-event-wrapper {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
+    flex-grow: inherit;
     gap: 0.5em;
 }
 
-div.event-mascot-wrapper {
-    margin-left: auto;
-}
+/* div.event-mascot-wrapper {
+} */
 
 #fortune-canvas {
     height: 120px;

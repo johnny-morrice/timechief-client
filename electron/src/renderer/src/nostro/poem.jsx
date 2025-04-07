@@ -1,4 +1,5 @@
 import { parse as papaParse } from 'papaparse';
+import { FeatureForceSpooky } from './features';
 
 class PoemList {
     constructor(poems) {
@@ -200,7 +201,11 @@ export function randomPoem(now, isSpooky) {
         return new Poem("Hi, I'm hands!", "neutral", [])
     }
 
-    if (isSpooky && Math.random() < 0.05) {
+    var spookyChance = 0.05;
+    if (FeatureForceSpooky) {
+        spookyChance = 0.95;
+    }
+    if (isSpooky && Math.random() < spookyChance) {
         return randomElem(spookyPoems());
     }
 
