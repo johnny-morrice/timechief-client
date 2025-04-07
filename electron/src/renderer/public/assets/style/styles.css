@@ -182,7 +182,7 @@ div.home-action-center {
 div.home-action-center-content {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 3em;
 }
 
 div.home-lhs-column {
