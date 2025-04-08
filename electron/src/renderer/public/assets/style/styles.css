@@ -457,6 +457,8 @@ div.next-event-shorttext {
 }
 
 div.loading-grid {
+    min-width: 3em;
+    min-height: 3em;
     font-family: "Noto Sans JP";
     font-size: 16pt;
     display: grid;
