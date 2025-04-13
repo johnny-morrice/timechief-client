@@ -33,7 +33,7 @@ func Update(ctx *cli.Context) error {
 
 	versionDownloader := versiondownload.MakeVersionDownloader(cfgStore, noAuthClientFactory)
 
-	updater := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout"))
+	updater := update.MakeUpdater(cfgStore, false, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout"))
 
 	init := update.Initialiser{
 		DB:      db,

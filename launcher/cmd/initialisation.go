@@ -50,6 +50,8 @@ func Initialise(ctx *cli.Context) error {
 		return err
 	}
 
+	includeNonLiveVersions := ctx.Bool("include-non-live-versions")
+
 	defer store.CloseDB(db)
 	cfgStore := store.ConfigStore{DB: db}
 	cfg, err := cfgFlags(ctx)
@@ -66,7 +68,7 @@ func Initialise(ctx *cli.Context) error {
 	init := update.Initialiser{
 		DB:            db,
 		KeyValueStore: store.KeyValueStore{DB: db},
-		Updater:       update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout")),
+		Updater:       update.MakeUpdater(cfgStore, includeNonLiveVersions, store.VersionStore{DB: db}, store.LaunchTargetStore{DB: db}, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout")),
 	}
 	if !init.IsInitialised() {
 		log.Println("initialising client")

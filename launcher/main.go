@@ -240,6 +240,11 @@ func getCLIApp() *cli.App {
 					Name: "force-resolution",
 				},
 				&cli.BoolFlag{
+					Name:    "include-non-live-versions",
+					Value:   false,
+					EnvVars: []string{"INCLUDE_NON_LIVE_VERSIONS"},
+				},
+				&cli.BoolFlag{
 					Name:    "update",
 					Value:   true,
 					Usage:   "Update the client after initialisation",

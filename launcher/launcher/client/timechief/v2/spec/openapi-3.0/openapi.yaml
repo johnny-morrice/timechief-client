@@ -557,6 +557,12 @@ paths:
           required: true
           schema:
             type: "string"
+        - in: "query"
+          name: "include_non_live_versions"
+          description: "Include non-live versions"
+          required: false
+          schema:
+            type: "boolean"
       responses:
         "200":
           description: "List of versions retrieved successfully"
