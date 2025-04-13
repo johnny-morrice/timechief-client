@@ -30,6 +30,9 @@ export function NoConnection() {
         console.log("NoConnection cleanup");
     })
 
+    const skipWait = true;
+
+    signals.setDebugAvailable(skipWait);
     // Debug becomes available after 5 seconds.
     setTimeout(() => {
         signals.setDebugAvailable(true);
