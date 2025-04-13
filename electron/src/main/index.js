@@ -10,6 +10,10 @@ import { Themer } from './themer.js';
 import { MediaDecorator } from './mediadecorator.js';
 import { runDebug } from './debug.js';
 
+// Change directory to /opt/timechief-launcher/bin
+if (process.env.TIMECHIEF_ELETRON_NO_CHANGE_DIR !== "true") {
+  process.chdir("/opt/timechief-launcher/bin");
+}
 
 
 const logger = winston.createLogger({
