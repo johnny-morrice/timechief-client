@@ -89,5 +89,5 @@ func (svc Service) GetDefaultTheme() (v2.Theme, error) {
 			return layout.Layout, nil
 		}
 	}
-	return v2.Theme{}, errors.New("no suitable layout")
+	return DefaultSevenInchLayout(), nil
 }
