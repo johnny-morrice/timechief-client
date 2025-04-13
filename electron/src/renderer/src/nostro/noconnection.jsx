@@ -6,6 +6,7 @@ import { Loading } from "./loading";
 class Signals {
     constructor() {
         [this.debugMessage, this.setDebugMessage] = createSignal("");
+        [this.debugAvailable, this.setDebugAvailable] = createSignal(false);
     }
 }
 
@@ -29,6 +30,11 @@ export function NoConnection() {
         console.log("NoConnection cleanup");
     })
 
+    // Debug becomes available after 5 seconds.
+    setTimeout(() => {
+        signals.setDebugAvailable(true);
+    }, 5000);
+
     function hasDebugMessage(signals) {
         return signals.debugMessage() !== "";
     }
@@ -41,7 +47,9 @@ export function NoConnection() {
         <div>No connection to local Linux service</div>
         <Loading />
 
-        <button class="action-button debug-button" onClick={onClickDebug}>Debug</button>
+        <Show when={signals.debugAvailable()}>
+            <button class="action-button debug-button" onClick={onClickDebug}>Debug</button>
+        </Show>
         
         <Show when={hasDebugMessage(signals)}>
             <div class="debug-message">{signals.debugMessage()}</div>
