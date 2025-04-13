@@ -55,6 +55,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   ipcMain.on(sendChan, (event, args) => {
     apiCall(args)
       .then(json => {
+        logger.info(`received results from ${sendChan} API: ${JSON.stringify(json)}`);
         logger.info(`returning results to channel: ${receiveChan}`);
         getMainWindow().webContents.send(receiveChan, json)
       })

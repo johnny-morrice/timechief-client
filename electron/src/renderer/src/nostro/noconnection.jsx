@@ -1,4 +1,4 @@
-import { onCleanup, Show } from "solid-js";
+import { onCleanup, Show, createSignal } from "solid-js";
 import { callbackName } from "./callback";
 import { addDebugSystemCallback, removeDebugSystemCallback, sendDebugSystem } from "./ipc";
 import { Loading } from "./loading";
@@ -40,7 +40,7 @@ export function NoConnection() {
     return <div class="system-error">
         <div>No connection to local Linux service</div>
         <Loading />
-        
+
         <button class="action-button debug-button" onClick={onClickDebug}>Debug</button>
         
         <Show when={hasDebugMessage(signals)}>
