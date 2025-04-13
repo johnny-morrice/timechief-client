@@ -101,7 +101,7 @@ func Daemon(ctx *cli.Context) error {
 	}
 
 	versionDownloader := versiondownload.MakeVersionDownloader(cfgStore, noAuthClientFactory)
-	up := update.MakeUpdater(cfgStore, store.VersionStore{DB: db}, launchTargetStore, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout"))
+	up := update.MakeUpdater(cfgStore, false, store.VersionStore{DB: db}, launchTargetStore, versionDownloader, noAuthClientFactory, ctx.Duration("service-request-timeout"))
 
 	myDevices := daemon.MakeMyDevices(timechiefClient, keyValueStore, flagStore, ctx.Duration("service-request-timeout"), time.Second*2)
 

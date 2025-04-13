@@ -19,25 +19,27 @@ import (
 )
 
 type Updater struct {
-	versionStore      store.VersionStore
-	launchTargetStore store.LaunchTargetStore
-	versionDownloader VersionDownloader
-	cfgStore          store.ConfigStore
-	clientFactory     ClientFactory
-	client            v2.ClientInterface
-	requestTimeout    time.Duration
-	once              sync.Once
+	versionStore           store.VersionStore
+	launchTargetStore      store.LaunchTargetStore
+	versionDownloader      VersionDownloader
+	cfgStore               store.ConfigStore
+	clientFactory          ClientFactory
+	client                 v2.ClientInterface
+	requestTimeout         time.Duration
+	once                   sync.Once
+	includeNonLiveVersions bool
 }
 
-func MakeUpdater(cfgStore store.ConfigStore, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader VersionDownloader, clientFactory ClientFactory, requestTimeout time.Duration) *Updater {
+func MakeUpdater(cfgStore store.ConfigStore, includeNonLiveVersions bool, versionStore store.VersionStore, launchTargetStore store.LaunchTargetStore, versionDownloader VersionDownloader, clientFactory ClientFactory, requestTimeout time.Duration) *Updater {
 	return &Updater{
-		versionStore:      versionStore,
-		launchTargetStore: launchTargetStore,
-		cfgStore:          cfgStore,
-		clientFactory:     clientFactory,
-		versionDownloader: versionDownloader,
-		requestTimeout:    requestTimeout,
-		once:              sync.Once{},
+		versionStore:           versionStore,
+		launchTargetStore:      launchTargetStore,
+		cfgStore:               cfgStore,
+		clientFactory:          clientFactory,
+		versionDownloader:      versionDownloader,
+		requestTimeout:         requestTimeout,
+		once:                   sync.Once{},
+		includeNonLiveVersions: includeNonLiveVersions,
 	}
 }
 
@@ -165,7 +167,9 @@ func (up *Updater) fetchVersions(ctx *cli.Context) ([]v2.Version, error) {
 		return nil, err
 	}
 	log.Println("fetching versions for product", product, "stream", stream)
-	versionResp, err := client.ListLatestVersions(requestContext, product, stream)
+	versionResp, err := client.ListLatestVersions(requestContext, product, stream, &v2.ListLatestVersionsParams{
+		IncludeNonLiveVersions: &up.includeNonLiveVersions,
+	})
 	if err != nil {
 		return nil, err
 	}
