@@ -22,7 +22,8 @@ contextBridge.exposeInMainWorld(
             "setAPIEnabled",
             "selectMyDevice",
             "resizeBrowserWindow",
-            "loadDefaultCSS"
+            "loadDefaultCSS",
+            "debugSystem",
         ];
         if (validChannels.includes(channel)) {
             ipcRenderer.send(channel, ...args);
@@ -37,6 +38,7 @@ contextBridge.exposeInMainWorld(
             "shutdownResult",
             "sshPasswordRegenResult",
             "apiKeyRegenResult",
+            "debugSystemResult",
         ];
         if (validChannels.includes(channel)) {
             ipcRenderer.on(channel, (event, ...args) => func(...args));

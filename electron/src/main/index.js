@@ -8,7 +8,12 @@ import { startTimechiefApp, getMainWindow, setWindowSize } from './window.js';
 import { LauncherClient } from './launcherclient.js';
 import { Themer } from './themer.js';
 import { MediaDecorator } from './mediadecorator.js';
+import { runDebug } from './debug.js';
 
+// Change directory to /opt/timechief-launcher/bin
+if (process.env.TIMECHIEF_ELETRON_NO_CHANGE_DIR !== "true") {
+  process.chdir("/opt/timechief-launcher/bin");
+}
 
 
 const logger = winston.createLogger({
@@ -54,6 +59,7 @@ function handleIPCAPICall(sendChan, receiveChan, apiCall) {
   ipcMain.on(sendChan, (event, args) => {
     apiCall(args)
       .then(json => {
+        logger.info(`received results from ${sendChan} API: ${JSON.stringify(json)}`);
         logger.info(`returning results to channel: ${receiveChan}`);
         getMainWindow().webContents.send(receiveChan, json)
       })
@@ -93,6 +99,7 @@ handleIPCAPICall("sshPasswordRegen", "sshPasswordRegenResult", () => client.post
 handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKey());
 handleIPCAPICall("selectMyDevice", "selectMyDeviceResult", (args) => client.postSelectMyDevice(args["uuid"]));
 handleIPCAPICall("setNetworkType", "setNetworkTypeResult", (args) => client.postNetworkType(args["network_type"]))
+handleIPCAPICall("debugSystem", "debugSystemResult", (args) => runDebug());
 
 ipcMain.on("loadDefaultCSS", (event, args) => {
   themer.setDefaultTheme(true);
