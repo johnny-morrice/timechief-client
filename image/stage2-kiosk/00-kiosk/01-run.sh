@@ -14,6 +14,13 @@ EOF
 
 mkdir -p "${ROOTFS_DIR}/boot/firmware"
 install -m 644 files/config.txt "${ROOTFS_DIR}/boot/firmware"
+# If the environment variable TIMECHIEF_DISPLAY_TOUCH2 is set to "true", then use
+# cmdline-touch2.txt instead of cmdline.txt.
+if [ "$TIMECHIEF_DISPLAY_TOUCH2" = "true" ]; then
+    install -m 644 files/cmdline-touch2.txt "${ROOTFS_DIR}/boot/firmware/cmdline.txt"
+else
+    install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/firmware/cmdline.txt"
+fi
 install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/firmware"
 install -m 644 files/nginx.conf "${ROOTFS_DIR}/etc/nginx/sites-available/timechief.conf"
 HOME="${ROOTFS_DIR}/home/${FIRST_USER_NAME}"
