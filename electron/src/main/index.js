@@ -8,6 +8,7 @@ import { startTimechiefApp, getMainWindow, setWindowSize } from './window.js';
 import { LauncherClient } from './launcherclient.js';
 import { Themer } from './themer.js';
 import { MediaDecorator } from './mediadecorator.js';
+import { runDebug } from './debug.js';
 
 
 
@@ -93,6 +94,7 @@ handleIPCAPICall("sshPasswordRegen", "sshPasswordRegenResult", () => client.post
 handleIPCAPICall("apiKeyRegen", "apiKeyRegenResult", () => client.postAPIRegenKey());
 handleIPCAPICall("selectMyDevice", "selectMyDeviceResult", (args) => client.postSelectMyDevice(args["uuid"]));
 handleIPCAPICall("setNetworkType", "setNetworkTypeResult", (args) => client.postNetworkType(args["network_type"]))
+handleIPCAPICall("debugSystem", "debugSystemResult", (args) => runDebug());
 
 ipcMain.on("loadDefaultCSS", (event, args) => {
   themer.setDefaultTheme(true);

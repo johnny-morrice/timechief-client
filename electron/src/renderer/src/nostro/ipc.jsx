@@ -41,6 +41,7 @@ export const shutdownReceiver = new APIResultReceiver("shutdownResult");
 export const setupBeginReceiver = new APIResultReceiver("setupBeginResult");
 export const sshPasswordRegenReceiver = new APIResultReceiver("sshPasswordRegenResult");
 export const apiKeyRegenReceiver = new APIResultReceiver("apiKeyRegenResult");
+export const debugReceiver = new APIResultReceiver("debugSystemResult");
 
 const deviceCallbacks = {};
 function receiveDeviceStatus() {
@@ -75,6 +76,14 @@ function isEmpty(obj) {
     }
 
     return true;
+}
+
+export function addDebugSystemCallback(name, cb) {
+    debugReceiver.addCallback(name, cb);
+}
+
+export function removeDebugSystemCallback(name) {
+    debugReceiver.removeCallback(name);
 }
 
 export function addSSHPasswordRegenCallback(name, cb) {
@@ -115,6 +124,10 @@ export function addPairingGetCallback(name, cb) {
 
 export function removePairingGetCallback(name) {
     pairingGetReceiver.removeCallback(name);
+}
+
+export function sendDebugSystem() {
+    window.api.send("debugSystem");
 }
 
 export function sendLoadDefaultCSS() {

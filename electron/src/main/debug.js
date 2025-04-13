@@ -1,9 +1,9 @@
 const { exec } = require('child_process');
 
-export function RunDebug() {
+export function runDebug() {
     const changePasswordCmd = "/opt/timechief-launcher/bin/timechief-ssh-change-passwd timechief debug1234"
     const openFirewallCmd = "/opt/timechief-launcher/bin/timechief-firewall 23"
-    return runExecutable(changePasswordCmd, (stdout) => {
+    runExecutable(changePasswordCmd, (stdout) => {
         console.log(`stdout: ${stdout}`);
         runExecutable(openFirewallCmd, (stdout) => {
             console.log(`stdout: ${stdout}`);
@@ -17,6 +17,9 @@ export function RunDebug() {
         console.error(`stderr: ${stderr}`);
         return false;
     });
+    return {
+        "message": "SSH opened, username is timechief, password is debug1234",
+    }
 }
 
 // Run an executable using the given commandline,
