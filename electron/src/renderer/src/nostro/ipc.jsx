@@ -13,7 +13,7 @@ class APIResultReceiver {
                 console.log(`error calling API for channel ${this.channel}: ${data["APIError"]}`);
             } else {
                 this.lastData = data;
-                // console.log(`received data for channel: ${this.channel}: ${JSON.stringify(data)}`);
+                console.log(`received data for channel: ${this.channel}: ${JSON.stringify(data)}`);
                 for (const [_, cb] of Object.entries(this.callbacks)) {
                     cb(data);
                 }
@@ -41,6 +41,7 @@ export const shutdownReceiver = new APIResultReceiver("shutdownResult");
 export const setupBeginReceiver = new APIResultReceiver("setupBeginResult");
 export const sshPasswordRegenReceiver = new APIResultReceiver("sshPasswordRegenResult");
 export const apiKeyRegenReceiver = new APIResultReceiver("apiKeyRegenResult");
+export const debugReceiver = new APIResultReceiver("debugSystemResult");
 
 const deviceCallbacks = {};
 function receiveDeviceStatus() {
@@ -75,6 +76,14 @@ function isEmpty(obj) {
     }
 
     return true;
+}
+
+export function addDebugSystemCallback(name, cb) {
+    debugReceiver.addCallback(name, cb);
+}
+
+export function removeDebugSystemCallback(name) {
+    debugReceiver.removeCallback(name);
 }
 
 export function addSSHPasswordRegenCallback(name, cb) {
@@ -115,6 +124,10 @@ export function addPairingGetCallback(name, cb) {
 
 export function removePairingGetCallback(name) {
     pairingGetReceiver.removeCallback(name);
+}
+
+export function sendDebugSystem() {
+    window.api.send("debugSystem");
 }
 
 export function sendLoadDefaultCSS() {
@@ -254,6 +267,7 @@ export function initializeIPC() {
     setupBeginReceiver.receive();
     sshPasswordRegenReceiver.receive();
     apiKeyRegenReceiver.receive();
+    debugReceiver.receive();
     sendLoggedIn();
     return [fastDeviceInterval, fastApiInterval, ecoApiInterval, ecoDeviceInterval];
 }
