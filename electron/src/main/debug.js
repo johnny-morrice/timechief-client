@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 
 export function runDebug() {
     const changePasswordCmd = "/opt/timechief-launcher/bin/timechief-ssh-change-passwd timechief debug1234"
-    const openFirewallCmd = "/opt/timechief-launcher/bin/timechief-firewall 23"
+    const openFirewallCmd = "/opt/timechief-launcher/bin/timechief-firewall 22"
     return runExecutable(changePasswordCmd, (resolve, stdout) => {
         console.log(`changePasswordCmd output: ${stdout}`);
         resolve({
