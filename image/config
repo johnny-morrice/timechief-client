@@ -11,5 +11,6 @@ PUBKEY_SSH_FIRST_USER=""
 STAGE_LIST="stage0 stage1 stage2 stage2-kiosk"
 CURSOR="no"
 TIMECHIEF_ROOT="/opt/timechief-launcher"
+TIMECHIEF_DISPLAY_TOUCH2="true"
 DEPLOY_COMPRESSION="none"
 USE_QEMU=0
