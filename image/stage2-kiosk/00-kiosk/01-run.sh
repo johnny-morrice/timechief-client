@@ -82,7 +82,7 @@ cat >> /etc/xdg/weston/weston.ini << CATEND
 
 [output]
 name=DSI-2
-transform=90
+transform=rotate-90
 CATEND
 EOF
 fi
