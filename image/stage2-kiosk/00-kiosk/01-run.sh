@@ -74,6 +74,19 @@ client=/opt/timechief-launcher/bin/timechief-bootstrap
 CATEND
 EOF
 
+if [ "$TIMECHIEF_DISPLAY_TOUCH2" = "true" ]; then
+    # Must also rotate weston including display and touch.
+    # Let's append to this file.
+    on_chroot << EOF
+cat >> /etc/xdg/weston/weston.ini << CATEND
+
+[output]
+name=DSI-2
+transform=90
+CATEND
+EOF
+fi
+
 # timechief-launcher daemon.
 # Use sigkill and timeout after 5 seconds.
 on_chroot << EOF
