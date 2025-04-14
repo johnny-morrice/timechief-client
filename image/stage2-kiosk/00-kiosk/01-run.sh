@@ -75,14 +75,14 @@ CATEND
 EOF
 
 if [ "$TIMECHIEF_DISPLAY_TOUCH2" = "true" ]; then
-    # Must also rotate weston 270 degrees including display and touch.
+    # Must also rotate weston including display and touch.
     # Let's append to this file.
     on_chroot << EOF
 cat >> /etc/xdg/weston/weston.ini << CATEND
 
 [output]
 name=DSI-2
-transform=rotate-270
+transform=90
 CATEND
 EOF
 fi
