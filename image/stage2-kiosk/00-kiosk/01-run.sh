@@ -21,7 +21,6 @@ if [ "$TIMECHIEF_DISPLAY_TOUCH2" = "true" ]; then
 else
     install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/firmware/cmdline.txt"
 fi
-install -m 644 files/cmdline.txt "${ROOTFS_DIR}/boot/firmware"
 install -m 644 files/nginx.conf "${ROOTFS_DIR}/etc/nginx/sites-available/timechief.conf"
 HOME="${ROOTFS_DIR}/home/${FIRST_USER_NAME}"
 install -m 644 -o 1000 -g 1000 files/.profile "${HOME}/"
