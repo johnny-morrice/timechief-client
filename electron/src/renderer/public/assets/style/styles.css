@@ -172,6 +172,7 @@ div.home-date {
 
 div.home-time {
     /* font-family: 'Seven Segment', monospace; */
+    align-self: flex-end;
     font-size: 98pt;
 }
 
