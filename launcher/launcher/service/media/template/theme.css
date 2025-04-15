@@ -1,66 +1,66 @@
 body {
-    color: {{.ForegroundColor}};
-    background-color: {{.BackgroundColor}};
-    font-family: {{.MainFont}};
-    font-size: {{.BodyFontSize}};
+    color: {{.ForegroundColor}} !important;
+    background-color: {{.BackgroundColor}} !important;
+    font-family: {{.MainFont}} !important;
+    font-size: {{.BodyFontSize}} !important;
 }
 
 button {
-    font-family: {{.MainFont}};
+    font-family: {{.MainFont}} !important;
 }
 
 div.home-time {
-    font-family: {{.TimeFont}};
-    color: {{.TimeColor}};
+    font-family: {{.TimeFont}} !important;
+    color: {{.TimeColor}} !important;
     font-size: {{.TimeFontSize}} !important;
 }
 
 .exposed {
-    color: {{.TimeColor}};
+    color: {{.TimeColor}} !important;
 }
 
 div.home-date {
-    color: {{.TimeColor}};
+    color: {{.TimeColor}} !important;
     font-size: {{.DateFontSize}} !important;
 }
 
 div.home-box {
-    background-color: {{.BoxBackgroundColor}};
+    background-color: {{.BoxBackgroundColor}} !important;
 }
 
 div.border {
-    border-radius: {{.BoxBorderRadius}};
-    border-width: {{.BoxBorderWidth}};
-    border-color: {{.BoxBorderColor}};
+    border-radius: {{.BoxBorderRadius}} !important;
+    border-width: {{.BoxBorderWidth}} !important;
+    border-color: {{.BoxBorderColor}} !important;
 }
 
 button.action-button {
-    border-radius: {{.ButtonBorderRadius}};
-    border-width: {{.ButtonBorderWidth}};
-    border-color: {{.ButtonBorderColor}};
-    background-color: {{.ButtonBackgroundColor}};
-    color: {{.ButtonForegroundColor}};
+    border-radius: {{.ButtonBorderRadius}} !important;
+    border-width: {{.ButtonBorderWidth}} !important;
+    border-color: {{.ButtonBorderColor}} !important;
+    background-color: {{.ButtonBackgroundColor}} !important;
+    color: {{.ButtonForegroundColor}} !important;
 }
 
 button.forecast-control-button {
-    border-radius: {{.ButtonBorderRadius}};
-    border-width: {{.ButtonBorderWidth}};
-    border-color: {{.ButtonBorderColor}};
-    background-color: {{.ButtonBackgroundColor}};
-    color: {{.ButtonForegroundColor}};
+    border-radius: {{.ButtonBorderRadius}} !important;
+    border-width: {{.ButtonBorderWidth}} !important;
+    border-color: {{.ButtonBorderColor}} !important;
+    background-color: {{.ButtonBackgroundColor}} !important;
+    color: {{.ButtonForegroundColor}} !important;
 }
 
 button.event-calendar-control-button {
-    border-radius: {{.ButtonBorderRadius}};
-    border-width: {{.ButtonBorderWidth}};
-    border-color: {{.ButtonBorderColor}};
-    background-color: {{.ButtonBackgroundColor}};
-    color: {{.ButtonForegroundColor}};
+    border-radius: {{.ButtonBorderRadius}} !important;
+    border-width: {{.ButtonBorderWidth}} !important;
+    border-color: {{.ButtonBorderColor}} !important;
+    background-color: {{.ButtonBackgroundColor}} !important;
+    color: {{.ButtonForegroundColor}} !important;
 }
 
 div.inverted-color, span.inverted-color {
-    color: {{.BoxBackgroundColor}};
-    background-color: {{.ForegroundColor}};
+    color: {{.BoxBackgroundColor}} !important;
+    background-color: {{.ForegroundColor}} !important;
 }
 
 div#theme-detection-canary {
