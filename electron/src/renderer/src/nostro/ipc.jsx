@@ -13,7 +13,6 @@ class APIResultReceiver {
                 console.log(`error calling API for channel ${this.channel}: ${data["APIError"]}`);
             } else {
                 this.lastData = data;
-                console.log(`received data for channel: ${this.channel}: ${JSON.stringify(data)}`);
                 for (const [_, cb] of Object.entries(this.callbacks)) {
                     cb(data);
                 }
