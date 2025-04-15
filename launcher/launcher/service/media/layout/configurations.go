@@ -41,7 +41,7 @@ const errorColor = "#ffa500ff"
 const borderRadius = "0px"
 const timeFont = "Seven Segment"
 const mainFont = "'Titillium Web'"
-const borderWidth = "1px"
+const borderWidth = "2px"
 
 func DefaultSevenInchLayout() v2.Theme {
 	return v2.Theme{
