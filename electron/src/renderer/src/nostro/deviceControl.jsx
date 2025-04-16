@@ -3,12 +3,10 @@ import { callbackName } from "./callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendSetupBegin, sendLogOut, sendShutdown } from './ipc';
 import { LineLoading } from './loading';
 import { labelMaker, textMaker } from './label';
-import { textTransitionSignal } from "./textGlitch";
-import { Line } from 'fabric';
 
 class Signals {
     constructor() {
-        [this.deviceStatus, this.setDeviceStatus] = textTransitionSignal("");
+        [this.deviceStatus, this.setDeviceStatus] = createSignal("");
         [this.launcherState, this.setLauncherState] = createSignal({});
         [this.clientVersion, this.setClientVersion] = createSignal("");
         [this.disableShutdown, this.setDisableShutdown] = createSignal(false);
