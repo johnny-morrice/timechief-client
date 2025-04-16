@@ -9,7 +9,21 @@ def get_resolution():
         resolution = f.read().strip().replace(',', 'x')
     return resolution
 
+def is_rotated():
+    with open('/etc/xdg/weston/weston.ini', 'r') as f:
+        for line in f:
+            if "rotate-270" in line or "rotate-90" in line:
+                return True
+    return False
+
+def get_rotated_resolution():
+    resolution = get_resolution()
+    width, height = map(int, resolution.split('x'))
+    if is_rotated():
+        return f"{height}x{width}"
+    return resolution
+
 if __name__ == '__main__':
-    print(get_resolution())
+    print(get_rotated_resolution())
 
 
