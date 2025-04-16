@@ -15,6 +15,7 @@ func (configs Configurations) GetSuitable(criteria Criteria) Configuration {
 			return layout
 		}
 	}
+	log.Printf("no suitable layout found for resolution %dx%d, failling back to default", criteria.Width, criteria.Height)
 	return sevenInchConfiguration()
 }
 
@@ -39,7 +40,7 @@ func GetConfigurations() Configurations {
 		},
 		{
 			Name:      "Touch2",
-			MinWidth:  1024,
+			MinWidth:  1280,
 			MaxWidth:  -1,
 			MinHeight: 720,
 			MaxHeight: -1,
@@ -54,7 +55,7 @@ func sevenInchConfiguration() Configuration {
 		MinWidth:  800,
 		MaxWidth:  -1,
 		MinHeight: 480,
-		MaxHeight: 1023,
+		MaxHeight: 719,
 		Layout:    DefaultSevenInchLayout(),
 	}
 }
