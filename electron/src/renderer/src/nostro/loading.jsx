@@ -40,6 +40,10 @@ export const LineLoading = () => {
     onCleanup(() => {
         clearInterval(interval);
     });
+    // Timeout after 30 seconds
+    setTimeout(() => {
+        clearInterval(interval);
+    }, 30 * 1000);
     return <div class="loading-line">{signals.lineText}</div>
 }
 

@@ -1,12 +1,14 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { callbackName } from "./callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendSetupBegin, sendLogOut, sendShutdown } from './ipc';
-import { Loading } from './loading';
+import { LineLoading } from './loading';
 import { labelMaker, textMaker } from './label';
+import { textTransitionSignal } from "./textGlitch";
+import { Line } from 'fabric';
 
 class Signals {
     constructor() {
-        [this.deviceStatus, this.setDeviceStatus] = createSignal("");
+        [this.deviceStatus, this.setDeviceStatus] = textTransitionSignal("");
         [this.launcherState, this.setLauncherState] = createSignal({});
         [this.clientVersion, this.setClientVersion] = createSignal("");
         [this.disableShutdown, this.setDisableShutdown] = createSignal(false);
@@ -27,9 +29,17 @@ function hasDeviceStatus(signals) {
 function getDeviceStatus(signals) {
     let launcherState = signals.launcherState();
     if ("flags" in launcherState) {
-        let isUpdating = launcherState["flags"].includes("updating");
+        const isUpdating = launcherState["flags"].includes("updating");
         if (isUpdating) {
             return "updating";
+        }
+        const isCalendarError = launcherState["flags"].includes("calendar-error");
+        if (isCalendarError) {
+            return "error";
+        }
+        const isDeviceDataError = launcherState["flags"].includes("device-data-error");
+        if (isDeviceDataError) {
+            return "error";
         }
     }
     if ("active_target_version" in launcherState) {
@@ -129,7 +139,7 @@ export const DeviceControl = () => {
                 </div>
             </Show>
             <Show when={!hasDeviceStatus(signals)}>
-                <Loading />
+                <LineLoading />
             </Show>
         </div>
     </div>;
