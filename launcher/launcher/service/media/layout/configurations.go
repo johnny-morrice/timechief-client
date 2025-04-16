@@ -193,7 +193,7 @@ func DefaultTouch2Layout() v2.Theme {
 		PlannerWidth:         "704px",
 		PlannerHeight:        "1200px",
 
-		BodyFontSize:                       "28pt",
+		BodyFontSize:                       "26pt",
 		DateFontSize:                       "48pt",
 		TimeFontSize:                       "136pt",
 		CurrentWeatherFontSize:             "32pt",
