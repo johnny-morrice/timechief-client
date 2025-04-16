@@ -1,24 +1,37 @@
 package layout
 
-import v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+import (
+	"log"
 
-func GetConfigurations() []Configuration {
-	return []Configuration{
+	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+)
+
+type Configurations []Configuration
+
+func (configs Configurations) GetSuitable(criteria Criteria) Configuration {
+	for _, layout := range configs {
+		if layout.IsSuitable(criteria) {
+			log.Printf("using layout: %s for resolution %dx%d", layout.Name, criteria.Width, criteria.Height)
+			return layout
+		}
+	}
+	log.Printf("no suitable layout found for resolution %dx%d, failling back to default", criteria.Width, criteria.Height)
+	return sevenInchConfiguration()
+}
+
+func GetConfigurations() Configurations {
+	return Configurations{
 		{
+			Name:      "Small",
 			MinWidth:  -1,
 			MaxWidth:  799,
 			MinHeight: -1,
 			MaxHeight: 479,
 			Layout:    DefaultSmallLayout(),
 		},
+		sevenInchConfiguration(),
 		{
-			MinWidth:  800,
-			MaxWidth:  -1,
-			MinHeight: 480,
-			MaxHeight: 1023,
-			Layout:    DefaultSevenInchLayout(),
-		},
-		{
+			Name:      "Planner",
 			MinWidth:  800,
 			MaxWidth:  1023,
 			MinHeight: 1024,
@@ -26,12 +39,24 @@ func GetConfigurations() []Configuration {
 			Layout:    DefaultPlannerLayout(),
 		},
 		{
-			MinWidth:  1024,
+			Name:      "Touch2",
+			MinWidth:  1280,
 			MaxWidth:  -1,
 			MinHeight: 720,
 			MaxHeight: -1,
 			Layout:    DefaultTouch2Layout(),
 		},
+	}
+}
+
+func sevenInchConfiguration() Configuration {
+	return Configuration{
+		Name:      "SevenInch",
+		MinWidth:  800,
+		MaxWidth:  -1,
+		MinHeight: 480,
+		MaxHeight: 719,
+		Layout:    DefaultSevenInchLayout(),
 	}
 }
 

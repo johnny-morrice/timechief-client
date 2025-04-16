@@ -29,7 +29,7 @@ type Options struct {
 	ForceResolution bool
 	Width           int
 	Height          int
-	Configurations  []Configuration `validate:"required"`
+	Configurations  Configurations `validate:"required"`
 }
 
 func (opt Options) validate() error {
@@ -80,14 +80,10 @@ func (svc Service) GetDefaultTheme() (v2.Theme, error) {
 		}
 	})
 
-	for _, layout := range svc.options.Configurations {
-		criteria := Criteria{
-			Width:  svc.options.Width,
-			Height: svc.options.Height,
-		}
-		if layout.IsSuitable(criteria) {
-			return layout.Layout, nil
-		}
+	criteria := Criteria{
+		Width:  svc.options.Width,
+		Height: svc.options.Height,
 	}
-	return DefaultSevenInchLayout(), nil
+	configuration := svc.options.Configurations.GetSuitable(criteria)
+	return configuration.Layout, nil
 }
