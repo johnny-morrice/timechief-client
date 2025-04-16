@@ -102,13 +102,13 @@ function getDefaultThemeCSS() {
     
     div.border {
         border-radius: 0;
-        border-width: 1px;
+        border-width: 2px;
         border-color: green;
     }
     
     button.action-button {
         border-radius: 0;
-        border-width: 1px;
+        border-width: 2px;
         border-color: green;
         background-color: black;
         color: green;
@@ -116,7 +116,7 @@ function getDefaultThemeCSS() {
     
     button.forecast-control-button {
         border-radius: 0;
-        border-width: 1px;
+        border-width: 2px;
         border-color: green;
         background-color: black;
         color: green;
@@ -124,7 +124,7 @@ function getDefaultThemeCSS() {
     
     button.event-calendar-control-button {
         border-radius: 0;
-        border-width: 1px;
+        border-width: 2px;
         border-color: green;
         background-color: black;
         color: green;
