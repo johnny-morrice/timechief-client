@@ -24,11 +24,16 @@ if [ "$ENVIRONMENT" != "dev" ] && [ "$ENVIRONMENT" != "prod" ] ; then
     exit 1
 fi
 
+if [ -z "$BRANCH" ] ; then
+    echo "BRANCH must be set to a branch name"
+    exit 1
+fi
+
 echo "Building $ENVIRONMENT $VERSION $PHASE"
 date
 source env/$ENVIRONMENT.sh
 git fetch
-git checkout origin/main
+git checkout $BRANCH
 git reset --hard
 pushd launcher
 ./script/build.sh
