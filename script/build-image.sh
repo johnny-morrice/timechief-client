@@ -19,6 +19,12 @@ if [ -z "$BUILD_DIR" ]; then
   BUILD_DIR=$(mktemp -d)
 fi
 
+# ENVIRONMENT must equal dev or prod.
+if [ "$ENVIRONMENT" != "dev" ] && [ "$ENVIRONMENT" != "prod" ] ; then
+    echo "ENVIRONMENT must be set to one of: dev, prod"
+    exit 1
+fi
+
 # We cannot at this moment easily tidy up the build directory so let's note where they are and we can have a process garbage collect them.
 mkdir -p $HOME/scratch
 TIDY_NOTE="$HOME/scratch/tidy-images.txt"
@@ -37,10 +43,11 @@ sudo ./build.sh
 DEPLOY_IMAGE=$(ls deploy/*.img | head -n 1)
 echo "Found image: $DEPLOY_IMAGE"
 # Copy the file to the output location
+OUTPUT_FILEPATH="$IMAGE_OUTPUT/Timechief-$ENVIRONMENT-$VERSION.img"
 rm -rf $IMAGE_OUTPUT
 mkdir -p $IMAGE_OUTPUT
-cp $DEPLOY_IMAGE $IMAGE_OUTPUT/Timechief-$VERSION.img
-echo "Copied image to $IMAGE_OUTPUT/Timechief-$VERSION.img"
+cp $DEPLOY_IMAGE $OUTPUT_FILEPATH
+echo "Copied image to $OUTPUT_FILEPATH"
 popd
 
 # TODO tidy up
