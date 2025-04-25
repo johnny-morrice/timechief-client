@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-set -x
+
 
 # Parameters
 # ENVIRONMENT
@@ -30,7 +30,11 @@ fi
 
 echo "Building $ENVIRONMENT $VERSION $PHASE"
 date
+
+set +x
 source env/$ENVIRONMENT.sh
+set -x
+
 git fetch
 git checkout $BRANCH
 git reset --hard
