@@ -9,10 +9,9 @@ set -x
 
 if [ -z "$PHASE" ] ; then
     echo "PHASE must be set to one of: bundle, upload, init-fs, build-iso, upload-iso, all"
-  exit 1
-fi
     exit 1
 fi
+
 if [ -z "$VERSION" ] ; then
     echo "VERSION must be set to a version string"
     exit 1
