@@ -1,6 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { callbackName } from "../../util/callback";
-import { addDataCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendShutdown } from './ipc';
+import { addDataCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendShutdown } from '../../ipc';
 
 class Signals {
     constructor() {

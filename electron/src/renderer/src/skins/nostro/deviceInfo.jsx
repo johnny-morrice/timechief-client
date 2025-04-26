@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback } from './ipc';
+import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback } from '../../ipc';
 import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { textTransitionSignal } from "../../util/textGlitch";
