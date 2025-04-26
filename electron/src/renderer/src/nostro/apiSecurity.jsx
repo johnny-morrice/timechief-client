@@ -1,7 +1,7 @@
 import { onCleanup, createSignal } from "solid-js";
-import { callbackName } from "./callback"
+import { callbackName } from "../util/callback"
 import { addDataCallback, removeDataCallback, addAPIRegenKeyCallback, removeAPIRegenKeyCallback, sendAPIRegenKey, sendSetAPIEnabled } from "./ipc";
-import { textTransitionSignal } from "./textGlitch";
+import { textTransitionSignal } from "../util/textGlitch";
 import { labelMaker } from "../components/label";
 
 class Signals {

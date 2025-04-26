@@ -1,5 +1,5 @@
 import { Show, createSignal } from "solid-js";
-import { Video } from "../nostro/video";
+import { Video } from "./video";
 
 export function IntroVideo(props) {
     if (props.element === undefined) {

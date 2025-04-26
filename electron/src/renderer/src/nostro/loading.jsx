@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from "solid-js";
-import { random, randomLoadingSymbol } from './fakeRandom';
+import { random, randomLoadingSymbol } from '../util/fakeRandom';
 
 class GridSignals {
     constructor() {

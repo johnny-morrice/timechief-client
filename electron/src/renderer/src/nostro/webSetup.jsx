@@ -1,9 +1,9 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
-import { callbackName } from "./callback";
+import { callbackName } from "../util/callback";
 import { Loading } from './loading';
-import { textTransitionSignal } from './textGlitch';
-import { random } from './fakeRandom';
+import { textTransitionSignal } from "../util/textGlitch";
+import { random } from '../util/fakeRandom';
 import { labelMaker, textMaker } from '../components/label';
 import { fadeTransition } from './fadeTransition';
 import { generateWifiQRCode } from 'wifi-qr-code-generator';

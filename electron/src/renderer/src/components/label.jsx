@@ -1,5 +1,5 @@
 import { Text as defaultText } from "../locale/lang/default";
-import { textTransitionSignal } from "../nostro/textGlitch";
+import { textTransitionSignal } from "../util/textGlitch";
 
 function lookupText(index, textDB) {
     let text = textDB;

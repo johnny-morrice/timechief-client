@@ -1,5 +1,5 @@
 import { onCleanup, Show, createSignal } from "solid-js";
-import { callbackName } from "./callback";
+import { callbackName } from "../util/callback";
 import { addDebugSystemCallback, removeDebugSystemCallback, sendDebugSystem } from "./ipc";
 import { Loading } from "./loading";
 

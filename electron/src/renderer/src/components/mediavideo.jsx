@@ -1,6 +1,6 @@
 import { Show, createSignal, onCleanup } from "solid-js";
-import { Video } from "../nostro/video";
-import { callbackName } from "../nostro/callback";
+import { Video } from "./video";
+import { callbackName } from "../util/callback";
 import { addDataCallback, removeDataCallback } from "../ipc";
 import { FeatureForceSpooky } from "../features";
 

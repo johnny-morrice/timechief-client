@@ -13,7 +13,7 @@ import { For, Show, createSignal, onCleanup } from 'solid-js';
 import { CalendarEvent, makeCanonicalDateText } from '../util/calendarEvent';
 import { Loading } from './loading';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
-import { callbackName } from './callback';
+import { callbackName } from '../util/callback';
 import { ActionCenter } from './actionCenter';
 import { fadeTransition } from './fadeTransition';
 

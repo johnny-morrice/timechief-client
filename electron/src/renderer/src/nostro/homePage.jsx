@@ -3,7 +3,7 @@ import { addServiceDataCallback } from './ipc';
 import { second } from '../components/timing';
 import { CalendarEvent, sortCalendarEvents } from '../util/calendarEvent';
 import { removeDataCallback } from './ipc';
-import { callbackName } from "./callback";
+import { callbackName } from "../util/callback";
 import { fadeTransition } from './fadeTransition';
 import { scoreEmote } from '../components/mascot';
 import { HomeSevenInch } from './homeSevenInch';

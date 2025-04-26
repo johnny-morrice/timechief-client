@@ -2,9 +2,9 @@ import { createSignal, onCleanup, Show } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { kelvinToCelsiusText } from '../util/temperature';
 import { weatherIconStyleClass } from '../util/weatherIcon';
-import { callbackName } from './callback';
+import { callbackName } from '../util/callback';
 import { Loading } from './loading';
-import { textTransitionSignal } from "./textGlitch";
+import { textTransitionSignal } from "../util/textGlitch";
 import { labelMaker } from '../components/label';
 import { fadeTransition } from './fadeTransition';
 

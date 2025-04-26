@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { callbackName } from "./callback";
+import { callbackName } from "../util/callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendSetupBegin, sendLogOut, sendShutdown } from './ipc';
 import { LineLoading } from './loading';
 import { labelMaker, textMaker } from '../components/label';

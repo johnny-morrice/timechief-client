@@ -1,8 +1,8 @@
 import { Show, createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
-import { callbackName } from "./callback";
+import { callbackName } from "../util/callback";
 import { Loading } from './loading';
-import { textTransitionSignal, textTransitionResource } from "./textGlitch";
+import { textTransitionSignal, textTransitionResource } from "../util/textGlitch";
 import { labelMaker } from '../components/label';
 
 class Signals {
