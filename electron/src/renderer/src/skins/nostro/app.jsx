@@ -1,6 +1,6 @@
 import { render } from 'solid-js/web';
 import { onCleanup } from 'solid-js';
-import { initializeIPC } from './ipc';
+import { initializeIPC } from '../../ipc';
 import { WebSetupPage } from "./webSetup";
 import { HomePage } from "./homePage";
 import { LoginPage } from './login';
