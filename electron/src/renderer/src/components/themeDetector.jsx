@@ -1,6 +1,6 @@
 import { Show, onCleanup, createSignal } from "solid-js";
 import { sendLoadDefaultCSS } from "../ipc"
-import { Loading } from "../nostro/loading";
+import { Loading } from "../skins/nostro/loading";
 
 function isCanaryThemed() {
     const canary = document.getElementById("theme-detection-canary");

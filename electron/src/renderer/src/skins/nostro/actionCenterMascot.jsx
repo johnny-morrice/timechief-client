@@ -1,4 +1,4 @@
-import { manageMascotCanvas } from "../components/mascot";
+import { manageMascotCanvas } from "../../components/mascot";
 
 var globalSignals = null;
 
