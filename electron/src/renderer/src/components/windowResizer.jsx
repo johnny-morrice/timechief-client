@@ -1,6 +1,6 @@
 import { onCleanup } from "solid-js";
-import { addServiceDataCallback, sendResizeBrowserWindow, removeDataCallback,  } from "./ipc";
-import { callbackName } from "./callback";
+import { addServiceDataCallback, sendResizeBrowserWindow, removeDataCallback,  } from "../ipc";
+import { callbackName } from "../nostro/callback";
 
 var lastWidth;
 var lastHeight;

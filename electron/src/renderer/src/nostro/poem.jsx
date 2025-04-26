@@ -1,5 +1,5 @@
 import { parse as papaParse } from 'papaparse';
-import { FeatureForceSpooky } from './features';
+import { FeatureForceSpooky } from '../features';
 
 class PoemList {
     constructor(poems) {

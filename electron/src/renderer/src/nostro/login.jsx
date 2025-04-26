@@ -4,7 +4,7 @@ import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, 
 import { toCanvas } from 'qrcode';
 import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
 import { Loading } from "./loading";
-import { labelMaker, textMaker } from "./label";
+import { labelMaker, textMaker } from "../components/label";
 
 class Signals {
     constructor() {

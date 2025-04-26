@@ -1,8 +1,8 @@
 import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "./callback"
 import { addServiceDataCallback, removeDataCallback } from "./ipc";
-import { weatherIconStyleClass } from '../weatherIcon';
-import { kelvinToCelsiusText } from '../temperature';
+import { weatherIconStyleClass } from '../util/weatherIcon';
+import { kelvinToCelsiusText } from '../util/temperature';
 import { Loading } from "./loading";
 import { textTransitionSignal } from "./textGlitch";
 

@@ -2,7 +2,7 @@ import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "./callback"
 import { addDataCallback, removeDataCallback, addAPIRegenKeyCallback, removeAPIRegenKeyCallback, sendAPIRegenKey, sendSetAPIEnabled } from "./ipc";
 import { textTransitionSignal } from "./textGlitch";
-import { labelMaker } from "./label";
+import { labelMaker } from "../components/label";
 
 class Signals {
     constructor() {

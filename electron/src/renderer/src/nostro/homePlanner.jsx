@@ -10,7 +10,7 @@ import { SSHSecurity } from './sshSecurity';
 import { APISecurity } from './apiSecurity';
 import { Debug } from './debugPanel';
 import { For, Show, createSignal, onCleanup } from 'solid-js';
-import { CalendarEvent, makeCanonicalDateText } from '../calendarEvent';
+import { CalendarEvent, makeCanonicalDateText } from '../util/calendarEvent';
 import { Loading } from './loading';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from './callback';

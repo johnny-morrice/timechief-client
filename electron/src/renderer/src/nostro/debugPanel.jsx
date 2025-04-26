@@ -1,6 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { Video } from './video';
-import { textMaker } from './label';
+import { textMaker } from '../components/label';
 
 class Signals {
     constructor() {

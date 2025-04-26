@@ -4,10 +4,10 @@ import { initializeIPC } from './ipc';
 import { WebSetupPage } from "./webSetup";
 import { HomePage } from "./homePage";
 import { LoginPage } from './login';
-import { IntroVideo } from './introVideo';
-import { MediaVideo } from './mediavideo';
-import { WindowResizer } from './windowResizer';
-import { ThemeDetector } from './themeDetector';
+import { IntroVideo } from '../components/introVideo';
+import { MediaVideo } from '../components/mediavideo';
+import { WindowResizer } from '../components/windowResizer';
+import { ThemeDetector } from '../components/themeDetector';
 
 const AppScreen = (props) => {
   console.log("AppScreen render");

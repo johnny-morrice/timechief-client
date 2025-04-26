@@ -1,11 +1,11 @@
 import { createSignal, onCleanup, Show } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from './ipc';
-import { kelvinToCelsiusText } from '../temperature';
-import { weatherIconStyleClass } from '../weatherIcon';
+import { kelvinToCelsiusText } from '../util/temperature';
+import { weatherIconStyleClass } from '../util/weatherIcon';
 import { callbackName } from './callback';
 import { Loading } from './loading';
 import { textTransitionSignal } from "./textGlitch";
-import { labelMaker } from './label';
+import { labelMaker } from '../components/label';
 import { fadeTransition } from './fadeTransition';
 
 let dayForecastCount = 5;

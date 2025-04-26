@@ -1,4 +1,4 @@
-import { manageMascotCanvas } from "./mascot";
+import { manageMascotCanvas } from "../components/mascot";
 
 var globalSignals = null;
 manageMascotCanvas("fortune-canvas", () => getFortuneSignals().mascotType(), () => getFortuneSignals().emote(), () => getFortuneSignals().mascotHeight());

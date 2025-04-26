@@ -4,7 +4,7 @@ import { callbackName } from "./callback";
 import { Loading } from './loading';
 import { textTransitionSignal } from './textGlitch';
 import { random } from './fakeRandom';
-import { labelMaker, textMaker } from './label';
+import { labelMaker, textMaker } from '../components/label';
 import { fadeTransition } from './fadeTransition';
 import { generateWifiQRCode } from 'wifi-qr-code-generator';
 import { NoConnection } from './noconnection';

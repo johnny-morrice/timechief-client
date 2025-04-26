@@ -3,7 +3,7 @@ import { addServiceDataCallback, removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { Loading } from './loading';
 import { textTransitionSignal, textTransitionResource } from "./textGlitch";
-import { labelMaker } from './label';
+import { labelMaker } from '../components/label';
 
 class Signals {
     constructor() {

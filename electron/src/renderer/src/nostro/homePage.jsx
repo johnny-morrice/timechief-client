@@ -1,11 +1,11 @@
 import { createSignal, onCleanup, Show } from 'solid-js';
 import { addServiceDataCallback } from './ipc';
-import { second } from '../timing';
-import { CalendarEvent, sortCalendarEvents } from '../calendarEvent';
+import { second } from '../components/timing';
+import { CalendarEvent, sortCalendarEvents } from '../util/calendarEvent';
 import { removeDataCallback } from './ipc';
 import { callbackName } from "./callback";
 import { fadeTransition } from './fadeTransition';
-import { scoreEmote } from './mascot';
+import { scoreEmote } from '../components/mascot';
 import { HomeSevenInch } from './homeSevenInch';
 import { Loading } from './loading';
 import { HomePlanner } from './homePlanner';

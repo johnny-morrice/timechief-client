@@ -2,7 +2,7 @@ import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "./callback"
 import { addDataCallback, removeDataCallback, addSSHPasswordRegenCallback, removeSSHPasswordRegenCallback, sendSSHRegenPassword, sendSetSSHEnabled } from "./ipc";
 import { textTransitionSignal } from "./textGlitch";
-import { labelMaker } from "./label";
+import { labelMaker } from "../components/label";
 
 class Signals {
     constructor() {

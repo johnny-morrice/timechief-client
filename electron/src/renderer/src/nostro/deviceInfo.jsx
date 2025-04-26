@@ -3,7 +3,7 @@ import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDev
 import { callbackName } from "./callback";
 import { Loading } from './loading';
 import { textTransitionSignal } from "./textGlitch";
-import { labelMaker } from './label';
+import { labelMaker } from '../components/label';
 
 class Signals {
     constructor() {
