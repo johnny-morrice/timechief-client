@@ -1,6 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, isEcoMode, removeDataCallback } from '../../ipc';
-import { second } from '../../components/timing'
+import { second } from '../../util/timing'
 import { callbackName } from "../../util/callback";
 import { fadeTransition } from './fadeTransition';
 

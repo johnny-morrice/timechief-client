@@ -1,4 +1,4 @@
-import { refreshInterval, ecoRefreshInterval } from "../timing";
+import { refreshInterval, ecoRefreshInterval } from "./util/timing";
 
 class APIResultReceiver {
     constructor(channel) {

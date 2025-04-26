@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, Show } from 'solid-js';
 import { addServiceDataCallback } from '../../ipc';
-import { second } from '../../components/timing';
+import { second } from '../../util/timing';
 import { CalendarEvent, sortCalendarEvents } from '../../util/calendarEvent';
 import { removeDataCallback } from '../../ipc';
 import { callbackName } from "../../util/callback";

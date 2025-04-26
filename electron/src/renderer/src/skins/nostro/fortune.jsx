@@ -1,6 +1,6 @@
 import { onCleanup, createSignal } from "solid-js";
 import { textTransitionSignal } from "../../util/textGlitch";
-import { randomPoem } from "./poem";
+import { randomPoem } from "../../util/poem";
 import { addServiceDataCallback, removeDataCallback } from "../../ipc";
 import { callbackName } from "../../util/callback";
 import { FortuneMascotCanvas, setFortuneSignals } from "./fortuneMascot";
