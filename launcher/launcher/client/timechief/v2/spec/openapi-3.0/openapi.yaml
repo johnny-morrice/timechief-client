@@ -1697,6 +1697,7 @@ components:
       type: object
       required:
         - uuid
+        - skin_name
         - foreground_color
         - background_color
         - box_background_color
@@ -1767,6 +1768,8 @@ components:
         - is_user_set_theme
       properties:
         uuid:
+          type: string
+        skin_name:
           type: string
         foreground_color:
           type: string
