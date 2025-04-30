@@ -19,9 +19,5 @@ function NostroApp(props) {
 
 export function NostroSkin() {
   console.log("Nostro skin render");
-  onCleanup(() => {
-    ipcIntervals.forEach(interval => clearInterval(interval));
-  });
-
   return <NostroApp element={<HomePage/>}/>
 };
