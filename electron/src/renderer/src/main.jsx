@@ -1,3 +1,3 @@
-import { attachApp } from "./skins/nostro/skin";
+import { attachApp } from "./skins/skinloader";
 
 attachApp();
