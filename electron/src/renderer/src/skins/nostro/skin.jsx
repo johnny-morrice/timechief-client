@@ -1,6 +1,4 @@
-import { render } from 'solid-js/web';
 import { onCleanup } from 'solid-js';
-import { initializeIPC } from '../../ipc';
 import { WebSetupPage } from "./webSetup";
 import { HomePage } from "./homePage";
 import { LoginPage } from './login';
@@ -9,7 +7,7 @@ import { MediaVideo } from '../../components/mediavideo';
 import { WindowResizer } from '../../components/windowResizer';
 import { ThemeDetector } from '../../components/themeDetector';
 
-const AppScreen = (props) => {
+function NostroApp(props) {
   console.log("AppScreen render");
   return <WindowResizer element={
       <IntroVideo element={
@@ -19,16 +17,11 @@ const AppScreen = (props) => {
               <MediaVideo element={props.element} />} />}/>} />} />} />
 };
 
-const App = () => {
-  console.log("App render");
-  let ipcIntervals = initializeIPC();
+export function NostroSkin() {
+  console.log("Nostro skin render");
   onCleanup(() => {
     ipcIntervals.forEach(interval => clearInterval(interval));
   });
 
-  return <AppScreen element={<HomePage/>}/>
+  return <NostroApp element={<HomePage/>}/>
 };
-
-export function attachApp() {
-    render(() => <App />, document.getElementById('app'));
-}
