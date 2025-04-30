@@ -1,8 +1,8 @@
 import { For, Show, createSignal, onCleanup } from "solid-js";
 import { callbackName } from "../../util/callback";
-import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, sendSelectMyDevice, sendSetupBegin, sendLogOut, recordInteraction } from "./ipc";
+import { sendPairingCreateRequest, sendPairingGetRequest, sendRefreshMyDevices, sendSelectMyDevice, sendSetupBegin, sendLogOut, recordInteraction } from "../../ipc";
 import { toCanvas } from 'qrcode';
-import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "./ipc";
+import { addPairingCreateCallback, addPairingGetCallback, addDataCallback, removeDataCallback, removeDeviceStatusCallback, removePairingCreateCallback, removePairingGetCallback } from "../../ipc";
 import { Loading } from "./loading";
 import { labelMaker, textMaker } from "../../components/label";
 

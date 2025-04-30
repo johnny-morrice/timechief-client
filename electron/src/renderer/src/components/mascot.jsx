@@ -1,6 +1,6 @@
 import * as fabric from 'fabric'
-import { isEcoMode } from './nostro/ipc';
-import { ecoRefreshInterval } from "./timing";
+import { isEcoMode } from '../ipc';
+import { ecoRefreshInterval } from "../util/timing";
 
 const canvasses = {};
 

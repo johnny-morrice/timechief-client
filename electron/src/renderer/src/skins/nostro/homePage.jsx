@@ -1,8 +1,8 @@
 import { createSignal, onCleanup, Show } from 'solid-js';
-import { addServiceDataCallback } from './ipc';
-import { second } from '../../components/timing';
+import { addServiceDataCallback } from '../../ipc';
+import { second } from '../../util/timing';
 import { CalendarEvent, sortCalendarEvents } from '../../util/calendarEvent';
-import { removeDataCallback } from './ipc';
+import { removeDataCallback } from '../../ipc';
 import { callbackName } from "../../util/callback";
 import { fadeTransition } from './fadeTransition';
 import { scoreEmote } from '../../components/mascot';

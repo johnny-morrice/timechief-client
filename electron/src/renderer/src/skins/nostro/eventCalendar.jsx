@@ -1,7 +1,7 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { CalendarEvent, makeCanonicalDateText, sortCalendarEvents } from '../../util/calendarEvent';
-import { addServiceDataCallback, removeDataCallback } from './ipc';
-import { day } from '../../components/timing';
+import { addServiceDataCallback, removeDataCallback } from '../../ipc';
+import { day } from '../../util/timing';
 import { callbackName } from '../../util/callback';
 import { Loading } from './loading';
 import { labelMaker, textMaker } from '../../components/label';

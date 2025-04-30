@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js';
-import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from './ipc';
+import { addDataCallback, sendSetupCancel, sendSetupRestart, sendReboot, sendShutdown, removeDataCallback } from '../../ipc';
 import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { textTransitionSignal } from "../../util/textGlitch";
@@ -8,7 +8,7 @@ import { labelMaker, textMaker } from '../../components/label';
 import { fadeTransition } from './fadeTransition';
 import { generateWifiQRCode } from 'wifi-qr-code-generator';
 import { NoConnection } from './noconnection';
-import { recordInteraction, sendClockDataRequest, sendSetNetworkTypeManual, sendSetNetworkTypeWifi } from './ipc';
+import { recordInteraction, sendClockDataRequest, sendSetNetworkTypeManual, sendSetNetworkTypeWifi } from '../../ipc';
 
 class Signals {
     constructor() {
