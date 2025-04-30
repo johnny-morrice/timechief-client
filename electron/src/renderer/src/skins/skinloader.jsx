@@ -3,6 +3,10 @@ import { createSignal, onCleanup, Show } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback, initializeIPC } from '../ipc';
 import { NostroSkin } from "./nostro/skin";
 import { callbackName } from '../util/callback';
+import { IntroVideo } from '../components/introVideo';
+import { MediaVideo } from '../components/mediavideo';
+import { WindowResizer } from '../components/windowResizer';
+import { ThemeDetector } from '../components/themeDetector';
 
 function SkinnedApp(props) {
     console.log("SkinnedApp render");
@@ -23,11 +27,18 @@ function SkinnedApp(props) {
         }
 
         const skinName = theme["skin_name"];
+        if (!skinName) {
+            return;
+        }
         setSkin(skinName);
     });
     onCleanup(() => {
         removeDataCallback(cbName);
     });
+
+    function isUnknownSkin(skin) {
+        return skin !== "nostro" && skin !== "winning";
+    }
 
     return <>
         <Show when={skin() === "nostro"}>
@@ -35,6 +46,9 @@ function SkinnedApp(props) {
         </Show>
         <Show when={skin() === "winning"}>
             <h1>Winning skin placeholder</h1>
+        </Show>
+        <Show when={isUnknownSkin(skin())}>
+            <h1>Unknown skin: {skin()}</h1>
         </Show>
     </>
 } 
@@ -46,7 +60,10 @@ function App(props) {
         ipcIntervals.forEach(interval => clearInterval(interval));
     });
 
-    return <SkinnedApp />
+    return <WindowResizer element={
+          <IntroVideo element={
+            <ThemeDetector element={
+                  <MediaVideo element={<SkinnedApp/>} />} />}/>} />;
 };
 
 export function attachApp() {
