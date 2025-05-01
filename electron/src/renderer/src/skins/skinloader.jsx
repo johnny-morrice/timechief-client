@@ -1,7 +1,9 @@
 import { render } from 'solid-js/web';
 import { createSignal, onCleanup, Show } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback, initializeIPC } from '../ipc';
-import { NostroSkin } from "./nostro/skin";
+import { NostroSkin} from "./nostro/skin";
+import { WebSetupPage } from './nostro/webSetup';
+import { LoginPage } from './nostro/login';
 import { callbackName } from '../util/callback';
 import { IntroVideo } from '../components/introVideo';
 import { MediaVideo } from '../components/mediavideo';
@@ -51,7 +53,7 @@ function SkinnedApp(props) {
             <h1>Unknown skin: {skin()}</h1>
         </Show>
     </>
-} 
+}
 
 function App(props) {
     console.log("App render");
@@ -60,10 +62,14 @@ function App(props) {
         ipcIntervals.forEach(interval => clearInterval(interval));
     });
 
+    // We will use nostro skin version of web setup and login pages for now.
+    // This will make the job of implementing the first skin easier.
     return <WindowResizer element={
-          <IntroVideo element={
+        <IntroVideo element={
             <ThemeDetector element={
-                  <MediaVideo element={<SkinnedApp/>} />} />}/>} />;
+                <MediaVideo element={
+                    <WebSetupPage element={
+                        <LoginPage element={<SkinnedApp />} />} />} />} />} />} />;
 };
 
 export function attachApp() {
