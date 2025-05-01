@@ -16,7 +16,6 @@ body {
     height: 100vh;
 }
 
-
 div.flex-column {
     display: flex;
     flex-direction: column;
@@ -144,10 +143,6 @@ div.system-error {
     font-family: "Titillium Web";
     font-size: 16pt;
     color: green;
-}
-
-div#theme-detection-canary {
-    display: none;
 }
 
 div.switcher-widget-small {
