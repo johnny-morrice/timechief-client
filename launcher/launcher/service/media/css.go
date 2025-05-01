@@ -4,24 +4,40 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"log"
 	"text/template"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 )
 
-//go:embed template/theme.css
-var themeCSS string
+//go:embed template/nostro.css
+var nostroCSS string
 
 //go:embed template/backgroundImage.css
 var backgroundImageCSS string
 
-var themeTemplate = template.Must(template.New("theme").Parse(themeCSS))
+//go:embed template/winning.css
+var winningCSS string
+
+// TODO could use a directory for these templates.
+var nostroTemplate = template.Must(template.New("nostro").Parse(nostroCSS))
 var backgroundImageTemplate = template.Must(template.New("backgroundImage").Parse(backgroundImageCSS))
+var winningTemplate = template.Must(template.New("winning").Parse(winningCSS))
 
 func renderThemeCSS(theme v2.Theme) (string, error) {
+	templatesBySkinName := map[string]*template.Template{
+		"nostro":  nostroTemplate,
+		"winning": winningTemplate,
+	}
+	template, ok := templatesBySkinName[theme.SkinName]
+	if !ok {
+		// Render nostro skin by default
+		log.Printf("unknown skin name %q, falling back to nostro", theme.SkinName)
+		template = nostroTemplate
+	}
 	buf := bytes.Buffer{}
-	err := themeTemplate.Execute(&buf, theme)
+	err := template.Execute(&buf, theme)
 	if err != nil {
 		return "", fmt.Errorf("failed to render theme: %w", err)
 	}
