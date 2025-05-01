@@ -492,7 +492,7 @@ div.status-note-small {
     margin-left: auto;
 }
 
-/* Template vars follow */
+/********************************************* Template vars follow ********************************/
 
 body {
     color: {{.ForegroundColor}} !important;

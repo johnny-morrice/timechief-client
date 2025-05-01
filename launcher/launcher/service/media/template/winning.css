@@ -1,3 +1,233 @@
+
+body {
+    margin: 0;
+    border: 0;
+    font-size: 16pt;
+    font-weight: 400;
+    user-select: none;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+div.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+div.flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+div.flex-grow {
+    flex-grow: 1;
+}
+
+div.flex-shrink {
+    flex-shrink: 1;
+}
+
+div.background-video-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background-color: black;
+}
+
+#background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+
+div.home-screen {
+    height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+div.login-screen {
+    height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+div.login-box {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin-bottom: 1em;
+}
+
+div.begin-login {
+    align-items: center;
+    justify-content: center;
+}
+
+div.system-error {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+    padding: 1em;
+    /* We include default colours in case of no theme load */
+    font-family: "Titillium Web";
+    font-size: 16pt;
+    color: green;
+}
+
+button.action-button:active {
+    outline: 0;
+}
+
+button.action-button:focus {
+    outline: 0;
+}
+
+button.action-button {
+    /* border: 1px solid green; */
+    /* background-color: black; */
+    /* color: green; */
+    border-style: solid;
+    font-size: 18pt;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Apply the glow animation when button is active */
+button.action-button:active {
+    animation: button-glow 0.1s ease-in-out;
+}
+
+/* Keyframes for button-glow animation */
+@keyframes button-glow {
+    0% {
+        box-shadow: 0 0 1px green,
+            0 0 2px green,
+            0 0 4px green;
+    }
+
+    50% {
+        box-shadow: 0 0 6px 2px green,
+            0 0 8px 4px green,
+            0 0 10px 6px green;
+    }
+
+    100% {
+        box-shadow: 0 0 0 green;
+    }
+}
+
+div.setup-wrapper {
+    height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+div.setup-title {
+    font-size: 22pt;
+}
+
+div.data-label {
+    font-weight: 500;
+}
+
+div.astro {
+    font-size: 16pt;
+}
+
+div.inverted-color,
+span.inverted-color {
+    /* color: black;
+    background-color: green; */
+}
+
+#fortune-canvas {
+    height: 120px;
+}
+
+#event-canvas {
+    height: 80px;
+}
+
+div.loading-grid {
+    min-width: 3em;
+    min-height: 3em;
+    font-family: "Noto Sans JP";
+    font-size: 16pt;
+    display: grid;
+    grid-template-rows: 0.1fr 0.1fr;
+    grid-template-columns: 0.1fr 0.1fr;
+    grid-gap: 0.1em;
+    opacity: 1;
+    animation: loading-fade 0.5s linear infinite;
+    justify-self: center;
+    align-self: center;
+}
+
+div.loading-line {
+    font-family: "Noto Sans JP";
+    justify-self: center;
+    align-self: center;
+    opacity: 1;
+    animation: loading-fade 0.5s linear infinite;
+}
+
+@keyframes loading-fade {
+
+    0%,
+    100% {
+        opacity: 1
+    }
+
+    50% {
+        opacity: 0.7
+    }
+}
+
+div.fade-in {
+    opacity: 0;
+    animation: fade-in 0.2s linear;
+}
+
+div.fade-out {
+    opacity: 1;
+    animation: fade-out 0.2s linear;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
+}
+
 div#theme-detection-canary {
     color: rgb(255, 0, 0);
 }
