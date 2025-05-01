@@ -81,6 +81,27 @@ function getDefaultThemeCSS() {
         background-repeat: initial;
         background-position: initial;
         background-color: initial;
+        margin: 0;
+        border: 0;
+        font-size: 16pt;
+        font-weight: 400;
+        user-select: none;
+        overflow: hidden;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    div.system-error {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        align-items: center;
+        justify-content: center;
+        padding: 1em;
+        /* We include default colours in case of no theme load */
+        font-family: "Titillium Web";
+        font-size: 16pt;
+        color: green;
     }
 
     div.home-time {
