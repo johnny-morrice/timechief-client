@@ -220,11 +220,25 @@ div#theme-detection-canary {
 
  div#date-time {
     position: absolute;
-    left: 340px;
+    left: 350px;
     top: 20px;
     width: 440px;
     height: 210px;
  }
+
+div.home-time {
+    font-style: italic;
+    font-weight: bold;
+    font-size: 80pt;
+    color: white;
+}
+
+div.home-date {
+    font-style: italic;
+    font-weight: bold;
+    font-size: 32pt;
+    color: white;
+}
 
  div#action-center {
     position: absolute;
