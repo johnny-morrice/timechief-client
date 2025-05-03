@@ -52,7 +52,8 @@ export const SwitcherWidget = (props) => {
     return <div id="switcher-widget" class="switcher-widget flex-column flex-grow border crt-box home-box">
         <Show when={hasWidget(widgets)}>
             <div id="switcher-widget-content" className={switcherWidgetTransition()}>
-                {getCurrentWidget(widgets, currentIndex).element()}
+                {/* {getCurrentWidget(widgets, currentIndex).element()} */}
+                Action center placeholder content
             </div>
             <div class="switcher-widget-button-wrapper flex-row flex-grow">
                 <div class="switcher-widget-button switcher-widget-prev-button">

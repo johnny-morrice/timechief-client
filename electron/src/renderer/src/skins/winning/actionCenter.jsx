@@ -51,7 +51,8 @@ export function ActionCenter(props) {
     setActionCenterSignals(signals);
     return <div id="action-center" class="home-action-center flex-grow border crt-box home-box">
         <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
-            <StatusNote />
+            Action center placeholder content
+            {/* <StatusNote />
             <Show when={hasNextEvent(signals)}>
                 <div class='next-event-wrapper'>
                     <div class='next-event-summary flex-column flex-grow'>
@@ -68,7 +69,7 @@ export function ActionCenter(props) {
             </Show>
             <Show when={!hasNextEvent(signals)}>
                 <Fortune />
-            </Show>
+            </Show> */}
         </div>
     </div>;
 }
