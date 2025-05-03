@@ -2,6 +2,7 @@ import { render } from 'solid-js/web';
 import { createSignal, onCleanup, Show } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback, initializeIPC } from '../ipc';
 import { NostroSkin} from "./nostro/skin";
+import { WinningSkin } from './winning/skin';
 import { WebSetupPage } from './nostro/webSetup';
 import { LoginPage } from './nostro/login';
 import { callbackName } from '../util/callback';
@@ -47,7 +48,7 @@ function SkinnedApp(props) {
             <NostroSkin />
         </Show>
         <Show when={skin() === "winning"}>
-            <h1>Winning skin placeholder</h1>
+            <WinningSkin />
         </Show>
         <Show when={isUnknownSkin(skin())}>
             <h1>Unknown skin: {skin()}</h1>
