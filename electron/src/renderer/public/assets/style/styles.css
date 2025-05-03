@@ -112,3 +112,27 @@ div.background-video-wrapper {
     height: 100%;
     z-index: 1000;
 }
+
+
+div.loading-grid {
+    min-width: 3em;
+    min-height: 3em;
+    font-family: "Noto Sans JP";
+    font-size: 16pt;
+    display: grid;
+    grid-template-rows: 0.1fr 0.1fr;
+    grid-template-columns: 0.1fr 0.1fr;
+    grid-gap: 0.1em;
+    opacity: 1;
+    animation: loading-fade 0.5s linear infinite;
+    justify-self: center;
+    align-self: center;
+}
+
+div.loading-line {
+    font-family: "Noto Sans JP";
+    justify-self: center;
+    align-self: center;
+    opacity: 1;
+    animation: loading-fade 0.5s linear infinite;
+}
