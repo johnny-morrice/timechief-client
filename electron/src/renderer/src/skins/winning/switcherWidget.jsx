@@ -49,11 +49,20 @@ export const SwitcherWidget = (props) => {
     const [switcherWidgetTransition, setSwitcherWidgetTransition] = createSignal("no-transition");
     const [currentIndex, setCurrentIndex] = createSignal(0);
 
-    return <div id="switcher-widget" class="switcher-widget flex-column flex-grow border crt-box home-box">
+    return <div id="switcher-widget" class="window switcher-widget flex-column flex-grow border crt-box home-box">
+          <div class="title-bar">
+            <div class="title-bar-text">TODO widget name</div>
+            <div class="title-bar-controls">
+            <button aria-label="Minimize"></button>
+            <button aria-label="Maximize"></button>
+            <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
         <Show when={hasWidget(widgets)}>
             <div id="switcher-widget-content" className={switcherWidgetTransition()}>
                 {/* {getCurrentWidget(widgets, currentIndex).element()} */}
-                Action center placeholder content
+                Widget switcher placeholder content
             </div>
             <div class="switcher-widget-button-wrapper flex-row flex-grow">
                 <div class="switcher-widget-button switcher-widget-prev-button">
@@ -64,5 +73,6 @@ export const SwitcherWidget = (props) => {
                 </div>
             </div>
         </Show>
+        </div>
     </div>;  
 };

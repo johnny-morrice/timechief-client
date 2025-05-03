@@ -49,10 +49,19 @@ function getLocale(signals) {
 export function ActionCenter(props) {
     const signals = props.signals;
     setActionCenterSignals(signals);
-    return <div id="action-center" class="home-action-center flex-grow border crt-box home-box">
-        <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
-            Action center placeholder content
-            {/* <StatusNote />
+    return <div id="action-center" class="window home-action-center flex-grow border crt-box home-box">
+        <div class="title-bar">
+            <div class="title-bar-text">TODO upcoming event name</div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <div id="home-action-center-content" className={`flex-row flex-grow ${signals.actionCentreTransition()}`}>
+                Action center placeholder content
+                {/* <StatusNote />
             <Show when={hasNextEvent(signals)}>
                 <div class='next-event-wrapper'>
                     <div class='next-event-summary flex-column flex-grow'>
@@ -70,6 +79,7 @@ export function ActionCenter(props) {
             <Show when={!hasNextEvent(signals)}>
                 <Fortune />
             </Show> */}
+            </div>
         </div>
     </div>;
 }
