@@ -1,15 +1,3 @@
-
-body {
-    margin: 0;
-    border: 0;
-    font-size: 16pt;
-    font-weight: 400;
-    user-select: none;
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
-}
-
 div.flex-column {
     display: flex;
     flex-direction: column;
@@ -29,26 +17,6 @@ div.flex-grow {
 div.flex-shrink {
     flex-shrink: 1;
 }
-
-div.background-video-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10;
-    background-color: black;
-}
-
-#background-video {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-}
-
 
 div.home-screen {
     height: 100vh;
