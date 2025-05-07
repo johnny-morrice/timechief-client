@@ -123,6 +123,15 @@ span.inverted-color {
     background-color: green; */
 }
 
+div.fortune-message {
+    font-size: 14pt;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    justify-content: flex-end;
+    flex-grow: inherit;
+}
+
 #fortune-canvas {
     height: 120px;
 }

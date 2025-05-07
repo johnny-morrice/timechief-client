@@ -26,8 +26,8 @@ type fileLoader struct {
 }
 
 type FileMedia struct {
-	Theme v2.Theme
-	Media Media
+	Theme v2.Theme `json:"theme"`
+	Media Media    `json:"media"`
 }
 
 func (fl *fileLoader) reader() (io.Reader, error) {
