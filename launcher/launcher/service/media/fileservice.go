@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -21,7 +22,7 @@ type fileLoader struct {
 	filePath        string
 	reloadFrequency time.Duration
 	lastLoaded      time.Time
-	buf             bytes.Buffer
+	buf             []byte
 	lock            sync.Mutex
 }
 
@@ -34,29 +35,31 @@ func (fl *fileLoader) reader() (io.Reader, error) {
 	fl.lock.Lock()
 	defer fl.lock.Unlock()
 	if time.Since(fl.lastLoaded) < fl.reloadFrequency {
-		return &fl.buf, nil
+		return bytes.NewReader(fl.buf), nil
 	}
 	return fl.readFile()
 }
 
 func (fl *fileLoader) readFile() (io.Reader, error) {
+	log.Printf("(re)loading media file at %s", fl.filePath)
 	file, err := os.Open(fl.filePath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open media file at %s: %w", fl.filePath, err)
 	}
 	defer func() {
 		err := file.Close()
 		if err != nil {
-			log.Printf("failed to close file: %v", err)
+			log.Printf("failed to close media file at %s: %v", fl.filePath, err)
 		}
 	}()
-	fl.buf.Reset()
-	_, err = io.Copy(&fl.buf, file)
+	fileContent, err := io.ReadAll(file)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read media file at %s: %w", fl.filePath, err)
 	}
+	fl.buf = fileContent
+	reader := bytes.NewReader(fileContent)
 	fl.lastLoaded = time.Now()
-	return &fl.buf, nil
+	return reader, nil
 }
 
 func MakeFileService(path string, reloadFrequency time.Duration) (FileService, error) {
@@ -83,7 +86,7 @@ func (svc FileService) GetMedia() (Media, error) {
 	fileMedia := FileMedia{}
 	err = json.NewDecoder(r).Decode(&fileMedia)
 	if err != nil {
-		return Media{}, err
+		return Media{}, fmt.Errorf("failed to decode media file at %s: %w", svc.loader.filePath, err)
 	}
 	media := fileMedia.Media
 	themeCSS, err := renderThemeCSS(fileMedia.Theme)

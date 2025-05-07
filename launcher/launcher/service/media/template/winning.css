@@ -215,7 +215,10 @@ div#theme-detection-canary {
 
  body {
     /* TODO customise with parameters but for now use teal windows 98 background */
-    background-color: #008080;
+    color: {{.ForegroundColor}} !important;
+    background-color: {{.BackgroundColor}} !important;
+    /* font-family: {{.MainFont}} !important;
+    font-size: {{.BodyFontSize}} !important; */
  }
 
  /* TODO need parameters for these absolute positions */
@@ -233,20 +236,19 @@ div#theme-detection-canary {
     top: 20px;
     width: 440px;
     height: 210px;
+    color: {{.TimeColor}} !important;
  }
 
 div.home-time {
     font-style: italic;
     font-weight: bold;
     font-size: 80pt;
-    color: white;
 }
 
 div.home-date {
     font-style: italic;
     font-weight: bold;
     font-size: 32pt;
-    color: white;
 }
 
  div#action-center {
@@ -256,6 +258,10 @@ div.home-date {
     width: 380px;
     height: 140px;
  }
+
+ div.home-box {
+    /* background-color: {{.BoxBackgroundColor}} !important; */
+}
 
 /* Windows 98 theme */
 /* https://jdan.github.io/98.css/ */
