@@ -42,6 +42,8 @@ type Poker interface {
 }
 
 type MediaService interface {
+	IsThemeOverride() bool
+	GetTheme() (v2.Theme, error)
 	GetMedia() (media.Media, error)
 }
 
@@ -216,6 +218,14 @@ func (svc Service) GetDeviceData() (DeviceData, error) {
 	deviceData, err := svc.deviceDataStore.GetDeviceData()
 	if err != nil {
 		return DeviceData{}, fmt.Errorf("failed to get device data from store: %w", err)
+	}
+
+	if svc.mediaService.IsThemeOverride() {
+		theme, err := svc.mediaService.GetTheme()
+		if err != nil {
+			return DeviceData{}, fmt.Errorf("failed to get theme override: %w", err)
+		}
+		deviceData.DeviceProfile.Value.Theme = theme
 	}
 
 	flags, err := svc.stateFlagStore.List()

@@ -78,15 +78,35 @@ func MakeFileService(path string, reloadFrequency time.Duration) (FileService, e
 	return svc, nil
 }
 
-func (svc FileService) GetMedia() (Media, error) {
+func (svc FileService) IsThemeOverride() bool {
+	return true
+}
+
+func (svc FileService) getFileMedia() (FileMedia, error) {
 	r, err := svc.loader.reader()
 	if err != nil {
-		return Media{}, err
+		return FileMedia{}, err
 	}
 	fileMedia := FileMedia{}
 	err = json.NewDecoder(r).Decode(&fileMedia)
 	if err != nil {
-		return Media{}, fmt.Errorf("failed to decode media file at %s: %w", svc.loader.filePath, err)
+		return FileMedia{}, fmt.Errorf("failed to decode media file at %s: %w", svc.loader.filePath, err)
+	}
+	return fileMedia, nil
+}
+
+func (svc FileService) GetTheme() (v2.Theme, error) {
+	fileMedia, err := svc.getFileMedia()
+	if err != nil {
+		return v2.Theme{}, err
+	}
+	return fileMedia.Theme, nil
+}
+
+func (svc FileService) GetMedia() (Media, error) {
+	fileMedia, err := svc.getFileMedia()
+	if err != nil {
+		return Media{}, err
 	}
 	media := fileMedia.Media
 	themeCSS, err := renderThemeCSS(fileMedia.Theme)

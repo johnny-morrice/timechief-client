@@ -57,6 +57,14 @@ func MakeService(defaultThemeService DefaultThemeService, videoService VideoServ
 	return svc, nil
 }
 
+func (svc Service) IsThemeOverride() bool {
+	return false
+}
+
+func (svc Service) GetTheme() (v2.Theme, error) {
+	return v2.Theme{}, errors.ErrUnsupported
+}
+
 func (svc Service) GetMedia() (Media, error) {
 	deviceData, err := svc.deviceDataStore.GetDeviceData()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
