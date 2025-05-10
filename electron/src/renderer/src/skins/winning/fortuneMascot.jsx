@@ -5,7 +5,7 @@ manageMascotCanvas("fortune-canvas", () => getFortuneSignals().mascotType(), () 
 
 class FakeSignals {
     mascotHeight() {
-        return "120px";
+        return "100px";
     }
 
     emote() {
@@ -13,15 +13,15 @@ class FakeSignals {
     }
 
     foregroundColor() {
-        return "green";
-    }
-
-    boxBackgroundColor() {
         return "black";
     }
 
+    boxBackgroundColor() {
+        return "c0c0c0ff";
+    }
+
     mascotType() {
-        return "dark";
+        return "light";
     }
 }
 
