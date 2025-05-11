@@ -1,7 +1,7 @@
 import { manageMascotCanvas } from "../../components/mascot";
 
 var globalSignals = null;
-manageMascotCanvas("fortune-canvas", () => getFortuneSignals().mascotType(), () => getFortuneSignals().emote(), () => getFortuneSignals().mascotHeight());
+manageMascotCanvas("fortune-canvas-nostro", () => getFortuneSignals().mascotType(), () => getFortuneSignals().emote(), () => getFortuneSignals().mascotHeight());
 
 class FakeSignals {
     mascotHeight() {
@@ -38,6 +38,6 @@ export function setFortuneSignals(signals) {
 
 export function FortuneMascotCanvas(props) {
     return <div class={"fortune-message-mascot-wrapper" + " " + props.classes }>
-        <canvas id="fortune-canvas" class="fortune-mascot" data-sig-mascot-height={getFortuneSignals().mascotHeight()} data-sig-fg-color={getFortuneSignals().foregroundColor()} data-sig-bg-color={getFortuneSignals().boxBackgroundColor()} data-sig-emote={getFortuneSignals().emote()} data-sig-mascot-type={getFortuneSignals().mascotType()}></canvas>
+        <canvas id="fortune-canvas-nostro" class="fortune-mascot" data-sig-mascot-height={getFortuneSignals().mascotHeight()} data-sig-fg-color={getFortuneSignals().foregroundColor()} data-sig-bg-color={getFortuneSignals().boxBackgroundColor()} data-sig-emote={getFortuneSignals().emote()} data-sig-mascot-type={getFortuneSignals().mascotType()}></canvas>
     </div>
 }
