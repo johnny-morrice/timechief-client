@@ -35,10 +35,10 @@ export function setActionCenterSignals(signals) {
     globalSignals = signals;
 }
 
-manageMascotCanvas("event-mascot-canvas", () => getActionCenterSignals().mascotType(), () => getActionCenterSignals().emote(), () => getActionCenterSignals().mascotHeight());
+manageMascotCanvas("event-mascot-canvas-nostro", () => getActionCenterSignals().mascotType(), () => getActionCenterSignals().emote(), () => getActionCenterSignals().mascotHeight());
 
 export function EventMascotCanvas() {
     return <div class="event-mascot-wrapper">
-        <canvas id="event-mascot-canvas" class="fortune-mascot" data-sig-mascot-height={getActionCenterSignals().mascotHeight()} data-sig-fg-color={getActionCenterSignals().foregroundColor()} data-sig-bg-color={getActionCenterSignals().boxBackgroundColor()} data-sig-emote={getActionCenterSignals().emote()} data-sig-mascot-type={getActionCenterSignals().mascotType()}></canvas>
+        <canvas id="event-mascot-canvas-nostro" class="fortune-mascot" data-sig-mascot-height={getActionCenterSignals().mascotHeight()} data-sig-fg-color={getActionCenterSignals().foregroundColor()} data-sig-bg-color={getActionCenterSignals().boxBackgroundColor()} data-sig-emote={getActionCenterSignals().emote()} data-sig-mascot-type={getActionCenterSignals().mascotType()}></canvas>
     </div>
 }
