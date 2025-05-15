@@ -49,27 +49,33 @@ export const SwitcherWidget = (props) => {
     const [switcherWidgetTransition, setSwitcherWidgetTransition] = createSignal("no-transition");
     const [currentIndex, setCurrentIndex] = createSignal(0);
 
+    function getWidgetName(widgets, currentIndex) {
+        if (!hasWidget(widgets)) {
+            return "Please wait..."
+        }
+        return widgets[currentIndex()].name;
+    }
+
     return <div id="switcher-widget" class="window switcher-widget flex-column flex-grow border crt-box home-box">
           <div class="title-bar">
-            <div class="title-bar-text">TODO widget name</div>
+            <div class="title-bar-text">{getWidgetName(widgets, currentIndex)}</div>
             <div class="title-bar-controls">
             <button aria-label="Minimize"></button>
             <button aria-label="Maximize"></button>
             <button aria-label="Close"></button>
             </div>
         </div>
-        <div class="window-body">
+        <div class="window-body switcher-widget-window-body">
         <Show when={hasWidget(widgets)}>
             <div id="switcher-widget-content" className={switcherWidgetTransition()}>
-                {/* {getCurrentWidget(widgets, currentIndex).element()} */}
-                Widget switcher placeholder content
+                {getCurrentWidget(widgets, currentIndex).element()}
             </div>
-            <div class="switcher-widget-button-wrapper flex-row flex-grow">
+            <div class="switcher-widget-button-wrapper flex-row">
                 <div class="switcher-widget-button switcher-widget-prev-button">
-                    <button class="action-button crt-box switcher-button" onClick={onClickPrev(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-left"></i>&nbsp;&nbsp;{getPrevWidget(widgets, currentIndex).icon()}</button>
+                    <button class="action-button crt-box switcher-button" onClick={onClickPrev(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>Previous</button>
                 </div>
                 <div class="switcher-widget-button switcher-widget-next-button">
-                    <button class="action-button crt-box switcher-button" onClick={onClickNext(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>{getNextWidget(widgets, currentIndex).icon()}&nbsp;&nbsp;<i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="action-button crt-box switcher-button" onClick={onClickNext(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>Next</button>
                 </div>
             </div>
         </Show>

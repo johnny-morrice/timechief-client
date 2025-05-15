@@ -8,6 +8,7 @@ export const Text = {
         "moon-phase": "Moon phase",
     },
     "current-weather": {
+        "location": "location",
         "temp": "temp",
         "feels": "feels",
         "current-condition": "current",

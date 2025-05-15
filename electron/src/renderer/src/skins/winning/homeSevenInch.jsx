@@ -14,15 +14,15 @@ import { ActionCenter } from './actionCenter';
 export function HomeSevenInch(props) {
     const signals = props.signals;
     const switcherWidgets = [
-        { icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
-        { icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl /> },
-        { icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo /> },
-        { icon: () => <i class="fa-brands fa-linux"></i>, element: () => <SSHSecurity /> },
-        { icon: () => <i class="fa-solid fa-house-laptop"></i>, element: () => <APISecurity /> },
-        { icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
-        { icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
-        { icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },
-        { icon: () => <i class="fa-solid fa-calendar-days"></i>, element: () => <EventCalendar /> },
+        { name: "Current Weather", icon: () => <i class="fa-solid fa-cloud-sun"></i>, element: () => <CurrentWeather /> },
+        { name: "Device Control", icon: () => <i class="fa-solid fa-gear"></i>, element: () => <DeviceControl /> },
+        { name: "Device Information", icon: () => <i class="fa-solid fa-network-wired"></i>, element: () => <DeviceInfo /> },
+        { name: "SSH Security", icon: () => <i class="fa-brands fa-linux"></i>, element: () => <SSHSecurity /> },
+        { name: "API Security", icon: () => <i class="fa-solid fa-house-laptop"></i>, element: () => <APISecurity /> },
+        { name: "Language and locale", icon: () => <i class="fa-solid fa-earth-americas"></i>, element: () => <Locale /> },
+        { name: "Astronomy", icon: () => <i class="fa-solid fa-moon"></i>, element: () => <Astro /> },
+        { name: "Forecast", icon: () => <i class="fa-solid fa-mountain-sun"></i>, element: () => <Forecast /> },
+        { name: "Calendar", icon: () => <i class="fa-solid fa-calendar-days"></i>, element: () => <EventCalendar /> },
     ];
 
     const useDebug = false;

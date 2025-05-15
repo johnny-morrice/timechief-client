@@ -81,17 +81,23 @@ export const CurrentWeather = () => {
             <Loading />
         </Show>
         <Show when={hasWeather(signals)}>
-            <div class="current-weather-location">{signals.location}</div>
-            <div class="current-weather-grid flex-grow">
-                <div class="weather-temp-label weather-label data-label">{label("temp")}</div>
-                <div class='weather-temp weather-data'>{signals.temp}</div>
-                <div class="weather-temp-feels-label weather-label data-label">{label("feels")}</div>
-                <div class='weather-temp-feels weather-data'>{signals.feelsLikeTemp}</div>
-                <div class='weather-condition-current-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></div>
-                <div class='weather-condition-today-icon current-weather-icon'><i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i></div>
-                <div class="weather-condition-current-label weather-label weather-icon-label">{label("current-condition")}</div>
-                <div class="weather-condition-today-label weather-label weather-icon-label">{label("today-condition")}</div>
-            </div>
+            <ul class="tree-view">
+                <li>{label("location")}
+                    <ul>{signals.location}</ul>
+                </li>
+                <li>{label("temp")}
+                    <ul>{signals.temp}</ul>
+                </li>
+                <li>{label("feels")}
+                    <ul>{signals.feelsLikeTemp}</ul>
+                </li>
+                <li>{label("current-condition")}
+                    <ul><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></ul>
+                </li>
+                <li>{label("today-condition")}
+                    <ul><i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i></ul>
+                </li>
+            </ul>
         </Show >
     </div >
 }
