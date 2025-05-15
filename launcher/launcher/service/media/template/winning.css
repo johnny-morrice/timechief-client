@@ -417,17 +417,16 @@ body{color:#222;font-family:Arial;font-size:12px}.title-bar,.window,button,input
 }
 
 
-
-.crt:not(.crt-jank) {
-    text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.1), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
-}
-
-.crt-jank {
-    animation: textShadowJank 1.6s infinite;
+/* .crt:not(.crt-jank) {
+    text-shadow: 0.048849136276208675px 0 0.5px rgba(0, 30, 255, 0.05), -0.048849136276208675px 0 0.5px rgba(255, 0, 80, 0.025), 0 0 1.5px;
 }
 
 .crt-box:not(.crt-box-jank) {
-    text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.1), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    text-shadow: 0.048849136276208675px 0 0.5px rgba(0, 30, 255, 0.05), -0.048849136276208675px 0 0.5px rgba(255, 0, 80, 0.025), 0 0 1.5px;
+} */
+
+.crt-jank {
+    animation: textShadowJank 1.6s infinite;
 }
 
 .crt-box-jank {
