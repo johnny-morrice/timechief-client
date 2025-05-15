@@ -65,13 +65,12 @@ export const SwitcherWidget = (props) => {
             <button aria-label="Close"></button>
             </div>
         </div>
-        <div class="window-body">
+        <div class="window-body switcher-widget-window-body">
         <Show when={hasWidget(widgets)}>
             <div id="switcher-widget-content" className={switcherWidgetTransition()}>
                 {getCurrentWidget(widgets, currentIndex).element()}
-                Widget switcher placeholder content
             </div>
-            <div class="switcher-widget-button-wrapper flex-row flex-grow">
+            <div class="switcher-widget-button-wrapper flex-row">
                 <div class="switcher-widget-button switcher-widget-prev-button">
                     <button class="action-button crt-box switcher-button" onClick={onClickPrev(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>Previous</button>
                 </div>
