@@ -49,9 +49,16 @@ export const SwitcherWidget = (props) => {
     const [switcherWidgetTransition, setSwitcherWidgetTransition] = createSignal("no-transition");
     const [currentIndex, setCurrentIndex] = createSignal(0);
 
+    function getWidgetName(widgets, currentIndex) {
+        if (!hasWidget(widgets)) {
+            return "Please wait..."
+        }
+        return widgets[currentIndex()].name;
+    }
+
     return <div id="switcher-widget" class="window switcher-widget flex-column flex-grow border crt-box home-box">
           <div class="title-bar">
-            <div class="title-bar-text">TODO widget name</div>
+            <div class="title-bar-text">{getWidgetName(widgets, currentIndex)}</div>
             <div class="title-bar-controls">
             <button aria-label="Minimize"></button>
             <button aria-label="Maximize"></button>
@@ -61,7 +68,7 @@ export const SwitcherWidget = (props) => {
         <div class="window-body">
         <Show when={hasWidget(widgets)}>
             <div id="switcher-widget-content" className={switcherWidgetTransition()}>
-                {/* {getCurrentWidget(widgets, currentIndex).element()} */}
+                {getCurrentWidget(widgets, currentIndex).element()}
                 Widget switcher placeholder content
             </div>
             <div class="switcher-widget-button-wrapper flex-row flex-grow">

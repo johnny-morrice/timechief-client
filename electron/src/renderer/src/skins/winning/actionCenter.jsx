@@ -46,12 +46,20 @@ function getLocale(signals) {
     return locale;
 }
 
+function titleText(signals) {
+    if (hasNextEvent(signals)) {
+        return signals.nextEvent().getNextEventStartTime(signals);
+    }
+
+    return "Fortune Cookie"
+}
+
 export function ActionCenter(props) {
     const signals = props.signals;
     setActionCenterSignals(signals);
     return <div id="action-center" class="window home-action-center flex-grow border crt-box home-box">
         <div class="title-bar">
-            <div class="title-bar-text">TODO upcoming event name</div>
+            <div class="title-bar-text">{titleText(signals)}</div>
             <div class="title-bar-controls">
                 <button aria-label="Minimize"></button>
                 <button aria-label="Maximize"></button>
