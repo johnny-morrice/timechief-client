@@ -58,20 +58,7 @@ div.system-error {
     color: green;
 }
 
-button.action-button:active {
-    outline: 0;
-}
-
-button.action-button:focus {
-    outline: 0;
-}
-
 button.action-button {
-    /* border: 1px solid green; */
-    /* background-color: black; */
-    /* color: green; */
-    border-style: solid;
-    font-size: 18pt;
     transition: box-shadow 0.3s ease-in-out;
 }
 
@@ -83,19 +70,19 @@ button.action-button:active {
 /* Keyframes for button-glow animation */
 @keyframes button-glow {
     0% {
-        box-shadow: 0 0 1px green,
-            0 0 2px green,
-            0 0 4px green;
+        box-shadow: 0 0 1px #c0c0c0,
+            0 0 2px #c0c0c0,
+            0 0 4px #c0c0c0;
     }
 
     50% {
-        box-shadow: 0 0 6px 2px green,
-            0 0 8px 4px green,
-            0 0 10px 6px green;
+        box-shadow: 0 0 6px 2px #c0c0c0,
+            0 0 8px 4px #c0c0c0,
+            0 0 10px 6px #c0c0c0;
     }
 
     100% {
-        box-shadow: 0 0 0 green;
+        box-shadow: 0 0 0 #c0c0c0;
     }
 }
 
@@ -208,6 +195,18 @@ div.fade-out {
 div#theme-detection-canary {
     color: rgb(255, 0, 0);
 }
+
+
+div.switcher-widget-window-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    /* Vertically align the content so the last element is at the bottom, but the other elements are at the top */
+    justify-content: space-between;
+    height: 95%;
+}
+
+/* The switcher widget button wrapper should push its contents to the bottom */
 
 /*****************************************************
  *  Theme specific styles
