@@ -73,10 +73,10 @@ export const SwitcherWidget = (props) => {
             </div>
             <div class="switcher-widget-button-wrapper flex-row flex-grow">
                 <div class="switcher-widget-button switcher-widget-prev-button">
-                    <button class="action-button crt-box switcher-button" onClick={onClickPrev(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}><i class="fa-solid fa-chevron-left"></i>&nbsp;&nbsp;{getPrevWidget(widgets, currentIndex).icon()}</button>
+                    <button class="action-button crt-box switcher-button" onClick={onClickPrev(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>Previous</button>
                 </div>
                 <div class="switcher-widget-button switcher-widget-next-button">
-                    <button class="action-button crt-box switcher-button" onClick={onClickNext(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>{getNextWidget(widgets, currentIndex).icon()}&nbsp;&nbsp;<i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="action-button crt-box switcher-button" onClick={onClickNext(setSwitcherWidgetTransition, widgets, currentIndex, setCurrentIndex)}>Next</button>
                 </div>
             </div>
         </Show>
