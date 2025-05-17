@@ -4,6 +4,7 @@ import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { textTransitionSignal } from "../../util/textGlitch";
 import { labelMaker } from '../../components/label';
+import { WinTable } from './wintable';
 
 class Signals {
     constructor() {
@@ -74,22 +75,20 @@ export const DeviceInfo = () => {
         </Show>
         <Show when={hasDeviceInfo(signals)}>
             <div class="flex-row flex-grow">
-                <div class="device-info-labels flex-column flex-grow">
-                    <div class="data-label flex-grow">{label("ip-address")}</div>
-                    <div class="data-label flex-grow">{label("network-type")}</div>
-                    <div class="data-label flex-grow">{label("software-version")}</div>
-                    {/* <Show when={hasUpdateVersion(signals)}>
-                        <div class="data-label flex-grow">{label("update-version")}</div>
-                    </Show> */}
-                </div>
-                <div class="device-info-values flex-column flex-grow">
-                    <div class="data-value flex-grow">{signals.ipAddress}</div>
-                    <div class="data-value flex-grow">{signals.networkType}</div>
-                    <div class="data-value flex-grow">{signals.clientVersionText}</div>
-                    {/* <Show when={hasUpdateVersion(signals)}>
-                        <div class="data-value flex-grow">{signals.activeTargetVersionText}</div>
-                    </Show> */}
-                </div>
+                <WinTable table={{ body: [
+                    [
+                        label("ip-address"),
+                        signals.ipAddress
+                    ],
+                    [
+                        label("network-type"),
+                        signals.networkType
+                    ],
+                    [
+                        label("software-version"),
+                        signals.clientVersionText
+                    ],
+                ]}} />
             </div>
         </Show>
     </div>;
