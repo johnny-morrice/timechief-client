@@ -81,7 +81,7 @@ export const CurrentWeather = () => {
             <Loading />
         </Show>
         <Show when={hasWeather(signals)}>
-            <ul class="tree-view">
+            <ul class="tree-view current-weather-tree-view">
                 <li>{label("location")}
                     <ul>{signals.location}</ul>
                 </li>

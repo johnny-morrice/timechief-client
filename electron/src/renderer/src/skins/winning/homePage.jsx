@@ -10,6 +10,7 @@ import { HomeSevenInch } from './homeSevenInch';
 import { Loading } from './loading';
 import { HomePlanner } from './homePlanner';
 import { HomeSmall } from './homeSmall';
+import { addBulletHole, cleanupBulletHoles } from './desktopDestroyer';
 
 class Signals {
   constructor() {
@@ -343,11 +344,31 @@ export const HomePage = () => {
     second
   );
 
+  var jankInterval = setInterval(
+  () => {
+    console.log("jank interval");
+    // Find element with class 'crt-jank'
+    const jankElement = document.querySelector('.crt-jank');
+    // If it exists, add a bullet hole.
+    if (jankElement) {
+      console.log("add bullet hole");
+      addBulletHole();
+    } else {
+      console.log("remove bullet holes");
+      cleanupBulletHoles();
+    }
+  }, 500);
+
   onCleanup(() => {
+    console.log("home page cleanup");
+    cleanupBulletHoles();
+    clearInterval(jankInterval);
     clearInterval(timeInterval);
     clearInterval(dateInterval);
     removeDataCallback(cbName);
   });
+
+
 
   return <>
     <Show when={isUnknownLayout(signals)}>
