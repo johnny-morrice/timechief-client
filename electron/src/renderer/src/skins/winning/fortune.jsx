@@ -1,5 +1,5 @@
 import { onCleanup, createSignal } from "solid-js";
-import { textTransitionSignal } from "../../util/textGlitch";
+import { winTextTransitionSignal } from "../../util/textGlitch";
 import { randomPoem } from "../../util/poem";
 import { addServiceDataCallback, removeDataCallback } from "../../ipc";
 import { callbackName } from "../../util/callback";
@@ -9,7 +9,7 @@ class Signals {
     constructor() {
         [this.boxBackgroundColor, this.setBoxBackgroundColor] = createSignal("black");
         [this.foregroundColor, this.setForegroundColor] = createSignal("green");
-        [this.text, this.setText] = textTransitionSignal("Hey there, I'm hands!");
+        [this.text, this.setText] = winTextTransitionSignal("Hey there, I'm hands!");
         [this.emote, this.setEmote] = createSignal("neutral");
         [this.isSpooky, this.setSpooky] = createSignal(false);
         [this.mascotHeight, this.setMascotHeight] = createSignal("120px");

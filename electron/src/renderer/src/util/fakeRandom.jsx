@@ -11,18 +11,97 @@ export const randomLoadingSymbol = () => {
     return loadingSymbols[loadingSymbolIndex];
 }
 
-
 var glitchTransitionSymbolIndex = 0;
-export const randomGlitchTransitionSymbol = () => {
-    glitchTransitionSymbolIndex = (glitchTransitionSymbolIndex + 1) % glichTransitionSymbols.length;
-    return glichTransitionSymbols[glitchTransitionSymbolIndex];
+export const randomGlitchTransitionSymbol = (styleName) => {
+    const glitchStyles = {
+        "default": glichTransitionSymbols,
+        "winning": winGlitchTransitionSymbols,
+    };
+    if (!styleName) {
+        styleName = "default";
+    }
+    const myGlitchSymbols = glitchStyles[styleName];
+    glitchTransitionSymbolIndex = (glitchTransitionSymbolIndex + 1) % myGlitchSymbols.length;
+    return myGlitchSymbols[glitchTransitionSymbolIndex];
 }
 
 var buttonGlitchSymbolIndex = 0;
-export const randomButtonGlitchSymbol = () => {
-    buttonGlitchSymbolIndex = (buttonGlitchSymbolIndex + 1) % buttonGlitchSymbols.length;
-    return buttonGlitchSymbols[buttonGlitchSymbolIndex];
+export const randomButtonGlitchSymbol = (styleName) => {
+    const glitchStyles = {
+        "default": buttonGlitchSymbols,
+        "winning": winButtonGlitchSymbols,
+    };
+    if (!styleName) {
+        styleName = "default";
+    }
+    const myGlitchSymbols = glitchStyles[styleName];
+    buttonGlitchSymbolIndex = (buttonGlitchSymbolIndex + 1) % myGlitchSymbols.length;
+    return myGlitchSymbols[buttonGlitchSymbolIndex];
 }
+
+const wingdingsStyleSymbols = [
+  '☜', // White left pointing index (U+261C)
+  '☞', // White right pointing index (U+261E)
+  '☟', // White down pointing index (U+261F)
+
+  '✏', // Pencil (U+270F)
+  '✒', // Black nib (U+2712)
+
+  '✞', // Latin cross (U+271E)
+  '✝', // Cross (U+271D)
+  '✟', // Shadowed white Latin cross (U+271F)
+  '☦', // Orthodox cross (U+2626)
+  '☨', // Cross of Lorraine (U+2628)
+  '☩', // Jerusalem cross (U+2629)
+
+  '✠', // Maltese cross (U+2720)
+  '☧', // Chi Rho (U+2627)
+
+  '☪', // Star and crescent (Islam) (U+262A)
+  '☮', // Peace (U+262E)
+  '☯', // Yin yang (U+262F)
+  '☸', // Dharma wheel (U+2638)
+
+  '✡', // Star of David (U+2721)
+
+  '♰', // Cross potent (U+2670)
+  '♱', // Cross of Calvary (U+2671)
+
+  '☏', // Telephone receiver (U+260F)
+  '☍', // Position indicator (U+260D)
+
+  '❶', '❷', '❸', '❹', '❺', '❻', '❼', '❽', '❾', '❿', // Circled digits (U+2776 to U+277F)
+  '➀', '➁', '➂', '➃', '➄', '➅', '➆', '➇', '➈', '➉', // Dingbat circled digits (U+2780 to U+2789)
+
+  '⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', // Enclosed alphanumerics (U+24EA to U+24FF)
+
+  '☠', // Skull (U+2620)
+  '☢', // Radioactive (U+2622)
+  '☣', // Biohazard (U+2623)
+  '⚠', // Warning (U+26A0)
+  '⚖', // Scales (U+2696)
+  '⚔', // Crossed swords (U+2694)
+  '⚒', // Hammer and pick (U+2692)
+
+  '✆', // Telephone symbol (U+2706)
+  '✇', // Tape (U+2707)
+
+  '✠', // Maltese Cross (U+2720)
+  '✢', '✣', '✤', '✥', '✦', '✧', // Fancy stars (U+2722 to U+2727)
+
+  '✩', '✪', '✫', '✬', '✭', '✮', '✯', // More stars (U+2729 to U+273F)
+
+  '❖', // Black diamond (U+2756)
+  '◉', // Fisheye (U+25C9)
+  '◌', // Dotted circle (U+25CC)
+  '◍', // Circle with vertical fill (U+25CD)
+  '◔', '◕', // Quartered circles
+
+  '⧫', // Black lozenge (U+29EB)
+  '⬒', '⬓', '⬔', '⬕', // Geometry shapes (U+2B12 to U+2B15)
+];
+
+const winButtonGlitchSymbols = wingdingsStyleSymbols;
 
 const buttonGlitchSymbols = [
     "&",
@@ -527,6 +606,8 @@ const buttonGlitchSymbols = [
     ":"
 
 ];
+
+const winGlitchTransitionSymbols = wingdingsStyleSymbols;
 
 const glichTransitionSymbols = [
     "%",

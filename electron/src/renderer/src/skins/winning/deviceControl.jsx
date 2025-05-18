@@ -2,7 +2,7 @@ import { createSignal, onCleanup } from 'solid-js';
 import { callbackName } from "../../util/callback";
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback, sendReboot, sendSetupBegin, sendLogOut, sendShutdown } from '../../ipc';
 import { Loading } from './loading';
-import { labelMaker, textMaker } from '../../components/label';
+import { winLabelMaker, textMaker } from '../../components/label';
 
 class Signals {
     constructor() {
@@ -104,7 +104,7 @@ export const DeviceControl = () => {
         removeDeviceStatusCallback(cbName);
     });
 
-    const label = labelMaker("device-control");
+    const label = winLabelMaker("device-control");
     const plainText = textMaker("device-control");
     return <div class="device-control flex-grow">
         <div class="flex-column flex-grow">

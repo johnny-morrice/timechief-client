@@ -2,18 +2,18 @@ import { createSignal, onCleanup } from 'solid-js';
 import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDeviceStatusCallback } from '../../ipc';
 import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
-import { textTransitionSignal } from "../../util/textGlitch";
-import { labelMaker } from '../../components/label';
+import { winTextTransitionSignal } from "../../util/textGlitch";
+import { winLabelMaker } from '../../components/label';
 import { WinTable } from './wintable';
 
 class Signals {
     constructor() {
-        [this.ipAddress, this.setIpAddress] = textTransitionSignal("");
-        [this.networkType, this.setNetworkType] = textTransitionSignal("");
+        [this.ipAddress, this.setIpAddress] = winTextTransitionSignal("");
+        [this.networkType, this.setNetworkType] = winTextTransitionSignal("");
         [this.activeTargetVersion, this.setActiveTargetVersion] = createSignal("");
         [this.clientVersion, this.setClientVersion] = createSignal("");
-        [this.clientVersionText, this.setClientVersionText] = textTransitionSignal("");
-        [this.activeTargetVersionText, this.setActiveTargetVersionText] = textTransitionSignal("");
+        [this.clientVersionText, this.setClientVersionText] = winTextTransitionSignal("");
+        [this.activeTargetVersionText, this.setActiveTargetVersionText] = winTextTransitionSignal("");
     }
 }
 
@@ -68,7 +68,7 @@ export const DeviceInfo = () => {
         removeDeviceStatusCallback(cbName);
     });
 
-    const label = labelMaker("device-info");
+    const label = winLabelMaker("device-info");
     return <div class="device-control flex-column flex-grow">
         <Show when={!hasDeviceInfo(signals)}>
             <Loading />

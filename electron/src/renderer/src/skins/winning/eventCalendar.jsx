@@ -4,7 +4,7 @@ import { addServiceDataCallback, removeDataCallback } from '../../ipc';
 import { day } from '../../util/timing';
 import { callbackName } from '../../util/callback';
 import { Loading } from './loading';
-import { labelMaker, textMaker } from '../../components/label';
+import { winLabelMaker, textMaker } from '../../components/label';
 import { fadeTransition } from './fadeTransition';
 
 class Signals {
@@ -262,7 +262,7 @@ export const EventCalendar = () => {
     return new NullCalendarDay();
   }
 
-  const label = labelMaker("event-calendar");
+  const label = winLabelMaker("event-calendar");
   const plainText = textMaker("event-calendar");
   return <div id="calendar-screen" className={signals.calendarTransition()}>
     <Show when={!signals.loaded()}>
