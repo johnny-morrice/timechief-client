@@ -1,12 +1,12 @@
 import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "../../util/callback"
 import { addDataCallback, removeDataCallback, addAPIRegenKeyCallback, removeAPIRegenKeyCallback, sendAPIRegenKey, sendSetAPIEnabled } from "../../ipc";
-import { textTransitionSignal } from "../../util/textGlitch";
+import { winTextTransitionSignal } from "../../util/textGlitch";
 import { labelMaker } from "../../components/label";
 
 class Signals {
     constructor() {
-        [this.key, this.setKey] = textTransitionSignal("********");
+        [this.key, this.setKey] = winTextTransitionSignal("********");
         [this.isAPIEnabled, this.setAPIEnabled] = createSignal(false);
         [this.isLoaded, this.setLoaded] = createSignal(false);
     }

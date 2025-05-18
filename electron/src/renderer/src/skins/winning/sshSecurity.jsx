@@ -1,13 +1,13 @@
 import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "../../util/callback"
 import { addDataCallback, removeDataCallback, addSSHPasswordRegenCallback, removeSSHPasswordRegenCallback, sendSSHRegenPassword, sendSetSSHEnabled } from "../../ipc";
-import { textTransitionSignal } from "../../util/textGlitch";
+import { winTextTransitionSignal } from "../../util/textGlitch";
 import { labelMaker } from "../../components/label";
 
 class Signals {
     constructor() {
-        [this.sshUser, this.setSSHUser] = textTransitionSignal("********");
-        [this.sshPassword, this.setSSHPassword] = textTransitionSignal("********");
+        [this.sshUser, this.setSSHUser] = winTextTransitionSignal("********");
+        [this.sshPassword, this.setSSHPassword] = winTextTransitionSignal("********");
         [this.isSshEnabled, this.setSSHEnabled] = createSignal(false);
         [this.isLoaded, this.setLoaded] = createSignal(false);
     }

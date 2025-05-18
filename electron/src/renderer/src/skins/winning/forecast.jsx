@@ -4,7 +4,7 @@ import { kelvinToCelsiusText } from '../../util/temperature';
 import { weatherIconStyleClass } from '../../util/weatherIcon';
 import { callbackName } from '../../util/callback';
 import { Loading } from './loading';
-import { textTransitionSignal } from "../../util/textGlitch";
+import { winTextTransitionSignal } from "../../util/textGlitch";
 import { labelMaker } from '../../components/label';
 import { fadeTransition } from './fadeTransition';
 
@@ -26,14 +26,14 @@ class DaySignals {
         [this.date, this.setDate] = createSignal("");
         [this.dayOfWeek, this.setDayOfWeek] = createSignal("");
         [this.shortDate, this.setShortDate] = createSignal("");
-        [this.mornTemp, this.setMornTemp] = textTransitionSignal("");
-        [this.dayTemp, this.setDayTemp] = textTransitionSignal("");
-        [this.eveTemp, this.setEveTemp] = textTransitionSignal("");
-        [this.nightTemp, this.setNightTemp] = textTransitionSignal("");
-        [this.mornFeelsLike, this.setMornFeelsLike] = textTransitionSignal("");
-        [this.dayFeelsLike, this.setDayFeelsLike] = textTransitionSignal("");
-        [this.eveFeelsLike, this.setEveFeelsLike] = textTransitionSignal("");
-        [this.nightFeelsLike, this.setNightFeelsLike] = textTransitionSignal("");
+        [this.mornTemp, this.setMornTemp] = winTextTransitionSignal("");
+        [this.dayTemp, this.setDayTemp] = winTextTransitionSignal("");
+        [this.eveTemp, this.setEveTemp] = winTextTransitionSignal("");
+        [this.nightTemp, this.setNightTemp] = winTextTransitionSignal("");
+        [this.mornFeelsLike, this.setMornFeelsLike] = winTextTransitionSignal("");
+        [this.dayFeelsLike, this.setDayFeelsLike] = winTextTransitionSignal("");
+        [this.eveFeelsLike, this.setEveFeelsLike] = winTextTransitionSignal("");
+        [this.nightFeelsLike, this.setNightFeelsLike] = winTextTransitionSignal("");
         [this.weatherConditions, this.setWeatherConditions] = createSignal("");
         [this.forecastTransition, this.setForecastTransition] = createSignal("no-transition");
     }

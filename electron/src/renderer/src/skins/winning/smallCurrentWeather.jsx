@@ -4,13 +4,13 @@ import { addServiceDataCallback, removeDataCallback } from "../../ipc";
 import { weatherIconStyleClass } from '../../util/weatherIcon';
 import { kelvinToCelsiusText } from '../../util/temperature';
 import { Loading } from "./loading";
-import { textTransitionSignal } from "../../util/textGlitch";
+import { winTextTransitionSignal } from "../../util/textGlitch";
 
 class Signals {
     constructor() {
-        [this.location, this.setLocation] = textTransitionSignal("");
-        [this.temp, this.setTemp] = textTransitionSignal("");
-        [this.feelsLikeTemp, this.setFeelsLikeTemp] = textTransitionSignal("");
+        [this.location, this.setLocation] = winTextTransitionSignal("");
+        [this.temp, this.setTemp] = winTextTransitionSignal("");
+        [this.feelsLikeTemp, this.setFeelsLikeTemp] = winTextTransitionSignal("");
         [this.tempK, this.setTempK] = createSignal(0);
         [this.feelsLikeTempK, this.setFeelsLikeTempK] = createSignal(0);
         [this.currentWeatherConditions, this.setCurrentWeatherConditions] = createSignal("");

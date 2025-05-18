@@ -2,15 +2,15 @@ import { Show, createSignal, onCleanup } from 'solid-js';
 import { addServiceDataCallback, removeDataCallback } from '../../ipc';
 import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
-import { textTransitionSignal, textTransitionResource } from "../../util/textGlitch";
+import { winTextTransitionSignal, textTransitionResource } from "../../util/textGlitch";
 import { labelMaker } from '../../components/label';
 
 class Signals {
     constructor() {
-        [this.sunrise, this.setSunrise] = textTransitionSignal("");
-        [this.sunset, this.setSunset] = textTransitionSignal("");
-        [this.moonrise, this.setMoonrise] = textTransitionSignal("");
-        [this.moonset, this.setMoonset] = textTransitionSignal("");
+        [this.sunrise, this.setSunrise] = winTextTransitionSignal("");
+        [this.sunset, this.setSunset] = winTextTransitionSignal("");
+        [this.moonrise, this.setMoonrise] = winTextTransitionSignal("");
+        [this.moonset, this.setMoonset] = winTextTransitionSignal("");
         [this.moonPhase, this.setMoonPhase] = createSignal(0);
         [this.moonPhaseText, this.setMoonPhaseText] = textTransitionResource("", this.moonPhase, this.setMoonPhase, moonPhaseDescription);
     }

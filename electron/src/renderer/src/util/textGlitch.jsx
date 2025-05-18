@@ -6,7 +6,11 @@ export const buttonGlitchStyle = (text) => {
     return `width: ${size}em;`;
 };
 
-export const runButtonGlitch = (when, out, text, delayMs) => {
+export const runWinButtonGlitch = (when, out, text, delayMs) => {
+    runButtonGlitch(when, out, text, delayMs, "winning");
+}
+
+export const runButtonGlitch = (when, out, text, delayMs, styleName) => {
     let isGlitching = when();
     if (isGlitching) {
         const glitched = buttonGlitchText(text, 2);
@@ -14,7 +18,7 @@ export const runButtonGlitch = (when, out, text, delayMs) => {
         const interval = setInterval(() => {
             const stillGlitching = when();
             if (stillGlitching) {
-                const glitched = buttonGlitchText(text, 2);
+                const glitched = buttonGlitchText(text, 2, styleName);
                 out(glitched);
             } else {
                 clearInterval(interval);
@@ -28,7 +32,7 @@ export const runButtonGlitch = (when, out, text, delayMs) => {
     }
 };
 
-export const buttonGlitchText = (text, n) => {
+export const buttonGlitchText = (text, n, styleName) => {
     // const symbols = [
     //     "!",
 	// 	"#",
@@ -60,7 +64,7 @@ export const buttonGlitchText = (text, n) => {
     // Change indices.
     for (let i = 0; i < text.length; i++) {
         if (indices.includes(i)) {
-            const symbol = randomButtonGlitchSymbol()
+            const symbol = randomButtonGlitchSymbol(styleName);
             arr.push(symbol);
         } else {
             arr.push(text[i]);
@@ -69,7 +73,7 @@ export const buttonGlitchText = (text, n) => {
     return "".concat(...arr);
 }
 
-export const textTransitionResource = (value, getter, setter, transform) => {
+export const textTransitionResource = (value, getter, setter, transform, styleName) => {
     const cleanups = [];
     const doCleanup = () => {
         cleanups.forEach(cleanup => cleanup());
@@ -81,7 +85,7 @@ export const textTransitionResource = (value, getter, setter, transform) => {
     const [intermediate, setIntermediate] = createSignal("");
     const applyHighlight = (text) => {
         console.log("textTransitionResource applying highlight");
-        return highlightSpansGlitch(text, textBuffer());
+        return highlightSpansGlitch(text, textBuffer(), styleName);
     };
     const [out] = createResource(intermediate, applyHighlight);
     var count = 0
@@ -99,7 +103,11 @@ export const textTransitionResource = (value, getter, setter, transform) => {
     return [out, doSet];
 };
 
-export const textTransitionSignal = (value) => {
+export const winTextTransitionSignal = (value) => {
+    return textTransitionSignal(value, "winning");
+}
+
+export const textTransitionSignal = (value, styleName) => {
     const cleanups = [];
     const doCleanup = () => {
         cleanups.forEach(cleanup => cleanup());
@@ -110,7 +118,7 @@ export const textTransitionSignal = (value) => {
     const [buffer, setBuffer] = createSignal("");
     const [intermediate, setIntermediate] = createSignal("");
     const applyHighlight = (text) => {
-        return highlightSpansGlitch(text, buffer());
+        return highlightSpansGlitch(text, buffer(), styleName);
     };
     const [out] = createResource(intermediate, applyHighlight);
     var count = 0
@@ -195,7 +203,7 @@ const transitionBuffer = (buffer, display, setter, n) => {
 
 // Construct a jsx element with spans around the letters that are different.
 // The spans should use class "inverted-color".
-export const highlightSpansGlitch = (displayText, bufferText) => {
+export const highlightSpansGlitch = (displayText, bufferText, styleName) => {
     // Compare fortune to fortuneBuffer and highlight the differences.
     // We will pad fortune and fortuneBuffer so they are the same length.
     // Then we construct a new string with <span> tags around the letters that are different.
@@ -263,7 +271,7 @@ export const highlightSpansGlitch = (displayText, bufferText) => {
         for (let i = 0; i < fortuneSlice.length; i++) {
             const isSymbol = random() < 0.5;
             if (isSymbol) {
-                arr.push(randomGlitchTransitionSymbol());
+                arr.push(randomGlitchTransitionSymbol(styleName));
             } else {
                 arr.push(fortuneSlice[i]);
             }
