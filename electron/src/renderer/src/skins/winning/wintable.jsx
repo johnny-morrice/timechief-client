@@ -33,7 +33,7 @@ export function WinTable(props) {
                     <For each={props.table.body}>
                         {(row) => <tr>
                             <For each={row}>
-                                {(cellSignal) => <td>{cellSignal()}</td>}
+                                {(cellSignal) => <td>{cellSignal}</td>}
                             </For>
                         </tr>}
                     </For>

@@ -3,6 +3,7 @@ import { callbackName } from "../../util/callback"
 import { addDataCallback, removeDataCallback, addSSHPasswordRegenCallback, removeSSHPasswordRegenCallback, sendSSHRegenPassword, sendSetSSHEnabled } from "../../ipc";
 import { winTextTransitionSignal } from "../../util/textGlitch";
 import { winLabelMaker } from "../../components/label";
+import { WinTable } from "./wintable";
 
 class Signals {
     constructor() {
@@ -86,14 +87,15 @@ export const SSHSecurity = () => {
                     <button class='action-button crt-box' onClick={onClickEnableSSH}>{label("enable")}</button>
                 </div>
             </Show>
-            <div class="ssh-security-user flex-row flex-grow">
-                <div class="ssh-security-label flex-row data-label">{label("username")}</div>
-                <div class="ssh-security-value flex-row">{signals.sshUser}</div>
-            </div>
-            <div class="ssh-security-password flex-row flex-grow">
-                <div class="ssh-security-label flex-row data-label">{label("password")}</div>
-                <div class="ssh-security-value flex-row">{signals.sshPassword}</div>
-            </div>
+                <WinTable tableClass="ssh-security-table" table={{
+                    headings: [
+                        label("username"),
+                        label("password"),
+                    ],
+                    body: [
+                        [signals.sshUser, signals.sshPassword],
+                    ]
+            }}/>
             <div class="ssh-security-regen">
                 <button class='action-button crt-box' onClick={onClickRegenPassword}>{label("regen-password")}</button>
             </div>
