@@ -3,7 +3,7 @@ import { addServiceDataCallback, removeDataCallback } from '../../ipc';
 import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { winTextTransitionSignal, textTransitionResource } from "../../util/textGlitch";
-import { labelMaker } from '../../components/label';
+import { winLabelMaker } from '../../components/label';
 
 class Signals {
     constructor() {
@@ -98,7 +98,7 @@ export const Astro = () => {
         removeDataCallback(cbName);
     });
 
-    const label = labelMaker("astro");
+    const label = winLabelMaker("astro");
 
     return <div class="astro">
         <Show when={!hasAstro(signals)}>

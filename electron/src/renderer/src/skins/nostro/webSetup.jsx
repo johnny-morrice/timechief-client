@@ -33,6 +33,8 @@ class Signals {
         [this.displayState, this.setDisplayState] = createSignal([false, false, false]);
         [this.crtRootTransition, this.setCrtRootTransition] = createSignal("no-transition");
         [this.isSmallMode, this.setSmallMode] = createSignal(false);
+
+        [this.skinName, this.setSkinName] = createSignal("nostro");
     }
 }
 
@@ -120,6 +122,9 @@ function updateSignals(signals, data) {
 
         const layoutType = theme["layout_type"];
         signals.setSmallMode(layoutType === "small");
+
+        const skinName = theme["skin_name"];
+        signals.setSkinName(skinName);
     }
 
     updateDisplayBuffer(signals);
@@ -208,8 +213,13 @@ export const WebSetupPage = (props) => {
     });
 
     const applyCRTJank = () => {
+        const skinName = signals.skinName();
+        var odds = 0.008333;
+        if (skinName === "winning") {
+            odds = 0.0008333;
+        }
         // There is a 1 in 120 chance of the CRT jank being applied.
-        if (random() < 0.008333) {
+        if (random() < odds) {
             // Get the crt-root element
             const crtRoot = document.getElementById("crt-root");
             const boxes = document.getElementsByClassName("crt-box");

@@ -3,7 +3,7 @@ import { addDataCallback, addDeviceStatusCallback, removeDataCallback, removeDev
 import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { winTextTransitionSignal } from "../../util/textGlitch";
-import { labelMaker } from '../../components/label';
+import { winLabelMaker } from '../../components/label';
 import { WinTable } from './wintable';
 
 class Signals {
@@ -68,7 +68,7 @@ export const DeviceInfo = () => {
         removeDeviceStatusCallback(cbName);
     });
 
-    const label = labelMaker("device-info");
+    const label = winLabelMaker("device-info");
     return <div class="device-control flex-column flex-grow">
         <Show when={!hasDeviceInfo(signals)}>
             <Loading />

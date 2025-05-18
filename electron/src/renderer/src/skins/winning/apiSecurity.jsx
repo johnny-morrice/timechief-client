@@ -2,7 +2,7 @@ import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "../../util/callback"
 import { addDataCallback, removeDataCallback, addAPIRegenKeyCallback, removeAPIRegenKeyCallback, sendAPIRegenKey, sendSetAPIEnabled } from "../../ipc";
 import { winTextTransitionSignal } from "../../util/textGlitch";
-import { labelMaker } from "../../components/label";
+import { winLabelMaker } from "../../components/label";
 
 class Signals {
     constructor() {
@@ -64,7 +64,7 @@ export const APISecurity = () => {
         sendAPIRegenKey();
     }
 
-    const label = labelMaker("api-security");
+    const label = winLabelMaker("api-security");
 
     return <div class="api-security flex-grow">
         <Show when={!signals.isLoaded()}>

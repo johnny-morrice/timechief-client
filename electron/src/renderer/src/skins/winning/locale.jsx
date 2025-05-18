@@ -3,7 +3,7 @@ import { addServiceDataCallback, removeDataCallback } from '../../ipc';
 import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { winTextTransitionSignal } from '../../util/textGlitch';
-import { labelMaker } from '../../components/label';
+import { winLabelMaker } from '../../components/label';
 
 class Signals {
     constructor() {
@@ -49,7 +49,7 @@ export const Locale = () => {
     onCleanup(() => {
         removeDataCallback(cbName);
     });
-    const label = labelMaker("locale");
+    const label = winLabelMaker("locale");
 
     return <div class="locale-root flex-grow">
         <Show when={!hasLocaleInfo(signals)}>

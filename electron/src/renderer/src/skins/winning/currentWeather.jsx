@@ -5,7 +5,7 @@ import { weatherIconStyleClass } from '../../util/weatherIcon';
 import { kelvinToCelsiusText } from '../../util/temperature';
 import { Loading } from "./loading";
 import { winTextTransitionSignal } from "../../util/textGlitch";
-import { labelMaker } from "../../components/label";
+import { winLabelMaker } from "../../components/label";
 
 class Signals {
     constructor() {
@@ -74,7 +74,7 @@ export const CurrentWeather = () => {
         removeDataCallback(cbName);
     });
 
-    const label = labelMaker("current-weather");
+    const label = winLabelMaker("current-weather");
 
     return <div class="current-weather flex-grow">
         <Show when={!hasWeather(signals)}>

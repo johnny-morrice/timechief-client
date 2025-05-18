@@ -39,8 +39,8 @@ export const textMaker = (index) => {
     };
 }
 
-export const Label = ({ index, args }) => {
-    const [text, setText] = textTransitionSignal("");
+export const Label = ({ index, args, styleName }) => {
+    const [text, setText] = textTransitionSignal("", styleName);
     const resultText = lookupText(index, defaultText);
     if (args && args.length > 0) {
         setText(resultText(...args));
@@ -50,7 +50,11 @@ export const Label = ({ index, args }) => {
     return <span>{text}</span>;
 };
 
-export const labelMaker = (index) => {
+export const winLabelMaker = (index) => {
+    return labelMaker(index, "winning");
+}
+
+export const labelMaker = (index, styleName) => {
     return (myIndex, ...myArgs) => {
         var combinedIndex = [];
         if (typeof index === 'string' || index instanceof String) {
@@ -64,6 +68,6 @@ export const labelMaker = (index) => {
         } else if (Array.isArray(myIndex)) {
             combinedIndex = combinedIndex.concat(myIndex);
         }
-        return <Label index={combinedIndex} args={myArgs} />;
+        return <Label index={combinedIndex} args={myArgs} styleName={styleName} />;
     };
 }

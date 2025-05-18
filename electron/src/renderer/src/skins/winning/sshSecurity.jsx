@@ -2,7 +2,7 @@ import { onCleanup, createSignal } from "solid-js";
 import { callbackName } from "../../util/callback"
 import { addDataCallback, removeDataCallback, addSSHPasswordRegenCallback, removeSSHPasswordRegenCallback, sendSSHRegenPassword, sendSetSSHEnabled } from "../../ipc";
 import { winTextTransitionSignal } from "../../util/textGlitch";
-import { labelMaker } from "../../components/label";
+import { winLabelMaker } from "../../components/label";
 
 class Signals {
     constructor() {
@@ -67,7 +67,7 @@ export const SSHSecurity = () => {
         sendSSHRegenPassword();
     }
 
-    const label = labelMaker("ssh-security");
+    const label = winLabelMaker("ssh-security");
 
     return <div class="ssh-security flex-grow">
         <Show when={!signals.isLoaded()}>

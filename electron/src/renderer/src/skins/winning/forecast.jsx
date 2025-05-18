@@ -5,7 +5,7 @@ import { weatherIconStyleClass } from '../../util/weatherIcon';
 import { callbackName } from '../../util/callback';
 import { Loading } from './loading';
 import { winTextTransitionSignal } from "../../util/textGlitch";
-import { labelMaker } from '../../components/label';
+import { winLabelMaker } from '../../components/label';
 import { fadeTransition } from './fadeTransition';
 
 let dayForecastCount = 5;
@@ -192,7 +192,7 @@ export const Forecast = () => {
         };
     }
 
-    const label = labelMaker("forecast");
+    const label = winLabelMaker("forecast");
 
     return <div id="forecast-widget" className={`forecast flex-column ${signals.forecastTransition()}`}>
         <Show when={!hasDay() || !hasDayLoaded()}>
