@@ -55,6 +55,8 @@ div.system-error {
     /* We include default colours in case of no theme load */
     font-family: "Titillium Web";
     font-size: 16pt;
+    /* TODO need to pragmatically work out what's going to happen with these theme
+    on system error and what colour would be best */
     color: green;
 }
 
@@ -220,47 +222,57 @@ div.switcher-widget-button-wrapper {
     /* TODO customise with parameters but for now use teal windows 98 background */
     color: {{.ForegroundColor}} !important;
     background-color: {{.BackgroundColor}} !important;
-    /* font-family: {{.MainFont}} !important;
-    font-size: {{.BodyFontSize}} !important; */
+    /* font-family: {{.MainFont}} !important; */
+    font-size: {{.BodyFontSize}} !important;
  }
+
+ button {
+    font-family: {{.MainFont}} !important;
+}
 
  /* TODO need parameters for these absolute positions */
  div#switcher-widget {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    width: 260px;
-    height: 380px;
+     position: absolute !important;
+    left: {{.WidgetSwitcherX}} !important;
+    top: {{.WidgetSwitcherY}} !important;
+    width: {{.WidgetSwitcherWidth}} !important;
+    height: {{.WidgetSwitcherHeight}} !important;
+    overflow: hidden !important;
  }
 
  div#date-time {
-    position: absolute;
-    left: 350px;
-    top: 20px;
-    width: 440px;
-    height: 210px;
+    position: absolute !important;
+    left: {{.DateTimeX}} !important;
+    top: {{.DateTimeY}} !important;
+    width: {{.DateTimeWidth}} !important;
+    height: {{.DateTimeHeight}} !important;
+    overflow: hidden !important;
     color: {{.TimeColor}} !important;
  }
 
 div.home-time {
     font-style: italic;
     font-weight: bold;
-    font-size: 80pt;
+    /* font-family: {{.TimeFont}} !important; */
+    color: {{.TimeColor}} !important;
+    font-size: {{.TimeFontSize}} !important;
 }
 
 div.home-date {
     font-style: italic;
     font-weight: bold;
-    font-size: 32pt;
+    color: {{.TimeColor}} !important;
+    font-size: {{.DateFontSize}} !important;
 }
 
- div#action-center {
-    position: absolute;
-    left: 350px;
-    top: 260px;
-    width: 380px;
-    height: 140px;
- }
+div#action-center {
+    position: absolute !important;
+    left: {{.ActionCenterX}} !important;
+    top: {{.ActionCenterY}} !important;
+    width: {{.ActionCenterWidth}} !important;
+    height: {{.ActionCenterHeight}} !important;
+    overflow: hidden !important;
+}
 
 div.current-weather ul.current-weather-tree-view {
     font-size: {{.CurrentWeatherFontSize}} !important;
@@ -268,6 +280,15 @@ div.current-weather ul.current-weather-tree-view {
 
 div.home-box {
     /* background-color: {{.BoxBackgroundColor}} !important; */
+}
+
+div.fortune-message {
+    font-size: {{.FortuneMessageFontSize}} !important;
+}
+
+table.win-table {
+    /* TODO Standard font size too big for table */
+    /* font-size: {{.BodyFontSize}} !important; */
 }
 
 /* Windows 98 theme */
