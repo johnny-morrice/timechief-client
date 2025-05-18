@@ -2,10 +2,11 @@ import { For, Show } from "solid-js";
 
 export function WinTable(props) {
     function getTableClass() {
-        var tableClass = "";
+        var tableClass = "win-table";
         if (props.tableClass) {
-            tableClass = props.tableClass;
+            tableClass = tableClass + " " + props.tableClass;
         }
+        return tableClass;
     }
 
     function hasHeadings() {
