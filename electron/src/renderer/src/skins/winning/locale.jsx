@@ -4,6 +4,7 @@ import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { winTextTransitionSignal } from '../../util/textGlitch';
 import { winLabelMaker } from '../../components/label';
+import { WinTable } from './wintable';
 
 class Signals {
     constructor() {
@@ -55,19 +56,15 @@ export const Locale = () => {
         <Show when={!hasLocaleInfo(signals)}>
             <Loading />
         </Show>
-        <div class="flex-row flex-grow">
-            <div class="locale-labels flex-column flex-grow">
-                <div class='data-label flex-grow'>{label("location")}</div>
-                <div class='data-label flex-grow'>{label("locale")}</div>
-                <div class='data-label flex-grow'>{label("timezone")}</div>
-                <div class='data-label flex-grow'>{label("coordinates")}</div>
-            </div>
-            <div class="locale-values flex-column flex-grow">
-                <div class='data-value flex-grow'>{signals.location}</div>
-                <div class='data-value flex-grow'>{signals.locale}</div>
-                <div class='data-value flex-grow'>{signals.timezone}</div>
-                <div class='data-value flex-grow'>{signals.coords}</div>
-            </div>
-        </div>
+        <Show when={hasLocaleInfo(signals)}>
+            <WinTable table={{
+                body: [
+                    [label("location"), signals.location],
+                    [label("locale"), signals.locale],
+                    [label("timezone"), signals.timezone],
+                    [label("coordinates"), signals.coords]
+                ]
+            }}/>
+        </Show>
     </div>;
 };

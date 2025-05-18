@@ -4,6 +4,7 @@ import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { winTextTransitionSignal, textTransitionResource } from "../../util/textGlitch";
 import { winLabelMaker } from '../../components/label';
+import { WinTable } from './wintable';
 
 class Signals {
     constructor() {
@@ -105,22 +106,15 @@ export const Astro = () => {
             <Loading />
         </Show>
         <Show when={hasAstro(signals)}>
-            <div class="flex-row flex-grow">
-                <div class="astro-labels flex-column flex-grow">
-                    <div class="data-label">{label("sunrise")} </div>
-                    <div class="data-label">{label("sunset")} </div>
-                    <div class="data-label">{label("moonrise")} </div>
-                    <div class="data-label">{label("moonset")} </div>
-                    <div class="data-label">{label("moon-phase")} </div>
-                </div>
-                <div class="astro-values flex-column flex-grow">
-                    <div class="data-value">{signals.sunrise}</div>
-                    <div class="data-value">{signals.sunset}</div>
-                    <div class="data-value">{signals.moonrise}</div>
-                    <div class="data-value">{signals.moonset}</div>
-                    <div class="data-value">{signals.moonPhaseText}</div>
-                </div>
-            </div>
+            <WinTable table={{
+                body: [
+                    [label("sunrise"), signals.sunrise],
+                    [label("sunset"), signals.sunset],
+                    [label("moonrise"), signals.moonrise],
+                    [label("moonset"), signals.moonset],
+                    [label("moon-phase"), signals.moonPhaseText]
+                ]
+            }}/>
         </Show>
     </div>;
 };
