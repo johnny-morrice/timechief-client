@@ -13,12 +13,12 @@ function hasNextEvent(signals) {
     return true;
 }
 
-function getNextEventShortText(signals) {
+function getNextEventShortText(signals, truncateLength = 20) {
     const nextEvent = signals.nextEvent();
     if (!nextEvent) {
         return "";
     }
-    return nextEvent.eventShortText();
+    return nextEvent.eventShortText(truncateLength);
 }
 
 function getNextEventStartTime(signals) {
@@ -48,7 +48,7 @@ function getLocale(signals) {
 
 function titleText(signals) {
     if (hasNextEvent(signals)) {
-        return signals.nextEvent().getNextEventStartTime(signals);
+        return `${getNextEventStartTime(signals)} - ${getNextEventShortText(signals, 10)}`;
     }
 
     return "Fortune Cookie"
