@@ -212,6 +212,14 @@ div.switcher-widget-button-wrapper {
   justify-content: space-between;
 }
 
+div.next-event-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-grow: inherit;
+    gap: 0.5em;
+}
+
 /* The switcher widget button wrapper should push its contents to the bottom */
 
 /*****************************************************
