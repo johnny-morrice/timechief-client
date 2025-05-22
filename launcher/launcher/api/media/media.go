@@ -8,25 +8,21 @@ import (
 )
 
 type MediaService interface {
-	Exists(fileName string) (bool, error)
+	VideoExists(fileName string) (bool, error)
+	PictureExists(fileName string) (bool, error)
 	GetFS() media.FS
 }
 
 type Media struct {
-	videoService   MediaService
-	pictureService MediaService
+	mediaService MediaService
 }
 
-func NewMediaAPI(videoService, pictureService MediaService) (Media, error) {
-	if videoService == nil {
-		return Media{}, errors.New("videoService must not be nil")
-	}
-	if pictureService == nil {
-		return Media{}, errors.New("pictureService must not be nil")
+func NewMediaAPI(mediaService MediaService) (Media, error) {
+	if mediaService == nil {
+		return Media{}, errors.New("mediaService must not be nil")
 	}
 	api := Media{
-		videoService:   videoService,
-		pictureService: pictureService,
+		mediaService: mediaService,
 	}
 	return api, nil
 }
@@ -48,7 +44,7 @@ func (api Media) HandleGetPicture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hasPicture, err := api.pictureService.Exists(fileName)
+	hasPicture, err := api.mediaService.PictureExists(fileName)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -59,7 +55,7 @@ func (api Media) HandleGetPicture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pictureFS := api.pictureService.GetFS()
+	pictureFS := api.mediaService.GetFS()
 	http.ServeFileFS(w, r, pictureFS, fileName)
 }
 
@@ -75,7 +71,7 @@ func (api Media) HandleGetVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hasVideo, err := api.videoService.Exists(fileName)
+	hasVideo, err := api.mediaService.VideoExists(fileName)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -86,6 +82,6 @@ func (api Media) HandleGetVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	videoFS := api.videoService.GetFS()
+	videoFS := api.mediaService.GetFS()
 	http.ServeFileFS(w, r, videoFS, fileName)
 }

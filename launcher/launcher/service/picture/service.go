@@ -109,7 +109,7 @@ func (svc Service) List() ([]PictureMetadata, error) {
 
 type Settings struct {
 	Enabled        bool   `json:"enabled"`
-	BackgroundSize string `json:"bacground_size"`
+	BackgroundSize string `json:"background_size"`
 }
 
 func (svc Service) GetPreferences() (Settings, error) {
@@ -145,27 +145,33 @@ func (svc Service) Exists(filename string) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("failed to list pictures: %w", err)
 	}
+	found := false
 	for _, pic := range pictures {
 		if pic.Filename == filename {
-			return true, nil
+			found = true
+			break
 		}
+	}
+	if !found {
+		log.Printf("file %s not found in list of pictures", filename)
+		return false, nil
 	}
 
 	fs := svc.GetFS()
 	// Check if file in filesystem.
 	file, err := fs.Open(filename)
 	if err != nil {
-		log.Printf("failed to open file %s: %v", filename, err)
+		log.Printf("failed to open file for picture exists check %s: %v", filename, err)
 		return false, nil
 	}
 	defer func() {
 		err := file.Close()
 		if err != nil {
-			log.Printf("failed to close file %s: %v", filename, err)
+			log.Printf("failed to close picture file %s: %v", filename, err)
 		}
 	}()
 
-	return false, nil
+	return true, nil
 }
 
 func (svc Service) GetFS() media.FS {

@@ -27,7 +27,11 @@ type MediaFS struct {
 }
 
 func (m MediaFS) Open(name string) (fs.File, error) {
-	return m.fs.Open(name)
+	file, err := m.fs.Open(name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open file at '%s/%s': %w", m.root, name, err)
+	}
+	return file, nil
 }
 
 func (m MediaFS) WriteFile(name string, data []byte, mode fs.FileMode) error {
@@ -45,7 +49,7 @@ func (m MediaFS) CheckSHA256(filename string, expected []byte) error {
 	}
 	file, err := m.Open(filename)
 	if err != nil {
-		return fmt.Errorf("failed to open file: %w", err)
+		return err
 	}
 	defer func() {
 		err := file.Close()

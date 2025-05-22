@@ -6,6 +6,7 @@ import (
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/daemon"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/media"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
@@ -18,6 +19,7 @@ type Service struct {
 	pictureService      PictureService
 	deviceDataStore     DeviceDataStore
 	kvStore             KeyValueStore
+	fs                  media.FS
 }
 
 type KeyValueStore interface {
@@ -25,11 +27,13 @@ type KeyValueStore interface {
 }
 
 type VideoService interface {
+	Exists(filename string) (bool, error)
 	List() ([]video.VideoMetadata, error)
 	GetPreferences() (video.Settings, error)
 }
 
 type PictureService interface {
+	Exists(filename string) (bool, error)
 	List() ([]picture.PictureMetadata, error)
 	GetPreferences() (picture.Settings, error)
 }
@@ -42,7 +46,7 @@ type DefaultThemeService interface {
 	GetDefaultTheme() (v2.Theme, error)
 }
 
-func MakeService(defaultThemeService DefaultThemeService, videoService VideoService, pictureService PictureService, deviceDataStore DeviceDataStore, kvStore KeyValueStore) (Service, error) {
+func MakeService(defaultThemeService DefaultThemeService, videoService VideoService, pictureService PictureService, deviceDataStore DeviceDataStore, kvStore KeyValueStore, filesystem media.FS) (Service, error) {
 	if defaultThemeService == nil {
 		return Service{}, errors.New("defaultThemeService is nil")
 	}
@@ -58,12 +62,16 @@ func MakeService(defaultThemeService DefaultThemeService, videoService VideoServ
 	if kvStore == nil {
 		return Service{}, errors.New("kvStore is nil")
 	}
+	if filesystem == nil {
+		return Service{}, errors.New("filesystem is nil")
+	}
 	svc := Service{
 		defaultThemeService: defaultThemeService,
 		videoService:        videoService,
 		pictureService:      pictureService,
 		deviceDataStore:     deviceDataStore,
 		kvStore:             kvStore,
+		fs:                  filesystem,
 	}
 	return svc, nil
 }
@@ -103,6 +111,18 @@ func (svc Service) IsThemeOverride() bool {
 	}
 
 	return false
+}
+
+func (svc Service) PictureExists(filename string) (bool, error) {
+	return svc.pictureService.Exists(filename)
+}
+
+func (svc Service) VideoExists(filename string) (bool, error) {
+	return svc.videoService.Exists(filename)
+}
+
+func (svc Service) GetFS() media.FS {
+	return svc.fs
 }
 
 func (svc Service) GetTheme() (v2.Theme, error) {
