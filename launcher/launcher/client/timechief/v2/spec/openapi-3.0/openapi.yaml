@@ -1583,59 +1583,18 @@ components:
           theme:
             type: object
             required:
-              - foreground_color
-              - background_color
-              - box_background_color
-              - box_border_radius
-              - box_border_width
-              - box_border_color
-              - main_font
-              - time_font
-              - time_color
-              - button_border_radius
-              - button_border_width
-              - button_border_color
-              - button_foreground_color
-              - button_background_color
-              - image_fit
-              - image_uuids
-              - mascot_type
+              - link
+              - duration
+              - skin_name
+              - preset_name
             properties:
-              foreground_color:
+              link:
                 type: string
-              background_color:
+              duration:
+                type: integer
+              skin_name:
                 type: string
-              box_background_color:
-                type: string
-              box_border_radius:
-                type: string
-              box_border_width:
-                type: string
-              box_border_color:
-                type: string
-              main_font:
-                type: string
-              time_font:
-                type: string
-              time_color:
-                type: string
-              button_border_radius:
-                type: string
-              button_border_width:
-                type: string
-              button_border_color:
-                type: string
-              button_foreground_color:
-                type: string
-              button_background_color:
-                type: string
-              image_fit:
-                type: string
-              image_uuids:
-                type: array
-                items:
-                  type: string
-              mascot_type:
+              preset_name:
                 type: string
 
     BucketFileLinks:
