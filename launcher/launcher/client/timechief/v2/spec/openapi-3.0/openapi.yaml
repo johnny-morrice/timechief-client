@@ -1580,22 +1580,10 @@ components:
             format: int64
           link:
             type: string
-          theme:
-            type: object
-            required:
-              - link
-              - duration
-              - skin_name
-              - preset_name
-            properties:
-              link:
-                type: string
-              duration:
-                type: integer
-              skin_name:
-                type: string
-              preset_name:
-                type: string
+          skin_name:
+            type: string
+          preset_name:
+            type: string
 
     BucketFileLinks:
       type: object

@@ -87,14 +87,10 @@ type BucketFileLinks struct {
 
 // BucketFileMetadata defines model for BucketFileMetadata.
 type BucketFileMetadata struct {
-	Duration *int64  `json:"duration,omitempty"`
-	Link     *string `json:"link,omitempty"`
-	Theme    *struct {
-		Duration   int    `json:"duration"`
-		Link       string `json:"link"`
-		PresetName string `json:"preset_name"`
-		SkinName   string `json:"skin_name"`
-	} `json:"theme,omitempty"`
+	Duration   *int64  `json:"duration,omitempty"`
+	Link       *string `json:"link,omitempty"`
+	PresetName *string `json:"preset_name,omitempty"`
+	SkinName   *string `json:"skin_name,omitempty"`
 }
 
 // BucketFilesDatum defines model for BucketFilesDatum.
