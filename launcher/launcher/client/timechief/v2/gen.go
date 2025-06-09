@@ -90,23 +90,10 @@ type BucketFileMetadata struct {
 	Duration *int64  `json:"duration,omitempty"`
 	Link     *string `json:"link,omitempty"`
 	Theme    *struct {
-		BackgroundColor       string   `json:"background_color"`
-		BoxBackgroundColor    string   `json:"box_background_color"`
-		BoxBorderColor        string   `json:"box_border_color"`
-		BoxBorderRadius       string   `json:"box_border_radius"`
-		BoxBorderWidth        string   `json:"box_border_width"`
-		ButtonBackgroundColor string   `json:"button_background_color"`
-		ButtonBorderColor     string   `json:"button_border_color"`
-		ButtonBorderRadius    string   `json:"button_border_radius"`
-		ButtonBorderWidth     string   `json:"button_border_width"`
-		ButtonForegroundColor string   `json:"button_foreground_color"`
-		ForegroundColor       string   `json:"foreground_color"`
-		ImageFit              string   `json:"image_fit"`
-		ImageUuids            []string `json:"image_uuids"`
-		MainFont              string   `json:"main_font"`
-		MascotType            string   `json:"mascot_type"`
-		TimeColor             string   `json:"time_color"`
-		TimeFont              string   `json:"time_font"`
+		Duration   int    `json:"duration"`
+		Link       string `json:"link"`
+		PresetName string `json:"preset_name"`
+		SkinName   string `json:"skin_name"`
 	} `json:"theme,omitempty"`
 }
 
