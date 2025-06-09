@@ -1087,6 +1087,34 @@ paths:
           description: "Unauthorized - Invalid or missing access token"
         "500":
           description: "Internal server error"
+  /theme/preset:
+    put:
+      summary: "Apply a preset theme"
+      operationId: "applyPresetTheme"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - preset_name
+                - theme_uuid
+              properties:
+                preset_name:
+                  type: "string"
+                theme_uuid:
+                  type: "string"
+      responses:
+        "204":
+          description: "Preset theme applied successfully"
+        "400":
+          description: "Bad request - Invalid input"
+        "401":
+          description: "Unauthorized - Invalid or missing access token"
+        "500":
+          description: "Internal server error"
+                  
   /theme/{id}:
     get:
       summary: "Get a theme by ID"
