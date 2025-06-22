@@ -4,7 +4,7 @@ import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { winTextTransitionSignal, textTransitionResource } from "../../util/textGlitch";
 import { winLabelMaker } from '../../components/label';
-import { WinTable } from './wintable';
+import { TreeView } from './treeview';
 
 class Signals {
     constructor() {
@@ -106,7 +106,7 @@ export const Astro = () => {
             <Loading />
         </Show>
         <Show when={hasAstro(signals)}>
-            <WinTable table={{
+            <TreeView table={{
                 body: [
                     [label("sunrise"), signals.sunrise],
                     [label("sunset"), signals.sunset],
