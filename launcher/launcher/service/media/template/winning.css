@@ -238,6 +238,10 @@ body {
     font-size: {{.BodyFontSize}} !important;
 }
 
+.tree-view {
+    font-size: {{.BodyFontSize}} !important;
+}
+
 button {
     font-family: {{.MainFont}} !important;
 }
