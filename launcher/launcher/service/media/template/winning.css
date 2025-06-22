@@ -226,15 +226,19 @@ div.next-event-wrapper {
  *  Theme specific styles
  *****************************************************/
 
- body {
+body {
     /* TODO customise with parameters but for now use teal windows 98 background */
     color: {{.ForegroundColor}} !important;
     background-color: {{.BackgroundColor}} !important;
     /* font-family: {{.MainFont}} !important; */
     font-size: {{.BodyFontSize}} !important;
- }
+}
 
- button {
+.win-table {
+    font-size: {{.BodyFontSize}} !important;
+}
+
+button {
     font-family: {{.MainFont}} !important;
 }
 
