@@ -4,7 +4,7 @@ import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { winTextTransitionSignal } from "../../util/textGlitch";
 import { winLabelMaker } from '../../components/label';
-import { WinTable } from './wintable';
+import { TreeView } from './treeview';
 
 class Signals {
     constructor() {
@@ -75,7 +75,7 @@ export const DeviceInfo = () => {
         </Show>
         <Show when={hasDeviceInfo(signals)}>
             <div class="flex-row flex-grow">
-                <WinTable table={{ body: [
+                <TreeView table={{ body: [
                     [
                         label("ip-address"),
                         signals.ipAddress

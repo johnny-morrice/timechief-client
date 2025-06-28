@@ -4,7 +4,7 @@ import { callbackName } from "../../util/callback";
 import { Loading } from './loading';
 import { winTextTransitionSignal } from '../../util/textGlitch';
 import { winLabelMaker } from '../../components/label';
-import { WinTable } from './wintable';
+import { TreeView } from './treeview';
 
 class Signals {
     constructor() {
@@ -57,7 +57,7 @@ export const Locale = () => {
             <Loading />
         </Show>
         <Show when={hasLocaleInfo(signals)}>
-            <WinTable table={{
+            <TreeView table={{
                 body: [
                     [label("location"), signals.location],
                     [label("locale"), signals.locale],

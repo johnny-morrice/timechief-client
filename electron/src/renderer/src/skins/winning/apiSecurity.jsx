@@ -3,7 +3,7 @@ import { callbackName } from "../../util/callback"
 import { addDataCallback, removeDataCallback, addAPIRegenKeyCallback, removeAPIRegenKeyCallback, sendAPIRegenKey, sendSetAPIEnabled } from "../../ipc";
 import { winTextTransitionSignal } from "../../util/textGlitch";
 import { winLabelMaker } from "../../components/label";
-import { WinTable } from "./wintable";
+import { TreeView } from "./treeview";
 
 class Signals {
     constructor() {
@@ -84,9 +84,8 @@ export const APISecurity = () => {
                     <button class='action-button crt-box' onClick={onClickEnableAPI}>{label("enable")}</button>
                 </div>
             </Show>
-            <WinTable table={{
-                headings: [label("key")],
-                body: [[signals.key]]
+            <TreeView table={{
+                body: [[label("key"), signals.key]]
             }}/>
             <div class="api-security-regen">
                 <button class='action-button crt-box' onClick={onClickRegenKey}>{label("regen-key")}</button>

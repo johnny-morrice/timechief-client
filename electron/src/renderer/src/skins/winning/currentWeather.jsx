@@ -6,6 +6,7 @@ import { kelvinToCelsiusText } from '../../util/temperature';
 import { Loading } from "./loading";
 import { winTextTransitionSignal } from "../../util/textGlitch";
 import { winLabelMaker } from "../../components/label";
+import { TreeView } from "./treeview";
 
 class Signals {
     constructor() {
@@ -81,23 +82,17 @@ export const CurrentWeather = () => {
             <Loading />
         </Show>
         <Show when={hasWeather(signals)}>
-            <ul class="tree-view current-weather-tree-view">
-                <li>{label("location")}
-                    <ul>{signals.location}</ul>
-                </li>
-                <li>{label("temp")}
-                    <ul>{signals.temp}</ul>
-                </li>
-                <li>{label("feels")}
-                    <ul>{signals.feelsLikeTemp}</ul>
-                </li>
-                <li>{label("current-condition")}
-                    <ul><i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i></ul>
-                </li>
-                <li>{label("today-condition")}
-                    <ul><i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i></ul>
-                </li>
-            </ul>
+            <TreeView className="current-weather-tree-view" table={{
+                body: [
+                    [label("location"), signals.location],
+                    [label("temp"), signals.temp],
+                    [label("feels"), signals.feelsLikeTemp],
+                    [label("current-condition"),
+                        <i class={"fa-solid " + weatherIconStyleClass(signals.currentWeatherConditions())}></i>],
+                    [label("today-condition"),
+                        <i class={"fa-solid " + weatherIconStyleClass(signals.todayWeatherConditions())}></i>]
+                ]}}
+            />
         </Show >
     </div >
 }
