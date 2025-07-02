@@ -357,3 +357,30 @@ body{color:#222;font-family:Arial;font-size:12px}.title-bar,.window,button,input
   pointer-events: none;
   z-index: 9999;
 }
+
+/* Win98 Customizations */
+
+.title-bar {
+    height: {{.Customizations.TitleBarHeight}} !important;
+}
+
+title-bar-controls button[aria-label="Minimize"], .title-bar-controls button[aria-label].minimize {
+    background-size: {{.Customizations.MinimizeControl.BackgroundSize}} !important;
+    background-position: {{.Customizations.MinimizeControl.BackgroundPosition}} !important;
+    min-width: {{.Customizations.MinimizeControl.MinWidth}} !important;
+    min-height: {{.Customizations.MinimizeControl.MinHeight}} !important;
+}
+
+.title-bar-controls button[aria-label="Maximize"], .title-bar-controls button[aria-label].maximize {
+    background-size: {{.Customizations.MaximizeControl.BackgroundSize}} !important;
+    background-position: {{.Customizations.MaximizeControl.BackgroundPosition}} !important;
+    min-width: {{.Customizations.MaximizeControl.MinWidth}} !important;
+    min-height: {{.Customizations.MaximizeControl.MinHeight}} !important;
+}
+
+.title-bar-controls button[aria-label="Close"], .title-bar-controls button[aria-label].close {
+    background-size: {{.Customizations.CloseControl.BackgroundSize}} !important;
+    background-position: {{.Customizations.CloseControl.BackgroundPosition}} !important;
+    min-width: {{.Customizations.CloseControl.MinWidth}} !important;
+    min-height: {{.Customizations.CloseControl.MinHeight}} !important;
+}

@@ -4,10 +4,10 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
-	"log"
 	"text/template"
 
 	v2 "github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/v2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/media/theme/winning"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/picture"
 )
 
@@ -26,20 +26,40 @@ var backgroundImageTemplate = template.Must(template.New("backgroundImage").Pars
 var winningTemplate = template.Must(template.New("winning").Parse(winningCSS))
 
 func renderThemeCSS(theme v2.Theme) (string, error) {
-	templatesBySkinName := map[string]*template.Template{
-		"nostro":  nostroTemplate,
-		"winning": winningTemplate,
+	switch theme.SkinName {
+	case "nostro":
+		return renderNostroTemplate(theme)
+	case "winning":
+		return renderWinningTemplate(theme)
+	default:
+		return "", fmt.Errorf("unknown theme skin name: %s", theme.SkinName)
 	}
-	template, ok := templatesBySkinName[theme.SkinName]
-	if !ok {
-		// Render nostro skin by default
-		log.Printf("unknown skin name %q, falling back to nostro", theme.SkinName)
-		template = nostroTemplate
+}
+
+func renderWinningTemplate(theme v2.Theme) (string, error) {
+	if theme.SkinName != "winning" {
+		return "", fmt.Errorf("expected theme skin name to be 'winning' but was '%s'", theme.SkinName)
 	}
 	buf := bytes.Buffer{}
-	err := template.Execute(&buf, theme)
+	templateData, err := winning.MakeWinningTemplateData(theme)
 	if err != nil {
-		return "", fmt.Errorf("failed to render theme: %w", err)
+		return "", fmt.Errorf("failed to make winning theme template data: %w", err)
+	}
+	err = winningTemplate.Execute(&buf, templateData)
+	if err != nil {
+		return "", fmt.Errorf("failed to render winning template: %w", err)
+	}
+	return buf.String(), nil
+}
+
+func renderNostroTemplate(theme v2.Theme) (string, error) {
+	if theme.SkinName != "nostro" {
+		return "", fmt.Errorf("expected theme skin name to be 'nostro' but was '%s'", theme.SkinName)
+	}
+	buf := bytes.Buffer{}
+	err := nostroTemplate.Execute(&buf, theme)
+	if err != nil {
+		return "", fmt.Errorf("failed to render nostro template: %w", err)
 	}
 	return buf.String(), nil
 }

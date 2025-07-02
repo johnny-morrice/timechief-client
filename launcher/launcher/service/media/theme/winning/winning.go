@@ -7,11 +7,11 @@ import (
 )
 
 type WinningTemplateData struct {
-	Theme          v2.Theme
+	v2.Theme
 	Customizations Win98Customizations
 }
 
-func MakeWinningTemplateDat(theme v2.Theme) (WinningTemplateData, error) {
+func MakeWinningTemplateData(theme v2.Theme) (WinningTemplateData, error) {
 	if theme.SkinName != "winning" {
 		return WinningTemplateData{}, fmt.Errorf("expected theme skin name to be 'winning' but was '%s'", theme.SkinName)
 	}
@@ -27,32 +27,37 @@ func MakeWinningTemplateDat(theme v2.Theme) (WinningTemplateData, error) {
 		return WinningTemplateData{}, fmt.Errorf("action center height / 10 must be greater than 0, but was %d", actionCenterHeight)
 	}
 
+	// Will this need some adjustment for 4k?
+	if titleBarHeightNum > 50 {
+		titleBarHeightNum = 50
+	}
+
 	controlHeightNum := titleBarHeightNum - 2
 	controlWidthNum := controlHeightNum
 	controlMinWidth := fmt.Sprintf("%dpx", controlWidthNum)
 	controlMinHeight := fmt.Sprintf("%dpx", controlHeightNum)
 
-	titleBarHeight := fmt.Sprintf("%dpx", actionCenterHeight/10)
+	titleBarHeight := fmt.Sprintf("%dpx", titleBarHeightNum)
 
 	customizations := Win98Customizations{
 		TitleBarHeight: titleBarHeight,
 		MinimizeControl: TitleBarControl{
-			BackgroundImage: minimizeControlBackgroundImage,
-			BackgroundSize:  "65% 65%",
-			MinHeight:       controlMinHeight,
-			MinWidth:        controlMinWidth,
+			BackgroundSize:     "65% 10%",
+			MinHeight:          controlMinHeight,
+			MinWidth:           controlMinWidth,
+			BackgroundPosition: "center calc(100% - 10px)",
 		},
 		MaximizeControl: TitleBarControl{
-			BackgroundImage: maximizeControlBackgroundImage,
-			BackgroundSize:  "65% 65%",
-			MinHeight:       controlMinHeight,
-			MinWidth:        controlMinWidth,
+			BackgroundSize:     "65% 65%",
+			MinHeight:          controlMinHeight,
+			MinWidth:           controlMinWidth,
+			BackgroundPosition: "center center",
 		},
 		CloseControl: TitleBarControl{
-			BackgroundImage: closeControlBackgroundImage,
-			BackgroundSize:  "65% 65%",
-			MinHeight:       controlMinHeight,
-			MinWidth:        controlMinWidth,
+			BackgroundSize:     "65% 65%",
+			MinHeight:          controlMinHeight,
+			MinWidth:           controlMinWidth,
+			BackgroundPosition: "center center",
 		},
 	}
 
@@ -61,10 +66,6 @@ func MakeWinningTemplateDat(theme v2.Theme) (WinningTemplateData, error) {
 		Customizations: customizations,
 	}, nil
 }
-
-const minimizeControlBackgroundImage = ""
-const maximizeControlBackgroundImage = ""
-const closeControlBackgroundImage = ""
 
 func parsePixelSize(size string) (int, error) {
 	var value int
@@ -83,8 +84,8 @@ type Win98Customizations struct {
 }
 
 type TitleBarControl struct {
-	BackgroundImage string
-	BackgroundSize  string
-	MinHeight       string
-	MinWidth        string
+	BackgroundSize     string
+	MinHeight          string
+	MinWidth           string
+	BackgroundPosition string
 }
