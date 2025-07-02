@@ -362,6 +362,7 @@ body{color:#222;font-family:Arial;font-size:12px}.title-bar,.window,button,input
 
 .title-bar {
     height: {{.Customizations.TitleBarHeight}} !important;
+    font-size: {{ .Customizations.TitleBarFontSize }} !important;
 }
 
 title-bar-controls button[aria-label="Minimize"], .title-bar-controls button[aria-label].minimize {

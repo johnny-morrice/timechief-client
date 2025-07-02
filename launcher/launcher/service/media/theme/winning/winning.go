@@ -38,9 +38,11 @@ func MakeWinningTemplateData(theme v2.Theme) (WinningTemplateData, error) {
 	controlMinHeight := fmt.Sprintf("%dpx", controlHeightNum)
 
 	titleBarHeight := fmt.Sprintf("%dpx", titleBarHeightNum)
+	titleBarFontSize := fmt.Sprintf("%dpx", titleBarHeightNum-(titleBarHeightNum/5))
 
 	customizations := Win98Customizations{
-		TitleBarHeight: titleBarHeight,
+		TitleBarHeight:   titleBarHeight,
+		TitleBarFontSize: titleBarFontSize,
 		MinimizeControl: TitleBarControl{
 			BackgroundSize:     "65% 10%",
 			MinHeight:          controlMinHeight,
@@ -77,10 +79,11 @@ func parsePixelSize(size string) (int, error) {
 }
 
 type Win98Customizations struct {
-	TitleBarHeight  string
-	MinimizeControl TitleBarControl
-	MaximizeControl TitleBarControl
-	CloseControl    TitleBarControl
+	TitleBarHeight   string
+	TitleBarFontSize string
+	MinimizeControl  TitleBarControl
+	MaximizeControl  TitleBarControl
+	CloseControl     TitleBarControl
 }
 
 type TitleBarControl struct {
