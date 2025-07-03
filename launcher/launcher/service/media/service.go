@@ -84,7 +84,7 @@ func (svc Service) IsThemeOverride() bool {
 	}
 
 	if setupState != daemon.SetupFlagInternetConnected {
-		log.Printf("setup state is not internet connected, theme overridde enaged")
+		log.Printf("setup state is not internet connected, theme overridde engaged")
 		return true
 	}
 
