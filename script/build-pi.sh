@@ -27,6 +27,11 @@ if [ -z "$BRANCH" ]; then
     exit 1
 fi
 
+if [ -z "$REPO" ]; then
+    echo "REPO must be set to a Git repository URL"
+    exit 1
+fi
+
 echo "Building $ENVIRONMENT $VERSION $PHASE"
 date
 
@@ -38,7 +43,7 @@ set -x
 TMPDIR=$(mktemp -d /tmp/timechief-launcher-XXXXXX)
 echo "Using temporary directory $TMPDIR"
 
-git clone --branch "$BRANCH" --single-branch git@github.com:johnny-morrice/timechief.git "$TMPDIR"
+git clone --branch "$BRANCH" --single-branch "$REPO" "$TMPDIR"
 cd "$TMPDIR"
 
 pushd launcher
