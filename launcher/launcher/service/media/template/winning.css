@@ -220,6 +220,13 @@ div.next-event-wrapper {
     gap: 0.5em;
 }
 
+div.forecast-day-controls {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+}
+
+
 /* The switcher widget button wrapper should push its contents to the bottom */
 
 /*****************************************************
@@ -246,10 +253,22 @@ body {
     font-size: {{.BodyFontSize}} !important;
 }
 
-button.action-button, button.switcher-widget-button {
+div#forecast-widget {
+    font-size: {{.BodyFontSize}} !important;
+}
+
+table.forecast-weather-table {
+    font-size: {{.BodyFontSize}} !important;
+}
+
+button.action-button, button.switcher-button, button.forecast-control-button {
     padding: 0.5em !important;
     /* font-family: {{.MainFont}} !important; */
     font-size: {{.BodyFontSize}} !important;
+}
+
+button.switcher-button {
+    min-width: 4.5em;
 }
 
  /* TODO need parameters for these absolute positions */
