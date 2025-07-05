@@ -242,8 +242,14 @@ body {
     font-size: {{.BodyFontSize}} !important;
 }
 
-button {
-    font-family: {{.MainFont}} !important;
+.data-label, .data-value {
+    font-size: {{.BodyFontSize}} !important;
+}
+
+button.action-button, button.switcher-widget-button {
+    padding: 0.5em !important;
+    /* font-family: {{.MainFont}} !important; */
+    font-size: {{.BodyFontSize}} !important;
 }
 
  /* TODO need parameters for these absolute positions */
