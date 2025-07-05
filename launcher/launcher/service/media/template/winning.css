@@ -261,14 +261,19 @@ table.forecast-weather-table {
     font-size: {{.BodyFontSize}} !important;
 }
 
-button.action-button, button.switcher-button, button.forecast-control-button {
+button.action-button {
     padding: 0.5em !important;
     /* font-family: {{.MainFont}} !important; */
-    font-size: {{.BodyFontSize}} !important;
+    font-size: {{.ActionButtonFontSize}} !important;
 }
 
 button.switcher-button {
-    min-width: 4.5em;
+    min-width: 4em;
+    font-size: {{.SwitcherButtonFontSize}} !important;
+}
+
+button.forecast-control-button {
+    font-size: {{.ForecastControlButtonFontSize}} !important;
 }
 
  /* TODO need parameters for these absolute positions */
