@@ -69,7 +69,7 @@ export const SSHSecurity = () => {
 
     const label = labelMaker("ssh-security");
 
-    return <div class="ssh-security flex-grow">
+    return <div class="ssh-security flex-column flex-grow">
         <Show when={!signals.isLoaded()}>
             <Loading />
         </Show>

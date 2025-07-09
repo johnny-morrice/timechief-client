@@ -66,7 +66,7 @@ export const APISecurity = () => {
 
     const label = labelMaker("api-security");
 
-    return <div class="api-security flex-grow">
+    return <div class="api-security flex-column flex-grow">
         <Show when={!signals.isLoaded()}>
             <Loading />
         </Show>
