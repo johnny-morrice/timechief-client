@@ -337,6 +337,11 @@ table.win-table {
     /* font-size: {{.BodyFontSize}} !important; */
 }
 
+div.status-note-indicator {
+    font-size: {{.StatusNoteFontSize}} !important;
+}
+
+
 /* Windows 98 theme */
 /* https://jdan.github.io/98.css/ */
 @font-face{font-family:"Pixelated MS Sans Serif";font-style:normal;font-weight:400;src:url("/assets/webfonts/w95fa.woff2") format("woff2")}
