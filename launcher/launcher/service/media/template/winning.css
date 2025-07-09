@@ -276,6 +276,10 @@ button.forecast-control-button {
     font-size: {{.ForecastControlButtonFontSize}} !important;
 }
 
+button.event-calendar-control-button {
+    font-size: {{.EventCalendarControlButtonFontSize}} !important;
+}
+
  /* TODO need parameters for these absolute positions */
  div#switcher-widget {
      position: absolute !important;
@@ -339,6 +343,22 @@ table.win-table {
 
 div.status-note-indicator {
     font-size: {{.StatusNoteFontSize}} !important;
+}
+
+div.next-event-time {
+    font-size: {{.NextEventTimeFontSize}} !important;
+}
+
+div.next-event-shorttext {
+    font-size: {{.NextEventTextFontSize}} !important;
+}
+
+div.calendar-day-date {
+    font-size: {{.CalendarDayDateFontSize}} !important;
+}
+
+div.calendar-day {
+    font-size: {{.CalendarDayFontSize}} !important;
 }
 
 
