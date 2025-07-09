@@ -217,40 +217,42 @@ export const Forecast = () => {
                         </div>
                     </Show>
                 </div>
-                <table class="forecast-weather-table flex-grow">
-                    <tbody>
-                        <tr>
-                            <th></th>
-                            <th>{label("temp")}</th>
-                            <th>{label("feels")}</th>
-                        </tr>
-                        <tr>
-                            <th>{label("morning")}</th>
-                            <td>{getCurrentDay().mornTemp}</td>
-                            <td>{getCurrentDay().mornFeelsLike}</td>
-                        </tr>
-                        <tr>
-                            <th>{label("day")}</th>
-                            <td>{getCurrentDay().dayTemp}</td>
-                            <td>{getCurrentDay().dayFeelsLike}</td>
-                        </tr>
-                        <tr>
-                            <th>{label("evening")}</th>
-                            <td>{getCurrentDay().eveTemp}</td>
-                            <td>{getCurrentDay().eveFeelsLike}</td>
-                        </tr>
-                        <tr>
-                            <th>{label("night")}</th>
-                            <td>{getCurrentDay().nightTemp}</td>
-                            <td>{getCurrentDay().nightFeelsLike}</td>
-                        </tr>
-                        <tr>
-                            <td class="weather-icon"><i class={"fa-solid " + weatherIconStyleClass(getCurrentDay().weatherConditions())}></i></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="sunken-panel">
+                    <table class="forecast-weather-table flex-grow">
+                        <tbody>
+                            <tr>
+                                <th></th>
+                                <th>{label("temp")}</th>
+                                <th>{label("feels")}</th>
+                            </tr>
+                            <tr>
+                                <th>{label("morning")}</th>
+                                <td>{getCurrentDay().mornTemp}</td>
+                                <td>{getCurrentDay().mornFeelsLike}</td>
+                            </tr>
+                            <tr>
+                                <th>{label("day")}</th>
+                                <td>{getCurrentDay().dayTemp}</td>
+                                <td>{getCurrentDay().dayFeelsLike}</td>
+                            </tr>
+                            <tr>
+                                <th>{label("evening")}</th>
+                                <td>{getCurrentDay().eveTemp}</td>
+                                <td>{getCurrentDay().eveFeelsLike}</td>
+                            </tr>
+                            <tr>
+                                <th>{label("night")}</th>
+                                <td>{getCurrentDay().nightTemp}</td>
+                                <td>{getCurrentDay().nightFeelsLike}</td>
+                            </tr>
+                            <tr>
+                                <td class="weather-icon"><i class={"fa-solid " + weatherIconStyleClass(getCurrentDay().weatherConditions())}></i></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </Show>
     </div>
