@@ -226,6 +226,12 @@ div.forecast-day-controls {
     grid-auto-columns: 1fr;
 }
 
+div.event-calendar-day-controls {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+}
+
 
 /* The switcher widget button wrapper should push its contents to the bottom */
 
@@ -439,4 +445,8 @@ title-bar-controls button[aria-label="Minimize"], .title-bar-controls button[ari
     background-position: {{.Customizations.CloseControl.BackgroundPosition}} !important;
     min-width: {{.Customizations.CloseControl.MinWidth}} !important;
     min-height: {{.Customizations.CloseControl.MinHeight}} !important;
+}
+
+div.home-box {
+    font-size: {{.BodyFontSize}} !important;
 }
