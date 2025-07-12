@@ -1,6 +1,11 @@
 import { manageMascotCanvas } from "../../components/mascot";
 
 var globalSignals = null;
+var isManaged = false;
+if (!isManaged) {
+    isManaged = true;
+    manageMascotCanvas("event-mascot-canvas-winning", () => getActionCenterSignals().mascotType(), () => getActionCenterSignals().emote(), () => getActionCenterSignals().mascotHeight());
+}
 
 class FakeSignals {
     mascotHeight() {
@@ -34,8 +39,6 @@ export function getActionCenterSignals() {
 export function setActionCenterSignals(signals) {
     globalSignals = signals;
 }
-
-manageMascotCanvas("event-mascot-canvas-winning", () => getActionCenterSignals().mascotType(), () => getActionCenterSignals().emote(), () => getActionCenterSignals().mascotHeight());
 
 export function EventMascotCanvas() {
     return <div class="event-mascot-wrapper">
