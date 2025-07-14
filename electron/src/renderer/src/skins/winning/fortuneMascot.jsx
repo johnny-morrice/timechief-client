@@ -1,7 +1,11 @@
 import { manageMascotCanvas } from "../../components/mascot";
 
 var globalSignals = null;
-manageMascotCanvas("fortune-canvas-winning", () => getFortuneSignals().mascotType(), () => getFortuneSignals().emote(), () => getFortuneSignals().mascotHeight());
+var isManaged = false;
+if (!isManaged) {
+    isManaged = true;
+    manageMascotCanvas("fortune-canvas-winning", () => getFortuneSignals().mascotType(), () => getFortuneSignals().emote(), () => getFortuneSignals().mascotHeight());
+}
 
 class FakeSignals {
     mascotHeight() {

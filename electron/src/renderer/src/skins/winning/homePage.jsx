@@ -346,15 +346,15 @@ export const HomePage = () => {
 
   var jankInterval = setInterval(
   () => {
-    console.log("jank interval");
+    // console.log("jank interval");
     // Find element with class 'crt-jank'
     const jankElement = document.querySelector('.crt-jank');
     // If it exists, add a bullet hole.
     if (jankElement) {
-      console.log("add bullet hole");
+      // console.log("add bullet hole");
       addBulletHole();
     } else {
-      console.log("remove bullet holes");
+      // console.log("remove bullet holes");
       cleanupBulletHoles();
     }
   }, 500);
