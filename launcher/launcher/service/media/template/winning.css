@@ -307,12 +307,12 @@ button.event-calendar-control-button {
     height: {{.DateTimeHeight}} !important;
     overflow: hidden !important;
     color: {{.TimeColor}} !important;
+    font-family: {{.TimeFont}} !important;
  }
 
 div.home-time {
     font-style: italic;
     font-weight: bold;
-    /* font-family: {{.TimeFont}} !important; */
     color: {{.TimeColor}} !important;
     font-size: {{.TimeFontSize}} !important;
 }
