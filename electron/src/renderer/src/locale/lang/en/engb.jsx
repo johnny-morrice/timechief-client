@@ -89,6 +89,7 @@ export const Text = {
         "is-disabled": "API Disabled",
     },
     "debug": {
-        "play-intro-video-button": "Play intro video"
+        "play-intro-video-button": "Play intro video",
+        "play-media-video-button": "Play media video",
     }
 };

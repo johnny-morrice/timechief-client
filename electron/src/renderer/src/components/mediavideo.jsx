@@ -51,14 +51,10 @@ export function MediaVideo(props) {
     const delay = 53 * 1000 * 60;
     const chance = 0.07;
     const signals = new Signals();
-    if (FeatureForceSpooky) {
+    if (props.forceVideo || FeatureForceSpooky) {
         signals.setShowVideo(true);
     }
     const interval = setInterval(() => {
-        if (forceVideo) {
-            signals.setShowVideo(true);
-            return;
-        }
         if (Math.random() < chance) {
             signals.setShowVideo(true);
         }
