@@ -197,6 +197,7 @@ func (dd DeviceData) FetchLatest() (v2.Data, error) {
 
 	newDeviceData, err := dd.doFetchLatest(lastDeviceData.DataVersion)
 	if err != nil {
+		log.Printf("error fetching latest device data, setting error state, using last device data: %s", err)
 		myErr := dd.stateFlagStore.CreateIfNotExists(DeviceDataErrorState)
 		if myErr != nil {
 			log.Printf("error setting device data error state: %s", myErr)
