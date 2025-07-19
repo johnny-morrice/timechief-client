@@ -1,0 +1,1054 @@
+/* First simple defaults, template vars are underneath */
+
+div.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+div.flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+div.flex-grow {
+    flex-grow: 1;
+}
+
+div.flex-shrink {
+    flex-shrink: 1;
+}
+
+div.home-screen {
+    height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+div.login-screen {
+    height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+div.border {
+    padding: 1em;
+    border-style: solid;
+    /* border: 1px solid green; */
+}
+
+div.home-time-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1em;
+}
+
+div.home-time-small-wrapper {
+    gap: 0;
+}
+
+div.time-mascot-small {
+    justify-content: end;
+}
+
+div.home-date {
+    font-size: 36pt;
+    align-self: flex-end;
+}
+
+div.home-time {
+    /* font-family: 'Seven Segment', monospace; */
+    align-self: flex-end;
+    font-size: 98pt;
+}
+
+div.home-action-center {
+    flex-basis: 40%;
+}
+
+div.home-action-center-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3em;
+}
+
+div.home-lhs-column {
+    flex-basis: 45%;
+}
+
+div.home-rhs-column {
+    flex-basis: 55%;
+}
+
+div.login-box {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin-bottom: 1em;
+}
+
+div.begin-login {
+    align-items: center;
+    justify-content: center;
+}
+
+div.system-error {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+    padding: 1em;
+    /* We include default colours in case of no theme load */
+    font-family: "Titillium Web";
+    font-size: 16pt;
+    color: green;
+}
+
+div.switcher-widget-small {
+    flex-grow: inherit;
+}
+
+div.switcher-widget-content-small {
+    flex-grow: inherit;
+}
+
+div.switcher-widget-button-wrapper {
+    justify-self: flex-end;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+div.switcher-widget-button-wrapper-small {
+    align-items: flex-end;
+    gap: 2px;
+}
+
+div.current-weather {
+    font-size: 18pt;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+div.current-weather-location {
+    align-self: center;
+    font-weight: bold;
+}
+
+div.current-weather-grid {
+    display: grid;
+    grid-template-rows: 1fr 1fr 0.5fr 0.5fr;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 0.4em;
+}
+
+button:active {
+    outline: 0;
+}
+
+button:focus {
+    outline: 0;
+}
+
+button.action-button {
+    /* border: 1px solid green; */
+    /* background-color: black; */
+    /* color: green; */
+    border-style: solid;
+    font-size: 18pt;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Apply the glow animation when button is active */
+button.action-button:active {
+    animation: button-glow 0.1s ease-in-out;
+}
+
+button.switcher-widget-button {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+button.switcher-widget-button:active {
+    animation: button-glow 0.1s ease-in-out;
+}
+
+/* Keyframes for button-glow animation */
+@keyframes button-glow {
+    0% {
+        box-shadow: 0 0 1px green,
+            0 0 2px green,
+            0 0 4px green;
+    }
+
+    50% {
+        box-shadow: 0 0 6px 2px green,
+            0 0 8px 4px green,
+            0 0 10px 6px green;
+    }
+
+    100% {
+        box-shadow: 0 0 0 green;
+    }
+}
+
+button.switcher-button {
+    font-size: 16pt;
+}
+
+div#switcher-widget-content {
+    overflow: hidden;
+}
+
+div.switcher-widget {
+    height: 100%;
+}
+
+div.setup-wrapper {
+    height: 100vh;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+div.setup-title {
+    font-size: 22pt;
+}
+
+div.data-label {
+    font-weight: 500;
+}
+
+div.astro {
+    font-size: 16pt;
+}
+
+div.weather-data {
+    font-size: 32pt;
+}
+
+div.current-weather-icon {
+    font-size: 28pt;
+}
+
+div.forecast-weather-icon {
+    font-size: 32pt;
+}
+
+table.forecast-weather-table th {
+    font-weight: 500;
+}
+
+table.forecast-weather-table td {
+    text-align: center;
+}
+
+table.forecast-weather-table td.weather-icon {
+    font-size: 24pt;
+}
+
+button.forecast-control-button {
+    /* border: 1px solid green; */
+    /* background-color: black; */
+    /* color: green; */
+    border-style: solid;
+    font-size: 16pt
+}
+
+div.forecast-control-label {
+    font-size: 16pt;
+}
+
+div.forecast-day-controls {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+}
+
+div.calendar-day-date {
+    font-size: 20pt;
+    font-weight: 500;
+}
+
+div.calendar-event-when {
+    font-weight: 500;
+}
+
+div.calendar-day {
+    font-size: 14pt;
+}
+
+div.event-calendar-day-controls {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+}
+
+button.event-calendar-control-button {
+    /* border: 1px solid green; */
+    /* background-color: black; */
+    /* color: green; */
+    border-style: solid;
+    font-size: 16pt
+}
+
+div.inverted-color,
+span.inverted-color {
+    /* color: black;
+    background-color: green; */
+}
+
+div.fortune-message {
+    font-size: 14pt;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    justify-content: flex-end;
+    flex-grow: inherit;
+}
+
+/* div.fortune-message-mascot-wrapper {} */
+
+div.fortune-message-mascot-wrapper-small {
+    margin-left: 0;
+}
+
+div.next-event-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-grow: inherit;
+    gap: 0.5em;
+}
+
+/* div.event-mascot-wrapper {
+} */
+
+#fortune-canvas {
+    height: 120px;
+}
+
+#event-canvas {
+    height: 80px;
+}
+
+div.next-event-time {
+    font-size: 18pt;
+}
+
+div.next-event-shorttext {
+    font-size: 16pt;
+}
+
+div.loading-grid {
+    min-width: 3em;
+    min-height: 3em;
+    font-family: "Noto Sans JP";
+    font-size: 16pt;
+    display: grid;
+    grid-template-rows: 0.1fr 0.1fr;
+    grid-template-columns: 0.1fr 0.1fr;
+    grid-gap: 0.1em;
+    opacity: 1;
+    animation: loading-fade 0.5s linear infinite;
+    justify-self: center;
+    align-self: center;
+}
+
+div.loading-line {
+    font-family: "Noto Sans JP";
+    justify-self: center;
+    align-self: center;
+    opacity: 1;
+    animation: loading-fade 0.5s linear infinite;
+}
+
+@keyframes loading-fade {
+
+    0%,
+    100% {
+        opacity: 1
+    }
+
+    50% {
+        opacity: 0.7
+    }
+}
+
+div.fade-in {
+    opacity: 0;
+    animation: fade-in 0.2s linear;
+}
+
+div.fade-out {
+    opacity: 1;
+    animation: fade-out 0.2s linear;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
+}
+
+div.planner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+div.planner-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+div.planner-dow {
+    font-weight: bold;
+    text-align: center;
+}
+
+div.planner-date-cell {
+    border-style: solid;
+    padding: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+div.planner-event-count {
+    font-weight: bold;
+}
+
+div.planner-day-date {
+    font-weight: bold;
+}
+
+div.planner-event-time {
+    font-weight: bold;
+}
+span.planner-event-summary-time {
+    font-weight: bold;
+}
+
+div.status-note-small {
+    margin-left: auto;
+}
+
+/********************************************* Template vars follow ********************************/
+
+body {
+    color: {{.ForegroundColor}} !important;
+    background-color: {{.BackgroundColor}} !important;
+    font-family: {{.MainFont}} !important;
+    font-size: {{.BodyFontSize}} !important;
+}
+
+button {
+    font-family: {{.MainFont}} !important;
+}
+
+div.home-time {
+    font-family: {{.TimeFont}} !important;
+    color: {{.TimeColor}} !important;
+    font-size: {{.TimeFontSize}} !important;
+}
+
+.exposed {
+    color: {{.TimeColor}} !important;
+}
+
+div.home-date {
+    color: {{.TimeColor}} !important;
+    font-size: {{.DateFontSize}} !important;
+}
+
+div.home-box {
+    background-color: {{.BoxBackgroundColor}} !important;
+}
+
+div.border {
+    border-radius: {{.BoxBorderRadius}} !important;
+    border-width: {{.BoxBorderWidth}} !important;
+    border-color: {{.BoxBorderColor}} !important;
+}
+
+button.action-button {
+    border-radius: {{.ButtonBorderRadius}} !important;
+    border-width: {{.ButtonBorderWidth}} !important;
+    border-color: {{.ButtonBorderColor}} !important;
+    background-color: {{.ButtonBackgroundColor}} !important;
+    color: {{.ButtonForegroundColor}} !important;
+}
+
+button.forecast-control-button {
+    border-radius: {{.ButtonBorderRadius}} !important;
+    border-width: {{.ButtonBorderWidth}} !important;
+    border-color: {{.ButtonBorderColor}} !important;
+    background-color: {{.ButtonBackgroundColor}} !important;
+    color: {{.ButtonForegroundColor}} !important;
+}
+
+button.event-calendar-control-button {
+    border-radius: {{.ButtonBorderRadius}} !important;
+    border-width: {{.ButtonBorderWidth}} !important;
+    border-color: {{.ButtonBorderColor}} !important;
+    background-color: {{.ButtonBackgroundColor}} !important;
+    color: {{.ButtonForegroundColor}} !important;
+}
+
+div.inverted-color, span.inverted-color {
+    color: {{.BoxBackgroundColor}} !important;
+    background-color: {{.ForegroundColor}} !important;
+}
+
+div#theme-detection-canary {
+    color: rgb(255, 0, 0);
+}
+
+div.current-weather {
+    font-size: {{.CurrentWeatherFontSize}} !important;
+}
+
+button.action-button {
+    font-size: {{.ActionButtonFontSize}} !important;
+}
+
+button.switcher-button {
+    font-size: {{.SwitcherButtonFontSize}} !important;
+}
+
+div.astro {
+    font-size: {{.AstroFontSize}} !important;
+}
+
+div.weather-data {
+    font-size: {{.WeatherDataFontSize}} !important;
+}
+
+div.current-weather-icon {
+    font-size: {{.CurrentWeatherIconFontSize}} !important;
+}
+
+div.forecast-weather-icon {
+    font-size: {{.ForecastIconFontSize}} !important;
+}
+
+table.forecast-weather-table td.weather-icon {
+    font-size: {{.ForecastWeatherTableIconFontSize}} !important;
+}
+
+button.forecast-control-button {
+    font-size: {{.ForecastControlButtonFontSize}} !important;
+}
+
+div.forecast-control-label {
+    font-size: {{.ForecastControlLabelFontSize}} !important;
+}
+
+div.calendar-day-date {
+    font-size: {{.CalendarDayDateFontSize}} !important;
+}
+
+div.calendar-day {
+    font-size: {{.CalendarDayFontSize}} !important;
+}
+
+button.event-calendar-control-button {
+    font-size: {{.EventCalendarControlButtonFontSize}} !important;
+}
+
+div.fortune-message {
+    font-size: {{.FortuneMessageFontSize}} !important;
+}
+
+div.next-event-time {
+    font-size: {{.NextEventTimeFontSize}} !important;
+}
+
+div.next-event-shorttext {
+    font-size: {{.NextEventTextFontSize}} !important;
+}
+
+div.loading-grid {
+    font-size: {{.LoadingGridFontSize}} !important;
+}
+
+div#switcher-widget {
+    position: absolute !important;
+    left: {{.WidgetSwitcherX}} !important;
+    top: {{.WidgetSwitcherY}} !important;
+    width: {{.WidgetSwitcherWidth}} !important;
+    height: {{.WidgetSwitcherHeight}} !important;
+    overflow: hidden !important;
+}
+
+div#date-time {
+    position: absolute !important;
+    left: {{.DateTimeX}} !important;
+    top: {{.DateTimeY}} !important;
+    width: {{.DateTimeWidth}} !important;
+    height: {{.DateTimeHeight}} !important;
+    overflow: hidden !important;
+}
+
+div#action-center {
+    position: absolute !important;
+    left: {{.ActionCenterX}} !important;
+    top: {{.ActionCenterY}} !important;
+    width: {{.ActionCenterWidth}} !important;
+    height: {{.ActionCenterHeight}} !important;
+    overflow: hidden !important;
+}
+
+div#planner {
+    position: absolute !important;
+    left: {{.PlannerX}} !important;
+    top: {{.PlannerY}} !important;
+    width: {{.PlannerWidth}} !important;
+    height: {{.PlannerHeight}} !important;
+    overflow: hidden !important;
+}
+
+div.planner-date-cell {
+    border-radius: {{.BoxBorderRadius}};
+    border-width: {{.BoxBorderWidth}};
+    border-color: {{.BoxBorderColor}};
+    color: {{.ForegroundColor}};
+    width: {{.PlannerDateCellWidth}} !important;
+    height: {{.PlannerDateCellHeight}} !important;
+}
+
+div.planner-date-cell-events {
+    font-size: {{.PlannerDateCellFontSize}};
+}
+
+div.planner-event-count {
+    background-color: {{.ForegroundColor}};
+    color: {{.BoxBackgroundColor}};
+}
+
+div.status-note-indicator {
+    font-size: {{.StatusNoteFontSize}} !important;
+}
+
+button:disabled {
+    color: {{.DisabledButtonForegroundColor}};
+    border-color: {{.DisabledButtonBorderColor}};
+    background-color: {{.DisabledButtonBackgroundColor}};
+}
+
+.is-error {
+    color: {{.ErrorColor}} !important;
+}
+
+/**** CRT emulation ****/
+
+@keyframes textShadow {
+    0% {
+        text-shadow: 0.4389924193300864px 0 1px rgba(0, 30, 255, 0.1), -0.4389924193300864px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    5% {
+        text-shadow: 0.4389924193300864px 0 1px rgba(0, 30, 255, 0.1), -0.4389924193300864px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    10% {
+        text-shadow: 0.02956275843481219px 0 1px rgba(0, 30, 255, 0.1), -0.02956275843481219px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    15% {
+        text-shadow: 0.40218538552878136px 0 1px rgba(0, 30, 255, 0.1), -0.40218538552878136px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    20% {
+        text-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    25% {
+        text-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    30% {
+        text-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    35% {
+        text-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    40% {
+        text-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    45% {
+        text-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    50% {
+        text-shadow: 0.08084290417898504px 0 1px rgba(0, 30, 255, 0.1), -0.08084290417898504px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    55% {
+        text-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    60% {
+        text-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    65% {
+        text-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    70% {
+        text-shadow: 0.48874025155497314px 0 1px rgba(0, 30, 255, 0.1), -0.48874025155497314px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    75% {
+        text-shadow: 1.8948491305757957px 0 1px rgba(0, 30, 255, 0.1), -1.8948491305757957px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    80% {
+        text-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.1), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    85% {
+        text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.1), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    90% {
+        text-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    95% {
+        text-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.1), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    100% {
+        text-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.1), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+}
+
+@keyframes textShadowJank {
+    0% {
+        text-shadow: 0.4389924193300864px 0 1px rgba(0, 30, 255, 0.3), -0.4389924193300864px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    5% {
+        text-shadow: 2.7928974010788217px 0 1px rgba(0, 30, 255, 0.3), -2.7928974010788217px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    10% {
+        text-shadow: 0.02956275843481219px 0 1px rgba(0, 30, 255, 0.3), -0.02956275843481219px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    15% {
+        text-shadow: 0.40218538552878136px 0 1px rgba(0, 30, 255, 0.3), -0.40218538552878136px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    20% {
+        text-shadow: 3.4794037899852017px 0 1px rgba(0, 30, 255, 0.3), -3.4794037899852017px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    25% {
+        text-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.3), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    30% {
+        text-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.3), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    35% {
+        text-shadow: 3.896914047650351px 0 1px rgba(0, 30, 255, 0.3), -3.896914047650351px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    40% {
+        text-shadow: 3.870905614848819px 0 1px rgba(0, 30, 255, 0.3), -3.870905614848819px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    45% {
+        text-shadow: 2.231056963361899px 0 1px rgba(0, 30, 255, 0.3), -2.231056963361899px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    50% {
+        text-shadow: 0.08084290417898504px 0 1px rgba(0, 30, 255, 0.3), -0.08084290417898504px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    55% {
+        text-shadow: 2.3758461067427543px 0 1px rgba(0, 30, 255, 0.3), -2.3758461067427543px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    60% {
+        text-shadow: 2.202193051050636px 0 1px rgba(0, 30, 255, 0.3), -2.202193051050636px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    65% {
+        text-shadow: 2.8638780614874975px 0 1px rgba(0, 30, 255, 0.3), -2.8638780614874975px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    70% {
+        text-shadow: 0.48874025155497314px 0 1px rgba(0, 30, 255, 0.3), -0.48874025155497314px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    75% {
+        text-shadow: 1.8948491305757957px 0 1px rgba(0, 30, 255, 0.3), -1.8948491305757957px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    80% {
+        text-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.3), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    85% {
+        text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.5), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    90% {
+        text-shadow: 3.443339761481782px 0 1px rgba(0, 30, 255, 0.5), -3.443339761481782px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    95% {
+        text-shadow: 2.1841838852799786px 0 1px rgba(0, 30, 255, 0.5), -2.1841838852799786px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    100% {
+        text-shadow: 2.6208764473832513px 0 1px rgba(0, 30, 255, 0.5), -2.6208764473832513px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+}
+
+@keyframes boxShadow {
+    0% {
+        box-shadow: 0.4389924193300864px 0 1px rgba(0, 30, 255, 0.1), -0.4389924193300864px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    5% {
+        box-shadow: 0.4389924193300864px 0 1px rgba(0, 30, 255, 0.1), -0.4389924193300864px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    10% {
+        box-shadow: 0.02956275843481219px 0 1px rgba(0, 30, 255, 0.1), -0.02956275843481219px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    15% {
+        box-shadow: 0.40218538552878136px 0 1px rgba(0, 30, 255, 0.1), -0.40218538552878136px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    20% {
+        box-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    25% {
+        box-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    30% {
+        box-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    35% {
+        box-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    40% {
+        box-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    45% {
+        box-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    50% {
+        box-shadow: 0.08084290417898504px 0 1px rgba(0, 30, 255, 0.1), -0.08084290417898504px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    55% {
+        box-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    60% {
+        box-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    65% {
+        box-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.1), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    70% {
+        box-shadow: 0.48874025155497314px 0 1px rgba(0, 30, 255, 0.1), -0.48874025155497314px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    75% {
+        box-shadow: 1.8948491305757957px 0 1px rgba(0, 30, 255, 0.1), -1.8948491305757957px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    80% {
+        box-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.1), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    85% {
+        box-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.1), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    90% {
+        box-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.1), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    95% {
+        box-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.1), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+
+    100% {
+        box-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.1), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+    }
+}
+
+@keyframes boxShadowJank {
+    0% {
+        box-shadow: 0.4389924193300864px 0 1px rgba(0, 30, 255, 0.3), -0.4389924193300864px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    5% {
+        box-shadow: 2.7928974010788217px 0 1px rgba(0, 30, 255, 0.3), -2.7928974010788217px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    10% {
+        box-shadow: 0.02956275843481219px 0 1px rgba(0, 30, 255, 0.3), -0.02956275843481219px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    15% {
+        box-shadow: 0.40218538552878136px 0 1px rgba(0, 30, 255, 0.3), -0.40218538552878136px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    20% {
+        box-shadow: 3.4794037899852017px 0 1px rgba(0, 30, 255, 0.3), -3.4794037899852017px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    25% {
+        box-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.3), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    30% {
+        box-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.3), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    35% {
+        box-shadow: 3.896914047650351px 0 1px rgba(0, 30, 255, 0.3), -3.896914047650351px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    40% {
+        box-shadow: 3.870905614848819px 0 1px rgba(0, 30, 255, 0.3), -3.870905614848819px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    45% {
+        box-shadow: 2.231056963361899px 0 1px rgba(0, 30, 255, 0.3), -2.231056963361899px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    50% {
+        box-shadow: 0.08084290417898504px 0 1px rgba(0, 30, 255, 0.3), -0.08084290417898504px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    55% {
+        box-shadow: 2.3758461067427543px 0 1px rgba(0, 30, 255, 0.3), -2.3758461067427543px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    60% {
+        box-shadow: 2.202193051050636px 0 1px rgba(0, 30, 255, 0.3), -2.202193051050636px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    65% {
+        box-shadow: 2.8638780614874975px 0 1px rgba(0, 30, 255, 0.3), -2.8638780614874975px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    70% {
+        box-shadow: 0.48874025155497314px 0 1px rgba(0, 30, 255, 0.3), -0.48874025155497314px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    75% {
+        box-shadow: 1.8948491305757957px 0 1px rgba(0, 30, 255, 0.3), -1.8948491305757957px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    80% {
+        box-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.3), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    85% {
+        box-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.5), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    90% {
+        box-shadow: 3.443339761481782px 0 1px rgba(0, 30, 255, 0.5), -3.443339761481782px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    95% {
+        box-shadow: 2.1841838852799786px 0 1px rgba(0, 30, 255, 0.5), -2.1841838852799786px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+
+    100% {
+        box-shadow: 2.6208764473832513px 0 1px rgba(0, 30, 255, 0.5), -2.6208764473832513px 0 1px rgba(255, 0, 80, 0.2), 0 0 3px;
+    }
+}
+
+.crt::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(18, 16, 16, 0.1);
+    opacity: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.crt::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+}
+
+.crt:not(.crt-jank) {
+    text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.1), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+}
+
+.crt-jank {
+    animation: textShadowJank 1.6s infinite;
+}
+
+.crt-box:not(.crt-box-jank) {
+    text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.1), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.05), 0 0 3px;
+}
+
+.crt-box-jank {
+    animation: boxShadowJank 1.6s infinite;
+}

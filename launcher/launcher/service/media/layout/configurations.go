@@ -70,6 +70,8 @@ const borderWidth = "2px"
 
 func DefaultSevenInchLayout() v2.Theme {
 	return v2.Theme{
+		SkinName: "nostro",
+
 		ForegroundColor: fgColor,
 		BackgroundColor: bgColor,
 
@@ -147,6 +149,8 @@ func DefaultSevenInchLayout() v2.Theme {
 
 func DefaultTouch2Layout() v2.Theme {
 	return v2.Theme{
+		SkinName: "nostro",
+
 		ForegroundColor: fgColor,
 		BackgroundColor: bgColor,
 
@@ -226,6 +230,8 @@ func DefaultTouch2Layout() v2.Theme {
 
 func DefaultSmallLayout() v2.Theme {
 	return v2.Theme{
+		SkinName: "nostro",
+
 		ForegroundColor: fgColor,
 		BackgroundColor: bgColor,
 

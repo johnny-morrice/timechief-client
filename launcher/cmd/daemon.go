@@ -279,7 +279,12 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	videoApi, err := mediaapi.NewMediaAPI(videoService, pictureService)
+	mediaService, err := makeMediaService(ctx, defaultThemeService, videoService, pictureService, deviceDataStore, keyValueStore, mediaFilesystem)
+	if err != nil {
+		return err
+	}
+
+	videoApi, err := mediaapi.NewMediaAPI(mediaService)
 	if err != nil {
 		return err
 	}
@@ -325,11 +330,6 @@ func Daemon(ctx *cli.Context) error {
 	rootMux := http.NewServeMux()
 	apiMux := http.NewServeMux()
 	mediaMux := http.NewServeMux()
-
-	mediaService, err := makeMediaService(ctx, defaultThemeService, videoService, pictureService, deviceDataStore)
-	if err != nil {
-		return err
-	}
 
 	dataService := datasvc.MakeService(
 		mediaService,
@@ -436,12 +436,21 @@ func Daemon(ctx *cli.Context) error {
 	return http.ListenAndServe(addr, rootMux)
 }
 
-func makeMediaService(ctx *cli.Context, defaultThemeService layout.Service, videoService mediasvc.VideoService, pictureService mediasvc.PictureService, deviceDataStore store.DeviceDataStore) (datasvc.MediaService, error) {
+type MediaService interface {
+	VideoExists(fileName string) (bool, error)
+	PictureExists(fileName string) (bool, error)
+	IsThemeOverride() bool
+	GetTheme() (v2.Theme, error)
+	GetMedia() (mediasvc.Media, error)
+	GetFS() media.FS
+}
+
+func makeMediaService(ctx *cli.Context, defaultThemeService layout.Service, videoService mediasvc.VideoService, pictureService mediasvc.PictureService, deviceDataStore store.DeviceDataStore, kvStore store.KeyValueStore, fs media.FS) (MediaService, error) {
 	mediaFilePath := ctx.String("media-file")
 	if mediaFilePath == "" {
-		return mediasvc.MakeService(defaultThemeService, videoService, pictureService, deviceDataStore)
+		return mediasvc.MakeService(defaultThemeService, videoService, pictureService, deviceDataStore, kvStore, fs)
 	}
-	return mediasvc.MakeFileService(mediaFilePath, ctx.Duration("media-file-frequency"))
+	return mediasvc.MakeFileService(mediaFilePath, ctx.Duration("media-file-frequency"), fs)
 }
 
 func regenerateAppAPIKey(ctx *cli.Context, kvStore store.KeyValueStore) error {

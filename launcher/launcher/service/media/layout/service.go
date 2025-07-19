@@ -30,6 +30,11 @@ type Options struct {
 	Width           int
 	Height          int
 	Configurations  Configurations `validate:"required"`
+	ThemeOverride   ThemeOverrideService
+}
+
+type ThemeOverrideService interface {
+	GetTheme() (v2.Theme, error)
 }
 
 func (opt Options) validate() error {

@@ -87,27 +87,10 @@ type BucketFileLinks struct {
 
 // BucketFileMetadata defines model for BucketFileMetadata.
 type BucketFileMetadata struct {
-	Duration *int64  `json:"duration,omitempty"`
-	Link     *string `json:"link,omitempty"`
-	Theme    *struct {
-		BackgroundColor       string   `json:"background_color"`
-		BoxBackgroundColor    string   `json:"box_background_color"`
-		BoxBorderColor        string   `json:"box_border_color"`
-		BoxBorderRadius       string   `json:"box_border_radius"`
-		BoxBorderWidth        string   `json:"box_border_width"`
-		ButtonBackgroundColor string   `json:"button_background_color"`
-		ButtonBorderColor     string   `json:"button_border_color"`
-		ButtonBorderRadius    string   `json:"button_border_radius"`
-		ButtonBorderWidth     string   `json:"button_border_width"`
-		ButtonForegroundColor string   `json:"button_foreground_color"`
-		ForegroundColor       string   `json:"foreground_color"`
-		ImageFit              string   `json:"image_fit"`
-		ImageUuids            []string `json:"image_uuids"`
-		MainFont              string   `json:"main_font"`
-		MascotType            string   `json:"mascot_type"`
-		TimeColor             string   `json:"time_color"`
-		TimeFont              string   `json:"time_font"`
-	} `json:"theme,omitempty"`
+	Duration   *int64  `json:"duration,omitempty"`
+	Link       *string `json:"link,omitempty"`
+	PresetName *string `json:"preset_name,omitempty"`
+	SkinName   *string `json:"skin_name,omitempty"`
 }
 
 // BucketFilesDatum defines model for BucketFilesDatum.
@@ -400,6 +383,7 @@ type Theme struct {
 	PlannerWidth                       string   `json:"planner_width"`
 	PlannerX                           string   `json:"planner_x"`
 	PlannerY                           string   `json:"planner_y"`
+	SkinName                           string   `json:"skin_name"`
 	StatusNoteFontSize                 string   `json:"status_note_font_size"`
 	SwitcherButtonFontSize             string   `json:"switcher_button_font_size"`
 	TimeColor                          string   `json:"time_color"`
@@ -532,6 +516,12 @@ type ListThemesParams struct {
 	Offset int `form:"offset" json:"offset"`
 }
 
+// ApplyPresetThemeJSONBody defines parameters for ApplyPresetTheme.
+type ApplyPresetThemeJSONBody struct {
+	PresetName string `json:"preset_name"`
+	ThemeUuid  string `json:"theme_uuid"`
+}
+
 // ListVersionsParams defines parameters for ListVersions.
 type ListVersionsParams struct {
 	// Limit Number of versions to return
@@ -598,6 +588,9 @@ type CreateThemeJSONRequestBody = Theme
 
 // UpdateThemeJSONRequestBody defines body for UpdateTheme for application/json ContentType.
 type UpdateThemeJSONRequestBody = Theme
+
+// ApplyPresetThemeJSONRequestBody defines body for ApplyPresetTheme for application/json ContentType.
+type ApplyPresetThemeJSONRequestBody ApplyPresetThemeJSONBody
 
 // CreateVersionJSONRequestBody defines body for CreateVersion for application/json ContentType.
 type CreateVersionJSONRequestBody = Version
@@ -833,6 +826,11 @@ type ClientInterface interface {
 	UpdateThemeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateTheme(ctx context.Context, body UpdateThemeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ApplyPresetThemeWithBody request with any body
+	ApplyPresetThemeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ApplyPresetTheme(ctx context.Context, body ApplyPresetThemeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetThemeById request
 	GetThemeById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1544,6 +1542,30 @@ func (c *Client) UpdateThemeWithBody(ctx context.Context, contentType string, bo
 
 func (c *Client) UpdateTheme(ctx context.Context, body UpdateThemeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateThemeRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ApplyPresetThemeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewApplyPresetThemeRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ApplyPresetTheme(ctx context.Context, body ApplyPresetThemeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewApplyPresetThemeRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3401,6 +3423,46 @@ func NewUpdateThemeRequestWithBody(server string, contentType string, body io.Re
 	return req, nil
 }
 
+// NewApplyPresetThemeRequest calls the generic ApplyPresetTheme builder with application/json body
+func NewApplyPresetThemeRequest(server string, body ApplyPresetThemeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewApplyPresetThemeRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewApplyPresetThemeRequestWithBody generates requests for ApplyPresetTheme with any type of body
+func NewApplyPresetThemeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/theme/preset")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewGetThemeByIdRequest generates requests for GetThemeById
 func NewGetThemeByIdRequest(server string, id string) (*http.Request, error) {
 	var err error
@@ -3933,6 +3995,11 @@ type ClientWithResponsesInterface interface {
 	UpdateThemeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateThemeResponse, error)
 
 	UpdateThemeWithResponse(ctx context.Context, body UpdateThemeJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateThemeResponse, error)
+
+	// ApplyPresetThemeWithBodyWithResponse request with any body
+	ApplyPresetThemeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApplyPresetThemeResponse, error)
+
+	ApplyPresetThemeWithResponse(ctx context.Context, body ApplyPresetThemeJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyPresetThemeResponse, error)
 
 	// GetThemeByIdWithResponse request
 	GetThemeByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*GetThemeByIdResponse, error)
@@ -4895,6 +4962,27 @@ func (r UpdateThemeResponse) StatusCode() int {
 	return 0
 }
 
+type ApplyPresetThemeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r ApplyPresetThemeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ApplyPresetThemeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetThemeByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5554,6 +5642,23 @@ func (c *ClientWithResponses) UpdateThemeWithResponse(ctx context.Context, body 
 		return nil, err
 	}
 	return ParseUpdateThemeResponse(rsp)
+}
+
+// ApplyPresetThemeWithBodyWithResponse request with arbitrary body returning *ApplyPresetThemeResponse
+func (c *ClientWithResponses) ApplyPresetThemeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApplyPresetThemeResponse, error) {
+	rsp, err := c.ApplyPresetThemeWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseApplyPresetThemeResponse(rsp)
+}
+
+func (c *ClientWithResponses) ApplyPresetThemeWithResponse(ctx context.Context, body ApplyPresetThemeJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyPresetThemeResponse, error) {
+	rsp, err := c.ApplyPresetTheme(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseApplyPresetThemeResponse(rsp)
 }
 
 // GetThemeByIdWithResponse request returning *GetThemeByIdResponse
@@ -6630,6 +6735,22 @@ func ParseUpdateThemeResponse(rsp *http.Response) (*UpdateThemeResponse, error) 
 	}
 
 	response := &UpdateThemeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseApplyPresetThemeResponse parses an HTTP response from a ApplyPresetThemeWithResponse call
+func ParseApplyPresetThemeResponse(rsp *http.Response) (*ApplyPresetThemeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ApplyPresetThemeResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

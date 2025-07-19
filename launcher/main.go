@@ -169,8 +169,9 @@ func getCLIApp() *cli.App {
 					Value: credentialPath,
 				},
 				&cli.StringFlag{
-					Name:  "media-file",
-					Usage: "load media settings from file",
+					Name:    "media-file",
+					Usage:   "load media settings from file",
+					EnvVars: []string{"TIMECHIEF_MEDIA_FILE"},
 				},
 				&cli.DurationFlag{
 					Name:  "media-file-frequency",
