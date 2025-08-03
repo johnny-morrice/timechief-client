@@ -163,12 +163,19 @@ func (ci *connectionInstance) readWebsocket(ctx context.Context, heartbeatChan c
 		return fmt.Errorf("failed to decode from websocket message: %w", err)
 	}
 
-	if msg.Kind != "heartbeat" {
-		log.Printf("received non-heartbeat message: %v", wholeMessageBytes)
+	if msg.Kind == "heartbeat" {
+		// log.Printf("received heartbeat message: %v", wholeMessageBytes)
+		heartbeatChan <- true
 		return nil
 	}
 
-	heartbeatChan <- true
+	if msg.Kind == "data_version" {
+		// log.Printf("received data version message: %v", wholeMessageBytes)
+		ci.dataVersionCallback <- msg.Message
+		return nil
+	}
+
+	log.Printf("received unknown message kind: %s, message: %s", msg.Kind, msg.Message)
 
 	return nil
 }
@@ -206,7 +213,7 @@ func (ci *connectionInstance) doWriteHeartbeat(ctx context.Context) error {
 	return nil
 }
 
-func (ci *connectionInstance) stop(ctx context.Context) {
+func (ci *connectionInstance) stop() {
 	close(ci.stopChan)
 }
 

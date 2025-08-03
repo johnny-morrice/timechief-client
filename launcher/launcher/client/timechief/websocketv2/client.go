@@ -43,38 +43,44 @@ func MakeWebsocketClient(apiBaseURL string, authorizationHeaderProvider Authoriz
 
 func (wc *Client) Run(ctx context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
-	defer func() {
-		// Do not block shutdown.
-		cancel()
-	}()
+	defer cancel()
 
-	wsh, err := wc.makeWebsocketHandler("")
+	dwm, err := wc.makeDeviceWebsocketManager("")
 	if err != nil {
 		log.Println("error creating websocket handler:", err)
 		return
 	}
-	go wsh.run(ctx) // Start the websocket handler
+	defer func() {
+		dwm.stop()
+	}()
+
+	go dwm.run(ctx) // Start the websocket handler
 	for {
 		select {
 		case <-ctx.Done():
 			log.Println("context done, stopping websocket loop")
-			wsh.stop(ctx) // Ensure we close the stop channel
+			dwm.stop() // Ensure we close the stop channel
 			return
 		case deviceUUID := <-wc.deviceUUIDProvider:
-			wsh.stop(ctx) // Stop the current websocket handler
+			dwm.stop() // Stop the current websocket handler
 			if deviceUUID != "" {
-				wsh, err = wc.makeWebsocketHandler(deviceUUID)
+				dwm, err = wc.makeDeviceWebsocketManager(deviceUUID)
 				if err != nil {
 					log.Println("error creating websocket handler for deviceUUID:", deviceUUID, "error:", err)
 					return
 				}
-				go wsh.run(ctx) // Start the new websocket handler
+				go dwm.run(ctx) // Start the new websocket handler
 			}
 		}
 		time.Sleep(1 * time.Second) // Sleep to avoid busy waiting
 	}
 }
 
-func (wc *Client) makeWebsocketHandler(deviceUUID string) (*websocketHandler, error) {
-	panic("not implemented yet") // Placeholder for actual implementation
+func (wc *Client) makeDeviceWebsocketManager(deviceUUID string) (*deviceWebsocketManager, error) {
+	return makeDeviceWebsocketManager(
+		wc.apiBaseURL,
+		deviceUUID,
+		wc.dataVersionCallback,
+		wc.authorizationHeaderProvider,
+	)
 }
