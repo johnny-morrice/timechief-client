@@ -47,7 +47,10 @@ func MakeWebsocketWakeupService(cfgStore ConfigStore, adaptiveTick AdaptiveTick,
 	return svc, nil
 }
 
-func (svc Service) Run() error {
+func (svc Service) Run(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	cfg, err := svc.cfgStore.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get config: %w", err)
@@ -80,8 +83,6 @@ func (svc Service) Run() error {
 		return err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	go client.Run(ctx)
 
 	// Read the incoming data versions

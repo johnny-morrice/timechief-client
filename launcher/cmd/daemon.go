@@ -38,6 +38,7 @@ import (
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/versiondownload"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/video"
 	websetupservice "github.com/johnny-morrice/timechief-client/launcher/launcher/service/websetup"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/service/websocketwakeup"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/sound"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/system"
@@ -308,8 +309,12 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
-	// websocketWakeup := websocketWakeup.
+	websocketWakeup, err := websocketwakeup.MakeWebsocketWakeupService(cfgStore, ticker, keyValueStore)
+	if err != nil {
+		return fmt.Errorf("failed to make websocket wakeup service: %w", err)
+	}
 
+	go websocketWakeup.Run(ctx)
 	go fwDaemon.Start(ctx.Context)
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
