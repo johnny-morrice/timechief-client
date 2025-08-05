@@ -163,14 +163,20 @@ func (ci *connectionInstance) readWebsocket(ctx context.Context, heartbeatChan c
 		return fmt.Errorf("failed to decode from websocket message: %w", err)
 	}
 
-	if msg.Kind == "heartbeat" {
-		// log.Printf("received heartbeat message: %v", wholeMessageBytes)
-		heartbeatChan <- true
+	switch msg.Kind {
+	case "close":
+		log.Printf("received close message: %s", msg.Message)
+		close(heartbeatChan)
+	case "welcome":
+		log.Printf("received welcome message: %s", msg.Message)
+		heartbeatChan <- true // Signal that the websocket is running
 		return nil
-	}
-
-	if msg.Kind == "data_version" {
-		// log.Printf("received data version message: %v", wholeMessageBytes)
+	case "heartbeat":
+		// log.Printf("received heartbeat message: %s", msg.Message)
+		heartbeatChan <- true // Signal that the websocket is running
+		return nil
+	case "data_version":
+		// log.Printf("received data version message: %s", msg.Message)
 		ci.dataVersionCallback <- msg.Message
 		return nil
 	}
