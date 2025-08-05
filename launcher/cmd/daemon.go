@@ -314,7 +314,7 @@ func Daemon(ctx *cli.Context) error {
 		return fmt.Errorf("failed to make websocket wakeup service: %w", err)
 	}
 
-	go websocketWakeup.Run(ctx)
+	go websocketWakeup.Run(ctx.Context)
 	go fwDaemon.Start(ctx.Context)
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
