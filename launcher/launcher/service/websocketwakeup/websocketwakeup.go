@@ -3,16 +3,18 @@ package websocketwakeup
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/websocketv2"
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 )
 
 type Service struct {
+	cfgStore      ConfigStore
 	adaptiveTick  AdaptiveTick
 	keyValueStore KeyValueStore
-	apiBaseURL    string
 }
 
 type AdaptiveTick interface {
@@ -23,7 +25,37 @@ type KeyValueStore interface {
 	Get(key string) (string, error)
 }
 
+type ConfigStore interface {
+	GetConfig() (store.Config, error)
+}
+
+func MakeWebsocketWakeupService(cfgStore ConfigStore, adaptiveTick AdaptiveTick, keyValueStore KeyValueStore) (Service, error) {
+	if cfgStore == nil {
+		return Service{}, errors.New("configStore was nil")
+	}
+	if adaptiveTick == nil {
+		return Service{}, errors.New("adaptiveTick was nil")
+	}
+	if keyValueStore == nil {
+		return Service{}, errors.New("keyValueStore was nil")
+	}
+	svc := Service{
+		cfgStore:      cfgStore,
+		adaptiveTick:  adaptiveTick,
+		keyValueStore: keyValueStore,
+	}
+	return svc, nil
+}
+
 func (svc Service) Run() error {
+	cfg, err := svc.cfgStore.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get config: %w", err)
+	}
+	apiBaseURL := cfg.GetAPIBaseURL()
+	if apiBaseURL == "" {
+		panic("BUG: API base URL is not set in the config")
+	}
 	authHeaderProvider := func(ctx context.Context) (string, error) {
 		authHeader, err := svc.keyValueStore.Get("authorization")
 		if err != nil {
@@ -38,7 +70,7 @@ func (svc Service) Run() error {
 	dataVersionCallback := make(chan string)
 
 	client, err := websocketv2.MakeWebsocketClient(
-		svc.apiBaseURL,
+		apiBaseURL,
 		authHeaderProvider,
 		dataVersionCallback,
 		deviceUUIDProvider,

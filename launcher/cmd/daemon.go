@@ -308,6 +308,8 @@ func Daemon(ctx *cli.Context) error {
 		return err
 	}
 
+	// websocketWakeup := websocketWakeup.
+
 	go fwDaemon.Start(ctx.Context)
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
