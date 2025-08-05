@@ -166,7 +166,8 @@ func (ci *connectionInstance) readWebsocket(ctx context.Context, heartbeatChan c
 	switch msg.Kind {
 	case "close":
 		log.Printf("received close message: %s", msg.Message)
-		close(heartbeatChan)
+		myErr := fmt.Errorf("websocket connection closed: %s", msg.Message)
+		return errors.Join(errDeadWebsocketHandler, myErr)
 	case "welcome":
 		log.Printf("received welcome message: %s", msg.Message)
 		heartbeatChan <- true // Signal that the websocket is running
