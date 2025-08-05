@@ -95,8 +95,11 @@ func (dwm *deviceWebsocketManager) handleWebsocketConnection(ctx context.Context
 			HTTPHeader: map[string][]string{
 				"Authorization": {authHeader},
 			},
+			Subprotocols: []string{"timechief_heartbeat"},
 		}
-		conn, resp, err := websocket.Dial(ctx, dwm.getDeviceWebsocketURL(), options)
+		websocketURL := dwm.getDeviceWebsocketURL()
+		log.Printf("connecting to websocket URL: %s", websocketURL)
+		conn, resp, err := websocket.Dial(ctx, websocketURL, options)
 		if err != nil {
 			return fmt.Errorf("failed to connect to websocket: %w", err)
 		}
@@ -119,5 +122,5 @@ func (dwm *deviceWebsocketManager) stop() {
 }
 
 func (dwm *deviceWebsocketManager) getDeviceWebsocketURL() string {
-	return fmt.Sprintf("%s/api/v2/data/%s/ws", dwm.apiBaseURL, dwm.deviceUUID)
+	return fmt.Sprintf("%s/data/%s/ws", dwm.apiBaseURL, dwm.deviceUUID)
 }

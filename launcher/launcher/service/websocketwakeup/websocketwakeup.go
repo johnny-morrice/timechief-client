@@ -2,11 +2,13 @@ package websocketwakeup
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/authzero"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/client/timechief/websocketv2"
 	"github.com/johnny-morrice/timechief-client/launcher/launcher/store"
 )
@@ -67,14 +69,16 @@ func (svc Service) doRun(ctx context.Context) error {
 		panic("BUG: API base URL is not set in the config")
 	}
 	authHeaderProvider := func(ctx context.Context) (string, error) {
-		authHeader, err := svc.keyValueStore.Get("authorization")
+		accessTokenText, err := svc.keyValueStore.Get(store.AccessTokenKey)
 		if err != nil {
 			return "", err
 		}
-		if authHeader == "" {
-			return "", errors.New("authorization header is empty")
+		accessToken := authzero.AccessTokenResp{}
+		err = json.Unmarshal([]byte(accessTokenText), &accessToken)
+		if err != nil {
+			return "", fmt.Errorf("failed to decode access token: %v", err)
 		}
-		return authHeader, nil
+		return fmt.Sprintf("Bearer %s", accessToken.AccessToken), nil
 	}
 	deviceUUIDProvider := make(chan string)
 	dataVersionCallback := make(chan string)
@@ -100,6 +104,7 @@ func (svc Service) doRun(ctx context.Context) error {
 				continue
 			}
 			lastDataVersion = dataVersion
+			log.Printf("websocket wakeup service received new data version: %s", dataVersion)
 			svc.adaptiveTick.Poke() // Notify the adaptive tick to adjust its timing
 		}
 	}()
@@ -113,7 +118,7 @@ func (svc Service) doRun(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		default:
-			deviceUUID, err := svc.keyValueStore.Get("device-uuid")
+			deviceUUID, err := svc.keyValueStore.Get(store.DeviceUUIDKey)
 			if err != nil {
 				log.Printf("error getting device UUID: %v", err)
 				continue
@@ -123,6 +128,7 @@ func (svc Service) doRun(ctx context.Context) error {
 			}
 			lastDeviceUUID = deviceUUID
 			if deviceUUID != "" {
+				log.Printf("websocket wakeup service now handling device UUID: %s", deviceUUID)
 				deviceUUIDProvider <- deviceUUID
 			}
 		}
