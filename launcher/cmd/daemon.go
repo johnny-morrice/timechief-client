@@ -314,7 +314,6 @@ func Daemon(ctx *cli.Context) error {
 		return fmt.Errorf("failed to make websocket wakeup service: %w", err)
 	}
 
-	go websocketWakeup.Run(ctx.Context)
 	go fwDaemon.Start(ctx.Context)
 	go wifiLoad.Start(ctx)
 	go wifiConn.Start(ctx)
@@ -332,6 +331,7 @@ func Daemon(ctx *cli.Context) error {
 	go videoDownload.Start(ctx)
 	go pictureDownloader.Start(ctx)
 	go telemetryDaemon.Start(ctx.Context)
+	go websocketWakeup.Run(ctx.Context)
 
 	addr := ctx.String("listen-addr")
 	rootMux := http.NewServeMux()

@@ -47,7 +47,14 @@ func MakeWebsocketWakeupService(cfgStore ConfigStore, adaptiveTick AdaptiveTick,
 	return svc, nil
 }
 
-func (svc Service) Run(ctx context.Context) error {
+func (svc Service) Run(ctx context.Context) {
+	err := svc.doRun(ctx)
+	if err != nil {
+		log.Printf("websocket wakeup service failed: %v", err)
+	}
+}
+
+func (svc Service) doRun(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
