@@ -24,6 +24,9 @@ func MakeMediaDownloader(timeout time.Duration) (MediaDownloader, error) {
 }
 
 func (md MediaDownloader) Download(ctx context.Context, url string, sha256 []byte) ([]byte, error) {
+	if url == "" {
+		return nil, fmt.Errorf("url is required")
+	}
 	content, err := md.doDownload(ctx, url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to download content at: %s: %w", url, err)
@@ -40,15 +43,15 @@ func (md MediaDownloader) doDownload(ctx context.Context, url string) ([]byte, e
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create video content request: %w", err)
+		return nil, fmt.Errorf("failed to create media content request: %w", err)
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to download video content: %w", err)
+		return nil, fmt.Errorf("failed to download media content: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to download video content: status code %d", resp.StatusCode)
+		return nil, fmt.Errorf("failed to download media content: status code %d", resp.StatusCode)
 	}
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
