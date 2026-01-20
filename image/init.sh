@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+set -e
 
 ## clone pi-gen
-git clone --depth 1 --branch arm64 https://github.com/RPI-Distro/pi-gen.git
+git clone --branch arm64 https://github.com/RPI-Distro/pi-gen.git
 
 ## TODO fix build
 pushd pi-gen
